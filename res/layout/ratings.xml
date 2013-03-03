@@ -15,14 +15,14 @@
 
       <TextView android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Ratings improve GroupStreamer's effectiveness."/>
+          android:text="@string/ratings_improve_gs"/>
 
       <CheckBox
           android:id="@+id/unratedCheckBox"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:enabled="false"
-          android:text="Show only unrated songs" />
+          android:text="@string/ratings_show_unrated_only" />
 
     </LinearLayout>
 
