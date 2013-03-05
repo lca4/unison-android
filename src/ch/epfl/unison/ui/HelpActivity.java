@@ -7,7 +7,8 @@ import com.actionbarsherlock.app.SherlockActivity;
 
 public class HelpActivity extends SherlockActivity {
 
-    private static final String TAG = "ch.epfl.unison.HelpActivity";
+    @SuppressWarnings("unused")
+	private static final String TAG = "ch.epfl.unison.HelpActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

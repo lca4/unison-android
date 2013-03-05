@@ -1,16 +1,24 @@
 package ch.epfl.unison.api;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
@@ -28,18 +36,19 @@ public class Request<T extends JsonStruct> {
         System.setProperty("http.keepAlive", "false");
     }
 
+    private static final String ENCODING = "UTF-8";
     private static final int CONNECT_TIMEOUT = 30 * 1000;  // In ms.
     private static final int READ_TIMEOUT = 30 * 1000;  // In ms.
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    private UnisonURLWrapper url;
+    private URL url;
     private Class<T> classOfT;
 
     private String auth;
     private Map<String, List<String>> data;
 
-    private Request(UnisonURLWrapper url, Class<T> classOfT) {
+    private Request(URL url, Class<T> classOfT) {
         this.url = url;
 
         // We need this to be able to instantiate the correct JSONStruct.
@@ -47,7 +56,7 @@ public class Request<T extends JsonStruct> {
     }
 
     public static <S extends JsonStruct> Request<S> of(
-    		UnisonURLWrapper url, Class<S> classOfS) {
+    		URL url, Class<S> classOfS) {
         return new Request<S>(url, classOfS);
     }
 
@@ -70,65 +79,74 @@ public class Request<T extends JsonStruct> {
     }
 
     public Result<T> doGET() {
-        return this.execute("GET");
+        return this.execute(new HttpGet());
     }
 
     public Result<T> doPOST() {
-        return this.execute("POST");
+        return this.execute(new HttpPost());
     }
 
     public Result<T> doPUT() {
-        return this.execute("PUT");
+        return this.execute(new HttpPut());
     }
 
     public Result<T> doDELETE() {
-        return this.execute("DELETE");
+        return this.execute(new HttpDelete());
     }
 
-    private Result<T> execute(String method) {
-        Log.i(TAG, String.format("%s request to %s", method, this.url.toString()));
-        HttpURLConnection conn = null;
-        String response = null;
-
+    private Result<T> execute(HttpRequestBase request) {
+    	try {
+			request.setURI(this.url.toURI());
+		} catch (URISyntaxException e) {
+			//This should never happen
+			return new Result<T>(new UnisonAPI.Error(0, "", "", e));
+		}
+        Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
+        String responseContent = null;
+        HttpResponse response = null;
+        StatusLine responseStatusLine = null;
+        
         try {
-            conn = (HttpURLConnection) this.url.openConnection();
-            conn.setRequestMethod(method);
-
             // Configure some sensible defaults.
-            conn.setConnectTimeout(CONNECT_TIMEOUT);
-            conn.setReadTimeout(READ_TIMEOUT);
-            conn.setInstanceFollowRedirects(false);
+            //Timeout setting could also be done in client, we choose to keep it here for better readability.
+            request.getParams().setParameter("http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
+            request.getParams().setParameter("http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
+            
 
             if (this.auth != null) {
                 // Set a raw HTTP Basic Auth header (java.net.Authenticator has issues).
-                conn.setRequestProperty("Authorization", "Basic " + this.auth);
+                request.addHeader("Authorization", "Basic " + this.auth);
             }
 
-            if (this.data != null) {
+            if (this.data != null && request instanceof HttpEntityEnclosingRequestBase) {
                 // Write out the request body (i.e. the form data).
-                conn.setDoOutput(true);
-                String data = generateQueryString(this.data);
-                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-                out.write(data);
-                out.close();
+            	String data = generateQueryString(this.data);
+            	((HttpEntityEnclosingRequestBase) request).setEntity(new StringEntity(data, ENCODING));
             }
 
             try {
                 // Get the response as a string.
-                response = streamToString(conn.getInputStream());
+            	response = HttpClientFactory.getInstance().execute(request);
+            	responseStatusLine = response.getStatusLine();
+//            	Log.d(TAG, "status = " + responseStatusLine.toString());
+            	responseContent = response.getEntity() == null ? null : EntityUtils
+        				.toString(response.getEntity());
             } catch(IOException ioe) {
                 // Happens when the server returns an error status code.
-                response = streamToString(conn.getErrorStream());
+            	responseContent = responseStatusLine == null ? null : responseStatusLine.getReasonPhrase();
             }
 
-            if (conn.getResponseCode() < 200 || conn.getResponseCode() > 299) {
+            int status = responseStatusLine.getStatusCode();
+            
+            if (status < 200 || status > 299) {
                 // We didn't receive a 2xx status code - we treat it as an error.
-                JsonStruct.Error jsonError = GSON.fromJson(response, JsonStruct.Error.class);
-                return new Result<T>(new UnisonAPI.Error(conn.getResponseCode(),
-                        conn.getResponseMessage(), response, jsonError));
+                JsonStruct.Error jsonError = GSON.fromJson(responseContent, JsonStruct.Error.class);
+                return new Result<T>(new UnisonAPI.Error(status,
+                		responseStatusLine.toString(), responseContent, jsonError));
             } else {
                 // Success.
-                T jsonStruct = GSON.fromJson(response, this.classOfT);
+//            	Log.d(TAG, "received: " + responseContent);
+                T jsonStruct = GSON.fromJson(responseContent, this.classOfT);
                 return new Result<T>(jsonStruct);
             }
 
@@ -137,18 +155,16 @@ public class Request<T extends JsonStruct> {
             // - IOException, thrown by most HttpURLConnection methods,
             // - NullPointerException. if there's not InputStream nor ErrorStream,
             // - JsonSyntaxException, if we fail to decode the server's response.
-            Log.w(TAG, "caught exception while handling request", e);
+            Log.e(TAG, "caught exception while handling request", e);
             int statusCode = 0;
             String statusMessage = null;
             try {
-                statusCode = conn.getResponseCode();
-                statusMessage = conn.getResponseMessage();
+                statusCode = responseStatusLine.getStatusCode();
+                statusMessage = responseStatusLine.getReasonPhrase();
             } catch(Exception foobar) {}
 
-            return new Result<T>(new UnisonAPI.Error(statusCode, statusMessage, response, e));
+            return new Result<T>(new UnisonAPI.Error(statusCode, statusMessage, responseContent, e));
 
-        } finally {
-            conn.disconnect();
         }
     }
 
@@ -166,16 +182,6 @@ public class Request<T extends JsonStruct> {
                     builder.append('&' + encKey + '=' + encValue);
                 }
             }
-        }
-        return builder.toString();
-    }
-
-    private static String streamToString(InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        StringBuilder builder = new StringBuilder();
-        String line;
-        while((line = reader.readLine()) != null) {
-            builder.append(line).append('\n');
         }
         return builder.toString();
     }

@@ -1,5 +1,7 @@
 package ch.epfl.unison.api;
 
+import java.net.URL;
+
 import android.os.AsyncTask;
 
 
@@ -17,13 +19,13 @@ public class AsyncRequest<T extends JsonStruct>
     }
 
 
-    private AsyncRequest(UnisonURLWrapper url, UnisonAPI.Handler<T> handler, Class<T> classOfT) {
+    private AsyncRequest(URL url, UnisonAPI.Handler<T> handler, Class<T> classOfT) {
         this.request = Request.of(url, classOfT);
         this.handler = handler;
     }
 
     public static <S extends JsonStruct> AsyncRequest<S> of(
-    		UnisonURLWrapper url, UnisonAPI.Handler<S> handler, Class<S> classOfS) {
+    		URL url, UnisonAPI.Handler<S> handler, Class<S> classOfS) {
         return new AsyncRequest<S>(url, handler, classOfS);
     }
 
