@@ -1,7 +1,6 @@
 package ch.epfl.unison.api;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import android.util.Base64;
 
@@ -13,7 +12,7 @@ public class UnisonAPI {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.UnisonAPI";
-
+    
     private static final String API_ROOT = "https://api.groupstreamer.com";
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
@@ -38,129 +37,129 @@ public class UnisonAPI {
     }
 
     public void login(Handler<JsonStruct.User> handler) {
-        URL url = urlFor("/");
+    	UnisonURLWrapper url = urlFor("/");
         AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void createUser(String email, String password,
             Handler<JsonStruct.User> handler) {
-        URL url = urlFor("/users");
+    	UnisonURLWrapper url = urlFor("/users");
         AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .addParam("email", email).addParam("password", password).doPOST();
     }
 
     public void getNickname(long uid, Handler<JsonStruct.User> handler) {
-        URL url = urlFor("/users/%d/nickname", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/nickname", uid);
         AsyncRequest.of(url, handler, JsonStruct.User.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void setNickname(long uid, String nickname, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/nickname", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/nickname", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("nickname", nickname).setAuth(this.auth).doPUT();
     }
 
     public void setEmail(long uid, String email, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/email", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/email", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("email", email).setAuth(this.auth).doPUT();
     }
 
     public void setPassword(long uid, String password, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/password", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/password", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("password", password).setAuth(this.auth).doPUT();
     }
 
     public void joinGroup(long uid, long gid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/group", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/group", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("gid", gid).setAuth(this.auth).doPUT();
     }
 
     public void leaveGroup(long uid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/group", uid);
+    	UnisonURLWrapper url = urlFor("/users/%d/group", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
     public void listGroups(Handler<JsonStruct.GroupsList> handler) {
-        URL url = urlFor("/groups");
+    	UnisonURLWrapper url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void listGroups(double lat, double lon, Handler<JsonStruct.GroupsList> handler) {
-        URL url = urlFor("/groups?lat=%f&lon=%f", lat, lon);
+    	UnisonURLWrapper url = urlFor("/groups?lat=%f&lon=%f", lat, lon);
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void createGroup(String name, double lat, double lon,
             Handler<JsonStruct.GroupsList> handler) {
-        URL url = urlFor("/groups");
+    	UnisonURLWrapper url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .addParam("name", name).addParam("lat", lat)
                 .addParam("lon", lon).setAuth(this.auth).doPOST();
     }
 
     public void getGroupInfo(long gid, Handler<JsonStruct.Group> handler) {
-        URL url = urlFor("/groups/%d", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d", gid);
         AsyncRequest.of(url, handler, JsonStruct.Group.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void getNextTracks(long gid, Handler<JsonStruct.TracksList> handler) {
-        URL url = urlFor("/groups/%d/tracks", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/tracks", gid);
         AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void getPlaylistId(long gid, final Handler<JsonStruct.TracksList> handler) {
-        URL url = urlFor("/groups/%d/playlist", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/playlist", gid);
         AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void setCurrentTrack(long gid, String artist, String title,
             Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/groups/%d/current", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/current", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("artist", artist).addParam("title", title)
                 .setAuth(this.auth).doPUT();
     }
 
     public void skipTrack(long gid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/groups/%d/current", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/current", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
     public void instantRate(long gid, String artist, String title, int rating,
             Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/groups/%d/ratings", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/ratings", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("artist", artist).addParam("title", title).addParam("rating", rating)
                 .setAuth(this.auth).doPOST();
     }
 
     public void becomeMaster(long gid, long uid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/groups/%d/master", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/master", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("uid", uid).setAuth(this.auth).doPUT();
     }
 
     public void resignMaster(long gid, long uid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/groups/%d/master", gid);
+    	UnisonURLWrapper url = urlFor("/groups/%d/master", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(this.auth).doDELETE();
     }
 
     public Request.Result<JsonStruct.Success> uploadLibrarySync(
             long uid, Iterable<JsonStruct.Track> tracks) {
-        URL url = urlFor("/libentries/%d", uid);
+    	UnisonURLWrapper url = urlFor("/libentries/%d", uid);
         Request<JsonStruct.Success> request = Request.of(url, JsonStruct.Success.class)
                 .setAuth(this.auth);
         for (JsonStruct.Track track : tracks) {
@@ -171,7 +170,7 @@ public class UnisonAPI {
 
     public Request.Result<JsonStruct.Success> updateLibrarySync(
             long uid, Iterable<JsonStruct.Delta> deltas) {
-        URL url = urlFor("/libentries/%d/batch", uid);
+    	UnisonURLWrapper url = urlFor("/libentries/%d/batch", uid);
         Request<JsonStruct.Success> request = Request.of(url, JsonStruct.Success.class)
                 .setAuth(this.auth);
         for (JsonStruct.Delta delta : deltas) {
@@ -181,22 +180,22 @@ public class UnisonAPI {
     }
 
     public void getRatings(long uid, Handler<JsonStruct.TracksList> handler) {
-        URL url = urlFor("/libentries/%d/ratings", uid);
+    	UnisonURLWrapper url = urlFor("/libentries/%d/ratings", uid);
         AsyncRequest.of(url, handler, JsonStruct.TracksList.class)
                 .setAuth(this.auth).doGET();
     }
 
     public void rate(long uid, String artist, String title, int rating,
             Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/libentries/%d/ratings", uid);
+    	UnisonURLWrapper url = urlFor("/libentries/%d/ratings", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class).setAuth(this.auth)
                 .addParam("artist", artist).addParam("title", title)
                 .addParam("rating", rating).doPOST();
     }
 
-    private static URL urlFor(String suffix, Object... objects) {
+    private static UnisonURLWrapper urlFor(String suffix, Object... objects) {
         try {
-            return new URL(API_ROOT + String.format(suffix, objects));
+            return new UnisonURLWrapper(API_ROOT + String.format(suffix, objects));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

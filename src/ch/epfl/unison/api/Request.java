@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,13 +33,13 @@ public class Request<T extends JsonStruct> {
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    private URL url;
+    private UnisonURLWrapper url;
     private Class<T> classOfT;
 
     private String auth;
     private Map<String, List<String>> data;
 
-    private Request(URL url, Class<T> classOfT) {
+    private Request(UnisonURLWrapper url, Class<T> classOfT) {
         this.url = url;
 
         // We need this to be able to instantiate the correct JSONStruct.
@@ -48,7 +47,7 @@ public class Request<T extends JsonStruct> {
     }
 
     public static <S extends JsonStruct> Request<S> of(
-            URL url, Class<S> classOfS) {
+    		UnisonURLWrapper url, Class<S> classOfS) {
         return new Request<S>(url, classOfS);
     }
 
