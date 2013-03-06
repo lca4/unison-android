@@ -3,7 +3,6 @@ package ch.epfl.unison.api;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,7 +19,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
@@ -124,8 +122,6 @@ public class Request<T extends JsonStruct> {
 
             if (this.data != null && request instanceof HttpEntityEnclosingRequestBase) {
                 // Write out the request body (i.e. the form data).
-            	String data = generateQueryString(this.data);
-            	Log.d(TAG, "Sending the following content = " + data);
 //            	request.setHeader("", data);
 //            	((HttpEntityEnclosingRequestBase) request).setEntity(new StringEntity(data, ENCODING));
             	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
