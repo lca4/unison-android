@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -18,6 +21,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
@@ -121,7 +125,12 @@ public class Request<T extends JsonStruct> {
             if (this.data != null && request instanceof HttpEntityEnclosingRequestBase) {
                 // Write out the request body (i.e. the form data).
             	String data = generateQueryString(this.data);
-            	((HttpEntityEnclosingRequestBase) request).setEntity(new StringEntity(data, ENCODING));
+            	Log.d(TAG, "Sending the following content = " + data);
+//            	request.setHeader("", data);
+//            	((HttpEntityEnclosingRequestBase) request).setEntity(new StringEntity(data, ENCODING));
+            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
+//            	Log.d(TAG, "entity = " + EntityUtils.toString(((HttpEntityEnclosingRequestBase) request).getEntity()));
+//            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
             }
 
             try {
@@ -167,23 +176,15 @@ public class Request<T extends JsonStruct> {
 
         }
     }
-
-    private static String generateQueryString(Map<String, List<String>> data) {
-        StringBuilder builder = new StringBuilder();
-        boolean isFirst = true;
-        for (Map.Entry<String, List<String>> entry : data.entrySet()) {
-            String encKey = URLEncoder.encode(entry.getKey());
-            for (String value : entry.getValue()) {
-                String encValue = URLEncoder.encode(value);
-                if (isFirst) {
-                    builder.append(encKey + '=' + encValue);
-                    isFirst = false;
-                } else {
-                    builder.append('&' + encKey + '=' + encValue);
-                }
-            }
-        }
-        return builder.toString();
+    
+    private static List<NameValuePair> generateQueryNVP(Map<String, List<String>> data) {
+    	List<NameValuePair> nvp = new ArrayList<NameValuePair>();
+		for (Map.Entry<String, List<String>> entry : data.entrySet()) {
+			for (String value : entry.getValue()) {
+				nvp.add(new BasicNameValuePair(entry.getKey(), value));
+			}
+		}
+		return nvp;
     }
 
     public static class Result<S> {
