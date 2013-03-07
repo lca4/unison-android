@@ -27,6 +27,7 @@ import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
@@ -195,11 +196,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     private void showHelpDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-        alert.setTitle("Welcome");
-        alert.setMessage("Want to learn how to use the application ?");
+        alert.setTitle(getString(R.string.groups_helpdialog_title));
+        alert.setMessage(getString(R.string.groups_helpdialog_message));
 
         final CheckBox cbox = new CheckBox(this);
-        cbox.setText("Don't show this again");
+        cbox.setText(getString(R.string.groups_helpdialog_chkbox));
         alert.setView(cbox);
 
         DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
@@ -215,8 +216,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             }
         };
 
-        alert.setPositiveButton("Yes", click);
-        alert.setNegativeButton("No, thanks", click);
+        alert.setPositiveButton(getString(R.string.groups_helpdialog_yesBtn), click);
+        alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
         alert.show();
     }
 
@@ -256,14 +257,14 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         public void onClick(View v) {
             AlertDialog.Builder alert = new AlertDialog.Builder(GroupsActivity.this);
 
-            alert.setTitle("New Group");
-            alert.setMessage("Pick a name for the group:");
+            alert.setTitle(getString(R.string.groups_alert_newgroup_title));
+            alert.setMessage(getString(R.string.groups_alert_newgroup_message));
 
             // Set an EditText view to get user input
             final EditText input = new EditText(GroupsActivity.this);
             alert.setView(input);
 
-            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok), new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String name = input.getText().toString();
@@ -296,7 +297,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 }
             });
 
-            alert.setNegativeButton("Cancel", null);
+            alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
             alert.show();
         }
     }
@@ -312,7 +313,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
                 public void callback(Success struct) {
                     GroupsActivity.this.startActivity(new Intent(GroupsActivity.this, MainActivity.class)
-                            .putExtra("gid", group.gid).putExtra("name", group.name));
+                            .putExtra(PreferenceKeys.GID_KEY, group.gid).putExtra(PreferenceKeys.NAME_KEY, group.name));
                 }
 
                 public void onError(Error error) {

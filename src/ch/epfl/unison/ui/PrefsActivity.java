@@ -11,6 +11,7 @@ import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
@@ -38,10 +39,10 @@ public class PrefsActivity extends SherlockPreferenceActivity {
         this.setTitle(R.string.activity_title_prefs);
         this.addPreferencesFromResource(R.xml.prefs);
 
-        this.findPreference("nickname").setOnPreferenceChangeListener(
+        this.findPreference(PreferenceKeys.NICKNAME_KEY).setOnPreferenceChangeListener(
                 new NicknameChangeListener());
 
-        this.findPreference("uid").setSummary(
+        this.findPreference(PreferenceKeys.UID_KEY).setSummary(
                 String.format("your UID is: %d", AppData.getInstance(this).getUid()));
     }
 

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="No track playing"
+        android:text="@string/stats_not_playing"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
     <TextView
@@ -22,7 +22,7 @@
         android:layout_below="@id/trackTitle"
         android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="How do people like this song ?" />
+        android:text="@string/stats_taste" />
   </RelativeLayout>
 
   <ListView

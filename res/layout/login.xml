@@ -19,7 +19,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:inputType="textEmailAddress"
-      android:hint="E-mail address"
+      android:hint="@string/login_email_hint"
       android:layout_marginLeft="40dp"
       android:layout_marginRight="40dp" >
   </EditText>
@@ -31,7 +31,8 @@
       android:inputType="textPassword"
       android:layout_marginLeft="40dp"
       android:layout_marginRight="40dp"
-      android:hint="Password" />
+      android:hint="@string/login_password_hint" >
+  </EditText>
 
   <Button
       android:id="@+id/loginBtn"
@@ -40,13 +41,13 @@
       android:layout_marginTop="20dp"
       android:layout_marginLeft="40dp"
       android:layout_marginRight="40dp"
-      android:text="Log In" />
+      android:text="@string/login_loginBtn" />
 
   <TextView
       android:id="@+id/signupTxt"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="80dp"
-      android:text="New to GroupStreamer ?" />
+      android:text="@string/login_signup" />
 
 </LinearLayout>

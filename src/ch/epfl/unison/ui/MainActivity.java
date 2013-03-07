@@ -22,6 +22,7 @@ import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -92,15 +93,15 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey("gid")) {
+        if (extras == null || !extras.containsKey(PreferenceKeys.GID_KEY)) {
             // Should never happen. If it does, redirect the user to the groups list.
             this.startActivity(new Intent(this, GroupsActivity.class));
             this.finish();
         } else {
-            this.groupId = extras.getLong("gid");
+            this.groupId = extras.getLong(PreferenceKeys.GID_KEY);
             Log.i(TAG, "joined group " + this.groupId);
-            if (extras.containsKey("name")) {
-                this.setTitle(extras.getString("name"));
+            if (extras.containsKey(PreferenceKeys.NAME_KEY)) {
+                this.setTitle(extras.getString(PreferenceKeys.NAME_KEY));
             }
         }
     }

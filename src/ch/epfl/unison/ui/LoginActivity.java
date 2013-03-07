@@ -17,6 +17,7 @@ import ch.epfl.unison.AppData;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
@@ -25,7 +26,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 public class LoginActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.LoginActivity";
-
+    
     private Button loginBtn;
     private TextView signupTxt;
 
@@ -41,7 +42,7 @@ public class LoginActivity extends SherlockActivity {
         this.password = (EditText) findViewById(R.id.password);
 
         this.signupTxt = (TextView) findViewById(R.id.signupTxt);
-        this.signupTxt.setText(Html.fromHtml("New to GroupStreamer? <a href=\"#\">Sign up</a>."));
+        this.signupTxt.setText(Html.fromHtml(getString(R.string.login_signup_html)));
         this.signupTxt.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class));
@@ -67,15 +68,15 @@ public class LoginActivity extends SherlockActivity {
         super.onStart();
 
         Bundle extras = this.getIntent().getExtras();
-        if (extras != null && extras.getBoolean("logout")) {
+        if (extras != null && extras.getBoolean(PreferenceKeys.LOGOUT_KEY)) {
             Log.d(TAG, "logging out");
             // Remove e-mail and password from the preferences.
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.remove("email");
-            editor.remove("password");
-            editor.remove("uid");
-            editor.remove("lastupdate");
+            editor.remove(PreferenceKeys.EMAIL_KEY);
+            editor.remove(PreferenceKeys.PASSWORD_KEY);
+            editor.remove(PreferenceKeys.UID_KEY);
+            editor.remove(PreferenceKeys.LASTUPDATE_KEY);
             editor.commit();
 
             // Truncate the library.
@@ -83,16 +84,16 @@ public class LoginActivity extends SherlockActivity {
 
         } else if (extras != null) {
             // We're coming from the signup form (whether native or online).
-            String email = extras.getString("email");
-            String password = extras.getString("password");
+            String email = extras.getString(PreferenceKeys.EMAIL_KEY);
+            String password = extras.getString(PreferenceKeys.PASSWORD_KEY);
             if (email != null && password != null) {
                 // Login information is in the intent.
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("email", email);
-                editor.putString("password", password);
-                editor.remove("uid");
-                editor.remove("lastupdate");
+                editor.putString(PreferenceKeys.EMAIL_KEY, email);
+                editor.putString(PreferenceKeys.PASSWORD_KEY, password);
+                editor.remove(PreferenceKeys.UID_KEY);
+                editor.remove(PreferenceKeys.LASTUPDATE_KEY);
                 editor.commit();
 
                 // Truncate the library. You never know.
@@ -102,8 +103,8 @@ public class LoginActivity extends SherlockActivity {
 
         // Try to login from the saved preferences.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String email = prefs.getString("email", null);
-        String password = prefs.getString("password", null);
+        String email = prefs.getString(PreferenceKeys.EMAIL_KEY, null);
+        String password = prefs.getString(PreferenceKeys.PASSWORD_KEY, null);
 
         if (email != null && password != null) {
             this.login(email, password);
@@ -114,18 +115,18 @@ public class LoginActivity extends SherlockActivity {
 
     private void fillEmailPassword() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        this.email.setText(prefs.getString("email", null));
-        this.password.setText(prefs.getString("password", null));
+        this.email.setText(prefs.getString(PreferenceKeys.EMAIL_KEY, null));
+        this.password.setText(prefs.getString(PreferenceKeys.PASSWORD_KEY, null));
     }
 
     private void storeInfo(String email, String password, String nickname, Long uid) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString("email", email);
-        editor.putString("password", password);
-        editor.putString("nickname", nickname);
-        editor.putLong("uid", uid != null ? uid : -1);
+        editor.putString(PreferenceKeys.EMAIL_KEY, email);
+        editor.putString(PreferenceKeys.PASSWORD_KEY, password);
+        editor.putString(PreferenceKeys.NICKNAME_KEY, nickname);
+        editor.putLong(PreferenceKeys.UID_KEY, uid != null ? uid : -1);
         editor.commit();
     }
 
@@ -133,7 +134,7 @@ public class LoginActivity extends SherlockActivity {
         if (user.gid != null) {
             // Directly go into group.
             this.startActivity(new Intent(this, MainActivity.class)
-                    .putExtra("gid", user.gid));
+                    .putExtra(PreferenceKeys.GID_KEY, user.gid));
         } else {
             // Display list of groups.
             this.startActivity(new Intent(this, GroupsActivity.class));
@@ -143,7 +144,7 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void login(final String email, final String password) {
-        final ProgressDialog dialog = ProgressDialog.show(LoginActivity.this, null, "Signing in...");
+        final ProgressDialog dialog = ProgressDialog.show(LoginActivity.this, null, getString(R.string.login_signing_in));
         UnisonAPI api = new UnisonAPI(email, password);
         api.login(new UnisonAPI.Handler<JsonStruct.User>() {
 

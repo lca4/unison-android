@@ -140,7 +140,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         if (!this.isDJ) {
             // Just to make sure, when the activity is recreated.
             this.buttons.setVisibility(View.INVISIBLE);
-            this.djBtn.setText("Become the DJ");
+            this.djBtn.setText(getString(R.string.player_become_dj));
         }
         this.activity.bindService(new Intent(this.activity, MusicService.class),
                 this.connection, Context.BIND_AUTO_CREATE);
@@ -311,7 +311,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             data.getAPI().becomeMaster(gid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {
-                    djBtn.setText("Leave DJ seat");
+                    djBtn.setText(getString(R.string.player_leave_dj));
                     toggleBtn.setBackgroundResource(R.drawable.btn_play);
                     buttons.setVisibility(View.VISIBLE);
 
@@ -335,7 +335,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             data.getAPI().resignMaster(gid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {
-                    djBtn.setText("Become the DJ");
+                    djBtn.setText(getString(R.string.player_become_dj));
                     buttons.setVisibility(View.INVISIBLE);
 
                     getActivity().startService(new Intent(MusicService.ACTION_STOP));
@@ -358,8 +358,8 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             }
 
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-            alert.setTitle("Rate this song");
-            alert.setMessage("How do you like this song ?");
+            alert.setTitle(getString(R.string.player_rate));
+            alert.setMessage(getString(R.string.player_like));
 
             LayoutInflater inflater = (LayoutInflater) getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -367,7 +367,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             final RatingBar bar = (RatingBar) layout.findViewById(R.id.ratingBar);
 
             alert.setView(layout);
-            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(getString(R.string.player_ok), new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int whichButton) {
                     if (currentTrack != null) {
@@ -391,7 +391,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                 }
             });
 
-            alert.setNegativeButton("Cancel", null);
+            alert.setNegativeButton(getString(R.string.player_cancel), null);
             alert.show();
         }
     }

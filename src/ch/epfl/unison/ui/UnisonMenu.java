@@ -3,6 +3,7 @@ package ch.epfl.unison.ui;
 import android.app.Activity;
 import android.content.Intent;
 import ch.epfl.unison.R;
+import ch.epfl.unison.api.PreferenceKeys;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -47,7 +48,7 @@ public abstract class UnisonMenu {
         break;
         case R.id.menu_item_logout:
             activity.startActivity(new Intent(activity, LoginActivity.class)
-                    .putExtra("logout", true));
+                    .putExtra(PreferenceKeys.LOGOUT_KEY, true));
             // Send broadcast to all activities that can only be used when logged in.
             activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
         break;

@@ -9,7 +9,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:src="@drawable/cover"
-      android:contentDescription="album cover"
+      android:contentDescription="@string/player_cover"
       android:scaleType="fitStart" />
 
   <LinearLayout
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="unknown"
+        android:text="@string/player_unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <!-- Title -->
@@ -35,7 +35,7 @@
         android:id="@+id/musicTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No track playing"
+        android:text="@string/player_not_playing"
         android:gravity="center"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -56,14 +56,14 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Become the DJ" />
+        android:text="@string/player_become_dj" />
 
     <Button
         android:id="@+id/ratingBtn"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Rating" />
+        android:text="@string/player_rating" />
   </LinearLayout>
 
   <RelativeLayout

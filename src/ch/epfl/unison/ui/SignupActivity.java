@@ -14,6 +14,7 @@ import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -57,7 +58,7 @@ public class SignupActivity extends SherlockActivity {
 
     public void signup(final String email, final String password) {
         final ProgressDialog dialog = ProgressDialog.show(
-                SignupActivity.this, null, "Signing up...");
+                SignupActivity.this, null, getString(R.string.signup_signing_up));
         this.submitBtn.setEnabled(false);
 
         UnisonAPI api = AppData.getInstance(this).getAPI();
@@ -71,7 +72,7 @@ public class SignupActivity extends SherlockActivity {
 
             public void callback(JsonStruct.User struct) {
                 startActivity(new Intent(SignupActivity.this, LoginActivity.class)
-                        .putExtra("email", email).putExtra("password", password));
+                        .putExtra(PreferenceKeys.EMAIL_KEY, email).putExtra(PreferenceKeys.PASSWORD_KEY, password));
                 dialog.dismiss();
             }
         });
@@ -85,21 +86,21 @@ public class SignupActivity extends SherlockActivity {
         Log.d(TAG, error.toString());
         if (error.hasJsonError()) {
             if (UnisonAPI.ErrorCodes.MISSING_FIELD == error.jsonError.error) {
-                this.showError("Fields are missing.");
+                this.showError(getString(R.string.signup_form_missing_fields));
 
             } else if (UnisonAPI.ErrorCodes.EXISTING_USER == error.jsonError.error) {
-                this.showError("User already exists (e-mail address in use).");
+                this.showError(getString(R.string.signup_form_email_in_use));
 
             } else if (UnisonAPI.ErrorCodes.INVALID_EMAIL == error.jsonError.error) {
-                this.showError("E-mail address is invalid.");
+                this.showError(getString(R.string.signup_form_email_invalid));
 
             } else if (UnisonAPI.ErrorCodes.INVALID_PASSWORD == error.jsonError.error) {
-                this.showError("Password is invalid.");
+                this.showError(getString(R.string.signup_form_password_invalid));
             }
             return;
         }
         // Last resort.
-        this.showError("Unable to create new user, please try again.");
+        this.showError(getString(R.string.signup_form_unable_to_create));
     }
 
     private class SubmitListener implements OnClickListener {
@@ -108,13 +109,13 @@ public class SignupActivity extends SherlockActivity {
             if (TextUtils.isEmpty(email.getText())
                     || TextUtils.isEmpty(password.getText())
                     || TextUtils.isEmpty(password2.getText())) {
-                showError("Please fill out all the fields.");
+                showError(getString(R.string.signup_form_fillout_fields));
             } else if (!password.getText().toString().equals(password2.getText().toString())) {
-                showError("Passwords don't match.");
+                showError(getString(R.string.signup_form_password_match));
             } else if (password.length() < 6) {
-                showError("Password is too short.");
+                showError(getString(R.string.signup_form_password_short));
             } else if (!tou.isChecked()) {
-                showError("You need to agree to the terms of use.");
+                showError(getString(R.string.signup_form_tou));
             } else {
                 signup(email.getText().toString(), password.getText().toString());
             }

@@ -183,7 +183,7 @@ public class RatingsActivity extends SherlockActivity {
             AlertDialog.Builder alert = new AlertDialog.Builder(RatingsActivity.this);
 
             alert.setTitle(item.title);
-            alert.setMessage("How do you like this song ?");
+            alert.setMessage(getString(R.string.ratings_like));
 
             LayoutInflater inflater = (LayoutInflater) RatingsActivity.this
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -192,7 +192,7 @@ public class RatingsActivity extends SherlockActivity {
             bar.setRating(oldRating);
 
             alert.setView(layout);
-            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(getString(R.string.ratings_ok), new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int whichButton) {
                     final int newRating = Math.max((int)bar.getRating(), 1);
@@ -218,7 +218,7 @@ public class RatingsActivity extends SherlockActivity {
                 }
             });
 
-            alert.setNegativeButton("Cancel", null);
+            alert.setNegativeButton(getString(R.string.ratings_cancel), null);
             alert.show();
         }
     }
