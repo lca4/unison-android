@@ -172,11 +172,14 @@ public class PlayerFragment extends SherlockFragment implements
 	@Override
 	public void onStart() {
 		super.onStart();
+		this.seekBar.setEnabled(this.isDJ);
 		if (!this.isDJ) {
 			// Just to make sure, when the activity is recreated.
 			this.buttons.setVisibility(View.INVISIBLE);
-			this.djBtn.setText(getString(R.string.player_become_dj));
-			this.seekBar.setEnabled(isDJ);
+			this.djBtn.setText(getString(R.string.player_become_dj));	
+			this.seekBar.setVisibility(View.INVISIBLE);
+		} else {
+			this.seekBar.setVisibility(View.VISIBLE);
 		}
 		this.activity.bindService(
 				new Intent(this.activity, MusicService.class), this.connection,
@@ -400,7 +403,7 @@ public class PlayerFragment extends SherlockFragment implements
 							toggleBtn
 									.setBackgroundResource(R.drawable.btn_play);
 							buttons.setVisibility(View.VISIBLE);
-							seekBar.setEnabled(true);
+							seekBar.setVisibility(View.VISIBLE);
 
 							trackQueue = new TrackQueue(getActivity(), gid)
 									.start();
@@ -427,7 +430,7 @@ public class PlayerFragment extends SherlockFragment implements
 						public void callback(Success structure) {
 							djBtn.setText(getString(R.string.player_become_dj));
 							buttons.setVisibility(View.INVISIBLE);
-							seekBar.setEnabled(false);
+							seekBar.setVisibility(View.INVISIBLE);
 
 							getActivity().startService(
 									new Intent(MusicService.ACTION_STOP));

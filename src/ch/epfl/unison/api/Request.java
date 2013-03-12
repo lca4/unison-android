@@ -144,6 +144,9 @@ public class Request<T extends JsonStruct> {
             if (status < 200 || status > 299) {
                 // We didn't receive a 2xx status code - we treat it as an error.
                 JsonStruct.Error jsonError = GSON.fromJson(responseContent, JsonStruct.Error.class);
+                if (jsonError == null) {
+                	jsonError = new JsonStruct.Error();
+                }
                 return new Result<T>(new UnisonAPI.Error(status,
                 		responseStatusLine.toString(), responseContent, jsonError));
             } else {
@@ -165,7 +168,9 @@ public class Request<T extends JsonStruct> {
                 statusCode = responseStatusLine.getStatusCode();
                 statusMessage = responseStatusLine.getReasonPhrase();
             } catch(Exception foobar) {}
-
+            if (statusMessage == null) {
+            	statusMessage = "";
+            }
             return new Result<T>(new UnisonAPI.Error(statusCode, statusMessage, responseContent, e));
 
         }
