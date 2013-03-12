@@ -200,6 +200,7 @@ public class PlayerFragment extends SherlockFragment implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		mHandler.removeCallbacks(mUpdateProgressTask);
 		getActivity().startService(new Intent(MusicService.ACTION_STOP));
 	}
 
