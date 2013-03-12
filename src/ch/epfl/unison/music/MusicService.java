@@ -283,6 +283,10 @@ public class MusicService extends Service
         		mediaPlayer.seekTo(newPos);
         	}
         }
+        public int getDuration() {
+        	return mediaPlayer != null ? mediaPlayer.getDuration() : 0;
+        }
+        
     }
 
     @Override
