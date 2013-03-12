@@ -122,18 +122,16 @@ public class Request<T extends JsonStruct> {
 
             if (this.data != null && request instanceof HttpEntityEnclosingRequestBase) {
                 // Write out the request body (i.e. the form data).
-//            	request.setHeader("", data);
-//            	((HttpEntityEnclosingRequestBase) request).setEntity(new StringEntity(data, ENCODING));
             	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
-//            	Log.d(TAG, "entity = " + EntityUtils.toString(((HttpEntityEnclosingRequestBase) request).getEntity()));
-//            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
+            	Log.d(TAG, "entity = " + EntityUtils.toString(((HttpEntityEnclosingRequestBase) request).getEntity()));
+            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
             }
 
             try {
                 // Get the response as a string.
             	response = HttpClientFactory.getInstance().execute(request);
             	responseStatusLine = response.getStatusLine();
-//            	Log.d(TAG, "status = " + responseStatusLine.toString());
+            	Log.d(TAG, "status = " + responseStatusLine.toString());
             	responseContent = response.getEntity() == null ? null : EntityUtils
         				.toString(response.getEntity());
             } catch(IOException ioe) {
@@ -150,7 +148,7 @@ public class Request<T extends JsonStruct> {
                 		responseStatusLine.toString(), responseContent, jsonError));
             } else {
                 // Success.
-//            	Log.d(TAG, "received: " + responseContent);
+            	Log.d(TAG, "received: " + responseContent);
                 T jsonStruct = GSON.fromJson(responseContent, this.classOfT);
                 return new Result<T>(jsonStruct);
             }

@@ -18,7 +18,7 @@ public class UnisonAPI {
     public static boolean DEBUG = false;
     private static final String LOCALHOST = "https://127.0.0.1";
     
-    
+    //TODO restore this url ot the real server URL.
     private static final String API_ROOT = "https://api.groupstreamer.com";
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
@@ -151,10 +151,11 @@ public class UnisonAPI {
                 .setAuth(this.auth).doPOST();
     }
 
-    public void becomeMaster(long gid, long uid, Handler<JsonStruct.Success> handler) {
+    public void becomeMaster(long gid, long uid, double lat, double lon, Handler<JsonStruct.Success> handler) {
     	URL url = urlFor("/groups/%d/master", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
-                .addParam("uid", uid).setAuth(this.auth).doPUT();
+                .addParam("uid", uid).addParam("lat", lat)
+                .addParam("lon", lon).setAuth(this.auth).doPUT();
     }
 
     public void resignMaster(long gid, long uid, Handler<JsonStruct.Success> handler) {

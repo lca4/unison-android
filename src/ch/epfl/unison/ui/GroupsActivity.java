@@ -243,7 +243,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 subtitle = String.format("%s away - %d people.",
                         Uutils.distToString(group.distance), group.nbUsers);
             } else {
-                subtitle = String.format("%d people.", group.nbUsers);
+                subtitle = String.format("%d " + (group.nbUsers > 1 ? "people." : "person."), group.nbUsers);
             }
             ((TextView) view.findViewById(R.id.nbParticipants)).setText(subtitle);
 

@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -25,6 +26,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.unison.AppData;
@@ -46,6 +49,10 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000;  // In milliseconds.
+    
+ // EPFL Polydome.
+    private static final double DEFAULT_LATITUDE = 46.52147800207456;
+    private static final double DEFAULT_LONGITUDE = 6.568992733955383;
 
     private MainActivity activity;
 
@@ -55,6 +62,9 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     private Button nextBtn;
     private Button prevBtn;
 
+    private SeekBar seekBar;
+    private TrackProgress progressTracker = null;
+    
     private View buttons;
     private TextView artistTxt;
     private TextView titleTxt;
@@ -105,6 +115,31 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         this.djBtn.setOnClickListener(this);
         this.ratingBtn = (Button) v.findViewById(R.id.ratingBtn);
         this.ratingBtn.setOnClickListener(new OnRatingClickListener());
+        
+        this.seekBar = (SeekBar) v.findViewById(R.id.musicProgBar);
+        this.seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				if (fromUser) {
+					seek(progress);
+				}
+				
+			}
+		});
 
         this.buttons = v.findViewById(R.id.musicButtons);
 
@@ -141,6 +176,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             // Just to make sure, when the activity is recreated.
             this.buttons.setVisibility(View.INVISIBLE);
             this.djBtn.setText(getString(R.string.player_become_dj));
+            this.seekBar.setEnabled(isDJ);
         }
         this.activity.bindService(new Intent(this.activity, MusicService.class),
                 this.connection, Context.BIND_AUTO_CREATE);
@@ -206,6 +242,13 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         }
     }
 
+    private void seek(int progress) {
+    	if((this.status == Status.Playing || this.status == Status.Paused) && this.isDJ) {
+//    		Log.d("setting player to")
+    		this.musicService.setCurrentPosition(progress);
+    	}
+    }
+    
     private void prev() {
         int curPos = this.isBound ? this.musicService.getCurrentPosition() : 0;
         if (curPos < CLICK_INTERVAL && this.histPointer < this.history.size() - 1) {
@@ -256,6 +299,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             this.getActivity().startService(new Intent(MusicService.ACTION_PLAY));
             this.status = Status.Playing;
             this.toggleBtn.setBackgroundResource(R.drawable.btn_pause);
+            
         }
     }
 
@@ -272,6 +316,15 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
         this.coverImg.setImageResource(R.drawable.cover);
         this.artistTxt.setText(item.artist);
         this.titleTxt.setText(item.title);
+        
+        MediaMetadataRetriever rex = new MediaMetadataRetriever();
+        rex.setDataSource(getActivity(), uri);
+        int duration = Integer.valueOf(rex.extractMetadata(rex.METADATA_KEY_DURATION));
+//        Log.d(TAG, "musicService gave us a duration of " + duration + " ms");
+        this.seekBar.setMax(duration);
+        
+        progressTracker = new TrackProgress(duration);
+        progressTracker.start();
 
         // Notify the server.
         UnisonAPI api = AppData.getInstance(this.activity).getAPI();
@@ -306,14 +359,25 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
     private void setDJ(boolean isDJ) {
         final long gid = ((MainActivity) this.getActivity()).getGroupId();
         AppData data = AppData.getInstance(getActivity());
+        double lat, lon;
 
         if (isDJ) {
-            data.getAPI().becomeMaster(gid, data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+        	if (data.getLocation() != null) {
+                lat = data.getLocation().getLatitude();
+                lon = data.getLocation().getLongitude();
+            } else {
+                lat = DEFAULT_LATITUDE;
+                lon = DEFAULT_LONGITUDE;
+                Log.i(TAG, "location was null, using default values");
+            }
+        	
+            data.getAPI().becomeMaster(gid, data.getUid(), lat, lon, new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 public void callback(Success structure) {
                     djBtn.setText(getString(R.string.player_leave_dj));
                     toggleBtn.setBackgroundResource(R.drawable.btn_play);
                     buttons.setVisibility(View.VISIBLE);
+                    seekBar.setEnabled(true);
 
                     trackQueue = new TrackQueue(getActivity(), gid).start();
                 }
@@ -337,6 +401,7 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
                 public void callback(Success structure) {
                     djBtn.setText(getString(R.string.player_become_dj));
                     buttons.setVisibility(View.INVISIBLE);
+                    seekBar.setEnabled(false);
 
                     getActivity().startService(new Intent(MusicService.ACTION_STOP));
                     status = Status.Stopped;
@@ -405,5 +470,30 @@ public class PlayerFragment extends SherlockFragment implements OnClickListener,
             PlayerFragment.this.next();
         }
 
+    }
+    
+    class TrackProgress extends Thread {
+    	private final int TIMEOUT = 120000;
+    	
+    	private int mDuration = 0;
+    	
+    	public TrackProgress(int duration) {
+    		this.mDuration = duration;
+    	}
+    	
+    	public void run() {
+    		int currentPosition = 0;
+
+
+    		while(currentPosition < mDuration && currentPosition < TIMEOUT) {
+    			try {
+					Thread.sleep(500);
+					currentPosition = musicService.getCurrentPosition();
+				} catch (InterruptedException e) {
+					Log.w(TAG, e.toString());
+				}
+    			seekBar.setProgress(currentPosition);
+    		}
+    	}
     }
 }

@@ -47,6 +47,7 @@ public class MusicService extends Service
     private MediaPlayer mediaPlayer;
     private Notification notification;
 
+
     MusicServiceBinder binder = new MusicServiceBinder();
 
     // State variables.
@@ -176,6 +177,7 @@ public class MusicService extends Service
      * Reconfigures MediaPlayer according to audio focus settings and starts/restarts it.
      */
     void configAndStartMediaPlayer() {
+    	Log.d(TAG, "duration = " + this.mediaPlayer.getDuration());
         if (this.focus == AudioFocus.NoFocusNoDuck) {
             // If we don't have audio focus and can't duck, we have to pause.
             if (this.mediaPlayer.isPlaying()) {
@@ -274,6 +276,12 @@ public class MusicService extends Service
     public class MusicServiceBinder extends Binder {
         public int getCurrentPosition() {
             return mediaPlayer != null ? mediaPlayer.getCurrentPosition() : -1;
+        }
+        public void setCurrentPosition(int newPos) {
+        	if (mediaPlayer != null) {
+        		Log.d(TAG, "using seekTo(" + newPos + ")");
+        		mediaPlayer.seekTo(newPos);
+        	}
         }
     }
 

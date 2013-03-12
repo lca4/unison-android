@@ -65,12 +65,27 @@
         android:layout_height="wrap_content"
         android:text="@string/player_rating" />
   </LinearLayout>
-
+  
+  <RelativeLayout
+      android:id="@+id/musicSeekBarContainer"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_margin="0dp"
+      android:layout_above="@id/musicActions"
+      android:background="@drawable/media_bg">
+    
+      	<SeekBar android:id="@+id/musicProgBar"
+        android:layout_height="40dp"
+        android:layout_width="match_parent" />
+      
+   </RelativeLayout>
+  
+  
   <RelativeLayout
       android:id="@+id/musicButtons"
       android:layout_width="match_parent"
       android:layout_height="56dp"
-      android:layout_above="@id/musicActions"
+      android:layout_above="@id/musicSeekBarContainer"
       android:background="@drawable/media_bg">
 
     <!-- Play / pause button -->
@@ -95,5 +110,6 @@
         android:layout_alignParentLeft="true" />
 
   </RelativeLayout>
+  
 
 </RelativeLayout>
