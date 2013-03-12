@@ -64,6 +64,7 @@
    	<string name="player_rating">Rating</string>
    	<string name="player_cover">album cover</string>
    	<string name="player_rate">Rate this song</string>
+   	<string name="player_rate_it">Rate it!</string>
    	<string name="player_like">How do you like this song ?</string>
    	<string name="player_ok">OK</string>
    	<string name="player_cancel">Cancel</string>

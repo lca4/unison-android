@@ -26,3 +26,6 @@ local.properties
 
 # Third party libraries
 /libs/
+
+# Local directory configuration file (LinuxMint)
+.directory

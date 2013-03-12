@@ -63,7 +63,7 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="@string/player_rating" />
+        android:text="@string/player_rate_it" />
   </LinearLayout>
   
   <RelativeLayout
