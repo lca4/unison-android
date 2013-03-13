@@ -405,7 +405,7 @@ public class PlayerFragment extends SherlockFragment implements
 									.setBackgroundResource(R.drawable.btn_play);
 							buttons.setVisibility(View.VISIBLE);
 							seekBar.setVisibility(View.VISIBLE);
-
+							seekBar.setEnabled(true);
 							trackQueue = new TrackQueue(getActivity(), gid)
 									.start();
 						}
@@ -432,6 +432,7 @@ public class PlayerFragment extends SherlockFragment implements
 							djBtn.setText(getString(R.string.player_become_dj));
 							buttons.setVisibility(View.INVISIBLE);
 							seekBar.setVisibility(View.INVISIBLE);
+							seekBar.setEnabled(false);
 
 							getActivity().startService(
 									new Intent(MusicService.ACTION_STOP));
