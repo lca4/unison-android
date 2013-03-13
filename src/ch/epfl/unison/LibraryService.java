@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 
@@ -56,7 +57,7 @@ public class LibraryService extends Service {
     private void update() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // How many seconds elapsed since the last successful update ?
-        long interval = (System.currentTimeMillis() / 1000l) - prefs.getLong("lastupdate", -1);
+        long interval = (System.currentTimeMillis() / 1000l) - prefs.getLong(PreferenceKeys.LASTUPDATE_KEY, -1);
 
         if (!this.isUpdating && interval > MIN_UPDATE_INTERVAL) {
             this.isUpdating = true;

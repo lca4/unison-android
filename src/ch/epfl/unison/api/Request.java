@@ -152,6 +152,9 @@ public class Request<T extends JsonStruct> {
             } else {
                 // Success.
             	Log.d(TAG, "received: " + responseContent);
+            	if(responseContent == null) {
+            		throw new RuntimeException("Received null answer from server.");
+            	}
                 T jsonStruct = GSON.fromJson(responseContent, this.classOfT);
                 return new Result<T>(jsonStruct);
             }

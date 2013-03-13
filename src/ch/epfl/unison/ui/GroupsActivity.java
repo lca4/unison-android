@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.gson.JsonArray;
 
 public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
@@ -138,7 +140,9 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             }
 
             public void onError(UnisonAPI.Error error) {
-                Log.d(TAG, error.toString());
+                if(error != null) {
+                	Log.d(TAG, error.toString());
+                }
                 if (GroupsActivity.this != null) {
                     Toast.makeText(GroupsActivity.this, R.string.error_loading_groups,
                             Toast.LENGTH_LONG).show();

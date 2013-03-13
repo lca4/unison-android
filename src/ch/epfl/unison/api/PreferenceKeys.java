@@ -9,4 +9,5 @@ public class PreferenceKeys {
 	public static final String NICKNAME_KEY = "nickname";
 	public static final String NAME_KEY = "name";
 	public static final String LOGOUT_KEY = "logout";
+	public static final String HELPDIALOG_KEY = "helpdialog";
 }

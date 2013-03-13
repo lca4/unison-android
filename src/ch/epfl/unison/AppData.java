@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 
 public class AppData implements OnSharedPreferenceChangeListener {
@@ -61,8 +62,8 @@ public class AppData implements OnSharedPreferenceChangeListener {
 
     public UnisonAPI getAPI() {
         if (this.api == null) {
-            String email = this.prefs.getString("email", null);
-            String password = this.prefs.getString("password", null);
+            String email = this.prefs.getString(PreferenceKeys.EMAIL_KEY, null);
+            String password = this.prefs.getString(PreferenceKeys.PASSWORD_KEY, null);
             if (email != null && password != null) {
                 this.api = new UnisonAPI(email, password);
             } else {
@@ -73,15 +74,15 @@ public class AppData implements OnSharedPreferenceChangeListener {
     }
 
     public long getUid() {
-        return this.prefs.getLong("uid", -1);
+        return this.prefs.getLong(PreferenceKeys.UID_KEY, -1);
     }
 
     public boolean showHelpDialog() {
-        return this.prefs.getBoolean("helpdialog", true);
+        return this.prefs.getBoolean(PreferenceKeys.HELPDIALOG_KEY, true);
     }
 
     public void setShowHelpDialog(boolean value) {
-        this.prefs.edit().putBoolean("helpdialog", value).commit();
+        this.prefs.edit().putBoolean(PreferenceKeys.HELPDIALOG_KEY, value).commit();
     }
 
     public Location getLocation() {
@@ -98,7 +99,7 @@ public class AppData implements OnSharedPreferenceChangeListener {
 
     public synchronized void onSharedPreferenceChanged(
             SharedPreferences sharedPreferences, String key) {
-        if (key.equals("email") || key.equals("password") || key.equals("uid")) {
+        if (key.equals(PreferenceKeys.EMAIL_KEY) || key.equals(PreferenceKeys.PASSWORD_KEY) || key.equals(PreferenceKeys.UID_KEY)) {
             this.api = null;
         }
     }
