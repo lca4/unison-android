@@ -271,7 +271,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok), new DialogInterface.OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String name = input.getText().toString();
+                    String name = input.getText().toString().trim();
                     AppData data = AppData.getInstance(GroupsActivity.this);
 
                     double lat, lon;
