@@ -98,6 +98,7 @@
     <string name="error_loading_groups">Unable to load the list of groups.</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
+    <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
     <string name="error_unauthorized">Incorrect password or e-mail address.</string>
     <string name="error_login_general">Unable to log in. Are you connected ?</string>
     <string name="error_loading_info">Unable to load the information.</string>

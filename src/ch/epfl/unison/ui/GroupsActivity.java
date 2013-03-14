@@ -272,32 +272,38 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
                 public void onClick(DialogInterface dialog, int whichButton) {
                     String name = input.getText().toString().trim();
-                    AppData data = AppData.getInstance(GroupsActivity.this);
-
-                    double lat, lon;
-                    if (data.getLocation() != null) {
-                        lat = data.getLocation().getLatitude();
-                        lon = data.getLocation().getLongitude();
+                    if (name == null || name.equals("")) {
+                    	Toast.makeText(GroupsActivity.this, R.string.error_creating_group_empty_name,
+                    			Toast.LENGTH_LONG).show();                    	
                     } else {
-                        lat = DEFAULT_LATITUDE;
-                        lon = DEFAULT_LONGITUDE;
-                        Log.i(TAG, "location was null, using default values");
+                    	
+	                    AppData data = AppData.getInstance(GroupsActivity.this);
+	
+	                    double lat, lon;
+	                    if (data.getLocation() != null) {
+	                        lat = data.getLocation().getLatitude();
+	                        lon = data.getLocation().getLongitude();
+	                    } else {
+	                        lat = DEFAULT_LATITUDE;
+	                        lon = DEFAULT_LONGITUDE;
+	                        Log.i(TAG, "location was null, using default values");
+	                    }
+	                    data.getAPI().createGroup(name, lat, lon,
+	                            new UnisonAPI.Handler<JsonStruct.GroupsList>() {
+	
+	                        public void callback(GroupsList struct) {
+	                            GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
+	                        }
+	
+	                        public void onError(Error error) {
+	                            Log.d(TAG, error.toString());
+	                            if (GroupsActivity.this != null) {
+	                                Toast.makeText(GroupsActivity.this, R.string.error_creating_group,
+	                                        Toast.LENGTH_LONG).show();
+	                            }
+	                        }
+	                    });
                     }
-                    data.getAPI().createGroup(name, lat, lon,
-                            new UnisonAPI.Handler<JsonStruct.GroupsList>() {
-
-                        public void callback(GroupsList struct) {
-                            GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
-                        }
-
-                        public void onError(Error error) {
-                            Log.d(TAG, error.toString());
-                            if (GroupsActivity.this != null) {
-                                Toast.makeText(GroupsActivity.this, R.string.error_creating_group,
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
                 }
             });
 
