@@ -18,8 +18,9 @@ public class UnisonAPI {
     public static boolean DEBUG = false;
     private static final String LOCALHOST = "https://127.0.0.1";
     
-    //TODO restore this url ot the real server URL.
-    private static final String API_ROOT = "https://api.groupstreamer.com";
+    //TODO restore this url to the real server URL.
+    private static final String API_ROOT = "http://staging.groupstreamer.com"; //This is the server for dev' (not an https one).
+//    private static final String API_ROOT = "https://api.groupstreamer.com";
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
