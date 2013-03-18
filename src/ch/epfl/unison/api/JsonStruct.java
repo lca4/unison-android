@@ -1,19 +1,26 @@
 package ch.epfl.unison.api;
 
-
+/**
+ * POJOs for JSON serialization / deserialization.
+ *
+ * @author lum
+ */
 public abstract class JsonStruct {
 
+    /** Error message from the server. */
     public static class Error extends JsonStruct {
 
         public Integer error;
         public String message;
     }
 
+    /** Success message from the server. */
     public static class Success extends JsonStruct {
 
         public Boolean success;
     }
 
+    /** Information about a user (used in both directions). */
     public static class User extends JsonStruct {
 
         public Long uid;
@@ -25,6 +32,7 @@ public abstract class JsonStruct {
         public Boolean predicted;  // or isPredicted?
     }
 
+    /** Information about a track (used in both directions). */
     public static class Track extends JsonStruct {
 
         public String artist;
@@ -33,21 +41,23 @@ public abstract class JsonStruct {
         public Integer localId;
         public Integer rating;
 
-        public Track() {}
+        public Track() { }
 
-        public Track(int localId, String artist, String title) {
-            this.localId = localId;
-            this.artist = artist;
-            this.title = title;
+        public Track(int id, String a, String t) {
+            localId = id;
+            artist = a;
+            title = t;
         }
     }
 
+    /** Information about a playlist (sent by server). */
     public static class TracksList extends JsonStruct {
 
         public String playlistId;
         public Track[] tracks;
     }
 
+    /** Information about a group (used in both directions). */
     public static class Group extends JsonStruct {
 
         public Long gid;
@@ -59,11 +69,13 @@ public abstract class JsonStruct {
         public Integer nbUsers;
     }
 
+    /** List of groups. */
     public static class GroupsList extends JsonStruct {
 
         public Group[] groups;
     }
 
+    /** Notification of addition / removal of track on the device. */
     public static class Delta extends JsonStruct {
 
         public static final String TYPE_PUT = "PUT";
@@ -72,10 +84,10 @@ public abstract class JsonStruct {
         public String type;
         public Track entry;
 
-        public Delta() {}
+        public Delta() { }
 
-        public Delta(String type, int localId, String artist, String title) {
-            this.type = type;
+        public Delta(String t, int localId, String artist, String title) {
+            this.type = t;
             this.entry = new Track(localId, artist, title);
         }
     }

@@ -10,52 +10,66 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+/**
+ * Fragment that is displayed inside MainActivity (one of the tabs). Contains
+ * information about the members of the group: nickname, rating of current song,
+ * etc.
+ *
+ * @author lum
+ */
 public class StatsFragment extends SherlockFragment implements MainActivity.OnGroupInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
-    private ListView usersList;
-    private TextView trackTitle;
+    // TODO(lum) Improve this mess.
+    private static final float TEN = 10f;
+    private static final float TWO = 2f;
 
-    private MainActivity activity;
+    private ListView mUsersList;
+    private TextView mTrackTitle;
+
+    private MainActivity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.stats, container, false);
 
-        this.usersList = (ListView)v.findViewById(R.id.usersList);
-        this.trackTitle = (TextView)v.findViewById(R.id.trackTitle);
+        mUsersList = (ListView) v.findViewById(R.id.usersList);
+        mTrackTitle = (TextView) v.findViewById(R.id.trackTitle);
 
         return v;
     }
 
+    @Override
     public void onGroupInfo(JsonStruct.Group groupInfo) {
         if (groupInfo.track != null && groupInfo.track.title != null) {
-            this.trackTitle.setText(groupInfo.track.title);
+            mTrackTitle.setText(groupInfo.track.title);
         }
-        this.usersList.setAdapter(new StatsAdapter(groupInfo));
+        mUsersList.setAdapter(new StatsAdapter(groupInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (MainActivity) activity;
-        this.activity.registerGroupInfoListener(this);
+        mActivity = (MainActivity) activity;
+        mActivity.registerGroupInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        this.activity.unregisterGroupInfoListener(this);
+        mActivity.unregisterGroupInfoListener(this);
     }
 
+    /** ArrayAdapter that displays the stats associated with each user in the group. */
     private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
 
         public static final int ROW_LAYOUT = R.layout.stats_row;
@@ -72,9 +86,12 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnGr
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.username)).setText(this.getItem(position).nickname);
-            int score = getItem(position).score != null ? getItem(position).score : 0;
-            float rating = Math.round(score / 10.0) / 2f;
+            ((TextView) view.findViewById(R.id.username)).setText(getItem(position).nickname);
+            int score = 0;
+            if (getItem(position).score != null) {
+                score = getItem(position).score;
+            }
+            float rating = Math.round(score / TEN) / TWO;
             ((RatingBar) view.findViewById(R.id.liking)).setRating(rating);
 
             TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);

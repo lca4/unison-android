@@ -1,9 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,10 +15,11 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -31,77 +28,87 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Activity that is displayed once you're inside the group. Displays the music player
+ * and information about the group (through fragments).
+ *
+ * @author lum
+ */
 public class MainActivity extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
-    private TabsAdapter tabsAdapter;
-    private ViewPager viewPager;
-    private Menu menu;
+    private TabsAdapter mTabsAdapter;
+    private ViewPager mViewPager;
+    private Menu mMenu;
 
-    private boolean isForeground = false;
-    private Handler handler = new Handler();
-    private Runnable updater = new Runnable() {
+    private boolean mIsForeground = false;
+    private Handler mHandler = new Handler();
+    private Runnable mUpdater = new Runnable() {
+        @Override
         public void run() {
-            if (isForeground) {
+            if (mIsForeground) {
                 onRefresh();
-                handler.postDelayed(this, RELOAD_INTERVAL);
+                mHandler.postDelayed(this, RELOAD_INTERVAL);
             }
         }
     };
 
-    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
         }
     };
 
-    private Set<OnGroupInfoListener> listeners = new HashSet<OnGroupInfoListener>();
+    private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
-    private long groupId;
+    private long mGroupId;
 
     public long getGroupId() {
-        return this.groupId;
+        return mGroupId;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.handleExtras(this.getIntent().getExtras());
+        handleExtras(getIntent().getExtras());
 
         // This activity should finish on logout.
-        this.registerReceiver(this.logoutReceiver,
-                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         // Set up the tabs & stuff.
-        this.viewPager = new ViewPager(this);
-        this.viewPager.setId(R.id.realtabcontent); // TODO change
-        this.setContentView(this.viewPager);
+        mViewPager = new ViewPager(this);
+        mViewPager.setId(R.id.realtabcontent); // TODO change
+        setContentView(mViewPager);
 
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        this.tabsAdapter = new TabsAdapter(this, this.viewPager);
-        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
+        mTabsAdapter = new TabsAdapter(this, mViewPager);
+        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
                 PlayerFragment.class, null);
-        this.tabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
+        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
                 StatsFragment.class, null);
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey(PreferenceKeys.GID_KEY)) {
+        if (extras == null || !extras.containsKey(Const.Strings.GID)) {
             // Should never happen. If it does, redirect the user to the groups list.
-            this.startActivity(new Intent(this, GroupsActivity.class));
-            this.finish();
+            startActivity(new Intent(this, GroupsActivity.class));
+            finish();
         } else {
-            this.groupId = extras.getLong(PreferenceKeys.GID_KEY);
-            Log.i(TAG, "joined group " + this.groupId);
-            if (extras.containsKey(PreferenceKeys.NAME_KEY)) {
-                this.setTitle(extras.getString(PreferenceKeys.NAME_KEY));
+            mGroupId = extras.getLong(Const.Strings.GID);
+            Log.i(TAG, "joined group " + mGroupId);
+            if (extras.containsKey(Const.Strings.NAME)) {
+                setTitle(extras.getString(Const.Strings.NAME));
             }
         }
     }
@@ -109,33 +116,34 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     @Override
     protected void onResume() {
         super.onResume();
-        this.isForeground = true;
-        this.handler.postDelayed(updater, INITIAL_DELAY);
+        mIsForeground = true;
+        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        this.isForeground = false;
+        mIsForeground = false;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(this.logoutReceiver);
+        unregisterReceiver(mLogoutReceiver);
     }
 
     public void repaintRefresh(boolean isRefreshing) {
-        if (this.menu == null) {
+        if (mMenu == null) {
             return;
         }
 
-        MenuItem refreshItem = this.menu.findItem(R.id.menu_item_refresh);
+        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
         if (refreshItem != null) {
             if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater)getSupportActionBar()
+                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
                         .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(R.layout.actionbar_indeterminate_progress, null);
+                View refreshView = inflater.inflate(
+                        R.layout.actionbar_indeterminate_progress, null);
                 refreshItem.setActionView(refreshView);
             } else {
                 refreshItem.setActionView(null);
@@ -143,17 +151,20 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         }
     }
 
+    @Override
     public void onRefresh() {
-        this.repaintRefresh(true);
+        repaintRefresh(true);
         UnisonAPI api = AppData.getInstance(this).getAPI();
-        api.getGroupInfo(this.groupId, new UnisonAPI.Handler<JsonStruct.Group>() {
+        api.getGroupInfo(mGroupId, new UnisonAPI.Handler<JsonStruct.Group>() {
 
+            @Override
             public void callback(JsonStruct.Group struct) {
                 MainActivity.this.onGroupInfo(struct);
                 MainActivity.this.dispatchGroupInfo(struct);
                 MainActivity.this.repaintRefresh(false);
             }
 
+            @Override
             public void onError(UnisonAPI.Error error) {
                 Log.d(TAG, error.toString());
                 if (MainActivity.this != null) {
@@ -167,12 +178,12 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     private void onGroupInfo(JsonStruct.Group group) {
-        this.setTitle(group.name);
+        setTitle(group.name);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
+        mMenu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
@@ -184,31 +195,32 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            this.startActivity(new Intent(this, GroupsActivity.class)
+            startActivity(new Intent(this, GroupsActivity.class)
                     .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            this.finish();
+            finish();
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
+    /** Simple interface to be notified about group info updates. */
+    public interface OnGroupInfoListener {
+        void onGroupInfo(JsonStruct.Group groupInfo);
+    }
+
     public void dispatchGroupInfo(JsonStruct.Group groupInfo) {
-        for (OnGroupInfoListener listener : this.listeners) {
+        for (OnGroupInfoListener listener : mListeners) {
             listener.onGroupInfo(groupInfo);
         }
     }
 
     public void registerGroupInfoListener(OnGroupInfoListener listener) {
-        this.listeners.add(listener);
+        mListeners.add(listener);
     }
 
     public void unregisterGroupInfoListener(OnGroupInfoListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    public static interface OnGroupInfoListener {
-        public void onGroupInfo(JsonStruct.Group groupInfo);
+        mListeners.remove(listener);
     }
 
 
@@ -222,6 +234,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
      * view to show as the tab content.  It listens to changes in tabs, and takes
      * care of switch to the correct paged in the ViewPager whenever the selected
      * tab changes.
+     *
+     * @author no-freaking-idea
      */
     public static class TabsAdapter extends FragmentPagerAdapter
             implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
@@ -230,13 +244,14 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         private final ViewPager mViewPager;
         private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 
+        /** No idea what this does. Copy-pasted this stuff from somewhere. */
         static final class TabInfo {
-            private final Class<?> clss;
-            private final Bundle args;
+            private final Class<?> mClass;
+            private final Bundle mArgs;
 
-            TabInfo(Class<?> _class, Bundle _args) {
-                clss = _class;
-                args = _args;
+            TabInfo(Class<?> clss, Bundle args) {
+                mClass = clss;
+                mArgs = args;
             }
         }
 
@@ -266,27 +281,33 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         @Override
         public Fragment getItem(int position) {
             TabInfo info = mTabs.get(position);
-            return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            return Fragment.instantiate(mContext, info.mClass.getName(), info.mArgs);
         }
 
+        @Override
         public void onPageSelected(int position) {
             mActionBar.setSelectedNavigationItem(position);
         }
 
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-        public void onPageScrollStateChanged(int state) {}
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+        @Override
+        public void onPageScrollStateChanged(int state) { }
 
+        @Override
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             mViewPager.setCurrentItem(tab.getPosition());
             Object tag = tab.getTag();
-            for (int i=0; i<mTabs.size(); i++) {
+            for (int i = 0; i < mTabs.size(); ++i) {
                 if (mTabs.get(i) == tag) {
                     mViewPager.setCurrentItem(i);
                 }
             }
         }
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) { }
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction ft) { }
     }
 }
