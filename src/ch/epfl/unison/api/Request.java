@@ -139,6 +139,7 @@ public final class Request<T extends JsonStruct> {
                 responseStatusLine = response.getStatusLine();
                 Log.d(TAG, "status = " + responseStatusLine.toString());
                 responseContent = EntityUtils.toString(response.getEntity());
+                Log.d(TAG, "received: " + responseContent);
             } catch (IOException ioe) {
                 // Happens when the server returns an error status code.
                 responseContent = responseStatusLine.getReasonPhrase();
@@ -152,7 +153,6 @@ public final class Request<T extends JsonStruct> {
                         responseStatusLine.toString(), responseContent, jsonError));
             } else {
                 // Success.
-                Log.d(TAG, "received: " + responseContent);
                 T jsonStruct = GSON.fromJson(responseContent, this.mClassOfT);
                 return new Result<T>(jsonStruct);
             }
