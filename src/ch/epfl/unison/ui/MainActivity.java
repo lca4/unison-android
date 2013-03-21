@@ -159,9 +159,15 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
             @Override
             public void callback(JsonStruct.Group struct) {
-                MainActivity.this.onGroupInfo(struct);
-                MainActivity.this.dispatchGroupInfo(struct);
-                MainActivity.this.repaintRefresh(false);
+            	try {
+					MainActivity.this.onGroupInfo(struct);
+					MainActivity.this.dispatchGroupInfo(struct);
+					MainActivity.this.repaintRefresh(false);
+				} catch (NullPointerException e) {
+					onError(new UnisonAPI.Error(0,
+							"null group or activity", "",
+							new JsonStruct.Error()));
+            	}
             }
 
             @Override

@@ -65,6 +65,7 @@ public class LibraryHelper {
                 new String[] { C_LOCAL_ID, C_ARTIST, C_TITLE },
                 null, null, null, null, null);
         boolean isEmpty = !cur.moveToFirst();
+        cur.close();
         db.close();
         return isEmpty;
     }
