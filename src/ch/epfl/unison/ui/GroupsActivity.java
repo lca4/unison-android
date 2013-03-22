@@ -141,16 +141,13 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
             @Override
             public void callback(GroupsList struct) {
-				try {
-					GroupsActivity.this.mGroupsList
-							.setAdapter(new GroupsAdapter(struct));
-					GroupsActivity.this.repaintRefresh(false);
-				} catch (NullPointerException e) {
-					// When the struct does not contain the expected fields
-					onError(new UnisonAPI.Error(0,
-							"null grouplist or activity", "",
-							new JsonStruct.Error()));
-				}
+                try {
+                    GroupsActivity.this.mGroupsList
+                            .setAdapter(new GroupsAdapter(struct));
+                    GroupsActivity.this.repaintRefresh(false);
+                } catch (NullPointerException e) {
+                    Log.w(TAG, "group or activity is null?", e);
+                }
 
             }
 
