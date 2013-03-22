@@ -61,7 +61,6 @@
    	<string name="player_not_playing">No track playing</string>
    	<string name="player_become_dj">Become the DJ</string>
    	<string name="player_leave_dj">Leave DJ seat</string>
-   	<string name="player_rating">Rating</string>
    	<string name="player_cover">album cover</string>
    	<string name="player_rate">Rate this song</string>
    	<string name="player_rate_it">Rate it!</string>
