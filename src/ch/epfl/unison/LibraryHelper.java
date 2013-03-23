@@ -55,6 +55,7 @@ public class LibraryHelper {
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
         }
+        cur.close();
         db.close();
         return set;
     }
@@ -96,6 +97,7 @@ public class LibraryHelper {
                 new String[] { String.valueOf(item.localId), item.artist, item.title},
                 null, null, null, "1");  // LIMIT 1
         boolean exists = c.moveToFirst();
+        c.close();
         db.close();
         return exists;
     }
