@@ -79,6 +79,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleExtras(getIntent().getExtras());
+        
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
@@ -106,6 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             finish();
         } else {
             mGroupId = extras.getLong(Const.Strings.GID);
+            AppData.getInstance(this).addToHistory(mGroupId);
             Log.i(TAG, "joined group " + mGroupId);
             if (extras.containsKey(Const.Strings.NAME)) {
                 setTitle(extras.getString(Const.Strings.NAME));
