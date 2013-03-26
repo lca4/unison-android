@@ -12,6 +12,11 @@ import android.util.Log;
 
 import ch.epfl.unison.api.UnisonAPI;
 
+import com.google.gson.GsonBuilder;
+
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Singleton object containing various utilities for the app.
  *
@@ -113,6 +118,32 @@ public final class AppData implements OnSharedPreferenceChangeListener {
                 || key.equals(Const.PrefKeys.UID)) {
             mApi = null;
         }
+    }
+    
+    public boolean addToHistory(long gid) {
+        Set<Long> history = this.getHistory();
+        if (history == null) {
+            history = new TreeSet<Long>();
+        } 
+
+        if (!history.add(Long.valueOf(gid))) {
+            return true;
+        }
+              
+        String value = new GsonBuilder().create().toJson(history);
+        
+        return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Set<Long> getHistory() {
+        String value = mPrefs.getString(Const.PrefKeys.HISTORY, null);
+        
+        if (value == null) {
+            return null;
+        }
+
+        return new GsonBuilder().create().fromJson(value, Set.class);
     }
 
     /**
