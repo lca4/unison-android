@@ -7,4 +7,8 @@
   <fileset name="all" enabled="true" check-config-name="gist - shareme/948425" local="true">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="libs"/>
+    <filter-data value="gen"/>
+  </filter>
 </fileset-config>

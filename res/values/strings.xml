@@ -41,7 +41,7 @@
 	<string name="login_loginBtn">Log In</string>
 	<string name="login_signup">New to GroupStreamer ?</string>
 	<string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
-	<string name="login_signing_in">Signing in...</string>
+	<string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
     
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>
@@ -55,6 +55,10 @@
    	<string name="groups_alert_newgroup_cancel">Cancel</string>
    	<string name="groups_createBtn">Create group</string>
    	<string name="groups_chooseGrp">or select one below :</string>
+   	
+   	<!-- Single user mode -->
+   	<string name="solo_playlists_createBtn">Create playlist</string>
+   	<string name="solo_playlists_choosePL">or select one below :</string>
     
     <!-- Player -->
    	<string name="player_unknown">unknown</string>
@@ -76,7 +80,7 @@
    	<string name="signup_password_confirm_hint">Confirm password</string>
    	<string name="signup_tou">I agree to the Terms of Use</string>
    	<string name="signup_signupBtn">Sign Up</string>
-   	<string name="signup_signing_up">Signing up...</string>
+   	<string name="signup_signing_up">Signing up&#8230;</string> <!-- &#8230; is "..." -->
    	
    	<!-- SignUpForm -->
    	<string name="signup_form_missing_fields">Fields are missing.</string>
