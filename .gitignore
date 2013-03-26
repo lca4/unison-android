@@ -23,9 +23,13 @@ local.properties
 .project
 .classpath
 .settings/
+.checkstyle
 
 # Third party libraries
 /libs/
 
 # Local directory configuration file (LinuxMint)
 .directory
+
+# Local temporary files
+*.kate-swp
