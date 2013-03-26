@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/musicMainLayout" >
+
+  <ImageView
+      android:id="@+id/musicCover"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:src="@drawable/cover"
+      android:contentDescription="@string/player_cover"
+      android:scaleType="fitStart" />
+
+  <LinearLayout
+      android:id="@+id/musicLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="#A000"
+      android:padding="20dp">
+
+
+    <!-- Artist -->
+    <TextView
+        android:id="@+id/musicArtist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/player_unknown"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/musicTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/player_not_playing"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+  </LinearLayout>
+
+
+  <LinearLayout
+      android:id="@+id/musicActions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_alignParentBottom="true"
+      android:padding="10dp">
+
+    <!-- <Button
+        android:id="@+id/djToggleBtn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="@string/player_become_dj" />
+
+    <Button
+        android:id="@+id/ratingBtn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="@string/player_rate_it" /> -->
+  </LinearLayout>
+  
+  <RelativeLayout
+      android:id="@+id/musicSeekBarContainer"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_margin="0dp"
+      android:layout_above="@id/musicActions"
+      android:background="@drawable/media_bg">
+    
+      	<SeekBar android:id="@+id/musicProgBar"
+        android:layout_height="40dp"
+        android:layout_width="match_parent" />
+      
+   </RelativeLayout>
+  
+  
+  <RelativeLayout
+      android:id="@+id/musicButtons"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:layout_above="@id/musicSeekBarContainer"
+      android:background="@drawable/media_bg">
+
+    <!-- Play / pause button -->
+    <Button android:id="@+id/musicToggleBtn"
+        android:background="@drawable/btn_play"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_centerHorizontal="true" />
+
+    <!-- Next button -->
+    <Button android:id="@+id/musicNextBtn"
+        android:background="@drawable/btn_next"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_alignParentRight="true" />
+
+    <!-- Previous button -->
+    <Button android:id="@+id/musicPrevBtn"
+        android:background="@drawable/btn_prev"
+        android:layout_width="74dp"
+        android:layout_height="56dp"
+        android:layout_alignParentLeft="true" />
+
+  </RelativeLayout>
+  
+
+</RelativeLayout>
