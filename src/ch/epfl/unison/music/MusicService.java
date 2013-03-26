@@ -1,7 +1,5 @@
 package ch.epfl.unison.music;
 
-import java.io.IOException;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,8 +14,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.MainActivity;
+
+import java.io.IOException;
 
 /**
  * Music player service. Inspired by the Android SDK's sample application,
@@ -34,49 +35,50 @@ public class MusicService extends Service
     private static final float DUCK_VOLUME = 0.1f;
 
     // Actions used on the service.
+    public static final String ACTION_LOAD = "ch.epfl.unison.music.action.LOAD";
     public static final String ACTION_PLAY = "ch.epfl.unison.music.action.PLAY";
     public static final String ACTION_PAUSE = "ch.epfl.unison.music.action.PAUSE";
     public static final String ACTION_STOP = "ch.epfl.unison.music.action.STOP";
-    public static final String ACTION_TOGGLE_PLAYBACK = "ch.epfl.unison.music.action.TOGGLE_PLAYBACK";
-    public static final String ACTION_LOAD = "ch.epfl.unison.music.action.LOAD";
+    public static final String ACTION_TOGGLE_PLAYBACK =
+            "ch.epfl.unison.music.action.TOGGLE_PLAYBACK";
 
     // Actions broadcasted.
     public static final String ACTION_COMPLETED = "ch.epfl.unison.music.action.COMPLETED";
 
-    private AudioFocusHelper focusHelper;
-    private MediaPlayer mediaPlayer;
-    private Notification notification;
+    private AudioFocusHelper mFocusHelper;
+    private MediaPlayer mMediaPlayer;
+    private Notification mNotification;
 
+    private MusicServiceBinder mBinder = new MusicServiceBinder();
 
-    MusicServiceBinder binder = new MusicServiceBinder();
-
-    // State variables.
-    enum State {
+    /** State of the the audio player. */
+    private enum State {
         Stopped,   // Media player is stopped.
         Preparing, // Media player is preparing
         Playing,   // Currently playing.
         Paused,    // Paused by user.
     }
-    private State state = State.Stopped;
+    private State mState = State.Stopped;
 
-    enum AudioFocus {
+    /** State of the audio focus. */
+    private enum AudioFocus {
         NoFocusNoDuck,  // We don't have the focus and can't duck.
         NoFocusCanDuck, // We don't have the focus but can duck.
         Focused,        // We have the focus. Yay!
     }
-    private AudioFocus focus = AudioFocus.NoFocusNoDuck;
+    private AudioFocus mFocus = AudioFocus.NoFocusNoDuck;
 
     @Override
     public void onCreate() {
-        this.focusHelper = new AudioFocusHelper(getApplicationContext(), this);
+        mFocusHelper = new AudioFocusHelper(getApplicationContext(), this);
     }
 
     @Override
     public void onDestroy() {
         // Service is being killed, so make sure we release our resources.
-        this.state = State.Stopped;
-        this.relaxResources(true);
-        this.giveUpAudioFocus();
+        mState = State.Stopped;
+        relaxResources(true);
+        giveUpAudioFocus();
     }
 
     /**
@@ -85,72 +87,78 @@ public class MusicService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        if (action.equals(ACTION_TOGGLE_PLAYBACK)) this.toggle();
-        else if (action.equals(ACTION_LOAD)) this.load(intent);
-        else if (action.equals(ACTION_PLAY)) this.play();
-        else if (action.equals(ACTION_PAUSE)) this.pause();
-        else if (action.equals(ACTION_STOP)) this.stop();
+        if (action.equals(ACTION_TOGGLE_PLAYBACK)) {
+            toggle();
+        } else if (action.equals(ACTION_LOAD)) {
+            load(intent);
+        } else if (action.equals(ACTION_PLAY)) {
+            play();
+        } else if (action.equals(ACTION_PAUSE)) {
+            pause();
+        } else if (action.equals(ACTION_STOP)) {
+            stop();
+        }
         // Don't restart if killed.
         return START_NOT_STICKY;
     }
 
     private void toggle() {
         Log.i(TAG, "blablablablabl");
-        if (this.state == State.Paused) {
-            this.play();
-        } else if (this.state == State.Playing) {
-            this.pause();
+        if (mState == State.Paused) {
+            play();
+        } else if (mState == State.Playing) {
+            pause();
         }
     }
 
     private void load(Intent intent) {
         Log.i(TAG, "doodlelidoo");
-        this.state = State.Stopped;
-        this.relaxResources(false);
-        this.tryToGetAudioFocus();
+        mState = State.Stopped;
+        relaxResources(false);
+        tryToGetAudioFocus();
 
         try {
             Uri uri = intent.getData();
-            this.createMediaPlayerIfNeeded();
+            createMediaPlayerIfNeeded();
 
-            this.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            this.mediaPlayer.setDataSource(this.getApplicationContext(), uri);
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mMediaPlayer.setDataSource(getApplicationContext(), uri);
 
-            this.state = State.Preparing;
+            mState = State.Preparing;
             // Calls OnPreparedListener when ready.
-            this.mediaPlayer.prepareAsync();
+            mMediaPlayer.prepareAsync();
 
-            this.setUpAsForeground("Unison"); // TODO Change notification text.
+            setUpAsForeground("Unison"); // TODO Change notification text.
         } catch (IOException ioe) {
             Log.e(TAG, "Couldn't load resource.");
         }
     }
 
     private void play() {
-        if (this.state == State.Paused) {
-            this.tryToGetAudioFocus();
-            this.setUpAsForeground("Unison"); // TODO Change notification text
-            this.state = State.Playing;
-            this.configAndStartMediaPlayer();
+        if (mState == State.Paused) {
+            tryToGetAudioFocus();
+            setUpAsForeground("Unison"); // TODO Change notification text
+            mState = State.Playing;
+            configAndStartMediaPlayer();
         }
     }
 
     private void pause() {
-        if (this.state == State.Playing) {
-            this.state = State.Paused;
-            this.mediaPlayer.pause();
-            this.relaxResources(false); // Keep audio focus.
+        if (mState == State.Playing) {
+            mState = State.Paused;
+            mMediaPlayer.pause();
+            relaxResources(false); // Keep audio focus.
         }
     }
 
     private void stop() {
-        if (this.state == State.Playing || this.state == State.Paused) {
-            this.relaxResources(true);
-            this.state = State.Stopped;
-            this.giveUpAudioFocus();
+        if (mState == State.Playing || mState == State.Paused) {
+            relaxResources(true);
+            mState = State.Stopped;
+            giveUpAudioFocus();
 
             // Service is no longer necessary.
-            this.stopSelf();
+            stopSelf();
         }
     }
 
@@ -159,39 +167,39 @@ public class MusicService extends Service
      * doesn't exist.
      */
     private void createMediaPlayerIfNeeded() {
-        if (this.mediaPlayer != null) {
+        if (mMediaPlayer != null) {
             // The MediaPlayer object is already set up. We just reset it.
-            this.mediaPlayer.reset();
+            mMediaPlayer.reset();
             return;
         }
-        this.mediaPlayer = new MediaPlayer();
+        mMediaPlayer = new MediaPlayer();
         // This means that the screen can go off, but the CPU has to stay running.
-        this.mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         // Various events we need to handle.
-        this.mediaPlayer.setOnPreparedListener(this);
-        this.mediaPlayer.setOnCompletionListener(this);
-        this.mediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnErrorListener(this);
     }
 
     /**
      * Reconfigures MediaPlayer according to audio focus settings and starts/restarts it.
      */
     void configAndStartMediaPlayer() {
-    	Log.d(TAG, "duration = " + this.mediaPlayer.getDuration());
-        if (this.focus == AudioFocus.NoFocusNoDuck) {
+        Log.d(TAG, "duration = " + mMediaPlayer.getDuration());
+        if (mFocus == AudioFocus.NoFocusNoDuck) {
             // If we don't have audio focus and can't duck, we have to pause.
-            if (this.mediaPlayer.isPlaying()) {
-                this.mediaPlayer.pause(); // Note: the status remains Playing.
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.pause(); // Note: the status remains Playing.
             }
-        } else if (this.focus == AudioFocus.NoFocusCanDuck) {
-            this.mediaPlayer.setVolume(DUCK_VOLUME, DUCK_VOLUME);
-            if (!this.mediaPlayer.isPlaying()) {
-                this.mediaPlayer.start();
+        } else if (mFocus == AudioFocus.NoFocusCanDuck) {
+            mMediaPlayer.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+            if (!mMediaPlayer.isPlaying()) {
+                mMediaPlayer.start();
             }
         } else { // this.focus == AudioFocus.Focused
-            this.mediaPlayer.setVolume(1.0f, 1.0f);
-            if (!this.mediaPlayer.isPlaying()) {
-                this.mediaPlayer.start();
+            mMediaPlayer.setVolume(1.0f, 1.0f);
+            if (!mMediaPlayer.isPlaying()) {
+                mMediaPlayer.start();
             }
         }
     }
@@ -200,13 +208,13 @@ public class MusicService extends Service
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        this.notification = new Notification();
-        this.notification.tickerText = text;
-        this.notification.icon = R.drawable.ic_media_play;
-        this.notification.flags |= Notification.FLAG_ONGOING_EVENT;
-        this.notification.setLatestEventInfo(getApplicationContext(), "Unison",
+        mNotification = new Notification();
+        mNotification.tickerText = text;
+        mNotification.icon = R.drawable.ic_media_play;
+        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+        mNotification.setLatestEventInfo(getApplicationContext(), "Unison",
                 text, pi);
-        this.startForeground(NOTIFICATION_ID, this.notification);
+        startForeground(NOTIFICATION_ID, mNotification);
     }
 
     /**
@@ -216,81 +224,96 @@ public class MusicService extends Service
      *     also be released or not.
      */
     void relaxResources(boolean releaseMediaPlayer) {
-        this.stopForeground(true);
+        stopForeground(true);
 
-        if (releaseMediaPlayer && this.mediaPlayer != null) {
-            this.mediaPlayer.reset();
-            this.mediaPlayer.release();
-            this.mediaPlayer = null;
+        if (releaseMediaPlayer && mMediaPlayer != null) {
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
     void tryToGetAudioFocus() {
-        if (this.focus != AudioFocus.Focused && this.focusHelper != null
-                && this.focusHelper.requestFocus()) {
-            this.focus = AudioFocus.Focused;
+        if (mFocus != AudioFocus.Focused && mFocusHelper != null
+                && mFocusHelper.requestFocus()) {
+            mFocus = AudioFocus.Focused;
         }
     }
 
     void giveUpAudioFocus() {
-        if (this.focus == AudioFocus.Focused && this.focusHelper != null
-                && this.focusHelper.abandonFocus()) {
-            this.focus = AudioFocus.NoFocusNoDuck;
+        if (mFocus == AudioFocus.Focused && mFocusHelper != null
+                && mFocusHelper.abandonFocus()) {
+            mFocus = AudioFocus.NoFocusNoDuck;
         }
     }
 
     public void onGainedAudioFocus() {
-        this.focus = AudioFocus.Focused;
-        if (this.state == State.Playing) {
-            this.configAndStartMediaPlayer();
+        mFocus = AudioFocus.Focused;
+        if (mState == State.Playing) {
+            configAndStartMediaPlayer();
         }
     }
 
     public void onLostAudioFocus(boolean canDuck) {
-        this.focus = canDuck? AudioFocus.NoFocusCanDuck : AudioFocus.NoFocusNoDuck;
-        if (this.mediaPlayer != null && this.mediaPlayer.isPlaying()) {
-            this.configAndStartMediaPlayer();
+        if (canDuck) {
+            mFocus = AudioFocus.NoFocusCanDuck;
+        } else {
+            mFocus = AudioFocus.NoFocusNoDuck;
+        }
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            configAndStartMediaPlayer();
         }
     }
 
+    @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.e(TAG, "Media player error: what=" + String.valueOf(what)
                 + ", extra=" + String.valueOf(extra));
 
-        this.state = State.Stopped;
-        this.relaxResources(true);
-        this.giveUpAudioFocus();
+        mState = State.Stopped;
+        relaxResources(true);
+        giveUpAudioFocus();
         return true; // true indicates we handled the error
     }
 
+    @Override
     public void onPrepared(MediaPlayer mp) {
-        this.state = State.Playing;
-        this.configAndStartMediaPlayer();
+        mState = State.Playing;
+        configAndStartMediaPlayer();
     }
 
+    @Override
     public void onCompletion(MediaPlayer mp) {
         Log.i(TAG, "track completed - sending broadcast message");
-        this.sendBroadcast(new Intent().setAction(ACTION_COMPLETED));
+        sendBroadcast(new Intent().setAction(ACTION_COMPLETED));
     }
 
+    /** Binder to get access to the media player. */
     public class MusicServiceBinder extends Binder {
         public int getCurrentPosition() {
-            return mediaPlayer != null ? mediaPlayer.getCurrentPosition() : -1;
+            if (mMediaPlayer != null) {
+                return  mMediaPlayer.getCurrentPosition();
+            }
+            return -1;
         }
+
         public void setCurrentPosition(int newPos) {
-        	if (mediaPlayer != null) {
-        		Log.d(TAG, "using seekTo(" + newPos + ")");
-        		mediaPlayer.seekTo(newPos);
-        	}
+            if (mMediaPlayer != null) {
+                Log.d(TAG, "using seekTo(" + newPos + ")");
+                mMediaPlayer.seekTo(newPos);
+            }
         }
         public int getDuration() {
-        	return mediaPlayer != null ? mediaPlayer.getDuration() : 0;
+            if (mMediaPlayer != null) {
+                return mMediaPlayer.getDuration();
+            }
+            return 0;
         }
-        
+
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return this.binder;
+        return mBinder;
     }
 }

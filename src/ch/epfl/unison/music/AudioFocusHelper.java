@@ -12,39 +12,41 @@ import android.media.AudioManager;
  */
 public class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener {
 
-    AudioManager audioManager;
-    MusicService musicService;
+    private AudioManager mAudioManager;
+    private MusicService mMusicService;
 
     public AudioFocusHelper(Context context, MusicService musicService) {
-        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        this.musicService = musicService;
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mMusicService = musicService;
     }
 
     public boolean requestFocus() {
-        return this.audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+        return mAudioManager.requestAudioFocus(
+                this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
     public boolean abandonFocus() {
-        return this.audioManager.abandonAudioFocus(this) ==
-                AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+        return mAudioManager.abandonAudioFocus(this)
+                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
+    @Override
     public void onAudioFocusChange(int focusChange) {
-        if (this.musicService == null) {
+        if (mMusicService == null) {
             return;
         }
 
         switch (focusChange) {
         case AudioManager.AUDIOFOCUS_GAIN:
-            musicService.onGainedAudioFocus();
+            mMusicService.onGainedAudioFocus();
             break;
         case AudioManager.AUDIOFOCUS_LOSS:
         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-            this.musicService.onLostAudioFocus(false);
+            mMusicService.onLostAudioFocus(false);
             break;
         case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-            this.musicService.onLostAudioFocus(true);
+            mMusicService.onLostAudioFocus(true);
             break;
         default:  // Should never happen.
             break;

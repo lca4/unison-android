@@ -9,123 +9,144 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import ch.epfl.unison.api.PreferenceKeys;
+
 import ch.epfl.unison.api.UnisonAPI;
 
-public class AppData implements OnSharedPreferenceChangeListener {
+/**
+ * Singleton object containing various utilities for the app.
+ *
+ * @author lum
+ */
+public final class AppData implements OnSharedPreferenceChangeListener {
 
     private static final String TAG = "ch.epfl.unison.AppData";
     private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
 
-    private static AppData instance;
+    private static AppData sInstance;
 
-    private Context context;
-    private UnisonAPI api;
-    private SharedPreferences prefs;
+    private Context mContext;
+    private UnisonAPI mApi;
+    private SharedPreferences mPrefs;
 
-    private LocationManager locationMgr;
-    private UnisonLocationListener gpsListener;
-    private Location gpsLocation;
-    private UnisonLocationListener networkListener;
-    private Location networkLocation;
+    private LocationManager mLocationMgr;
+    private UnisonLocationListener mGpsListener;
+    private Location mGpsLocation;
+    private UnisonLocationListener mNetworkListener;
+    private Location mNetworkLocation;
 
     private AppData(Context context) {
-        this.context = context;
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        this.prefs.registerOnSharedPreferenceChangeListener(this);
+        mContext = context;
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     private AppData setupLocation() {
-        if (this.locationMgr == null) {
-            this.locationMgr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (mLocationMgr == null) {
+            mLocationMgr = (LocationManager) mContext.getSystemService(
+                    Context.LOCATION_SERVICE);
         }
         // try to set up the network location listener.
-        if (this.networkListener == null
-                && this.locationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            this.networkListener = new UnisonLocationListener(LocationManager.NETWORK_PROVIDER);
-            this.locationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_INTERVAL, 1f, this.networkListener);
-            this.networkLocation = this.locationMgr.getLastKnownLocation(
+        if (mNetworkListener == null
+                && mLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            mNetworkListener = new UnisonLocationListener(LocationManager.NETWORK_PROVIDER);
+            mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    LOCATION_INTERVAL, 1f, mNetworkListener);
+            mNetworkLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.NETWORK_PROVIDER);
         }
         // try to set up the GPS location listener.
-        if (this.gpsListener == null
-                && this.locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            this.gpsListener = new UnisonLocationListener(LocationManager.GPS_PROVIDER);
-            this.locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    LOCATION_INTERVAL, 1f, this.gpsListener);
-            this.gpsLocation = this.locationMgr.getLastKnownLocation(
+        if (mGpsListener == null
+                && mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mGpsListener = new UnisonLocationListener(LocationManager.GPS_PROVIDER);
+            mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_INTERVAL, 1f, mGpsListener);
+            mGpsLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.GPS_PROVIDER);
         }
         return this;
     }
 
     public UnisonAPI getAPI() {
-        if (this.api == null) {
-            String email = this.prefs.getString(PreferenceKeys.EMAIL_KEY, null);
-            String password = this.prefs.getString(PreferenceKeys.PASSWORD_KEY, null);
+        if (mApi == null) {
+            String email = mPrefs.getString(Const.PrefKeys.EMAIL, null);
+            String password = mPrefs.getString(Const.PrefKeys.PASSWORD, null);
             if (email != null && password != null) {
-                this.api = new UnisonAPI(email, password);
+                mApi = new UnisonAPI(email, password);
             } else {
-                this.api = new UnisonAPI();
+                mApi = new UnisonAPI();
             }
         }
-        return this.api;
+        return mApi;
     }
 
     public long getUid() {
-        return this.prefs.getLong(PreferenceKeys.UID_KEY, -1);
+        return mPrefs.getLong(Const.PrefKeys.UID, -1);
     }
 
     public boolean showHelpDialog() {
-        return this.prefs.getBoolean(PreferenceKeys.HELPDIALOG_KEY, true);
+        return mPrefs.getBoolean(Const.PrefKeys.HELPDIALOG, true);
     }
 
     public void setShowHelpDialog(boolean value) {
-        this.prefs.edit().putBoolean(PreferenceKeys.HELPDIALOG_KEY, value).commit();
+        mPrefs.edit().putBoolean(Const.PrefKeys.HELPDIALOG, value).commit();
     }
 
     public Location getLocation() {
-        // Prefer GPS locations over network locations.
-        return this.gpsLocation != null ? this.gpsLocation : this.networkLocation;
+        if (mGpsLocation != null) {
+            return mGpsLocation;  // Prefer GPS locations over network locations.
+        }
+        return mNetworkLocation;
     }
 
     public static synchronized AppData getInstance(Context c) {
-        if (instance == null) {
-            instance = new AppData(c.getApplicationContext());
+        if (sInstance == null) {
+            sInstance = new AppData(c.getApplicationContext());
         }
-        return instance.setupLocation();
+        return sInstance.setupLocation();
     }
 
+    @Override
     public synchronized void onSharedPreferenceChanged(
             SharedPreferences sharedPreferences, String key) {
-        if (key.equals(PreferenceKeys.EMAIL_KEY) || key.equals(PreferenceKeys.PASSWORD_KEY) || key.equals(PreferenceKeys.UID_KEY)) {
-            this.api = null;
+        if (key.equals(Const.PrefKeys.EMAIL)
+                || key.equals(Const.PrefKeys.PASSWORD)
+                || key.equals(Const.PrefKeys.UID)) {
+            mApi = null;
         }
     }
 
+    /**
+     * Simple LocationListener that differentiates updates from the
+     * network provider and those from the GPS provider.
+     *
+     * @author lum
+     */
     public class UnisonLocationListener implements LocationListener {
 
-        private String provider;
+        private String mProvider;
 
         public UnisonLocationListener(String provider) {
-            this.provider = provider;
+            mProvider = provider;
         }
 
+        @Override
         public void onLocationChanged(Location location) {
-            if (LocationManager.GPS_PROVIDER.equals(this.provider)) {
-                AppData.this.gpsLocation = location;
-            } else if (LocationManager.NETWORK_PROVIDER.equals(this.provider)) {
-                AppData.this.networkLocation = location;
+            if (LocationManager.GPS_PROVIDER.equals(mProvider)) {
+                AppData.this.mGpsLocation = location;
+            } else if (LocationManager.NETWORK_PROVIDER.equals(mProvider)) {
+                AppData.this.mNetworkLocation = location;
             } else {
                 throw new RuntimeException("unsupported location provider");
-            };
+            }
             Log.i(TAG, String.format("Got location (%s): lat=%f, lon=%f",
-                    provider, location.getLatitude(), location.getLongitude()));
+                    mProvider, location.getLatitude(), location.getLongitude()));
         }
 
-        public void onProviderDisabled(String provider) {}
-        public void onProviderEnabled(String provider) {}
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+        @Override
+        public void onProviderDisabled(String provider) { }
+        @Override
+        public void onProviderEnabled(String provider) { }
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) { }
     }
 }

@@ -2,8 +2,9 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
-import ch.epfl.unison.api.PreferenceKeys;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -32,7 +33,8 @@ public abstract class UnisonMenu {
         return true;
     }
 
-    public static boolean onOptionsItemSelected(Activity activity, OnRefreshListener listener, MenuItem item) {
+    public static boolean onOptionsItemSelected(Activity activity,
+            OnRefreshListener listener, MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_item_refresh:
             if (listener != null) { listener.onRefresh(); }
@@ -48,7 +50,7 @@ public abstract class UnisonMenu {
         break;
         case R.id.menu_item_logout:
             activity.startActivity(new Intent(activity, LoginActivity.class)
-                    .putExtra(PreferenceKeys.LOGOUT_KEY, true));
+                    .putExtra(Const.Strings.LOGOUT, true));
             // Send broadcast to all activities that can only be used when logged in.
             activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
         break;
@@ -67,7 +69,8 @@ public abstract class UnisonMenu {
         return true;
     }
 
-    public static interface OnRefreshListener {
-        public void onRefresh();
+    /** Simple interface to notify listeners when the refresh button is hit. */
+    public interface OnRefreshListener {
+        void onRefresh();
     }
 }

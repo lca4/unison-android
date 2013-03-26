@@ -1,13 +1,10 @@
 package ch.epfl.unison.api;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import android.util.Log;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -22,13 +19,22 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import android.util.Log;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-public class Request<T extends JsonStruct> {
+/**
+ * Helper class that facilitates HTTP requests returning JSON data.
+ *
+ * @param <T> the type of the response
+ * @author lum
+ */
+public final class Request<T extends JsonStruct> {
 
     private static final String TAG = "ch.epfl.unison.Request";
 
@@ -38,45 +44,46 @@ public class Request<T extends JsonStruct> {
         System.setProperty("http.keepAlive", "false");
     }
 
+    private static final int SUCCESS_RANGE_START = 200;
+    private static final int SUCCESS_RANGE_STOP = 299;
     private static final String ENCODING = "UTF-8";
     private static final int CONNECT_TIMEOUT = 30 * 1000;  // In ms.
     private static final int READ_TIMEOUT = 30 * 1000;  // In ms.
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    private URL url;
-    private Class<T> classOfT;
+    private URL mUrl;
+    private Class<T> mClassOfT;
 
-    private String auth;
-    private Map<String, List<String>> data;
+    private String mAuth;
+    private Map<String, List<String>> mData;
 
     private Request(URL url, Class<T> classOfT) {
-        this.url = url;
-
+        mUrl = url;
         // We need this to be able to instantiate the correct JSONStruct.
-        this.classOfT = classOfT;
+        mClassOfT = classOfT;
     }
 
     public static <S extends JsonStruct> Request<S> of(
-    		URL url, Class<S> classOfS) {
+            URL url, Class<S> classOfS) {
         return new Request<S>(url, classOfS);
     }
 
     public Request<T> addParam(String key, Object value) {
-        if (this.data == null) {
+        if (this.mData == null) {
             // This is the first parameter. Initialize the map.
-            this.data = new HashMap<String, List<String>>();
+            this.mData = new HashMap<String, List<String>>();
         }
-        if (!this.data.containsKey(key)) {
+        if (!this.mData.containsKey(key)) {
             // First value for this key. Initialize the list of values.
-            this.data.put(key, new LinkedList<String>());
+            this.mData.put(key, new LinkedList<String>());
         }
-        this.data.get(key).add(value.toString());
+        this.mData.get(key).add(value.toString());
         return this;
     }
 
     public Request<T> setAuth(String auth) {
-        this.auth = auth;
+        this.mAuth = auth;
         return this;
     }
 
@@ -97,65 +104,56 @@ public class Request<T extends JsonStruct> {
     }
 
     private Result<T> execute(HttpRequestBase request) {
-    	try {
-			request.setURI(this.url.toURI());
-		} catch (URISyntaxException e) {
-			//This should never happen
-			return new Result<T>(new UnisonAPI.Error(0, "", "", e));
-		}
+        try {
+            request.setURI(this.mUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
         Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
         String responseContent = null;
         HttpResponse response = null;
         StatusLine responseStatusLine = null;
-        
+
         try {
-            // Configure some sensible defaults.
-            //Timeout setting could also be done in client, we choose to keep it here for better readability.
-            request.getParams().setParameter("http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
-            request.getParams().setParameter("http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
-            
+            // Configure some sensible defaults. Timeout setting could also be done in client,
+            // we choose to keep it here for better readability.
+            request.getParams().setParameter(
+                    "http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
+            request.getParams().setParameter(
+                    "http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
 
-            if (this.auth != null) {
+            if (mAuth != null) {
                 // Set a raw HTTP Basic Auth header (java.net.Authenticator has issues).
-                request.addHeader("Authorization", "Basic " + this.auth);
+                request.addHeader("Authorization", "Basic " + mAuth);
             }
-
-            if (this.data != null && request instanceof HttpEntityEnclosingRequestBase) {
+            if (mData != null) {
                 // Write out the request body (i.e. the form data).
-            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
-            	Log.d(TAG, "entity = " + EntityUtils.toString(((HttpEntityEnclosingRequestBase) request).getEntity()));
-            	((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(generateQueryNVP(this.data), ENCODING));
+                ((HttpEntityEnclosingRequestBase) request).setEntity(
+                        new UrlEncodedFormEntity(generateQueryNVP(this.mData), ENCODING));
             }
 
             try {
                 // Get the response as a string.
-            	response = HttpClientFactory.getInstance().execute(request);
-            	responseStatusLine = response.getStatusLine();
-            	Log.d(TAG, "status = " + responseStatusLine.toString());
-            	responseContent = response.getEntity() == null ? null : EntityUtils
-        				.toString(response.getEntity());
-            } catch(IOException ioe) {
+                response = HttpClientFactory.getInstance().execute(request);
+                responseStatusLine = response.getStatusLine();
+                Log.d(TAG, "status = " + responseStatusLine.toString());
+                responseContent = EntityUtils.toString(response.getEntity());
+                Log.d(TAG, "received: " + responseContent);
+            } catch (IOException ioe) {
                 // Happens when the server returns an error status code.
-            	responseContent = responseStatusLine == null ? null : responseStatusLine.getReasonPhrase();
+                responseContent = responseStatusLine.getReasonPhrase();
             }
 
             int status = responseStatusLine.getStatusCode();
-            
-            if (status < 200 || status > 299) {
+            if (status < SUCCESS_RANGE_START || status > SUCCESS_RANGE_STOP) {
                 // We didn't receive a 2xx status code - we treat it as an error.
                 JsonStruct.Error jsonError = GSON.fromJson(responseContent, JsonStruct.Error.class);
-                if (jsonError == null) {
-                	jsonError = new JsonStruct.Error();
-                }
                 return new Result<T>(new UnisonAPI.Error(status,
-                		responseStatusLine.toString(), responseContent, jsonError));
+                        responseStatusLine.toString(), responseContent, jsonError));
             } else {
                 // Success.
-            	Log.d(TAG, "received: " + responseContent);
-            	if(responseContent == null) {
-            		throw new RuntimeException("Received null answer from server.");
-            	}
-                T jsonStruct = GSON.fromJson(responseContent, this.classOfT);
+                T jsonStruct = GSON.fromJson(responseContent, this.mClassOfT);
                 return new Result<T>(jsonStruct);
             }
 
@@ -166,44 +164,45 @@ public class Request<T extends JsonStruct> {
             // - JsonSyntaxException, if we fail to decode the server's response.
             Log.e(TAG, "caught exception while handling request", e);
             int statusCode = 0;
-            String statusMessage = null;
+            String statusMessage = "";
             try {
                 statusCode = responseStatusLine.getStatusCode();
                 statusMessage = responseStatusLine.getReasonPhrase();
-            } catch(Exception foobar) {}
-            if (statusMessage == null) {
-            	statusMessage = "";
+            } catch (Exception foobar) {
+                Log.i(TAG, "execute(): couldn't even get status code or reason phrase", foobar);
             }
-            return new Result<T>(new UnisonAPI.Error(statusCode, statusMessage, responseContent, e));
 
+            return new Result<T>(new UnisonAPI.Error(
+                    statusCode, statusMessage, responseContent, e));
         }
     }
-    
+
     private static List<NameValuePair> generateQueryNVP(Map<String, List<String>> data) {
-    	List<NameValuePair> nvp = new ArrayList<NameValuePair>();
-		for (Map.Entry<String, List<String>> entry : data.entrySet()) {
-			for (String value : entry.getValue()) {
-				nvp.add(new BasicNameValuePair(entry.getKey(), value));
-			}
-		}
-		return nvp;
+        List<NameValuePair> nvp = new ArrayList<NameValuePair>();
+        for (Map.Entry<String, List<String>> entry : data.entrySet()) {
+            for (String value : entry.getValue()) {
+                nvp.add(new BasicNameValuePair(entry.getKey(), value));
+            }
+        }
+        return nvp;
     }
 
+    /** Simple POJO containing the result of the request. */
     public static class Result<S> {
         public final UnisonAPI.Error error;
         public final S result;
 
-        private Result(S result, UnisonAPI.Error error) {
-            this.result = result;
-            this.error = error;
+        private Result(S res, UnisonAPI.Error err) {
+            result = res;
+            error = err;
         }
 
-        public Result(S result) {
-            this(result, null);
+        public Result(S res) {
+            this(res, null);
         }
 
-        public Result(UnisonAPI.Error error) {
-            this(null, error);
+        public Result(UnisonAPI.Error err) {
+            this(null, err);
         }
     }
 

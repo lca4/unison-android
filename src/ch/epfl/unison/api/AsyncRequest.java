@@ -1,16 +1,22 @@
 package ch.epfl.unison.api;
 
-import java.net.URL;
-
 import android.os.AsyncTask;
 
+import java.net.URL;
 
-public class AsyncRequest<T extends JsonStruct>
+/**
+ * Wraps a Request in an AsyncTask to allow non-blocking requests.
+ *
+ * @param <T> the type of the response
+ * @author lum
+ */
+public final class AsyncRequest<T extends JsonStruct>
         extends AsyncTask<AsyncRequest.Method, Void, Request.Result<T>> {
 
-    private Request<T> request;
-    private UnisonAPI.Handler<T> handler;
+    private Request<T> mRequest;
+    private UnisonAPI.Handler<T> mHandler;
 
+    /** Types of HTTP requests. */
     public static enum Method {
         GET,
         POST,
@@ -20,52 +26,52 @@ public class AsyncRequest<T extends JsonStruct>
 
 
     private AsyncRequest(URL url, UnisonAPI.Handler<T> handler, Class<T> classOfT) {
-        this.request = Request.of(url, classOfT);
-        this.handler = handler;
+        mRequest = Request.of(url, classOfT);
+        mHandler = handler;
     }
 
     public static <S extends JsonStruct> AsyncRequest<S> of(
-    		URL url, UnisonAPI.Handler<S> handler, Class<S> classOfS) {
+            URL url, UnisonAPI.Handler<S> handler, Class<S> classOfS) {
         return new AsyncRequest<S>(url, handler, classOfS);
     }
 
     public AsyncRequest<T> addParam(String key, Object value) {
-        this.request.addParam(key, value);
+        mRequest.addParam(key, value);
         return this;
     }
 
     public AsyncRequest<T> setAuth(String auth) {
-        this.request.setAuth(auth);
+        mRequest.setAuth(auth);
         return this;
     }
 
     public void doGET() {
-        this.execute(Method.GET);
+        execute(Method.GET);
     }
 
     public void doPOST() {
-        this.execute(Method.POST);
+        execute(Method.POST);
     }
 
     public void doPUT() {
-        this.execute(Method.PUT);
+        execute(Method.PUT);
     }
 
     public void doDELETE() {
-        this.execute(Method.DELETE);
+        execute(Method.DELETE);
     }
 
     @Override
     protected Request.Result<T> doInBackground(Method... method) {
         switch(method[0]) {
         case GET:
-            return this.request.doGET();
+            return mRequest.doGET();
         case POST:
-            return this.request.doPOST();
+            return mRequest.doPOST();
         case PUT:
-            return this.request.doPUT();
+            return mRequest.doPUT();
         case DELETE:
-            return this.request.doDELETE();
+            return mRequest.doDELETE();
         default:
             return null;  // Should never happen.
         }
@@ -74,9 +80,9 @@ public class AsyncRequest<T extends JsonStruct>
     @Override
     protected void onPostExecute(Request.Result<T> res) {
         if (res.result != null) {
-            this.handler.callback(res.result);
+            mHandler.callback(res.result);
         } else {
-            this.handler.onError(res.error);
+            mHandler.onError(res.error);
         }
     }
 }

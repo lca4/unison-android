@@ -1,7 +1,5 @@
 package ch.epfl.unison.api;
 
-import java.net.URI;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectHandler;
@@ -16,47 +14,61 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
-public class HttpClientFactory {
+import java.net.URI;
 
-	
-	private static HttpClient httpClient;
-	
-	private static final int HTTP_PORT = 80;
-	private static final int HTTPS_PORT = 443;
-	
-	public static synchronized HttpClient getInstance() {
-		if (httpClient == null) {
-			httpClient = create();
-		}
-		
-		return httpClient;
-	}
+/**
+ * TODO(louismagarshack) Write the javadoc for this class.
+ *
+ * @author louismagarshack
+ */
+public final class HttpClientFactory {
 
-	final private static RedirectHandler REDIRECT_NO_FOLLOW = new RedirectHandler() {
-		
-		public boolean isRedirectRequested(HttpResponse response, HttpContext context) {
-			return false;
-		}
+    private static final int HTTP_PORT = 80;
+    private static final int HTTPS_PORT = 443;
 
-		
-		public URI getLocationURI(HttpResponse response, HttpContext context) throws org.apache.http.ProtocolException {
-			return null;
-		}
-	};
+    private static final RedirectHandler REDIRECT_NO_FOLLOW = new RedirectHandler() {
 
-	private static HttpClient create() {
-		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), HTTP_PORT));
-		schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), HTTPS_PORT));
-		HttpParams params = new BasicHttpParams();
-		ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(params, schemeRegistry);
-		AbstractHttpClient result = new DefaultHttpClient(connManager, params);
-		result.setRedirectHandler(REDIRECT_NO_FOLLOW);
-		return result;
-	}
+        @Override
+        public boolean isRedirectRequested(HttpResponse response, HttpContext context) {
+            return false;
+        }
 
-	//For tests since Mockito cannot mock AbstractHttpClient.
-	public static void setInstance(HttpClient instance) {
-		httpClient = instance;
-	}
+        @Override
+        public URI getLocationURI(HttpResponse response, HttpContext context)
+                throws org.apache.http.ProtocolException {
+            return null;
+        }
+    };
+
+    private static HttpClient sHttpClient;
+
+    /** Hide the Constructor. */
+    private HttpClientFactory() { };
+
+    public static synchronized HttpClient getInstance() {
+        if (sHttpClient == null) {
+            sHttpClient = create();
+        }
+
+        return sHttpClient;
+    }
+
+    private static HttpClient create() {
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(
+                new Scheme("http", PlainSocketFactory.getSocketFactory(), HTTP_PORT));
+        schemeRegistry.register(
+                new Scheme("https", SSLSocketFactory.getSocketFactory(), HTTPS_PORT));
+        HttpParams params = new BasicHttpParams();
+        ThreadSafeClientConnManager connManager =
+                new ThreadSafeClientConnManager(params, schemeRegistry);
+        AbstractHttpClient result = new DefaultHttpClient(connManager, params);
+        result.setRedirectHandler(REDIRECT_NO_FOLLOW);
+        return result;
+    }
+
+    //For tests since Mockito cannot mock AbstractHttpClient.
+    public static void setInstance(HttpClient instance) {
+        sHttpClient = instance;
+    }
 }

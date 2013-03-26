@@ -1,11 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +21,7 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.LibraryHelper;
 import ch.epfl.unison.MusicItem;
@@ -37,19 +32,31 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Activity where the user can rate the music on his device (or, more precisely: the
+ * tracks that are on the local SQLite DB managed by the app).
+ *
+ * @author lum
+ */
 public class RatingsActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.RatingsActivity";
 
-    private ListView musicList;
-    private CheckBox unratedCheck;
+    private ListView mMusicList;
+    private CheckBox mUnratedCheck;
 
-    private Map<String, Integer> ratings;
-    private List<MusicItem> items;
+    private Map<String, Integer> mRatings;
+    private List<MusicItem> mItems;
 
-    private boolean unratedOnly;
+    private boolean mUnratedOnly;
 
-    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
@@ -61,28 +68,30 @@ public class RatingsActivity extends SherlockActivity {
         super.onCreate(savedInstanceState);
 
         // This activity should finish on logout.
-        this.registerReceiver(this.logoutReceiver,
+        registerReceiver(mLogoutReceiver,
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        this.setContentView(R.layout.ratings);
-        this.setTitle(R.string.activity_title_ratings);
+        setContentView(R.layout.ratings);
+        setTitle(R.string.activity_title_ratings);
 
-        this.musicList = (ListView) this.findViewById(R.id.listMusicList);
-        this.musicList.setOnItemClickListener(new OnChangeRatingListener());
+        mMusicList = (ListView) findViewById(R.id.listMusicList);
+        mMusicList.setOnItemClickListener(new OnChangeRatingListener());
 
-        this.unratedCheck = (CheckBox) this.findViewById(R.id.unratedCheckBox);
-        this.unratedCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        mUnratedCheck = (CheckBox) findViewById(R.id.unratedCheckBox);
+        mUnratedCheck.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                unratedOnly = isChecked;
+                mUnratedOnly = isChecked;
                 refreshList();
             }
         });
 
-        this.initItems();
-        this.initRatings(new Runnable() {
+        initItems();
+        initRatings(new Runnable() {
+            @Override
             public void run() {
                 refreshList();
-                unratedCheck.setEnabled(true);
+                mUnratedCheck.setEnabled(true);
             }
         });
     }
@@ -90,21 +99,23 @@ public class RatingsActivity extends SherlockActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(this.logoutReceiver);
+        unregisterReceiver(mLogoutReceiver);
     }
 
     private void initRatings(final Runnable clbk) {
         AppData data = AppData.getInstance(this);
         data.getAPI().getRatings(data.getUid(), new UnisonAPI.Handler<JsonStruct.TracksList>() {
 
+            @Override
             public void callback(JsonStruct.TracksList struct) {
-                ratings = new HashMap<String, Integer>();
+                mRatings = new HashMap<String, Integer>();
                 for (JsonStruct.Track t : struct.tracks) {
-                    ratings.put(t.artist + t.title, t.rating);
+                    mRatings.put(t.artist + t.title, t.rating);
                 }
                 clbk.run();
             }
 
+            @Override
             public void onError(Error error) {
                 Log.d(TAG, error.toString());
                 if (RatingsActivity.this != null) {
@@ -117,69 +128,103 @@ public class RatingsActivity extends SherlockActivity {
 
     private void initItems() {
         LibraryHelper helper = new LibraryHelper(this);
-        this.items = new ArrayList<MusicItem>(helper.getEntries());
-        Collections.sort(this.items);
+        mItems = new ArrayList<MusicItem>(helper.getEntries());
+        Collections.sort(mItems);
         helper.close();
     }
 
     private void refreshList() {
-        this.refreshList(0);
+        refreshList(0);
     }
 
     private void refreshList(int position) {
-        if (this.unratedOnly) {
+        if (mUnratedOnly) {
             List<MusicItem> filtered = new ArrayList<MusicItem>();
-            for (MusicItem item : this.items) {
-                if (!this.ratings.containsKey(item.artist + item.title)) {
+            for (MusicItem item : mItems) {
+                if (!mRatings.containsKey(item.artist + item.title)) {
                     filtered.add(item);
                 }
             }
-            this.musicList.setAdapter(new RatingsAdapter(filtered));
+            mMusicList.setAdapter(new RatingsAdapter(filtered));
         } else {
-            this.musicList.setAdapter(new RatingsAdapter(this.items));
+            mMusicList.setAdapter(new RatingsAdapter(mItems));
         }
-        this.musicList.setSelection(position);
+        mMusicList.setSelection(position);
     }
 
+    /** Adapter used to display tracks and their ratings in a ListView. */
     private class RatingsAdapter extends ArrayAdapter<MusicItem> {
 
         public static final int ROW_LAYOUT = R.layout.ratings_row;
 
-        private RatingsActivity that;
+        private RatingsActivity mActivity;
 
         public RatingsAdapter(List<MusicItem> ratings) {
             super(RatingsActivity.this, 0, ratings);
-            that = RatingsActivity.this;
+            mActivity = RatingsActivity.this;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) that.getSystemService(
+                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            String artist = this.getItem(position).artist;
-            String title = this.getItem(position).title;
-            Integer rating = that.ratings.get(artist + title);
+            String artist = getItem(position).artist;
+            String title = getItem(position).title;
+            Integer rating = mActivity.mRatings.get(artist + title);
 
             ((TextView) view.findViewById(R.id.artistMusicList)).setText(artist);
             ((TextView) view.findViewById(R.id.textMusicList)).setText(title);
-            ((RatingBar) view.findViewById(R.id.ratingBarMusicList))
-                    .setRating(rating != null ? rating : 0);
+            RatingBar bar = (RatingBar) view.findViewById(R.id.ratingBarMusicList);
+            if (rating != null) {
+                bar.setRating(rating);
+            } else {
+                bar.setRating(0);
+            }
 
-            view.setTag(this.getItem(position));
+            view.setTag(getItem(position));
             return view;
         }
     }
 
+    /** Listens to changes in ratings and updates the back-end accordingly. */
     private class OnChangeRatingListener implements OnItemClickListener {
 
+        public void sendRating(final MusicItem item, final int rating, final int position) {
+            AppData data = AppData.getInstance(RatingsActivity.this);
+            data.getAPI().rate(data.getUid(), item.artist, item.title, rating,
+                    new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                        @Override
+                        public void callback(JsonStruct.Success struct) {
+                            mRatings.put(item.artist + item.title, rating);
+                            refreshList(position);
+                        }
+
+                        @Override
+                        public void onError(Error error) {
+                            Log.d(TAG, error.toString());
+                            if (RatingsActivity.this != null) {
+                                Toast.makeText(RatingsActivity.this,
+                                        R.string.error_updating_rating,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        }
+
+        @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id)  {
             final MusicItem item = (MusicItem) view.getTag();
-            final int oldRating = ratings.get(item.artist + item.title) != null
-                    ? ratings.get(item.artist + item.title) : 0;
+            int tempRating = 0;
+            if (mRatings.get(item.artist + item.title) != null) {
+                tempRating = mRatings.get(item.artist + item.title);
+            }
+            final int oldRating = tempRating;
+
             AlertDialog.Builder alert = new AlertDialog.Builder(RatingsActivity.this);
 
             alert.setTitle(item.title);
@@ -192,29 +237,15 @@ public class RatingsActivity extends SherlockActivity {
             bar.setRating(oldRating);
 
             alert.setView(layout);
-            alert.setPositiveButton(getString(R.string.ratings_ok), new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(getString(R.string.ratings_ok),
+                    new DialogInterface.OnClickListener() {
 
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    final int newRating = Math.max((int)bar.getRating(), 1);
-                    if (newRating != oldRating) {
-                        AppData data = AppData.getInstance(RatingsActivity.this);
-                        data.getAPI().rate(data.getUid(), item.artist, item.title, newRating,
-                                new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                            public void callback(JsonStruct.Success struct) {
-                                ratings.put(item.artist + item.title, newRating);
-                                refreshList(position);
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            final int newRating = Math.max((int) bar.getRating(), 1);
+                            if (newRating != oldRating) {
+                                sendRating(item, newRating, position);
                             }
-
-                            public void onError(Error error) {
-                                Log.d(TAG, error.toString());
-                                if (RatingsActivity.this != null) {
-                                    Toast.makeText(RatingsActivity.this, R.string.error_updating_rating,
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    }
                 }
             });
 
