@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+  <LinearLayout android:orientation="horizontal"
+      android:layout_width="fill_parent" android:layout_height="wrap_content"
+      android:padding="10dp"
+      android:gravity="center"
+      android:background="#3FFF">
+
+    <Button
+        android:id="@+id/createPlaylistBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginRight="10dp"
+        android:text="@string/solo_playlists_createBtn" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/solo_playlists_choosePL"/>
+
+  </LinearLayout>
+
+  <!-- Text output wrapper -->
+  <ListView
+      android:layout_height="0dp"
+      android:layout_width="match_parent"
+      android:layout_weight="1"
+      android:id="@+id/soloPlaylistsList" />
+
+</LinearLayout>
