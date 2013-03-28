@@ -205,7 +205,7 @@ public class UnisonAPI {
     }
     
     public void createPlaylist(String name, Handler<JsonStruct.PlaylistsList> handler) {
-        URL url = urlFor("/groups");
+        URL url = urlFor("/playlists");
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
                 .addParam("name", name).setAuth(mAuth).doPOST();
         //TODO adapt

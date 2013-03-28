@@ -95,10 +95,11 @@ public abstract class JsonStruct {
     /** Information about a playlist (used in both directions). */
     public static class Playlist extends JsonStruct {
 
-        public Long gid;
+        public Long plid;
         public String name;
         //TODO complete
-        public Integer nbListeners;
+        public Integer size;
+        public Integer listeners;
     }
 
     /** List of groups. */
