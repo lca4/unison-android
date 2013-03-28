@@ -203,6 +203,13 @@ public class UnisonAPI {
                 .addParam("artist", artist).addParam("title", title)
                 .addParam("rating", rating).doPOST();
     }
+    
+    public void createPlaylist(String name, Handler<JsonStruct.PlaylistsList> handler) {
+        URL url = urlFor("/groups");
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                .addParam("name", name).setAuth(mAuth).doPOST();
+        //TODO adapt
+    }
 
     private static URL urlFor(String suffix, Object... objects) {
         try {

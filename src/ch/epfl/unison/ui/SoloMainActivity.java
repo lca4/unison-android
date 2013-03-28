@@ -71,7 +71,6 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +102,8 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
             startActivity(new Intent(this, GroupsActivity.class));
             finish();
         } else {
-//            mGroupId = extras.getLong(Const.Strings.GID);
-//            Log.i(TAG, "joined group " + mGroupId);
+            // mGroupId = extras.getLong(Const.Strings.GID);
+            // Log.i(TAG, "joined group " + mGroupId);
             if (extras.containsKey(Const.Strings.NAME)) {
                 setTitle(extras.getString(Const.Strings.NAME));
             }
@@ -149,6 +148,10 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
         }
     }
 
+    /*
+     * Could be refactorized (non-Javadoc)
+     * @see ch.epfl.unison.ui.UnisonMenu.OnRefreshListener#onRefresh()
+     */
     @Override
     public void onRefresh() {
         repaintRefresh(true);
@@ -156,13 +159,24 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
 
     }
 
-
+    /*
+     * Could be refactorized (non-Javadoc)
+     * @see
+     * com.actionbarsherlock.app.SherlockFragmentActivity#onCreateOptionsMenu
+     * (android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
+    /*
+     * Could be refactorized (non-Javadoc)
+     * @see
+     * com.actionbarsherlock.app.SherlockFragmentActivity#onOptionsItemSelected
+     * (android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return UnisonMenu.onOptionsItemSelected(this, this, item);

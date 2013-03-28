@@ -91,4 +91,19 @@ public abstract class JsonStruct {
             this.entry = new Track(localId, artist, title);
         }
     }
+    
+    /** Information about a playlist (used in both directions). */
+    public static class Playlist extends JsonStruct {
+
+        public Long gid;
+        public String name;
+        //TODO complete
+        public Integer nbListeners;
+    }
+
+    /** List of groups. */
+    public static class PlaylistsList extends JsonStruct {
+
+        public Playlist[] playlists;
+    }
 }

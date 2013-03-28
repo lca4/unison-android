@@ -31,6 +31,7 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
+import ch.epfl.unison.api.JsonStruct.PlaylistsList;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
@@ -42,19 +43,15 @@ import com.actionbarsherlock.view.MenuItem;
 /**
  * Listing of the groups.
  * 
- * @author lum
+ * @author marc bourqui
  */
 public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
-    private static final String TAG = "ch.epfl.unison.GroupsActivity";
+    private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
-    // EPFL Polydome.
-    private static final double DEFAULT_LATITUDE = 46.52147800207456;
-    private static final double DEFAULT_LONGITUDE = 6.568992733955383;
-
-    public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
+    //public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
 
     private ListView mPlaylistsList;
     private Menu mMenu;
@@ -71,6 +68,9 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
         }
     };
 
+    /*
+     * Coulde be refactorized
+     */
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -88,21 +88,27 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
         setContentView(R.layout.solo_playlists);
 
         ((Button) findViewById(R.id.createGroupBtn))
-                .setOnClickListener(new OnCreateGroupListener());
+                .setOnClickListener(new OnCreatePlaylistListener());
 
         mPlaylistsList = (ListView) findViewById(R.id.groupsList);
-        mPlaylistsList.setOnItemClickListener(new OnGroupSelectedListener());
+        mPlaylistsList.setOnItemClickListener(new OnPlaylistSelectedListener());
 
-        // Actions that should be taken whe activity is started.
-        if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
-            // We are coming back from a group - let's make sure the back-end
-            // knows.
-            leaveGroup();
-        } else if (AppData.getInstance(this).showHelpDialog()) {
-            showHelpDialog();
-        }
+//        // Actions that should be taken when activity is started.
+//        if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
+//            // We are coming back from a group - let's make sure the back-end
+//            // knows.
+//            leaveGroup();
+//        } else if (AppData.getInstance(this).showHelpDialog()) {
+//            showHelpDialog();
+//        }
     }
 
+    /*
+     * Could be refactorized
+     * 
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -111,24 +117,48 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
         mHandler.postDelayed(mUpdater, INITIAL_DELAY);
     }
 
+    /*
+     * Could be refactorized
+     * 
+     * (non-Javadoc)
+     * @see com.actionbarsherlock.app.SherlockActivity#onPause()
+     */
     @Override
     protected void onPause() {
         super.onPause();
         mIsForeground = false;
     }
-
+    
+    /*
+     * Could be refactorized
+     * 
+     * (non-Javadoc)
+     * @see com.actionbarsherlock.app.SherlockActivity#onDestroy()
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mLogoutReceiver);
     };
 
+    /*
+     * Could be refactorized
+     * 
+     * (non-Javadoc)
+     * @see com.actionbarsherlock.app.SherlockActivity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
+    /*
+     * Could be refactorized
+     * 
+     * (non-Javadoc)
+     * @see com.actionbarsherlock.app.SherlockActivity#onOptionsItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return UnisonMenu.onOptionsItemSelected(this, this, item);
@@ -144,7 +174,7 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
             public void callback(GroupsList struct) {
                 try {
                     SoloPlaylistsActivity.this.mPlaylistsList
-                            .setAdapter(new GroupsAdapter(struct));
+                            .setAdapter(new PlaylistsAdapter(struct));
                     SoloPlaylistsActivity.this.repaintRefresh(false);
                 } catch (NullPointerException e) {
                     Log.w(TAG, "group or activity is null?", e);
@@ -158,21 +188,12 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
                     Log.d(TAG, error.toString());
                 }
                 if (SoloPlaylistsActivity.this != null) {
-                    Toast.makeText(SoloPlaylistsActivity.this, R.string.error_loading_groups,
+                    Toast.makeText(SoloPlaylistsActivity.this, R.string.error_loading_playlists,
                             Toast.LENGTH_LONG).show();
                     SoloPlaylistsActivity.this.repaintRefresh(false);
                 }
             }
         };
-
-        AppData data = AppData.getInstance(this);
-        if (data.getLocation() != null) {
-            double lat = data.getLocation().getLatitude();
-            double lon = data.getLocation().getLongitude();
-            data.getAPI().listGroups(lat, lon, handler);
-        } else {
-            data.getAPI().listGroups(handler);
-        }
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -197,59 +218,59 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
         }
     }
 
-    private void leaveGroup() {
-        // Make sure the user is not marked as present in any group.
-        AppData data = AppData.getInstance(this);
-        data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+//    private void leaveGroup() {
+//        // Make sure the user is not marked as present in any group.
+//        AppData data = AppData.getInstance(this);
+//        data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+//
+//            @Override
+//            public void callback(Success struct) {
+//                Log.d(TAG, "successfully left group");
+//            }
+//
+//            @Override
+//            public void onError(Error error) {
+//                Log.d(TAG, error.toString());
+//            }
+//        });
+//    }
 
-            @Override
-            public void callback(Success struct) {
-                Log.d(TAG, "successfully left group");
-            }
-
-            @Override
-            public void onError(Error error) {
-                Log.d(TAG, error.toString());
-            }
-        });
-    }
-
-    private void showHelpDialog() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        alert.setTitle(getString(R.string.groups_helpdialog_title));
-        alert.setMessage(getString(R.string.groups_helpdialog_message));
-
-        final CheckBox cbox = new CheckBox(this);
-        cbox.setText(getString(R.string.groups_helpdialog_chkbox));
-        alert.setView(cbox);
-
-        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (cbox.isChecked()) {
-                    // Don't show the dialog again in the future.
-                    AppData.getInstance(SoloPlaylistsActivity.this).setShowHelpDialog(false);
-                }
-                if (DialogInterface.BUTTON_POSITIVE == which) {
-                    startActivity(new Intent(SoloPlaylistsActivity.this, HelpActivity.class));
-                }
-            }
-        };
-
-        alert.setPositiveButton(getString(R.string.groups_helpdialog_yesBtn), click);
-        alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
-        alert.show();
-    }
+//    private void showHelpDialog() {
+//        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//
+//        alert.setTitle(getString(R.string.groups_helpdialog_title));
+//        alert.setMessage(getString(R.string.groups_helpdialog_message));
+//
+//        final CheckBox cbox = new CheckBox(this);
+//        cbox.setText(getString(R.string.groups_helpdialog_chkbox));
+//        alert.setView(cbox);
+//
+//        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                if (cbox.isChecked()) {
+//                    // Don't show the dialog again in the future.
+//                    AppData.getInstance(SoloPlaylistsActivity.this).setShowHelpDialog(false);
+//                }
+//                if (DialogInterface.BUTTON_POSITIVE == which) {
+//                    startActivity(new Intent(SoloPlaylistsActivity.this, HelpActivity.class));
+//                }
+//            }
+//        };
+//
+//        alert.setPositiveButton(getString(R.string.groups_helpdialog_yesBtn), click);
+//        alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
+//        alert.show();
+//    }
 
     /** Adapter used to populate the ListView listing the groups. */
-    private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
+    private class PlaylistsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
         public static final int ROW_LAYOUT = R.layout.groups_row;
 
-        public GroupsAdapter(JsonStruct.GroupsList list) {
-            super(SoloPlaylistsActivity.this, 0, list.groups);
+        public PlaylistsAdapter(JsonStruct.PlaylistsList list) {
+            super(SoloPlaylistsActivity.this, 0, list.playlists);
         }
 
         @Override
@@ -284,31 +305,31 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
      * When clicking on "create new group", trigger an AlertView that asks for a
      * group name and creates the group on the back-end through the API.
      */
-    private class OnCreateGroupListener implements OnClickListener {
+    private class OnCreatePlaylistListener implements OnClickListener {
 
         @Override
         public void onClick(View v) {
             AlertDialog.Builder alert = new AlertDialog.Builder(SoloPlaylistsActivity.this);
 
-            alert.setTitle(getString(R.string.groups_alert_newgroup_title));
-            alert.setMessage(getString(R.string.groups_alert_newgroup_message));
+            alert.setTitle(getString(R.string.solo_playlists_alert_newplaylist_title));
+            alert.setMessage(getString(R.string.solo_playlists_alert_newplaylist_message));
 
             // Set an EditText view to get user input
             final EditText input = new EditText(SoloPlaylistsActivity.this);
             alert.setView(input);
 
             // When clicking on "OK", create the group.
-            alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok),
+            alert.setPositiveButton(getString(R.string.solo_playlists_alert_newplaylist_ok),
                     new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String name = input.getText().toString().trim();
-                            OnCreateGroupListener.this.createGroup(name);
+                            OnCreatePlaylistListener.this.createGroup(name);
                         }
                     });
 
-            alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
+            alert.setNegativeButton(getString(R.string.solo_playlists_alert_newplaylist_cancel), null);
             alert.show();
         }
 
@@ -325,22 +346,12 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
                         R.string.error_creating_group_empty_name, Toast.LENGTH_LONG).show();
             } else {
                 AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
-                double lat, lon;
-                if (data.getLocation() != null) {
-                    lat = data.getLocation().getLatitude();
-                    lon = data.getLocation().getLongitude();
-                } else {
-                    lat = DEFAULT_LATITUDE;
-                    lon = DEFAULT_LONGITUDE;
-                    Log.i(TAG, "location was null, using default values");
-                }
 
-                data.getAPI().createGroup(name, lat, lon,
-                        new UnisonAPI.Handler<JsonStruct.GroupsList>() {
+                data.getAPI().createPlaylist(name, new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
                             @Override
-                            public void callback(GroupsList struct) {
+                            public void callback(PlaylistsList struct) {
                                 SoloPlaylistsActivity.this.mPlaylistsList
-                                        .setAdapter(new GroupsAdapter(struct));
+                                        .setAdapter(new PlaylistsAdapter(struct));
                             }
 
                             @Override
@@ -361,7 +372,7 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
      * When clicking on a group, send a request to the server and start
      * MainActivity.
      */
-    private class OnGroupSelectedListener implements OnItemClickListener {
+    private class OnPlaylistSelectedListener implements OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

@@ -8,6 +8,7 @@
     <string name="activity_title_prefs">Settings</string>
     <string name="activity_title_main">Group</string>
     <string name="activity_title_help">Help</string>
+    <string name="activity_title_solo">Single-user mode</string>
     <string name="activity_title_signup">Sign Up</string>
 
     <!-- Fragment titles -->
@@ -57,6 +58,15 @@
    	<string name="groups_chooseGrp">or select one below :</string>
    	
    	<!-- Single user mode -->
+   	<string name="solo_playlists_helpdialog_title">Welcome</string>
+    <string name="solo_playlists_helpdialog_message">Want to learn how to use the application ?</string>
+    <string name="solo_playlists_helpdialog_chkbox">Don\'t show this again</string>
+    <string name="solo_playlists_helpdialog_yesBtn">Yes</string>
+    <string name="solo_playlists_helpdialog_noBtn">No, thanks</string>
+    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
+    <string name="solo_playlists_alert_newplaylist_message">Pick a name for the playlist:</string>
+    <string name="solo_playlists_alert_newplaylist_ok">OK</string>
+    <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
    	<string name="solo_playlists_createBtn">Create playlist</string>
    	<string name="solo_playlists_choosePL">or select one below :</string>
     
@@ -99,6 +109,7 @@
    	
     <!-- Errors. -->
     <string name="error_loading_groups">Unable to load the list of groups.</string>
+    <string name="error_loading_playlists">Unable to load the list of playlists</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
     <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
