@@ -1,5 +1,9 @@
 package ch.epfl.unison;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -9,13 +13,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
+import android.util.Pair;
+import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.google.gson.GsonBuilder;
-
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Singleton object containing various utilities for the app.
@@ -120,15 +122,20 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         }
     }
     
-    public boolean addToHistory(long gid) {
-        Set<Long> history = this.getHistory();
+    public boolean addToHistory(JsonStruct.Group group) {
+    	if (group == null) {
+    		return false;
+    	}
+    	
+        Map<Long, Pair<JsonStruct.Group, Date>> history = this.getHistory();
         if (history == null) {
-            history = new TreeSet<Long>();
+            history = new HashMap<Long, Pair<JsonStruct.Group, Date>>();
         } 
+        
 
-        if (!history.add(Long.valueOf(gid))) {
-            return true;
-        }
+        history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
+        
+        //Possible optimization here
               
         String value = new GsonBuilder().create().toJson(history);
         
@@ -136,14 +143,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     }
     
     @SuppressWarnings("unchecked")
-    public Set<Long> getHistory() {
+    public Map<Long, Pair<JsonStruct.Group, Date>> getHistory() {
         String value = mPrefs.getString(Const.PrefKeys.HISTORY, null);
         
         if (value == null) {
             return null;
         }
 
-        return new GsonBuilder().create().fromJson(value, Set.class);
+        return new GsonBuilder().create().fromJson(value, Map.class);
     }
 
     /**

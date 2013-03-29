@@ -101,17 +101,18 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey(Const.Strings.GID)) {
+        if (extras == null || !extras.containsKey(Const.Strings.GROUP)) {
             // Should never happen. If it does, redirect the user to the groups list.
             startActivity(new Intent(this, GroupsActivity.class));
             finish();
         } else {
-            mGroupId = extras.getLong(Const.Strings.GID);
-            AppData.getInstance(this).addToHistory(mGroupId);
+        	JsonStruct.Group group = (JsonStruct.Group) extras.get(Const.Strings.GROUP);
+            mGroupId = group.gid;
             Log.i(TAG, "joined group " + mGroupId);
-            if (extras.containsKey(Const.Strings.NAME)) {
-                setTitle(extras.getString(Const.Strings.NAME));
-            }
+            
+            setTitle(group.name);
+            AppData.getInstance(this).addToHistory(group);
+             
         }
     }
 

@@ -364,10 +364,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
                 @Override
                 public void callback(Success struct) {
+                	                	
                     GroupsActivity.this.startActivity(
                             new Intent(GroupsActivity.this, MainActivity.class)
-                            .putExtra(Const.Strings.GID, group.gid)
-                            .putExtra(Const.Strings.NAME, group.name));
+                            .putExtra(Const.Strings.GROUP, group));
                 }
 
                 @Override
