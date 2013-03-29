@@ -56,32 +56,39 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
      // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
         setContentView(R.layout.group_history);
-        
-        //get the map of visited groups, sorted by chronological order
-        Map<Long, Pair<JsonStruct.Group, Date>> mapOfGroups = AppData.getInstance(this).getHistory();
-        List<Pair<JsonStruct.Group, Date>> listOfGroups = new ArrayList<Pair<JsonStruct.Group,Date>>(mapOfGroups.values());
-        Collections.sort(listOfGroups, new Comparator<Pair<JsonStruct.Group,Date>>() {
-        	public int compare(Pair<JsonStruct.Group,Date> o1, Pair<JsonStruct.Group,Date> o2) {
-        		return o1.second.compareTo(o2.second);
-        	}
-		});
-        mGroupsHistory = new JsonStruct.Group[listOfGroups.size()];
-        
-        for (int i = 0; i < mGroupsHistory.length; i++) {
-        	mGroupsHistory[i] = listOfGroups.get(i).first;
-        }
-        
-        mGroupsList = (ListView) findViewById(R.id.groupsList);
-        mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
-        
-        try {
-            mGroupsList
-                    .setAdapter(new GroupsAdapter());
-            repaintRefresh(false);
-        } catch (NullPointerException e) {
-            Log.w(TAG, "group or activity is null?", e);
-        }
-    }
+
+		// get the map of visited groups, sorted by chronological order
+		Map<Long, Pair<JsonStruct.Group, Date>> mapOfGroups = AppData
+				.getInstance(this).getHistory();
+		if (mapOfGroups == null) {
+			mGroupsHistory = null;
+		} else {
+			List<Pair<JsonStruct.Group, Date>> listOfGroups = new ArrayList<Pair<JsonStruct.Group, Date>>(
+					mapOfGroups.values());
+			Collections.sort(listOfGroups,
+					new Comparator<Pair<JsonStruct.Group, Date>>() {
+						public int compare(Pair<JsonStruct.Group, Date> o1,
+								Pair<JsonStruct.Group, Date> o2) {
+							return o1.second.compareTo(o2.second);
+						}
+					});
+			mGroupsHistory = new JsonStruct.Group[listOfGroups.size()];
+
+			for (int i = 0; i < mGroupsHistory.length; i++) {
+				mGroupsHistory[i] = listOfGroups.get(i).first;
+			}
+
+			mGroupsList = (ListView) findViewById(R.id.groupsList);
+			mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
+
+			try {
+				mGroupsList.setAdapter(new GroupsAdapter());
+				repaintRefresh(false);
+			} catch (NullPointerException e) {
+				Log.w(TAG, "group or activity is null?", e);
+			}
+		}
+	}
 
 //    @Override
     protected void onDestroy() {
