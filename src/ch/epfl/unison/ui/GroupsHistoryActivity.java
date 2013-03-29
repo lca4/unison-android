@@ -78,7 +78,7 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
 				mGroupsHistory[i] = listOfGroups.get(i).first;
 			}
 
-			mGroupsList = (ListView) findViewById(R.id.groupsList);
+			mGroupsList = (ListView) findViewById(R.id.groupHistoryList);
 			mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
 
 			try {

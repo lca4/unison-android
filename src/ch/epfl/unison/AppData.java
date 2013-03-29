@@ -1,5 +1,6 @@
 package ch.epfl.unison;
 
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Singleton object containing various utilities for the app.
@@ -136,9 +138,8 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
         
         //Possible optimization here
-              
-        String value = new GsonBuilder().create().toJson(history);
-        
+        Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
+        String value = new GsonBuilder().create().toJson(history, mapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
     
@@ -149,8 +150,8 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         if (value == null) {
             return null;
         }
-
-        return new GsonBuilder().create().fromJson(value, Map.class);
+        Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
+        return new GsonBuilder().create().fromJson(value, mapType);
     }
 
     /**
