@@ -35,7 +35,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-public class GroupsHistoryActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
+public class GroupsHistoryActivity extends SherlockActivity {
 	
 	private static final String TAG = "ch.epfl.unison.GroupHistoryActivity";
 	private Menu mMenu;
@@ -57,7 +57,7 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
         setContentView(R.layout.group_history);
 
-		// get the map of visited groups, sorted by chronological order
+		// get the map of visited groups, sorted by chronological order (newer first).
 		Map<Long, Pair<JsonStruct.Group, Date>> mapOfGroups = AppData
 				.getInstance(this).getHistory();
 		if (mapOfGroups == null) {
@@ -69,7 +69,7 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
 					new Comparator<Pair<JsonStruct.Group, Date>>() {
 						public int compare(Pair<JsonStruct.Group, Date> o1,
 								Pair<JsonStruct.Group, Date> o2) {
-							return o1.second.compareTo(o2.second);
+							return - o1.second.compareTo(o2.second);
 						}
 					});
 			mGroupsHistory = new JsonStruct.Group[listOfGroups.size()];
@@ -96,16 +96,16 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
         unregisterReceiver(mLogoutReceiver);
     };
     
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mMenu = menu;
-        return UnisonMenu.onCreateOptionsMenu(this, menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        mMenu = menu;
+//        return UnisonMenu.onCreateOptionsMenu(this, menu);
+//    }
     
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UnisonMenu.onOptionsItemSelected(this, this, item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        return UnisonMenu.onOptionsItemSelected(this, this, item);
+//    }
     
     /** Adapter used to populate the ListView listing the groups. */
     private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
@@ -144,11 +144,11 @@ public class GroupsHistoryActivity extends SherlockActivity implements UnisonMen
         }
     }
 
-	@Override
-	public void onRefresh() {
-		repaintRefresh(true);
-		//No server comm for now.
-	}
+//	@Override
+//	public void onRefresh() {
+//		repaintRefresh(true);
+//		//No server comm for now.
+//	}
 	
 	 public void repaintRefresh(boolean isRefreshing) {
 	        if (mMenu == null) {

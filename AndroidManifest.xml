@@ -33,7 +33,7 @@
             android:label="@string/activity_title_groups" />
         <activity
             android:name=".ui.GroupsHistoryActivity"
-            android:label="@string/title_activity_group_history" />
+            android:label="@string/activity_title_history" />
         
         <activity
             android:name=".ui.LoginActivity"

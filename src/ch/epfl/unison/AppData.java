@@ -1,8 +1,12 @@
 package ch.epfl.unison;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
@@ -30,12 +34,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
 
     private static final String TAG = "ch.epfl.unison.AppData";
     private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
+    private static final int MAX_HISTORY_SIZE = 10;
 
     private static AppData sInstance;
 
     private Context mContext;
     private UnisonAPI mApi;
     private SharedPreferences mPrefs;
+    private Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
 
     private LocationManager mLocationMgr;
     private UnisonLocationListener mGpsListener;
@@ -135,23 +141,61 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         } 
         
 
+        //make sure the Map doesn't become too big:
+        truncateHistory(history);
+        //adds new entry
         history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
         
         //Possible optimization here
-        Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
         String value = new GsonBuilder().create().toJson(history, mapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
     
-    @SuppressWarnings("unchecked")
     public Map<Long, Pair<JsonStruct.Group, Date>> getHistory() {
         String value = mPrefs.getString(Const.PrefKeys.HISTORY, null);
         
         if (value == null) {
             return null;
         }
-        Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
         return new GsonBuilder().create().fromJson(value, mapType);
+    }
+    
+    /**
+     * This method checks whether the history has become too long and,
+     * if so, deletes the oldest entries. It should be called in the
+     * addToHistory method so that it truncates the history map "in place" before
+     * it is being stored in the shared prefs.
+     * It can handle a way too large history in case of bug, but it should usually
+     * only remove one entry at a time.  
+     */
+    private boolean truncateHistory(Map<Long, Pair<JsonStruct.Group, Date>> history) {
+
+        int historySize = history.size();
+        
+        if (history == null || historySize <= MAX_HISTORY_SIZE - 1) {
+            return false;
+        } 
+        
+        //TODO code duplicated from groupHistoryActivity.
+        List<Pair<JsonStruct.Group, Date>> listOfGroups = new ArrayList<Pair<JsonStruct.Group, Date>>(
+                history.values());
+        Collections.sort(listOfGroups,
+                new Comparator<Pair<JsonStruct.Group, Date>>() {
+            public int compare(Pair<JsonStruct.Group, Date> o1,
+                    Pair<JsonStruct.Group, Date> o2) {
+                return - o1.second.compareTo(o2.second);
+            }
+        });
+        
+       for (int i = 1; i <= historySize - (MAX_HISTORY_SIZE - 1); i++) {
+            history.remove(listOfGroups.get(historySize - i).first.gid);
+        }
+       return true;
+    }
+    
+    
+    public boolean clearHistory() {
+        return mPrefs.edit().remove(Const.PrefKeys.HISTORY).commit();
     }
 
     /**
