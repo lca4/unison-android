@@ -241,14 +241,15 @@ public class GroupsHistoryActivity extends SherlockActivity {
                     };
 
             if (mAlreadyInGroup) {
-                leaveGroup(enterGroup, uid, group.gid);
+                leaveThenJoinGroup(enterGroup, uid, group.gid);
+            } else {
+                api.joinGroup(uid, group.gid, enterGroup);
             }
-
-            api.joinGroup(uid, group.gid, enterGroup);
         }
     }
 
-    private void leaveGroup(final UnisonAPI.Handler<JsonStruct.Success> enterGroup, final long uid,
+    private void leaveThenJoinGroup(final UnisonAPI.Handler<JsonStruct.Success> enterGroup, 
+            final long uid,
             final long gid) {
         // Make sure the user is not marked as present in any group.
         AppData data = AppData.getInstance(this);
