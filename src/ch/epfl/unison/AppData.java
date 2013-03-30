@@ -1,14 +1,5 @@
 package ch.epfl.unison;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -19,11 +10,21 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
+
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Singleton object containing various utilities for the app.
@@ -41,7 +42,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private Context mContext;
     private UnisonAPI mApi;
     private SharedPreferences mPrefs;
-    private Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {}.getType();
+    private Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() { } .getType();
 
     private LocationManager mLocationMgr;
     private UnisonLocationListener mGpsListener;
@@ -138,15 +139,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         Map<Long, Pair<JsonStruct.Group, Date>> history = this.getHistory();
         if (history == null) {
             history = new HashMap<Long, Pair<JsonStruct.Group, Date>>();
-        } 
-        
+        }       
 
         //make sure the Map doesn't become too big:
         truncateHistory(history);
         //adds new entry
         history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
         
-        //Possible optimization here
+        //Possible optimization heres
         String value = new GsonBuilder().create().toJson(history, mapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
@@ -169,21 +169,26 @@ public final class AppData implements OnSharedPreferenceChangeListener {
      * only remove one entry at a time.  
      */
     private boolean truncateHistory(Map<Long, Pair<JsonStruct.Group, Date>> history) {
+        
+        if (history == null) {
+            return false;
+        }
 
         int historySize = history.size();
         
-        if (history == null || historySize <= MAX_HISTORY_SIZE - 1) {
+        if (historySize <= MAX_HISTORY_SIZE - 1) {
             return false;
         } 
         
         //TODO code duplicated from groupHistoryActivity.
-        List<Pair<JsonStruct.Group, Date>> listOfGroups = new ArrayList<Pair<JsonStruct.Group, Date>>(
-                history.values());
+        List<Pair<JsonStruct.Group, Date>> listOfGroups =
+                new ArrayList<Pair<JsonStruct.Group, Date>>(
+                        history.values());
         Collections.sort(listOfGroups,
                 new Comparator<Pair<JsonStruct.Group, Date>>() {
             public int compare(Pair<JsonStruct.Group, Date> o1,
                     Pair<JsonStruct.Group, Date> o2) {
-                return - o1.second.compareTo(o2.second);
+                return -o1.second.compareTo(o2.second);
             }
         });
         

@@ -102,7 +102,7 @@
     <string name="stats_taste">How do people like this song ?</string>
     
     <!--  History -->
-	<string name="history_delete_label">todo Delete History</string>
+	<string name="history_delete_label">Delete History</string>
 
     <!-- Errors. -->
     <string name="error_loading_groups">Unable to load the list of groups.</string>
