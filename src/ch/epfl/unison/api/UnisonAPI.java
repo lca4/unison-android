@@ -205,10 +205,21 @@ public class UnisonAPI {
     }
     
     public void createPlaylist(String name, Handler<JsonStruct.PlaylistsList> handler) {
-        URL url = urlFor("/playlists");
+        URL url = urlFor("/playlist");
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
                 .addParam("name", name).setAuth(mAuth).doPOST();
         //TODO adapt
+    }
+    
+    public void listPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
+        URL url = urlFor("/playlists");
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                .setAuth(mAuth).doGET();
+    }
+    
+    public void generatePlaylist(String type, String seed) {
+        URL url = urlFor("/playlist");
+        
     }
 
     private static URL urlFor(String suffix, Object... objects) {

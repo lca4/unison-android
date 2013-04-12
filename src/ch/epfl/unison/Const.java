@@ -21,6 +21,8 @@ public final class Const {
         public static final String GID = "gid";
         public static final String NAME = "name";
         public static final String LOGOUT = "logout";
+        public static final String GROUP = "group"; //not sure if GID and NAME are used anymore
+        public static final String CALLER = "caller";
 
         private Strings() { }  // Non-instantiable.
     }

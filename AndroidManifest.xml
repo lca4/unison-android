@@ -4,79 +4,93 @@
     android:versionCode="2"
     android:versionName="1.1" >
 
-  <!-- Requirements. -->
-  <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"  />
+    <!-- Requirements. -->
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="14" />
 
-  <application
-      android:icon="@drawable/ic_launcher"
-      android:label="@string/app_name"
-      android:theme="@style/Theme.Sherlock">
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!-- Activities. -->
-    <activity android:name=".ui.PrefsActivity"
-        android:label="@string/activity_title_prefs" />
-
-    <activity android:name=".ui.RatingsActivity"
-        android:label="@string/activity_title_ratings" />
-
-    <activity android:name=".ui.HelpActivity"
-        android:label="@string/activity_title_help" />
-
-    <activity android:name=".ui.GroupsActivity"
-        android:label="@string/activity_title_groups" />
-
-    <activity android:name=".ui.LoginActivity"
-        android:screenOrientation="portrait"
+    <application
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock.NoActionBar">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-      </intent-filter>
-    </activity>
+        android:theme="@style/Theme.Sherlock" >
 
-    <activity android:name=".ui.SignupActivity"
-        android:screenOrientation="portrait"
-        android:label="@string/activity_title_signup" />
+        <!-- Activities. -->
+        <activity
+            android:name=".ui.PrefsActivity"
+            android:label="@string/activity_title_prefs" />
+        <activity
+            android:name=".ui.RatingsActivity"
+            android:label="@string/activity_title_ratings" />
+        <activity
+            android:name=".ui.HelpActivity"
+            android:label="@string/activity_title_help" />
+        <activity
+            android:name=".ui.GroupsActivity"
+            android:label="@string/activity_title_groups" />
+        <activity
+            android:name=".ui.GroupsHistoryActivity"
+            android:label="@string/activity_title_history" />
+        
+        <activity
+            android:name=".ui.LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Sherlock.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-    <activity android:name=".ui.MainActivity"
-        android:screenOrientation="portrait"
-        android:label="@string/activity_title_main" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-    <!-- Services. -->
-    <service android:name=".music.MusicService"
-        android:exported="false">
-      <intent-filter>
-        <action android:name="ch.epfl.unison.music.action.TOGGLE_PLAYBACK" />
-        <action android:name="ch.epfl.unison.music.action.PLAY" />
-        <action android:name="ch.epfl.unison.music.action.PAUSE" />
-        <action android:name="ch.epfl.unison.music.action.STOP" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="ch.epfl.unison.music.action.LOAD" />
-        <!-- This has been copied from the default android music app. -->
-        <data android:mimeType="audio/*"/>
-        <data android:mimeType="application/ogg"/>
-        <data android:mimeType="application/x-ogg"/>
-        <data android:mimeType="application/itunes"/>
-      </intent-filter>
-    </service>
-    <service android:name=".LibraryService"
-        android:exported="false">
-      <intent-filter>
-        <action android:name="ch.epfl.unison.action.UPDATE" />
-        <action android:name="ch.epfl.unison.action.TRUNCATE" />
-      </intent-filter>
-    </service>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.SignupActivity"
+            android:label="@string/activity_title_signup"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:label="@string/activity_title_main"
+            android:screenOrientation="portrait" />
+        
 
-  </application>
+        <!-- Services. -->
+        <service
+            android:name=".music.MusicService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="ch.epfl.unison.music.action.TOGGLE_PLAYBACK" />
+                <action android:name="ch.epfl.unison.music.action.PLAY" />
+                <action android:name="ch.epfl.unison.music.action.PAUSE" />
+                <action android:name="ch.epfl.unison.music.action.STOP" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="ch.epfl.unison.music.action.LOAD" />
+                <!-- This has been copied from the default android music app. -->
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+                <data android:mimeType="application/itunes" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".LibraryService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="ch.epfl.unison.action.UPDATE" />
+                <action android:name="ch.epfl.unison.action.TRUNCATE" />
+            </intent-filter>
+        </service>
+
+        
+    </application>
 
 </manifest>

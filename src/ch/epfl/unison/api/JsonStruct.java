@@ -1,5 +1,7 @@
 package ch.epfl.unison.api;
 
+import java.io.Serializable;
+
 /**
  * POJOs for JSON serialization / deserialization.
  *
@@ -58,9 +60,13 @@ public abstract class JsonStruct {
     }
 
     /** Information about a group (used in both directions). */
-    public static class Group extends JsonStruct {
+    public static class Group extends JsonStruct implements Serializable {
 
-        public Long gid;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		public Long gid;
         public String name;
         public Track track;
         public Float distance;

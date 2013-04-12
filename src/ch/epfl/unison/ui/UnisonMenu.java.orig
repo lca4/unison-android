@@ -48,13 +48,15 @@ public abstract class UnisonMenu {
         case R.id.menu_item_help:
             activity.startActivity(new Intent(activity, HelpActivity.class));
         break;
-        
+<<<<<<< HEAD
         case R.id.menu_item_solo:
             activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
+=======
         case R.id.menu_item_history:
                 activity.startActivity(new Intent(activity, GroupsHistoryActivity.class).putExtra(
                         Const.Strings.CALLER, activity.getClass().getName()));
                 break;
+>>>>>>> 709c26b58fb73701b6d5d4f264d2053b0e16b2f6
         case R.id.menu_item_logout:
             activity.startActivity(new Intent(activity, LoginActivity.class)
                     .putExtra(Const.Strings.LOGOUT, true));

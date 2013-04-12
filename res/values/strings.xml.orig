@@ -50,6 +50,31 @@
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>
     <string name="groups_helpdialog_message">Want to learn how to use the application ?</string>
+<<<<<<< HEAD
+   	<string name="groups_helpdialog_chkbox">Don\'t show this again</string>
+   	<string name="groups_helpdialog_yesBtn">Yes</string>
+   	<string name="groups_helpdialog_noBtn">No, thanks</string>
+   	<string name="groups_alert_newgroup_title">New Group</string>
+   	<string name="groups_alert_newgroup_message">Pick a name for the group:</string>
+   	<string name="groups_alert_newgroup_ok">OK</string>
+   	<string name="groups_alert_newgroup_cancel">Cancel</string>
+   	<string name="groups_createBtn">Create group</string>
+   	<string name="groups_chooseGrp">or select one below :</string>
+   	
+   	<!-- Single user mode -->
+   	<string name="solo_playlists_helpdialog_title">Welcome</string>
+    <string name="solo_playlists_helpdialog_message">Want to learn how to use the application ?</string>
+    <string name="solo_playlists_helpdialog_chkbox">Don\'t show this again</string>
+    <string name="solo_playlists_helpdialog_yesBtn">Yes</string>
+    <string name="solo_playlists_helpdialog_noBtn">No, thanks</string>
+    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
+    <string name="solo_playlists_alert_newplaylist_message">Pick a name for the playlist:</string>
+    <string name="solo_playlists_alert_newplaylist_ok">OK</string>
+    <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
+   	<string name="solo_playlists_createBtn">Create playlist</string>
+   	<string name="solo_playlists_choosePL">or select one below :</string>
+    
+=======
     <string name="groups_helpdialog_chkbox">Don\'t show this again</string>
     <string name="groups_helpdialog_yesBtn">Yes</string>
     <string name="groups_helpdialog_noBtn">No, thanks</string>
@@ -61,18 +86,10 @@
     <string name="groups_chooseGrp">or select one below :</string>
 
     <!-- Single user mode -->
-   	<string name="solo_playlists_helpdialog_title">Welcome</string>
-    <string name="solo_playlists_helpdialog_message">Want to learn how to use the application ?</string>
-    <string name="solo_playlists_helpdialog_chkbox">Don\'t show this again</string>
-    <string name="solo_playlists_helpdialog_yesBtn">Yes</string>
-    <string name="solo_playlists_helpdialog_noBtn">No, thanks</string>
-    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
-    <string name="solo_playlists_alert_newplaylist_message">Pick a name for the playlist:</string>
-    <string name="solo_playlists_alert_newplaylist_ok">OK</string>
-    <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
     <string name="solo_playlists_createBtn">Create playlist</string>
     <string name="solo_playlists_choosePL">or select one below :</string>
 
+>>>>>>> 709c26b58fb73701b6d5d4f264d2053b0e16b2f6
     <!-- Player -->
     <string name="player_unknown">unknown</string>
     <string name="player_not_playing">No track playing</string>

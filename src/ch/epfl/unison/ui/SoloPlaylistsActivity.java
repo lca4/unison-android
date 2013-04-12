@@ -35,12 +35,21 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+/*
+ * TODO
+ * 
+ * - retrieve playlists stored in android database
+ * - store playlist to android database 
+ * 
+ */
+
 /**
  * Listing of the groups.
  * 
  * @author marc bourqui
  */
-public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
+public class SoloPlaylistsActivity extends SherlockActivity
+        implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
@@ -158,32 +167,36 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
     public void onRefresh() {
         repaintRefresh(true);
 
-        UnisonAPI.Handler<JsonStruct.PlaylistsList> handler = new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
+        UnisonAPI.Handler<JsonStruct.PlaylistsList> handler =
+                new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
 
-            @Override
-            public void callback(PlaylistsList struct) {
-                try {
-                    SoloPlaylistsActivity.this.mPlaylistsList
-                            .setAdapter(new PlaylistsAdapter(struct));
-                    SoloPlaylistsActivity.this.repaintRefresh(false);
-                } catch (NullPointerException e) {
-                    Log.w(TAG, "playlist or activity is null?", e);
-                }
+                    @Override
+                    public void callback(PlaylistsList struct) {
+                        try {
+                            SoloPlaylistsActivity.this.mPlaylistsList
+                                    .setAdapter(new PlaylistsAdapter(struct));
+                            SoloPlaylistsActivity.this.repaintRefresh(false);
+                        } catch (NullPointerException e) {
+                            Log.w(TAG, "playlist or activity is null?", e);
+                        }
 
-            }
+                    }
 
-            @Override
-            public void onError(UnisonAPI.Error error) {
-                if (error != null) {
-                    Log.d(TAG, error.toString());
-                }
-                if (SoloPlaylistsActivity.this != null) {
-                    Toast.makeText(SoloPlaylistsActivity.this, R.string.error_loading_playlists,
-                            Toast.LENGTH_LONG).show();
-                    SoloPlaylistsActivity.this.repaintRefresh(false);
-                }
-            }
-        };
+                    @Override
+                    public void onError(UnisonAPI.Error error) {
+                        if (error != null) {
+                            Log.d(TAG, error.toString());
+                        }
+                        if (SoloPlaylistsActivity.this != null) {
+                            Toast.makeText(SoloPlaylistsActivity.this,
+                                    R.string.error_loading_playlists,
+                                    Toast.LENGTH_LONG).show();
+                            SoloPlaylistsActivity.this.repaintRefresh(false);
+                        }
+                    }
+                };
+                AppData data = AppData.getInstance(this);
+        data.getAPI().listPlaylists(handler);
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -377,26 +390,28 @@ public class SoloPlaylistsActivity extends SherlockActivity implements UnisonMen
             long uid = AppData.getInstance(SoloPlaylistsActivity.this).getUid();
             final JsonStruct.Playlist playlist = (JsonStruct.Playlist) view.getTag();
 
-//            api.joinGroup(uid, playlist.plid, new UnisonAPI.Handler<JsonStruct.Success>() {
-//
-//                @Override
-//                public void callback(Success struct) {
-//                    SoloPlaylistsActivity.this.startActivity(
-//                            new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-//                                    .putExtra(Const.Strings.GID, playlist.plid)
-//                                    .putExtra(Const.Strings.NAME, playlist.name));
-//                }
-//
-//                @Override
-//                public void onError(Error error) {
-//                    Log.d(TAG, error.toString());
-//                    if (SoloPlaylistsActivity.this != null) {
-//                        Toast.makeText(SoloPlaylistsActivity.this, R.string.error_joining_group,
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//
-//            });
+            // api.joinGroup(uid, playlist.plid, new
+            // UnisonAPI.Handler<JsonStruct.Success>() {
+            //
+            // @Override
+            // public void callback(Success struct) {
+            // SoloPlaylistsActivity.this.startActivity(
+            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
+            // .putExtra(Const.Strings.GID, playlist.plid)
+            // .putExtra(Const.Strings.NAME, playlist.name));
+            // }
+            //
+            // @Override
+            // public void onError(Error error) {
+            // Log.d(TAG, error.toString());
+            // if (SoloPlaylistsActivity.this != null) {
+            // Toast.makeText(SoloPlaylistsActivity.this,
+            // R.string.error_joining_group,
+            // Toast.LENGTH_LONG).show();
+            // }
+            // }
+            //
+            // });
         }
     }
 }
