@@ -12,6 +12,7 @@ public final class Const {
         public static final String NICKNAME = "nickname";
         public static final String HELPDIALOG = "helpdialog";
         public static final String HISTORY = "ghistory";
+        public static final String GROUP_SUGGESTION = "gsuggestion";
 
         private PrefKeys() { }  // Non-instantiable.
     }

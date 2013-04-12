@@ -99,6 +99,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         } else if (AppData.getInstance(this).showHelpDialog()) {
             showHelpDialog();
         }
+        
+        //TODO remove these line.
+//        String [] fakeUsers = {"user1", "user2", "user3", "user4", 
+//                "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"};
+//        showGroupSuggestion("group", fakeUsers);
     }
 
     @Override
@@ -240,6 +245,52 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         alert.setPositiveButton(getString(R.string.groups_helpdialog_yesBtn), click);
         alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
         alert.show();
+    }
+    
+    /**
+     * Pass information as arguments for now for easy testing.
+     * They could be written as class variables.
+     */
+    private void showGroupSuggestion(final String groupName, String[] userList) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //TODO choose a better string, put it in android.R.string
+        builder.setTitle("Would you like to join this group of users?");
+        
+        ListView userView = new ListView(this);
+
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(this,
+                R.layout.group_suggestion_user_row, R.id.group_suggestion_username, userList);
+
+        userView.setAdapter(userAdapter);
+        
+        builder.setView(userView);
+        
+        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //I want to join.
+                if (DialogInterface.BUTTON_POSITIVE == which) {
+                    startActivity(new Intent(GroupsActivity.this, MainActivity.class)
+                            .putExtra(Const.Strings.GROUP, groupName));
+                
+                  //Never ask me again if I want to join a group.    
+                } else if (DialogInterface.BUTTON_NEGATIVE == which) {
+                    AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
+                }
+                  //I do not want to join this particular group.
+                  //Commented out because no action needs to be done
+//                } else if (DialogInterface.BUTTON_NEUTRAL == which) {
+//                    
+//                }
+            }
+        };
+        
+        builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
+        builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
+        builder.setNeutralButton(getString(R.string.groups_suggestion_neutralBtn), click);
+        
+        builder.show();
     }
 
     /** Adapter used to populate the ListView listing the groups. */

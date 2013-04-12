@@ -106,6 +106,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     public void setShowHelpDialog(boolean value) {
         mPrefs.edit().putBoolean(Const.PrefKeys.HELPDIALOG, value).commit();
     }
+    
+    public void setShowGroupSuggestion(boolean value) {
+        mPrefs.edit().putBoolean(Const.PrefKeys.GROUP_SUGGESTION, value).commit();
+    }
 
     public Location getLocation() {
         if (mGpsLocation != null) {

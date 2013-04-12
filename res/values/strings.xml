@@ -53,6 +53,9 @@
     <string name="groups_helpdialog_chkbox">Don\'t show this again</string>
     <string name="groups_helpdialog_yesBtn">Yes</string>
     <string name="groups_helpdialog_noBtn">No, thanks</string>
+    <string name="groups_suggestion_yesBtn">Yes</string>
+    <string name="groups_suggestion_neutralBtn">No, not this one</string>
+    <string name="groups_suggestion_noBtn">No, do not ask me again</string>
     <string name="groups_alert_newgroup_title">New Group</string>
     <string name="groups_alert_newgroup_message">Pick a name for the group:</string>
     <string name="groups_alert_newgroup_ok">OK</string>
