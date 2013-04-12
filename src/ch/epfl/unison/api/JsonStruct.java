@@ -33,6 +33,15 @@ public abstract class JsonStruct {
         public Integer score;
         public Boolean predicted;  // or isPredicted?
     }
+    
+    /** Group Suggestion from the server. */
+    public static class GroupSuggestion extends JsonStruct {
+        
+        public Group group;
+        //Note that the users are not the same as the Users Field of the group as it
+        //may also contain users that are not in the group.
+        public String[] users;
+    }
 
     /** Information about a track (used in both directions). */
     public static class Track extends JsonStruct {

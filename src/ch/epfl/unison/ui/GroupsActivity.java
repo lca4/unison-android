@@ -1,11 +1,13 @@
 package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -29,6 +31,7 @@ import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.JsonStruct.GroupSuggestion;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
@@ -57,6 +60,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
     private ListView mGroupsList;
     private Menu mMenu;
+    
+    private JsonStruct.GroupSuggestion mSuggestion;
 
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -98,12 +103,18 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             leaveGroup();
         } else if (AppData.getInstance(this).showHelpDialog()) {
             showHelpDialog();
+        } else {
+            showGroupSuggestion();
         }
         
-        //TODO remove these line.
+        //TODO remove these lines.
 //        String [] fakeUsers = {"user1", "user2", "user3", "user4", 
 //                "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"};
-//        showGroupSuggestion("group", fakeUsers);
+//        mSuggestion = new JsonStruct.GroupSuggestion();
+//        mSuggestion.group = new JsonStruct.Group();
+//        mSuggestion.group.name = "group";
+//        mSuggestion.users = fakeUsers;
+        
     }
 
     @Override
@@ -235,6 +246,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 if (cbox.isChecked()) {
                     // Don't show the dialog again in the future.
                     AppData.getInstance(GroupsActivity.this).setShowHelpDialog(false);
+                    showGroupSuggestion();
                 }
                 if (DialogInterface.BUTTON_POSITIVE == which) {
                     startActivity(new Intent(GroupsActivity.this, HelpActivity.class));
@@ -246,51 +258,78 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
         alert.show();
     }
-    
+
+    private UnisonAPI.Handler<JsonStruct.GroupSuggestion> mSuggestionHandler = 
+            new UnisonAPI.Handler<JsonStruct.GroupSuggestion>() {
+
+        @Override
+        public void callback(GroupSuggestion struct) {
+            mSuggestion = struct;           
+            if (mSuggestion == null || GroupsActivity.this == null || mSuggestion.users == null
+                    || mSuggestion.group == null) {
+                return;
+            }
+            
+            AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
+            builder.setTitle(getString(R.string.groups_suggestion_title));
+            
+            LayoutInflater layoutInflater = (LayoutInflater) 
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View dialogView = layoutInflater.inflate(R.layout.suggestion_dialog, null);
+            builder.setView(dialogView);
+            
+            ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
+            final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
+            ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
+                    R.layout.group_suggestion_user_row, 
+                    R.id.group_suggestion_username, mSuggestion.users);
+            userView.setAdapter(userAdapter);
+                    
+            DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (cbox.isChecked()) {
+                        AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
+                    }
+                    if (DialogInterface.BUTTON_POSITIVE == which) {
+                        startActivity(new Intent(GroupsActivity.this, MainActivity.class)
+                                .putExtra(Const.Strings.GROUP, mSuggestion.group));    
+                    } 
+                }
+            };
+            
+            builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
+            builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
+            
+            final Dialog dialog = builder.create();
+            dialog.show();
+        }
+
+        @Override
+        public void onError(Error error) {
+            mSuggestion = null;
+            //Do nothing, errors silently happen in the background.
+        }
+    };
+
     /**
      * Pass information as arguments for now for easy testing.
      * They could be written as class variables.
      */
-    private void showGroupSuggestion(final String groupName, String[] userList) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        //TODO choose a better string, put it in android.R.string
-        builder.setTitle("Would you like to join this group of users?");
+    private void showGroupSuggestion() {
+        AppData data = AppData.getInstance(GroupsActivity.this);
+        UnisonAPI api = data.getAPI();
+        long uid = data.getUid();
         
-        ListView userView = new ListView(this);
-
-        ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(this,
-                R.layout.group_suggestion_user_row, R.id.group_suggestion_username, userList);
-
-        userView.setAdapter(userAdapter);
+        Location currentLoc = data.getLocation();
         
-        builder.setView(userView);
-        
-        DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //I want to join.
-                if (DialogInterface.BUTTON_POSITIVE == which) {
-                    startActivity(new Intent(GroupsActivity.this, MainActivity.class)
-                            .putExtra(Const.Strings.GROUP, groupName));
-                
-                  //Never ask me again if I want to join a group.    
-                } else if (DialogInterface.BUTTON_NEGATIVE == which) {
-                    AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
-                }
-                  //I do not want to join this particular group.
-                  //Commented out because no action needs to be done
-//                } else if (DialogInterface.BUTTON_NEUTRAL == which) {
-//                    
-//                }
-            }
-        };
-        
-        builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
-        builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
-        builder.setNeutralButton(getString(R.string.groups_suggestion_neutralBtn), click);
-        
-        builder.show();
+        //Only do suggestions based on location for now.
+        if (currentLoc != null) {
+            double lat = currentLoc.getLatitude();
+            double lon = currentLoc.getLongitude();
+            api.getSuggestion(uid, lat, lon, mSuggestionHandler);
+        } 
     }
 
     /** Adapter used to populate the ListView listing the groups. */

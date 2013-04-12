@@ -23,6 +23,7 @@
       android:id="@+id/groupHistoryName"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
+      android:textIsSelectable="true"
       android:textAppearance="?android:attr/textAppearanceMedium" />
 
   </LinearLayout>
