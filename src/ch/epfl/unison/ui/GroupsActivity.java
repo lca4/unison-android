@@ -64,6 +64,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     private JsonStruct.GroupSuggestion mSuggestion;
 
     private boolean mDismissedHelp = false;
+    private boolean suggestionIsForeground = false;
     
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -296,6 +297,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    suggestionIsForeground = false;
                     if (cbox.isChecked()) {
                         AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
                     }
@@ -309,6 +311,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
             builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
             
+            suggestionIsForeground = true;
             final Dialog dialog = builder.create();
             dialog.show();
         }
