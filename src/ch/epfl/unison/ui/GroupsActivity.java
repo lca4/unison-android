@@ -64,7 +64,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     private JsonStruct.GroupSuggestion mSuggestion;
 
     private boolean mDismissedHelp = false;
-    private boolean suggestionIsForeground = false;
+    private boolean mSuggestionIsForeground = false;
     
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -155,10 +155,9 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     @Override
     public void onRefresh() {
         repaintRefresh(true);
-
         UnisonAPI.Handler<JsonStruct.GroupsList> handler
                 = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
-
+            
             @Override
             public void callback(GroupsList struct) {
                 try {
@@ -168,7 +167,6 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 } catch (NullPointerException e) {
                     Log.w(TAG, "group or activity is null?", e);
                 }
-
             }
 
             @Override
@@ -183,7 +181,6 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 }
             }
         };
-
         AppData data = AppData.getInstance(this);
         if (data.getLocation() != null) {
             double lat = data.getLocation().getLatitude();
@@ -191,8 +188,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             data.getAPI().listGroups(lat, lon, handler);            
         } else {
             data.getAPI().listGroups(handler);
-        }
-        
+        }        
         if (mDismissedHelp && data.showGroupSuggestion()) {
             showGroupSuggestion();
         }
@@ -276,28 +272,24 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             if (mSuggestion == null || GroupsActivity.this == null || mSuggestion.users == null
                     || mSuggestion.group == null) {
                 return;
-            }
-            
+            }           
             AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
-            builder.setTitle(getString(R.string.groups_suggestion_title));
-            
+            builder.setTitle(getString(R.string.groups_suggestion_title));         
             LayoutInflater layoutInflater = (LayoutInflater) 
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View dialogView = layoutInflater.inflate(R.layout.suggestion_dialog, null);
-            builder.setView(dialogView);
-            
+            builder.setView(dialogView);           
             ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
             final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
             ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
                     R.layout.group_suggestion_user_row, 
                     R.id.group_suggestion_username, mSuggestion.users);
-            userView.setAdapter(userAdapter);
-                    
+            userView.setAdapter(userAdapter);                   
             DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    suggestionIsForeground = false;
+                    mSuggestionIsForeground = false;
                     if (cbox.isChecked()) {
                         AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
                     }
@@ -311,7 +303,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
             builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
             
-            suggestionIsForeground = true;
+            mSuggestionIsForeground = true;
             final Dialog dialog = builder.create();
             dialog.show();
         }
@@ -328,6 +320,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
      * They could be written as class variables.
      */
     private void showGroupSuggestion() {
+        if (mSuggestionIsForeground) {
+            return;
+        }
+        
         AppData data = AppData.getInstance(GroupsActivity.this);
         UnisonAPI api = data.getAPI();
         long uid = data.getUid();
