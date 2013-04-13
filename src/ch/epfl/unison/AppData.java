@@ -107,6 +107,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         mPrefs.edit().putBoolean(Const.PrefKeys.HELPDIALOG, value).commit();
     }
     
+    public boolean showGroupSuggestion() {
+        return mPrefs.getBoolean(Const.PrefKeys.GROUP_SUGGESTION, true);
+    }
+    
     public void setShowGroupSuggestion(boolean value) {
         mPrefs.edit().putBoolean(Const.PrefKeys.GROUP_SUGGESTION, value).commit();
     }

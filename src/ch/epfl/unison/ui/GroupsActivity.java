@@ -49,7 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.GroupsActivity";
-    private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
+    private static final int RELOAD_INTERVAL = 10 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
     // EPFL Polydome.
@@ -63,6 +63,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     
     private JsonStruct.GroupSuggestion mSuggestion;
 
+    private boolean mDismissedHelp = false;
+    
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -103,7 +105,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             leaveGroup();
         } else if (AppData.getInstance(this).showHelpDialog()) {
             showHelpDialog();
-        } else {
+        } else if (AppData.getInstance(this).showGroupSuggestion()) {
+            mDismissedHelp = true;
             showGroupSuggestion();
         }
         
@@ -184,9 +187,13 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         if (data.getLocation() != null) {
             double lat = data.getLocation().getLatitude();
             double lon = data.getLocation().getLongitude();
-            data.getAPI().listGroups(lat, lon, handler);
+            data.getAPI().listGroups(lat, lon, handler);            
         } else {
             data.getAPI().listGroups(handler);
+        }
+        
+        if (mDismissedHelp && data.showGroupSuggestion()) {
+            showGroupSuggestion();
         }
     }
 
@@ -243,11 +250,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mDismissedHelp = true;
                 if (cbox.isChecked()) {
                     // Don't show the dialog again in the future.
                     AppData.getInstance(GroupsActivity.this).setShowHelpDialog(false);
-                    showGroupSuggestion();
-                }
+                }            
                 if (DialogInterface.BUTTON_POSITIVE == which) {
                     startActivity(new Intent(GroupsActivity.this, HelpActivity.class));
                 }
