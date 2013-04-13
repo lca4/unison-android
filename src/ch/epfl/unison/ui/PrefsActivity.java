@@ -48,8 +48,7 @@ public class PrefsActivity extends SherlockPreferenceActivity {
         findPreference(Const.PrefKeys.NICKNAME).setOnPreferenceChangeListener(
                 new NicknameChangeListener());
 
-        findPreference(Const.PrefKeys.UID).setSummary(
-                String.format("your UID is: %d", AppData.getInstance(this).getUid()));
+        
     }
 
     @Override
@@ -87,6 +86,5 @@ public class PrefsActivity extends SherlockPreferenceActivity {
         }
 
     }
-
-
+    
 }

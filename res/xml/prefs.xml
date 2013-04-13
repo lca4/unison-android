@@ -9,4 +9,10 @@
       android:key="uid"
       android:summary="@string/pref_title_uid"
       android:enabled="false"/>
+  <CheckBoxPreference
+      android:title="@string/pref_title_suggestion_enabled"
+      android:key="gsuggestion"
+      android:defaultValue="true"
+      android:persistent="true"/>
+  
 </PreferenceScreen>
