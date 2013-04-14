@@ -7,7 +7,7 @@
     <!-- Requirements. -->
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="14" />
+        android:targetSdkVersion="8" /> <!-- previously: 14 (https://developer.android.com/tools/extras/support-library.html#SettingUp) -->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -34,6 +34,12 @@
         <activity
             android:name=".ui.GroupsHistoryActivity"
             android:label="@string/activity_title_history" />
+        <activity
+            android:name=".ui.SoloMainActivity"
+            android:label="@string/activity_title_solo_main" />
+        <activity
+            android:name=".ui.SoloPlaylistsActivity"
+            android:label="@string/activity_title_solo_playlists" />
         
         <activity
             android:name=".ui.LoginActivity"

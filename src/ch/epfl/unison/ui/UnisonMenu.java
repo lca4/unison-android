@@ -66,7 +66,7 @@ public abstract class UnisonMenu {
                 // logged in.
                 activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
                 break;
-            case android.R.id.home:
+            case R.id.home:
                 // app icon in Action Bar clicked; go home
                 activity.startActivity(new Intent(activity, GroupsActivity.class)
                         .setAction(GroupsActivity.ACTION_LEAVE_GROUP)

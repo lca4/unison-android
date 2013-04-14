@@ -1,14 +1,21 @@
 
 package ch.epfl.unison.ui;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +25,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -31,9 +38,13 @@ import ch.epfl.unison.api.JsonStruct.PlaylistsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /*
  * TODO
@@ -48,12 +59,15 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * @author marc bourqui
  */
-public class SoloPlaylistsActivity extends SherlockActivity
+public class SoloPlaylistsActivity extends SherlockFragmentActivity
         implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
+
+    private static SeedType smSeedType;
+    private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
 
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
@@ -195,8 +209,8 @@ public class SoloPlaylistsActivity extends SherlockActivity
                         }
                     }
                 };
-                AppData data = AppData.getInstance(this);
-        data.getAPI().listPlaylists(handler);
+        AppData data = AppData.getInstance(this);
+        data.getAPI().listPlaylists(data.getUid(), handler);
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -317,65 +331,228 @@ public class SoloPlaylistsActivity extends SherlockActivity
 
         @Override
         public void onClick(View v) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(SoloPlaylistsActivity.this);
+            /*
+             * TODO: - show dialog listing types of seeds
+             */
+            PickSeedDialogFragment pickSeedDialog = new PickSeedDialogFragment();
+            pickSeedDialog.show(getSupportFragmentManager(), "seedTypes");
 
-            alert.setTitle(getString(R.string.solo_playlists_alert_newplaylist_title));
-            alert.setMessage(getString(R.string.solo_playlists_alert_newplaylist_message));
-
-            // Set an EditText view to get user input
-            final EditText input = new EditText(SoloPlaylistsActivity.this);
-            alert.setView(input);
-
-            // When clicking on "OK", create the group.
-            alert.setPositiveButton(getString(R.string.solo_playlists_alert_newplaylist_ok),
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String name = input.getText().toString().trim();
-                            OnCreatePlaylistListener.this.createPlaylist(name);
-                        }
-                    });
-
-            alert.setNegativeButton(getString(R.string.solo_playlists_alert_newplaylist_cancel),
-                    null);
-            alert.show();
+            // AlertDialog.Builder alert = new
+            // AlertDialog.Builder(SoloPlaylistsActivity.this);
+            //
+            // alert.setTitle(getString(R.string.solo_playlists_alert_newplaylist_title));
+            // alert.setMessage(getString(R.string.solo_playlists_alert_newplaylist_message));
+            //
+            // // Set an EditText view to get user input
+            // final EditText input = new EditText(SoloPlaylistsActivity.this);
+            // alert.setView(input);
+            //
+            // // When clicking on "OK", create the group.
+            // alert.setPositiveButton(getString(R.string.solo_playlists_alert_newplaylist_ok),
+            // new DialogInterface.OnClickListener() {
+            //
+            // @Override
+            // public void onClick(DialogInterface dialog, int whichButton) {
+            // String name = input.getText().toString().trim();
+            // OnCreatePlaylistListener.this.createPlaylist(name);
+            // }
+            // });
+            //
+            // alert.setNegativeButton(getString(R.string.solo_playlists_alert_newplaylist_cancel),
+            // null);
+            // alert.show();
         }
 
         /**
-         * Creates a group on the back-end. If it succeeds, the ListView
-         * containing the list of groups is updated. If it fails, a toast
+         * Creates a playlist on the back-end. If it succeeds, the ListView
+         * containing the list of playlists is updated. If it fails, a toast
          * notification is shown.
-         * 
-         * @param name the name of the group to be created
          */
-        private void createPlaylist(String name) {
-            if (name == null || name.equals("")) {
-                Toast.makeText(SoloPlaylistsActivity.this,
-                        R.string.error_creating_playlist_empty_name, Toast.LENGTH_LONG).show();
-            } else {
-                AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
 
-                data.getAPI().createPlaylist(name,
-                        new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
-                            @Override
-                            public void callback(PlaylistsList struct) {
-                                SoloPlaylistsActivity.this.mPlaylistsList
-                                        .setAdapter(new PlaylistsAdapter(struct));
-                            }
+        @SuppressLint("NewApi")
+        protected void createPlaylist() {
+            AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
 
-                            @Override
-                            public void onError(Error error) {
-                                Log.d(TAG, error.toString());
-                                if (SoloPlaylistsActivity.this != null) {
-                                    Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_creating_group,
-                                            Toast.LENGTH_LONG).show();
-                                }
+            // Create the JSONObject containing seeds
+            for (int i = 0; i < smSeeds.size(); i++) {
+                System.out.println("seeds: " + smSeeds.get(i) + "\n");
+            }
+
+            Resources res = getResources();
+            TypedArray tags = res.obtainTypedArray(R.array.tags);
+            String seedsInString = "";
+            HashMap<String, String> seedsMap = new HashMap<String, String>();
+            for (int i = 0; i < smSeeds.size(); i++) {
+                if (!seedsInString.isEmpty()) {
+                    seedsInString.concat(",");
+                }
+                seedsInString.concat(tags.getString(i));
+            }
+            seedsMap.put("tags", seedsInString);
+            Gson gson = new Gson();
+            String json = gson.toJson(seedsMap);
+
+            data.getAPI().createPlaylist(data.getUid(), null,
+                    new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
+                        @Override
+                        public void callback(PlaylistsList struct) {
+                            SoloPlaylistsActivity.this.mPlaylistsList
+                                    .setAdapter(new PlaylistsAdapter(struct));
+                        }
+                        @Override
+                        public void onError(Error error) {
+                            Log.d(TAG, error.toString());
+                            if (SoloPlaylistsActivity.this != null) {
+                                Toast.makeText(SoloPlaylistsActivity.this,
+                                        R.string.error_creating_group,
+                                        Toast.LENGTH_LONG).show();
                             }
-                        });
+                        }
+                    });
+        }
+
+        /**
+         * @author marc
+         */
+        @SuppressLint({
+                "ValidFragment", "NewApi"
+        })
+        private class PickSeedDialogFragment extends android.support.v4.app.DialogFragment {
+            // private SeedType mType = null;
+
+            // private ArrayList<Integer> mSeeds = new ArrayList<Integer>();
+
+            // public PickSeedDialogFragment() {
+            // // TODO Auto-generated constructor stub
+            // }
+
+//            public void show(FragmentManager supportFragmentManager, String string) {
+//                // TODO Auto-generated method stub
+//                this.show(getSupportFragmentManager(), "seedTypes");
+//            }
+
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.solo_playlists_dialog_pick_seedtype);
+                builder.setItems(R.array.seedtypes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        Resources res = getResources();
+                        TypedArray seedsTypes = res.obtainTypedArray(R.array.seedtypes);
+                        String seed = seedsTypes.getString(which);
+                        seedsTypes.recycle();
+                        if (seed != null) {
+                            SeedType seedType = SeedType.getSeedType(seed);
+                            switch (seedType) {
+                                case TAGS:
+                                    PickTagsDialogFragment pickTagsDialog =
+                                            new PickTagsDialogFragment();
+                                    pickTagsDialog.show(getSupportFragmentManager(), "tags");
+                                    break;
+                                case TRACKS:
+                                    /*
+                                     * TODO open a new dialog containing a music
+                                     * file chooser.
+                                     */
+                                    break;
+                                default:
+                                    // Should never happen
+                                    break;
+                            }
+                        }
+                        // else {
+                        // //TODO handle error, but should never happen.
+                        // }
+                    }
+                });
+                return builder.create();
+            }
+
+            // public void setSeeds(ArrayList<Integer> seeds) {
+            // mSeeds = seeds;
+            // }
+            //
+            // public ArrayList<Integer> getSeeds() {
+            // return this.mSeeds;
+            // }
+        }
+
+        /**
+         * @author marc
+         */
+        @SuppressLint({
+                "ValidFragment", "NewApi"
+        })
+        private class PickTagsDialogFragment extends android.support.v4.app.DialogFragment {
+            private final ArrayList<Integer> mSelectedItems = new ArrayList<Integer>();
+
+            public PickTagsDialogFragment() {
+                // TODO Auto-generated constructor stub
+            }
+
+//            public void show(FragmentManager supportFragmentManager, String string) {
+//                // TODO Auto-generated method stub
+//                this.show(getSupportFragmentManager(), "tags");
+//            }
+
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                // Where we track the selected items
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                // Set the dialog title
+                builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
+                        // Specify the list array, the items to be selected by
+                        // default (null for none), and the listener through
+                        // which
+                        // to receive callbacks when items are selected
+                        .setMultiChoiceItems(R.array.tags, null,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which,
+                                            boolean isChecked) {
+                                        if (isChecked) {
+                                            // If the user checked the item, add
+                                            // it
+                                            // to the selected items
+                                            mSelectedItems.add(which);
+                                        } else if (mSelectedItems.contains(which)) {
+                                            // Else, if the item is already in
+                                            // the
+                                            // array, remove it
+                                            mSelectedItems.remove(Integer.valueOf(which));
+                                        }
+                                    }
+                                })
+                        // Set the action buttons
+                        .setPositiveButton(R.string.generic_ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User clicked OK, so save the
+                                        // mSelectedItems
+                                        // results somewhere or return them to
+                                        // the component
+                                        // that opened the dialog
+                                        storeTracks();
+                                    }
+                                })
+                        .setNegativeButton(R.string.generic_cancel,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // TODO
+                                    }
+                                });
+                return builder.create();
+            }
+
+            private void storeTracks() {
+                SoloPlaylistsActivity.smSeeds = mSelectedItems;
             }
         }
+
     }
 
     /**
@@ -414,4 +591,5 @@ public class SoloPlaylistsActivity extends SherlockActivity
             // });
         }
     }
+
 }
