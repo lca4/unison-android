@@ -51,7 +51,7 @@ public final class Const {
 
         private final String mLabel;
         
-        private static HashMap<String, SeedType> mLabelToStatusMapping;
+        private static HashMap<String, SeedType> smLabelToStatusMapping;
 
         private SeedType(String label) {
             this.mLabel = label;
@@ -63,20 +63,20 @@ public final class Const {
          * @return The SeedType corresponding to the label
          */
         public static SeedType getSeedType(String label) {
-            if (mLabelToStatusMapping == null) {
+            if (smLabelToStatusMapping == null) {
                 initMapping();
             }
             SeedType result = null;
             for (SeedType st : values()) {
-                result = mLabelToStatusMapping.get(label.toLowerCase());
+                result = smLabelToStatusMapping.get(label.toLowerCase());
             }
             return result;
         }
         
         private static void initMapping() {
-            mLabelToStatusMapping = new HashMap<String, Const.SeedType>();
+            smLabelToStatusMapping = new HashMap<String, Const.SeedType>();
             for (SeedType st : values()) {
-                mLabelToStatusMapping.put(st.mLabel, st);
+                smLabelToStatusMapping.put(st.mLabel, st);
             }
         }
         

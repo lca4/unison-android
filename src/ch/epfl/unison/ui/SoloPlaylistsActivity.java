@@ -2,7 +2,6 @@
 package ch.epfl.unison.ui;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -12,10 +11,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +39,10 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,8 +67,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
-    private static SeedType smSeedType;
-    private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
+    // private static SeedType smSeedType;
+    // private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
+    private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
 
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
@@ -95,6 +97,16 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         public void onReceive(Context context, Intent intent) {
             finish();
         }
+    };
+
+    /**
+     * If the type is still existing, the new seeds overwrite the previous ones.
+     * 
+     * @param type
+     * @param seeds
+     */
+    private void storeRawSeeds(SeedType type, ArrayList<Integer> seeds) {
+        smRawSeeds.put(type, seeds);
     };
 
     @Override
@@ -373,24 +385,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         protected void createPlaylist() {
             AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
 
-            // Create the JSONObject containing seeds
-            for (int i = 0; i < smSeeds.size(); i++) {
-                System.out.println("seeds: " + smSeeds.get(i) + "\n");
-            }
-
-            Resources res = getResources();
-            TypedArray tags = res.obtainTypedArray(R.array.tags);
-            String seedsInString = "";
-            HashMap<String, String> seedsMap = new HashMap<String, String>();
-            for (int i = 0; i < smSeeds.size(); i++) {
-                if (!seedsInString.isEmpty()) {
-                    seedsInString.concat(",");
-                }
-                seedsInString.concat(tags.getString(i));
-            }
-            seedsMap.put("tags", seedsInString);
-            Gson gson = new Gson();
-            String json = gson.toJson(seedsMap);
+            // TODO get JSONObject to pass to createPL
 
             data.getAPI().createPlaylist(data.getUid(), null,
                     new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
@@ -399,6 +394,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                             SoloPlaylistsActivity.this.mPlaylistsList
                                     .setAdapter(new PlaylistsAdapter(struct));
                         }
+
                         @Override
                         public void onError(Error error) {
                             Log.d(TAG, error.toString());
@@ -409,6 +405,39 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                             }
                         }
                     });
+        }
+
+        /**
+         * Helper to convert a TypedArray to a String in JSONObject format. The
+         * TypedArray values are treated as Strings. Only the values with index
+         * from indexes are selected.
+         * 
+         * @param key
+         * @param values
+         * @param indexes
+         * @return null in case of failure
+         */
+        @SuppressLint("NewApi")
+        private JSONObject export(String key, int array,
+                ArrayList<Integer> indexes) {
+            TypedArray tags = getResources().obtainTypedArray(array);
+            String valuesInString = "";
+            for (int i = 0; i < indexes.size(); i++) {
+                if (!valuesInString.isEmpty()) {
+                    valuesInString = valuesInString.concat(",");
+                }
+                valuesInString = valuesInString.concat(tags.getString(i));
+            }
+            tags.recycle();
+            JSONObject json = new JSONObject();
+            try {
+                json.put("tags", valuesInString);
+                return json;
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
         }
 
         /**
@@ -426,10 +455,11 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
             // // TODO Auto-generated constructor stub
             // }
 
-//            public void show(FragmentManager supportFragmentManager, String string) {
-//                // TODO Auto-generated method stub
-//                this.show(getSupportFragmentManager(), "seedTypes");
-//            }
+            // public void show(FragmentManager supportFragmentManager, String
+            // string) {
+            // // TODO Auto-generated method stub
+            // this.show(getSupportFragmentManager(), "seedTypes");
+            // }
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -492,10 +522,11 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 // TODO Auto-generated constructor stub
             }
 
-//            public void show(FragmentManager supportFragmentManager, String string) {
-//                // TODO Auto-generated method stub
-//                this.show(getSupportFragmentManager(), "tags");
-//            }
+            // public void show(FragmentManager supportFragmentManager, String
+            // string) {
+            // // TODO Auto-generated method stub
+            // this.show(getSupportFragmentManager(), "tags");
+            // }
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -519,8 +550,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                             mSelectedItems.add(which);
                                         } else if (mSelectedItems.contains(which)) {
                                             // Else, if the item is already in
-                                            // the
-                                            // array, remove it
+                                            // the array, remove it
                                             mSelectedItems.remove(Integer.valueOf(which));
                                         }
                                     }
@@ -535,7 +565,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                         // results somewhere or return them to
                                         // the component
                                         // that opened the dialog
-                                        storeTracks();
+                                        Log.i(TAG, mSelectedItems.toString());
+                                        storeRawSeeds(SeedType.TAGS, mSelectedItems);
+                                        createPlaylist();
                                     }
                                 })
                         .setNegativeButton(R.string.generic_cancel,
@@ -546,10 +578,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                     }
                                 });
                 return builder.create();
-            }
-
-            private void storeTracks() {
-                SoloPlaylistsActivity.smSeeds = mSelectedItems;
             }
         }
 
