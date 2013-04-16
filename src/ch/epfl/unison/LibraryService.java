@@ -123,6 +123,8 @@ public class LibraryService extends Service {
                     set.add(new MusicItem(cur.getInt(colId),
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
+            }
+            if (!cur.isClosed()) {
                 cur.close();
             }
 
