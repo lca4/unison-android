@@ -2,6 +2,7 @@
 package ch.epfl.unison.api;
 
 import android.util.Base64;
+import android.util.Log;
 
 import ch.epfl.unison.Const.Filter;
 import ch.epfl.unison.Const.Sorting;
@@ -225,12 +226,13 @@ public class UnisonAPI {
      * Solo mode
      */
 
-    public void createPlaylist(long uid, JSONObject seeds, 
+    public void generatePlaylist(long uid, JSONObject seeds,
             Handler<JsonStruct.PlaylistsList> handler) {
-        // TODO adapt
+        Log.i(TAG, "Ready to get!");
+        // TODO add options
         URL url = urlFor("/solo/%d/playlist", uid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .addParam("seeds", seeds).setAuth(mAuth).doPOST();
+                .addParam("seeds", seeds).setAuth(mAuth).doGET();
     }
 
     public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {

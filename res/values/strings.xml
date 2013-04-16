@@ -133,6 +133,7 @@
     <string name="error_loading_playlists">Unable to load the list of playlists</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
+    <string name="error_creating_playlist">Unable to create the playlist.</string>
     <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
     <string name="error_creating_playlist_empty_name">Unable to create a group with empty name.</string>
     <string name="error_unauthorized">Incorrect password or e-mail address.</string>

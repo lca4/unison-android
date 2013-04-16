@@ -29,6 +29,7 @@ import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.LibraryService;
+import ch.epfl.unison.Playlist;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.PlaylistsList;
@@ -77,6 +78,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     private ListView mPlaylistsList;
     private Menu mMenu;
 
+    private Playlist mPlaylist;
+    
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -99,15 +102,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         }
     };
 
-    /**
-     * If the type is still existing, the new seeds overwrite the previous ones.
-     * 
-     * @param type
-     * @param seeds
-     */
-    private void storeRawSeeds(SeedType type, ArrayList<Integer> seeds) {
-        smRawSeeds.put(type, seeds);
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +109,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        
+        smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
+        mPlaylist = new Playlist();
 
         setContentView(R.layout.solo_playlists);
 
@@ -380,31 +377,35 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
          * containing the list of playlists is updated. If it fails, a toast
          * notification is shown.
          */
-
         @SuppressLint("NewApi")
-        protected void createPlaylist() {
+        protected void generatePlaylist() {
             AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
 
             // TODO get JSONObject to pass to createPL
-
-            data.getAPI().createPlaylist(data.getUid(), null,
-                    new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
-                        @Override
-                        public void callback(PlaylistsList struct) {
-                            SoloPlaylistsActivity.this.mPlaylistsList
-                                    .setAdapter(new PlaylistsAdapter(struct));
-                        }
-
-                        @Override
-                        public void onError(Error error) {
-                            Log.d(TAG, error.toString());
-                            if (SoloPlaylistsActivity.this != null) {
-                                Toast.makeText(SoloPlaylistsActivity.this,
-                                        R.string.error_creating_group,
-                                        Toast.LENGTH_LONG).show();
+            JSONObject json = mPlaylist.export(getResources());
+            Log.i(TAG, "json: " + json + "\n");
+            
+            if (json !=  null) {
+                data.getAPI().generatePlaylist(data.getUid(), json,
+                        new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
+                            @Override
+                            public void callback(PlaylistsList struct) {
+                                Log.i(TAG, "Playlist created!");
+                                SoloPlaylistsActivity.this.mPlaylistsList
+                                        .setAdapter(new PlaylistsAdapter(struct));
                             }
-                        }
-                    });
+    
+                            @Override
+                            public void onError(Error error) {
+                                Log.d(TAG, error.toString());
+                                if (SoloPlaylistsActivity.this != null) {
+                                    Toast.makeText(SoloPlaylistsActivity.this,
+                                            R.string.error_creating_group,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+            }
         }
 
         /**
@@ -566,8 +567,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                         // the component
                                         // that opened the dialog
                                         Log.i(TAG, mSelectedItems.toString());
-                                        storeRawSeeds(SeedType.TAGS, mSelectedItems);
-                                        createPlaylist();
+//                                        storeRawSeeds(SeedType.TAGS, mSelectedItems);
+                                        mPlaylist.addRawTags(mSelectedItems);
+                                        OnCreatePlaylistListener.this.generatePlaylist();
                                     }
                                 })
                         .setNegativeButton(R.string.generic_cancel,
