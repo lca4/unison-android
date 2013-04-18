@@ -24,21 +24,27 @@ import java.util.LinkedList;
  */
 public class Playlist {
 
+    private String mName;
+    private Long mLocalId;
+    private int mListeners;
+    
     // private HashMap<SeedType, LinkedList<Long>> mRaw;
-    private ArrayList<Integer> mRawTags;
+    private ArrayList<Integer> mRawTagsId;
     // TODO mRawTracks
-    private LinkedList<MusicItem> mPlaylist;
     private HashMap<String, Object> mOptions;
+    
+    private LinkedList<MusicItem> mPlaylist;
+    private int mTracks;    
 
     public Playlist() {
-        mRawTags = new ArrayList<Integer>();
+        mRawTagsId = new ArrayList<Integer>();
         mPlaylist = new LinkedList<MusicItem>();
         mOptions = new HashMap<String, Object>();
     }
 
     public void addRawTags(ArrayList<Integer> seeds) {
 //        Log.i("Playlist", "to be added to rawlist: " + seeds + "\n");
-        mRawTags.addAll(seeds);
+        mRawTagsId.addAll(seeds);
 //        Log.i("Playlist", "rawlist: " + mRawTags.toString() + "\n");
     }
 
@@ -55,7 +61,7 @@ public class Playlist {
     @SuppressLint("NewApi")
     public JSONObject export(Resources res) {
 
-        if (mRawTags.isEmpty()) {
+        if (mRawTagsId.isEmpty()) {
             return null;
         }
 
@@ -64,7 +70,7 @@ public class Playlist {
         // Tags
         TypedArray tags = res.obtainTypedArray(R.array.tags);
         JSONArray jsonArray = new JSONArray();
-        for (int i = 0; i < mRawTags.size(); i++) {
+        for (int i = 0; i < mRawTagsId.size(); i++) {
             jsonArray.put(tags.getString(i));
         }
         tags.recycle();

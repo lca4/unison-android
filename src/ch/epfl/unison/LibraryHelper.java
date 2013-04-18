@@ -7,10 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import ch.epfl.unison.data.UnisonDB;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * @deprecated use {@link UnisonDB} instead.<br />
+ * 
  * Helper class for accessing / managing the music library. Note: we are talking
  * about the one *that GroupStreamer owns*, not the Android content provider which
  * gives access to the music files.

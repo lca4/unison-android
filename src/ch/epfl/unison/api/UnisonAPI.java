@@ -232,7 +232,7 @@ public class UnisonAPI {
         // TODO add options
         URL url = urlFor("/solo/%d/playlist", uid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .addParam("seeds", seeds).setAuth(mAuth).doGET();
+                .setAuth(mAuth).addParam("seeds", seeds).doPOST();
     }
 
     public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {

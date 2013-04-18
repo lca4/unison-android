@@ -70,16 +70,17 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
     // private static SeedType smSeedType;
     // private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
-    private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
+//    private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
 
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
 
+    private Playlist mPlaylist;
+    
+    // GUI specific
     private ListView mPlaylistsList;
     private Menu mMenu;
 
-    private Playlist mPlaylist;
-    
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -102,15 +103,14 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
-        
-        smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
+
+//        smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
         mPlaylist = new Playlist();
 
         setContentView(R.layout.solo_playlists);
@@ -295,7 +295,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     // alert.show();
     // }
 
-    /** Adapter used to populate the ListView listing the groups. */
+    /** Adapter used to populate the ListView listing the playlists. */
     private class PlaylistsAdapter extends ArrayAdapter<JsonStruct.Playlist> {
 
         public static final int ROW_LAYOUT = R.layout.solo_playlists_row;
@@ -384,8 +384,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
             // TODO get JSONObject to pass to createPL
             JSONObject json = mPlaylist.export(getResources());
             Log.i(TAG, "json: " + json + "\n");
-            
-            if (json !=  null) {
+
+            if (json != null) {
                 data.getAPI().generatePlaylist(data.getUid(), json,
                         new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
                             @Override
@@ -394,7 +394,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                 SoloPlaylistsActivity.this.mPlaylistsList
                                         .setAdapter(new PlaylistsAdapter(struct));
                             }
-    
+
                             @Override
                             public void onError(Error error) {
                                 Log.d(TAG, error.toString());
@@ -567,7 +567,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                         // the component
                                         // that opened the dialog
                                         Log.i(TAG, mSelectedItems.toString());
-//                                        storeRawSeeds(SeedType.TAGS, mSelectedItems);
+                                        // storeRawSeeds(SeedType.TAGS,
+                                        // mSelectedItems);
                                         mPlaylist.addRawTags(mSelectedItems);
                                         OnCreatePlaylistListener.this.generatePlaylist();
                                     }
@@ -586,16 +587,19 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     }
 
     /**
-     * When clicking on a group, send a request to the server and start
+     * When clicking on a playlist, send a request to the server and start
      * MainActivity.
      */
     private class OnPlaylistSelectedListener implements OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            UnisonAPI api = AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-            long uid = AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-            final JsonStruct.Playlist playlist = (JsonStruct.Playlist) view.getTag();
+            // UnisonAPI api =
+            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
+            // long uid =
+            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
+            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
+            // view.getTag();
 
             // api.joinGroup(uid, playlist.plid, new
             // UnisonAPI.Handler<JsonStruct.Success>() {
