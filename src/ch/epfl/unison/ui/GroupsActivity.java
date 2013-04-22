@@ -299,6 +299,17 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                     } 
                 }
             };
+
+            //This is supposed to handle the situation where the user presses the BACK key too.
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {         
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    mSuggestionIsForeground = false;
+                    
+                    //We could handle here whether the checkbox was checked or not,
+                    //but it makes more sense to do so only when the user presses a button.
+                }
+            });
             
             builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
             builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);

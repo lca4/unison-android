@@ -25,6 +25,7 @@
     <string name="pref_title_nickname">Nickname</string>
     <string name="pref_summary_nickname">Lets other users identify you.</string>
     <string name="pref_title_uid">UUID</string>
+     <string name="pref_title_suggestion_enabled">Enable Suggestions</string>
 
     <!-- Ratings -->
     <string name="ratings_improve_gs">Ratings improve GroupStreamer\'s effectiveness.</string>
