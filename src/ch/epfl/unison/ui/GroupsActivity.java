@@ -49,7 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.GroupsActivity";
-    private static final int RELOAD_INTERVAL = 10 * 1000;  // in ms.
+    private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
     // EPFL Polydome.
