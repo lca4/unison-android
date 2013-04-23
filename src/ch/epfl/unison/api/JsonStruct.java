@@ -34,8 +34,20 @@ public abstract class JsonStruct {
         public Boolean predicted;  // or isPredicted?
     }
     
+    /** Cluster as used on the server to regroup users. */
+    public static class Cluster extends JsonStruct {
+        
+        public Long cid;
+        public Double lat;
+        public Double lon;
+        public Long gid;
+    }
+    
     /** Group Suggestion from the server. */
     public static class GroupSuggestion extends JsonStruct {
+        
+        public boolean suggestion;
+        public Cluster cluster;
         
         public Group group;
         //Note that the users are not the same as the Users Field of the group as it
