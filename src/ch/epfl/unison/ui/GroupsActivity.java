@@ -49,7 +49,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.GroupsActivity";
-    private static final int RELOAD_INTERVAL = 10 * 1000;  // in ms.
+    private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
     // EPFL Polydome.
@@ -272,6 +272,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn), click);
         alert.show();
     }
+    
 
     private UnisonAPI.Handler<JsonStruct.GroupSuggestion> mSuggestionHandler = 
             new UnisonAPI.Handler<JsonStruct.GroupSuggestion>() {
@@ -279,7 +280,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         @Override
         public void callback(GroupSuggestion struct) {
             mSuggestion = struct;           
-            if (mSuggestion == null || GroupsActivity.this == null || mSuggestion.users == null
+            if (mSuggestion == null || GroupsActivity.this == null
+                    || !mSuggestion.suggestion
+                    || mSuggestion.users == null
+                    || mSuggestion.cluster == null
                     || mSuggestion.group == null) {
                 return;
             }           
@@ -304,8 +308,28 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                         AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
                     }
                     if (DialogInterface.BUTTON_POSITIVE == which) {
-                        startActivity(new Intent(GroupsActivity.this, MainActivity.class)
-                                .putExtra(Const.Strings.GROUP, mSuggestion.group));    
+                        UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
+                        long uid = AppData.getInstance(GroupsActivity.this).getUid();
+                        api.joinGroup(uid, mSuggestion.group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                            @Override
+                            public void callback(Success struct) {
+                                                    
+                                GroupsActivity.this.startActivity(
+                                        new Intent(GroupsActivity.this, MainActivity.class)
+                                        .putExtra(Const.Strings.GROUP, mSuggestion.group));
+                            }
+                           
+                            @Override
+                            public void onError(Error error) {
+                                Log.d(TAG, error.toString());
+                                if (GroupsActivity.this != null) {
+                                    Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                        });    
                     } 
                 }
             };
@@ -477,6 +501,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             long uid = AppData.getInstance(GroupsActivity.this).getUid();
             final JsonStruct.Group group = (JsonStruct.Group) view.getTag();
 
+          //TODO modularize
             api.joinGroup(uid, group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
 
                 @Override
@@ -486,7 +511,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                             new Intent(GroupsActivity.this, MainActivity.class)
                             .putExtra(Const.Strings.GROUP, group));
                 }
-
+               
                 @Override
                 public void onError(Error error) {
                     Log.d(TAG, error.toString());
