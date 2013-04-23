@@ -89,6 +89,9 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(TAG, "GroupsActivity is being created.");
+        
+        
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
@@ -104,10 +107,14 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
             // We are coming back from a group - let's make sure the back-end knows.
             leaveGroup();
+            mDismissedHelp = true;
         } else if (AppData.getInstance(this).showHelpDialog()) {
             showHelpDialog();
-        } else if (AppData.getInstance(this).showGroupSuggestion()) {
+        } else {
             mDismissedHelp = true;
+        }
+        
+        if (AppData.getInstance(this).showGroupSuggestion() && mDismissedHelp) {
             showGroupSuggestion();
         }
         
@@ -124,6 +131,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     @Override
     public void onResume() {
         super.onResume();
+//        mDismissedHelp = true;
         mIsForeground = true;
         startService(new Intent(LibraryService.ACTION_UPDATE));
         mHandler.postDelayed(mUpdater, INITIAL_DELAY);
@@ -154,6 +162,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
     @Override
     public void onRefresh() {
+        Log.d(TAG, "help: " + mDismissedHelp + ", sugg: " + mSuggestion + ", suggForg: " + mSuggestionIsForeground);
+        
         repaintRefresh(true);
         UnisonAPI.Handler<JsonStruct.GroupsList> handler
                 = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
