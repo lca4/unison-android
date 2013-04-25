@@ -33,20 +33,17 @@ import ch.epfl.unison.Playlist;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.PlaylistsList;
+import ch.epfl.unison.api.JsonStruct.TagsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /*
  * TODO
@@ -70,13 +67,13 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
     // private static SeedType smSeedType;
     // private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
-//    private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
+    // private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
 
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
 
     private Playlist mPlaylist;
-    
+
     // GUI specific
     private ListView mPlaylistsList;
     private Menu mMenu;
@@ -110,7 +107,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-//        smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
+        // smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
         mPlaylist = new Playlist();
 
         setContentView(R.layout.solo_playlists);
@@ -190,7 +187,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     public void onRefresh() {
         repaintRefresh(true);
 
-        UnisonAPI.Handler<JsonStruct.PlaylistsList> handler =
+        UnisonAPI.Handler<JsonStruct.PlaylistsList> playlistsHandler =
                 new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
 
                     @Override
@@ -218,8 +215,34 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                         }
                     }
                 };
+
+        // Update tags
+        UnisonAPI.Handler<JsonStruct.TagsList> tagsHandler =
+                new UnisonAPI.Handler<JsonStruct.TagsList>() {
+
+                    @Override
+                    public void callback(TagsList struct) {
+                        // TODO update sqlit db
+
+                    }
+
+                    @Override
+                    public void onError(UnisonAPI.Error error) {
+                        if (error != null) {
+                            Log.d(TAG, error.toString());
+                        }
+                        if (SoloPlaylistsActivity.this != null) {
+                            Toast.makeText(SoloPlaylistsActivity.this,
+                                    R.string.error_loading_tags,
+                                    Toast.LENGTH_LONG).show();
+                            SoloPlaylistsActivity.this.repaintRefresh(false);
+                        }
+                    }
+                };
+
         AppData data = AppData.getInstance(this);
-        data.getAPI().listPlaylists(data.getUid(), handler);
+        data.getAPI().listPlaylists(data.getUid(), playlistsHandler);
+        data.getAPI().listTags(data.getUid(), tagsHandler);
     }
 
     public void repaintRefresh(boolean isRefreshing) {
@@ -400,7 +423,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                 Log.d(TAG, error.toString());
                                 if (SoloPlaylistsActivity.this != null) {
                                     Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_creating_group,
+                                            R.string.error_creating_playlist,
                                             Toast.LENGTH_LONG).show();
                                 }
                             }

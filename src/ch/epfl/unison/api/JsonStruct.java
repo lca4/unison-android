@@ -108,9 +108,22 @@ public abstract class JsonStruct {
         public Integer listeners;
     }
 
-    /** List of groups. */
+    /** List of playlists. */
     public static class PlaylistsList extends JsonStruct {
 
         public Playlist[] playlists;
+    }
+    
+    /** Information about a tag (used in both directions). */
+    public static class Tag extends JsonStruct {
+
+        public Long tid;
+        public String name;
+    }
+
+    /** List of tags. */
+    public static class TagsList extends JsonStruct {
+
+        public Tag[] tags;
     }
 }

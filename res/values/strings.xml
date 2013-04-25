@@ -131,6 +131,7 @@
     <!-- Errors. -->
     <string name="error_loading_groups">Unable to load the list of groups.</string>
     <string name="error_loading_playlists">Unable to load the list of playlists</string>
+    <string name="error_loading_tags">Unable to load the list of tags</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
     <string name="error_creating_playlist">Unable to create the playlist.</string>

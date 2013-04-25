@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.util.Log;
 
 import ch.epfl.unison.Const.SeedType;
+import ch.epfl.unison.data.MusicItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;

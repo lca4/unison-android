@@ -119,8 +119,8 @@ public final class Const {
      *
      */
     public enum Sorting {
-        RATING("rating"),
-        PROXIMITY("proximity");
+        RATING("rating".toLowerCase()),
+        PROXIMITY("proximity".toLowerCase());
 
         private final String mSorting;
 

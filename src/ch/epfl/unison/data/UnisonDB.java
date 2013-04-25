@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import ch.epfl.unison.MusicItem;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +28,8 @@ public class UnisonDB {
 
     private static final String LIBE_WHERE_ALL = Const.LIBE_C_LOCAL_ID + " = ? AND "
             + Const.LIBE_C_ARTIST + " = ? AND " + Const.LIBE_C_TITLE + " = ?";
+    private static final String TAGS_WHERE_ALL = Const.TAGS_C_ID + " = ? AND "
+            + Const.TAGS_C_NAME + " = ?";
 
     public UnisonDB(Context c) {
         mContext = c;
@@ -133,7 +134,57 @@ public class UnisonDB {
      * tags specific methods
      */
 
-    public Cursor tagsGetEntries() {
-        return null;
+    public Set<TagItem> tagsGetEntries() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cur = db.query(Const.TAGS_TABLE_NAME,
+                new String[] {
+                        Const.TAGS_C_ID, Const.TAGS_C_NAME
+                },
+                null, null, null, null, null);
+        Set<TagItem> set = new HashSet<TagItem>();
+        if (cur != null && cur.moveToFirst()) {
+            int colId = cur.getColumnIndex(Const.TAGS_C_ID);
+            int colName = cur.getColumnIndex(Const.TAGS_C_NAME);
+            int colRemoteId = cur.getColumnIndex(Const.TAGS_C_REMOTE_ID);
+            do {
+                set.add(new TagItem(cur.getInt(colId),
+                        cur.getString(colName), colRemoteId));
+            } while (cur.moveToNext());
+        }
+        cur.close();
+        db.close();
+        return set;
+    }
+    
+    public boolean tagsIsEmpty() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cur = db.query(Const.TAGS_TABLE_NAME,
+                new String[] {
+                        Const.TAGS_C_ID, Const.TAGS_C_NAME
+                },
+                null, null, null, null, null);
+        boolean isEmpty = !cur.moveToFirst();
+        cur.close();
+        db.close();
+        return isEmpty;
+    }
+
+    public void tagsInsert(TagItem item) {
+        ContentValues values = new ContentValues();
+        values.put(Const.TAGS_C_ID, item.localId);
+        values.put(Const.TAGS_C_NAME, item.name);
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.insert(Const.LIBE_TABLE_NAME, null, values);
+        db.close();
+    }
+
+    public void tagsDelete(TagItem item) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(Const.TAGS_TABLE_NAME, TAGS_WHERE_ALL,
+                new String[] {
+                        String.valueOf(item.localId), item.name
+                });
+        db.close();
     }
 }

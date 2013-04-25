@@ -226,18 +226,31 @@ public class UnisonAPI {
      * Solo mode
      */
 
+    // ---------------
+    // PLAYLISTS
+    
     public void generatePlaylist(long uid, JSONObject seeds,
             Handler<JsonStruct.PlaylistsList> handler) {
         Log.i(TAG, "Ready to get!");
         // TODO add options
+        JSONObject options = new JSONObject();
         URL url = urlFor("/solo/%d/playlist", uid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .setAuth(mAuth).addParam("seeds", seeds).doPOST();
+                .setAuth(mAuth).addParam("seeds", seeds).addParam("options", options).doPOST();
     }
 
     public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/%d/playlists", uid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                .setAuth(mAuth).doGET();
+    }
+
+    // ---------------
+    // TAGS
+    
+    public void listTags(long uid, Handler<JsonStruct.TagsList> handler) {
+        URL url = urlFor("/solo/tags", uid);
+        AsyncRequest.of(url, handler, JsonStruct.TagsList.class)
                 .setAuth(mAuth).doGET();
     }
 
