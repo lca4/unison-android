@@ -157,7 +157,14 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     @Override
     public void onRefresh() {
         repaintRefresh(true);
+        AppData data = AppData.getInstance(this);
         UnisonAPI api = AppData.getInstance(this).getAPI();
+        
+        if (data.getLocation() != null) {
+            double lat = data.getLocation().getLatitude();
+            double lon = data.getLocation().getLongitude();
+        }
+        //TODO continue
         api.getGroupInfo(mGroupId, new UnisonAPI.Handler<JsonStruct.Group>() {
 
             @Override
