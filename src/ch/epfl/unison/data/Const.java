@@ -25,12 +25,14 @@ final class Const {
     static final String TAGS_C_ID = BaseColumns._ID;
     static final String TAGS_C_NAME = "name";
     static final String TAGS_C_REMOTE_ID = "remote_id";
-    
+
     static final String MOODS_TABLE_NAME = "mood"; // Prefix: MOOD_
+    // moods table fields here
     static final String MOOD_C_ID = BaseColumns._ID;
     static final String MOOD_C_NAME = "name";
-    
+
     static final String MOODS_TAGS_TABLE_NAME = "moods_tags"; // Prefix: MOTA_
+    // moods-tags table fields here
     static final String MOTA_C_MOOD_ID = "mood_id";
     static final String MOTA_C_TAG_ID = "tag_id";
 

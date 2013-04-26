@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,7 +51,7 @@ public class UnisonDB {
     /*
      * lib_entry specific methods
      */
-    public Set<MusicItem> libeGetEntries() {
+    public Set<MusicItem> getMusicItems() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(Const.LIBE_TABLE_NAME,
                 new String[] {
@@ -87,7 +86,7 @@ public class UnisonDB {
         return isEmpty;
     }
 
-    public void libeInsert(MusicItem item) {
+    public void insert(MusicItem item) {
         ContentValues values = new ContentValues();
         values.put(Const.LIBE_C_LOCAL_ID, item.localId);
         values.put(Const.LIBE_C_ARTIST, item.artist);
@@ -98,7 +97,7 @@ public class UnisonDB {
         db.close();
     }
 
-    public void libeDelete(MusicItem item) {
+    public void delete(MusicItem item) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
                 new String[] {
@@ -107,7 +106,7 @@ public class UnisonDB {
         db.close();
     }
 
-    public boolean libeExists(MusicItem item) {
+    public boolean exists(MusicItem item) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor c = db.query(Const.LIBE_TABLE_NAME,
                 new String[] {
@@ -131,10 +130,20 @@ public class UnisonDB {
     }
 
     /*
-     * tags specific methods
+     * Tags specific methods
      */
 
-    public Set<TagItem> tagsGetEntries() {
+    public Cursor getTagItemsCursor() {
+        return mDb.query(Const.TAGS_TABLE_NAME, null, null, null, null, null, null);
+    }
+    
+    public TagItem getTagItem(int index) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+//        Cursor cur = db.qu
+        return null;
+    }
+
+    public Set<TagItem> getTagItems() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(Const.TAGS_TABLE_NAME,
                 new String[] {
@@ -148,14 +157,14 @@ public class UnisonDB {
             int colRemoteId = cur.getColumnIndex(Const.TAGS_C_REMOTE_ID);
             do {
                 set.add(new TagItem(cur.getInt(colId),
-                        cur.getString(colName), colRemoteId));
+                        cur.getString(colName), cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
         }
         cur.close();
         db.close();
         return set;
     }
-    
+
     public boolean tagsIsEmpty() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(Const.TAGS_TABLE_NAME,
@@ -169,22 +178,50 @@ public class UnisonDB {
         return isEmpty;
     }
 
-    public void tagsInsert(TagItem item) {
+    /**
+     * Inserts the item only if it still does not exists.
+     * 
+     * @param item
+     */
+    public void insert(TagItem item) {
         ContentValues values = new ContentValues();
         values.put(Const.TAGS_C_ID, item.localId);
         values.put(Const.TAGS_C_NAME, item.name);
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.insert(Const.LIBE_TABLE_NAME, null, values);
+        if (!exists(item)) {
+            db.insert(Const.LIBE_TABLE_NAME, null, values);
+        }
         db.close();
     }
 
-    public void tagsDelete(TagItem item) {
+    public void delete(TagItem item) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(Const.TAGS_TABLE_NAME, TAGS_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.name
                 });
         db.close();
+    }
+
+    public boolean exists(TagItem item) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor c = db.query(Const.TAGS_TABLE_NAME,
+                new String[] {
+                    Const.TAGS_C_ID
+                },
+                TAGS_WHERE_ALL,
+                new String[] {
+                        String.valueOf(item.localId), item.name, String.valueOf(item.remoteId)
+                },
+                null, null, null, "1"); // LIMIT 1
+        boolean exists = c.moveToFirst();
+        c.close();
+        db.close();
+        return exists;
+    }
+    
+    public String getTagNameColumnLabel() {
+        return Const.TAGS_C_NAME;
     }
 }

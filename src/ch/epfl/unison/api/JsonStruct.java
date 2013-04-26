@@ -1,5 +1,7 @@
 package ch.epfl.unison.api;
 
+import ch.epfl.unison.data.TagItem;
+
 import java.io.Serializable;
 
 /**
@@ -117,8 +119,13 @@ public abstract class JsonStruct {
     /** Information about a tag (used in both directions). */
     public static class Tag extends JsonStruct {
 
-        public Long tid;
+        public int tid;
         public String name;
+        public Long refId;
+        
+        public TagItem getTagItem() {
+            return new TagItem(tid, name, refId);
+        }
     }
 
     /** List of tags. */

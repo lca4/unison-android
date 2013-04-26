@@ -9,9 +9,9 @@ public class TagItem implements Comparable<TagItem> {
     
     public final int localId;
     public final String name;
-    public final int remoteId; // id on GS database
+    public final Long remoteId; // id on GS database, hash in fact
     
-    public TagItem(int lid, String n, int rid) {
+    public TagItem(int lid, String n, Long rid) {
         localId = lid;
         name = n;
         remoteId = rid;

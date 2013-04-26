@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.Playlist;
@@ -36,6 +38,7 @@ import ch.epfl.unison.api.JsonStruct.PlaylistsList;
 import ch.epfl.unison.api.JsonStruct.TagsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -44,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /*
  * TODO
@@ -73,6 +77,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     // "ch.epfl.unison.action.LEAVE_GROUP";
 
     private Playlist mPlaylist;
+    private UnisonDB mDb;
 
     // GUI specific
     private ListView mPlaylistsList;
@@ -107,11 +112,11 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        // smRawSeeds = new HashMap<SeedType, ArrayList<Integer>>();
         mPlaylist = new Playlist();
+        mDb = new UnisonDB(this);
+        mDb.open();
 
         setContentView(R.layout.solo_playlists);
-
         ((Button) findViewById(R.id.createPlaylistBtn))
                 .setOnClickListener(new OnCreatePlaylistListener());
 
@@ -157,6 +162,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mDb.close();
         unregisterReceiver(mLogoutReceiver);
     };
 
@@ -199,7 +205,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                         } catch (NullPointerException e) {
                             Log.w(TAG, "playlist or activity is null?", e);
                         }
-
                     }
 
                     @Override
@@ -222,8 +227,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
                     @Override
                     public void callback(TagsList struct) {
-                        // TODO update sqlit db
-
+                        for (int i = 0; i < struct.tags.length; i++) {
+                            mDb.insert(struct.tags[i].getTagItem());
+                        }
                     }
 
                     @Override
@@ -363,9 +369,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
         @Override
         public void onClick(View v) {
-            /*
-             * TODO: - show dialog listing types of seeds
-             */
+
             PickSeedDialogFragment pickSeedDialog = new PickSeedDialogFragment();
             pickSeedDialog.show(getSupportFragmentManager(), "seedTypes");
 
@@ -404,7 +408,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         protected void generatePlaylist() {
             AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
 
-            // TODO get JSONObject to pass to createPL
             JSONObject json = mPlaylist.export(getResources());
             Log.i(TAG, "json: " + json + "\n");
 
@@ -458,7 +461,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 json.put("tags", valuesInString);
                 return json;
             } catch (JSONException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return null;
@@ -471,19 +473,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 "ValidFragment", "NewApi"
         })
         private class PickSeedDialogFragment extends android.support.v4.app.DialogFragment {
-            // private SeedType mType = null;
-
-            // private ArrayList<Integer> mSeeds = new ArrayList<Integer>();
-
-            // public PickSeedDialogFragment() {
-            // // TODO Auto-generated constructor stub
-            // }
-
-            // public void show(FragmentManager supportFragmentManager, String
-            // string) {
-            // // TODO Auto-generated method stub
-            // this.show(getSupportFragmentManager(), "seedTypes");
-            // }
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -516,9 +505,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                     break;
                             }
                         }
-                        // else {
-                        // //TODO handle error, but should never happen.
-                        // }
                     }
                 });
                 return builder.create();
@@ -540,29 +526,24 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 "ValidFragment", "NewApi"
         })
         private class PickTagsDialogFragment extends android.support.v4.app.DialogFragment {
-            private final ArrayList<Integer> mSelectedItems = new ArrayList<Integer>();
+            private final ArrayList<Integer> mSelectedItems;
 
             public PickTagsDialogFragment() {
-                // TODO Auto-generated constructor stub
+                mSelectedItems = new ArrayList<Integer>();
             }
-
-            // public void show(FragmentManager supportFragmentManager, String
-            // string) {
-            // // TODO Auto-generated method stub
-            // this.show(getSupportFragmentManager(), "tags");
-            // }
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 // Where we track the selected items
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 // Set the dialog title
+                Cursor cursor = mDb.getTagItemsCursor();
                 builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
                         // Specify the list array, the items to be selected by
                         // default (null for none), and the listener through
                         // which
                         // to receive callbacks when items are selected
-                        .setMultiChoiceItems(R.array.tags, null,
+                        .setMultiChoiceItems(cursor, null, mDb.getTagNameColumnLabel(),
                                 new DialogInterface.OnMultiChoiceClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which,
@@ -606,7 +587,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 return builder.create();
             }
         }
-
     }
 
     /**

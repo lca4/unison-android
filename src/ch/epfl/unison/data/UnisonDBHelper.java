@@ -27,8 +27,9 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     private static final String TAGS_SCHEMA = "CREATE TABLE "
             + Const.TAGS_TABLE_NAME + " ("
             + Const.TAGS_C_ID + " int PRIMARY KEY, "
-            + Const.TAGS_C_NAME + " text"
-            + " );";
+            + Const.TAGS_C_NAME + " text, "
+            + Const.TAGS_C_REMOTE_ID + " bigint "
+            + ");";
 
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);

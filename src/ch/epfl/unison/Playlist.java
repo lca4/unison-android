@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.util.Log;
 
+import com.google.gson.JsonNull;
+
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.data.MusicItem;
 
@@ -69,12 +71,13 @@ public class Playlist {
         JSONObject json = new JSONObject();
 
         // Tags
-        TypedArray tags = res.obtainTypedArray(R.array.tags);
+//        TypedArray tags = res.obtainTypedArray(R.array.tags);
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < mRawTagsId.size(); i++) {
-            jsonArray.put(tags.getString(i));
+//            jsonArray.put(tags.getString(i));
+            jsonArray.put(JSONObject.NULL);
         }
-        tags.recycle();
+//        tags.recycle();
 
         // Tracks
         // TODO
