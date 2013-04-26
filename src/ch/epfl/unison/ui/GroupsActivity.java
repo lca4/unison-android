@@ -88,9 +88,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d(TAG, "GroupsActivity is being created.");
-        
+        Log.d(TAG, "GroupsActivity is being created.");       
         
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
@@ -117,14 +115,6 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         if (AppData.getInstance(this).showGroupSuggestion() && mDismissedHelp) {
             showGroupSuggestion();
         }
-        
-        //TODO remove these lines.
-//        String [] fakeUsers = {"user1", "user2", "user3", "user4", 
-//                "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"};
-//        mSuggestion = new JsonStruct.GroupSuggestion();
-//        mSuggestion.group = new JsonStruct.Group();
-//        mSuggestion.group.name = "group";
-//        mSuggestion.users = fakeUsers;
         
     }
 
@@ -162,8 +152,6 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
     @Override
     public void onRefresh() {
-        Log.d(TAG, "help: " + mDismissedHelp + ", sugg: " + mSuggestion + ", suggForg: " + mSuggestionIsForeground);
-        
         repaintRefresh(true);
         UnisonAPI.Handler<JsonStruct.GroupsList> handler
                 = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
@@ -273,6 +261,64 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         alert.show();
     }
     
+    private DialogInterface.OnClickListener mSuggestionClick;
+    
+    private UnisonAPI.Handler<JsonStruct.Success> mAcceptSuggestionHandler = 
+            new UnisonAPI.Handler<JsonStruct.Success>() {
+
+        @Override
+        public void callback(Success struct) {
+            GroupsActivity.this.startActivity(
+                    new Intent(GroupsActivity.this, MainActivity.class)
+                    .putExtra(Const.Strings.GROUP, mSuggestion.group));
+        }
+       
+        @Override
+        public void onError(Error error) {
+            Log.d(TAG, error.toString());
+            if (GroupsActivity.this != null) {
+                Toast.makeText(GroupsActivity.this, 
+                        R.string.error_joining_group,
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+
+    };
+    
+    private AlertDialog.Builder prepareSuggestionBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
+        builder.setTitle(getString(R.string.groups_suggestion_title));         
+        LayoutInflater layoutInflater = (LayoutInflater) 
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = layoutInflater.inflate(R.layout.suggestion_dialog, null);
+        builder.setView(dialogView);           
+        ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
+        final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
+                R.layout.group_suggestion_user_row, 
+                R.id.group_suggestion_username, mSuggestion.users);
+        userView.setAdapter(userAdapter);
+        
+        mSuggestionClick = 
+                new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSuggestionIsForeground = false;
+                
+                if (cbox.isChecked()) {
+                    AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
+                }
+                if (DialogInterface.BUTTON_POSITIVE == which) {
+                    UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
+                    long uid = AppData.getInstance(GroupsActivity.this).getUid();
+                    api.joinGroup(uid, mSuggestion.group.gid, mAcceptSuggestionHandler);    
+                } 
+            }
+        };
+        
+        return builder;
+    }
 
     private UnisonAPI.Handler<JsonStruct.GroupSuggestion> mSuggestionHandler = 
             new UnisonAPI.Handler<JsonStruct.GroupSuggestion>() {
@@ -287,52 +333,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                     || mSuggestion.group == null) {
                 return;
             }           
-            AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
-            builder.setTitle(getString(R.string.groups_suggestion_title));         
-            LayoutInflater layoutInflater = (LayoutInflater) 
-                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View dialogView = layoutInflater.inflate(R.layout.suggestion_dialog, null);
-            builder.setView(dialogView);           
-            ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
-            final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
-            ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
-                    R.layout.group_suggestion_user_row, 
-                    R.id.group_suggestion_username, mSuggestion.users);
-            userView.setAdapter(userAdapter);                   
-            DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mSuggestionIsForeground = false;
-                    if (cbox.isChecked()) {
-                        AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
-                    }
-                    if (DialogInterface.BUTTON_POSITIVE == which) {
-                        UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
-                        long uid = AppData.getInstance(GroupsActivity.this).getUid();
-                        api.joinGroup(uid, mSuggestion.group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                            @Override
-                            public void callback(Success struct) {
-                                                    
-                                GroupsActivity.this.startActivity(
-                                        new Intent(GroupsActivity.this, MainActivity.class)
-                                        .putExtra(Const.Strings.GROUP, mSuggestion.group));
-                            }
-                           
-                            @Override
-                            public void onError(Error error) {
-                                Log.d(TAG, error.toString());
-                                if (GroupsActivity.this != null) {
-                                    Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                        });    
-                    } 
-                }
-            };
+            AlertDialog.Builder builder = prepareSuggestionBuilder();
 
             //This is supposed to handle the situation where the user presses the BACK key too.
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {         
@@ -345,8 +346,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 }
             });
             
-            builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn), click);
-            builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn), click);
+            builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn),
+                    mSuggestionClick);
+            builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn),
+                    mSuggestionClick);
             
             mSuggestionIsForeground = true;
             final Dialog dialog = builder.create();

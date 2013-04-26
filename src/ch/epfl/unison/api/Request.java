@@ -20,6 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -102,37 +103,43 @@ public final class Request<T extends JsonStruct> {
     public Result<T> doDELETE() {
         return this.execute(new HttpDelete());
     }
-
-    private Result<T> execute(HttpRequestBase request) {
+    
+    private HttpRequestBase prepareRequest(HttpRequestBase request) 
+            throws UnsupportedEncodingException {
         try {
             request.setURI(this.mUrl.toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+        // Configure some sensible defaults. Timeout setting could also be done in client,
+        // we choose to keep it here for better readability.
+        request.getParams().setParameter(
+                "http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
+        request.getParams().setParameter(
+                "http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
 
-        Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
+        if (mAuth != null) {
+            // Set a raw HTTP Basic Auth header (java.net.Authenticator has issues).
+            request.addHeader("Authorization", "Basic " + mAuth);
+        }
+        
+        if (mData != null && request instanceof HttpEntityEnclosingRequestBase) {
+            // Write out the request body (i.e. the form data).
+            ((HttpEntityEnclosingRequestBase) request).setEntity(
+                    new UrlEncodedFormEntity(generateQueryNVP(this.mData), ENCODING));
+        }
+        
+        return request;
+    }
+
+    private Result<T> execute(HttpRequestBase request) {       
         String responseContent = null;
         HttpResponse response = null;
         StatusLine responseStatusLine = null;
 
-        try {
-            // Configure some sensible defaults. Timeout setting could also be done in client,
-            // we choose to keep it here for better readability.
-            request.getParams().setParameter(
-                    "http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
-            request.getParams().setParameter(
-                    "http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
-
-            if (mAuth != null) {
-                // Set a raw HTTP Basic Auth header (java.net.Authenticator has issues).
-                request.addHeader("Authorization", "Basic " + mAuth);
-            }
-            if (mData != null) {
-                // Write out the request body (i.e. the form data).
-                ((HttpEntityEnclosingRequestBase) request).setEntity(
-                        new UrlEncodedFormEntity(generateQueryNVP(this.mData), ENCODING));
-            }
-
+        try {           
+            request = prepareRequest(request);
+            Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
             try {
                 // Get the response as a string.
                 response = HttpClientFactory.getInstance().execute(request);

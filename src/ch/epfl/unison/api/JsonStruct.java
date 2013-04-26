@@ -94,6 +94,12 @@ public abstract class JsonStruct {
         public User master;
         public User[] users;
         public Integer nbUsers;
+        
+        //Linked to automatic groups. We use default values for backwards compatibility.
+        public boolean automatic = false;
+        public Double lat = 0.0;
+        public Double lon = 0.0;
+        
     }
 
     /** List of groups. */

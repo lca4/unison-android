@@ -51,7 +51,6 @@ public abstract class UnisonMenu {
             case R.id.menu_item_help:
                 activity.startActivity(new Intent(activity, HelpActivity.class));
                 break;
-
             case R.id.menu_item_solo:
                 activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
                 break;

@@ -1,16 +1,5 @@
 package ch.epfl.unison;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -21,11 +10,22 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
+
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Singleton object containing various utilities for the app.
@@ -36,7 +36,8 @@ public final class AppData implements OnSharedPreferenceChangeListener {
 
     private static final String TAG = "ch.epfl.unison.AppData";
 //    private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
-    private static final int LOCATION_INTERVAL = 30 * 1000;  // In ms. For testing purpose, TODO: set multiple intervals
+//    For testing purpose, TODO: set multiple intervals
+    private static final int LOCATION_INTERVAL = 30 * 1000;  // In ms.
     private static final int LOCATION_EXPIRATION_TIME = 10 * 60 * 1000;  // In ms.
     private static final int MAX_LOCATION_HISTORY_SIZE = 3;
     private static final int MAX_HISTORY_SIZE = 10;
@@ -46,9 +47,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private Context mContext;
     private UnisonAPI mApi;
     private SharedPreferences mPrefs;
-    private Type groupHistoryMapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() { } .getType();
-    private Type locationHistoryQueueType = new TypeToken<LinkedList<Pair<Location, Date>>>() { } .getType();
-    //TODO Use Pair<Double, Double> instead of Position 
+    private Type mGroupHistoryMapType = new 
+            TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() { } .getType();
+    private Type mLocationHistoryQueueType = new 
+            TypeToken<LinkedList<Pair<Pair<Double, Double>, Date>>>() { } .getType(); 
 
     private LocationManager mLocationMgr;
     private UnisonLocationListener mGpsListener;
@@ -120,64 +122,78 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     public void setShowGroupSuggestion(boolean value) {
         mPrefs.edit().putBoolean(Const.PrefKeys.GROUP_SUGGESTION, value).commit();
     }
-
-    public Location getLocation() {
-      //TODO Use Pair<Double, Double> instead of Position
-        String value = mPrefs.getString(Const.PrefKeys.LOCATION_HISTORY, null);
-        LinkedList<Pair<Location, Date>> positionHistoryQueue;
-        
-        if(value == null) {
-            positionHistoryQueue = new LinkedList<Pair<Location,Date>>(); // We use the linkedList as a Queue.
+    
+    private LinkedList<Pair<Pair<Double, Double>, Date>> extractQueueFromString(String value) {
+        if (value == null) {
+            return new LinkedList<Pair<Pair<Double, Double>, Date>>();
         } else {
-            Log.d(TAG, value);
-            positionHistoryQueue = new GsonBuilder().create().fromJson(value, locationHistoryQueueType);
+            return new GsonBuilder().create().fromJson(value, mLocationHistoryQueueType);
         }
-        
-        Location lastLocation;
-        Date lastLocationTimestamp;
-        if (mGpsLocation != null) {
-            lastLocation = mGpsLocation;  // Prefer GPS locations over network locations.
-        } else {
-            lastLocation = mNetworkLocation;            
-        }
-        lastLocationTimestamp = new Date();
-        
-        while(!positionHistoryQueue.isEmpty()){
+    }
+    
+    private LinkedList<Pair<Pair<Double, Double>, Date>> removeOutdatedLocations(
+            LinkedList<Pair<Pair<Double, Double>, Date>> queue, double currentTime)
+    {
+        int n = 0;
+        while (!queue.isEmpty() && n < MAX_LOCATION_HISTORY_SIZE) {
             //Clear location history according to threshold
-            if(lastLocationTimestamp.getTime() - positionHistoryQueue.peek().second.getTime() > LOCATION_EXPIRATION_TIME) {
-                positionHistoryQueue.remove();
-            } else {
-                break;
-            }
+            if (currentTime - queue.peek().second.getTime() 
+                    > LOCATION_EXPIRATION_TIME) {
+                queue.remove();
+            }        
+            ++n;
         }
         
-        if(positionHistoryQueue.size() >= MAX_LOCATION_HISTORY_SIZE) {
+        return queue;
+    }
+    
+    public Location getLocation() {
+        String value = mPrefs.getString(Const.PrefKeys.LOCATION_HISTORY, null);
+        LinkedList<Pair<Pair<Double, Double>, Date>> positionHistoryQueue = 
+                extractQueueFromString(value);      
+        Location lastLocation = chooseLocationOrigin();
+        //This means that we never had a location... 
+        if (lastLocation == null) {
+            return null;
+        }      
+        Date lastLocationTimestamp = new Date();
+        positionHistoryQueue = 
+                removeOutdatedLocations(positionHistoryQueue, lastLocationTimestamp.getTime());
+        if (positionHistoryQueue.size() >= MAX_LOCATION_HISTORY_SIZE) {
             positionHistoryQueue.remove();
         }
-        positionHistoryQueue.offer(new Pair<Location, Date>(lastLocation, lastLocationTimestamp));
+        positionHistoryQueue.offer(new Pair<Pair<Double, Double>, Date>(
+                new Pair<Double, Double>(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                lastLocationTimestamp));
         
-        double meanLat = 0;
-        double meanLon = 0;
+        double meanLat = 0.0, meanLon = 0.0;
         
-        for(Pair<Location,Date> p : positionHistoryQueue) {
-            meanLat += p.first.getLatitude();
-            meanLon += p.first.getLongitude();
+        for (Pair<Pair<Double, Double>, Date> p : positionHistoryQueue) {
+            meanLat += p.first.first;
+            meanLon += p.first.second;
         }
-        meanLat /= (double)(positionHistoryQueue.size());
-        meanLon /= (double)(positionHistoryQueue.size());
+        meanLat /= (double) (positionHistoryQueue.size());
+        meanLon /= (double) (positionHistoryQueue.size());
         
         Location meanLocation = new Location(lastLocation); //we must copy an old location...
         meanLocation.setLatitude(meanLat);
-        meanLocation.setLongitude(meanLon);
+        meanLocation.setLongitude(meanLon);        
         
-        
-        value = new GsonBuilder().create().toJson(positionHistoryQueue, locationHistoryQueueType);
+        value = new GsonBuilder().create().toJson(positionHistoryQueue, mLocationHistoryQueueType);
         if (value != null) {
             mPrefs.edit().putString(Const.PrefKeys.LOCATION_HISTORY, value).commit();
             Log.d(TAG, "location added in Queue!");
         }
         
         return meanLocation;
+    }
+    
+    private Location chooseLocationOrigin() {
+        if (mGpsLocation != null) {
+            return mGpsLocation;
+        } else {
+            return mNetworkLocation;
+        }
     }
 
     public static synchronized AppData getInstance(Context c) {
@@ -213,7 +229,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
         
         //Possible optimization heres
-        String value = new GsonBuilder().create().toJson(history, groupHistoryMapType);
+        String value = new GsonBuilder().create().toJson(history, mGroupHistoryMapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
     
@@ -223,7 +239,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         if (value == null) {
             return null;
         }
-        return new GsonBuilder().create().fromJson(value, groupHistoryMapType);
+        return new GsonBuilder().create().fromJson(value, mGroupHistoryMapType);
     }
     
     /**

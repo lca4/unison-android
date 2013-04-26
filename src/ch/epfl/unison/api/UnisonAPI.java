@@ -224,7 +224,7 @@ public class UnisonAPI {
     }
     
     public void generatePlaylist(String type, String seed) {
-        URL url = urlFor("/playlist");
+//        URL url = urlFor("/playlist");
         
     }
 

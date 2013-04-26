@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -43,7 +44,9 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
-
+    //Distance treshold in meters.
+    private static final double MAX_DISTANCE = 1000;
+    
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
     private Menu mMenu;
@@ -69,10 +72,10 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
-    private long mGroupId;
+    private JsonStruct.Group mGroup;
 
     public long getGroupId() {
-        return mGroupId;
+        return mGroup.gid;
     }
 
     @Override
@@ -106,12 +109,11 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             startActivity(new Intent(this, GroupsActivity.class));
             finish();
         } else {
-        	JsonStruct.Group group = (JsonStruct.Group) extras.get(Const.Strings.GROUP);
-            mGroupId = group.gid;
-            Log.i(TAG, "joined group " + mGroupId);
+        	mGroup = (JsonStruct.Group) extras.get(Const.Strings.GROUP);
+            Log.i(TAG, "joined group " + getGroupId());
             
-            setTitle(group.name);
-            AppData.getInstance(this).addToHistory(group);
+            setTitle(mGroup.name);
+            AppData.getInstance(this).addToHistory(mGroup);
              
         }
     }
@@ -153,19 +155,34 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             }
         }
     }
+    
+    private void autoLeave() {
+        AppData data = AppData.getInstance(this);
+        if (data.getLocation() != null 
+                && mGroup.lat != null 
+                && mGroup.lon != null 
+                && mGroup.automatic) {
+            double lat = data.getLocation().getLatitude();
+            double lon = data.getLocation().getLongitude();
+            float[] res = new float[1];
+            
+            Location.distanceBetween(mGroup.lat, mGroup.lon, lat, lon, res);
+            double dist =  res[0];
+            
+            if (dist > MAX_DISTANCE) {
+                onKeyDown(KeyEvent.KEYCODE_BACK, null);
+            }
+        }
+    }
 
     @Override
     public void onRefresh() {
         repaintRefresh(true);
-        AppData data = AppData.getInstance(this);
         UnisonAPI api = AppData.getInstance(this).getAPI();
         
-        if (data.getLocation() != null) {
-            double lat = data.getLocation().getLatitude();
-            double lon = data.getLocation().getLongitude();
-        }
-        //TODO continue
-        api.getGroupInfo(mGroupId, new UnisonAPI.Handler<JsonStruct.Group>() {
+        autoLeave();
+        
+        api.getGroupInfo(getGroupId(), new UnisonAPI.Handler<JsonStruct.Group>() {
 
             @Override
             public void callback(JsonStruct.Group struct) {
