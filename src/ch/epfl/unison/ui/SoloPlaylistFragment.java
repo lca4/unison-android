@@ -18,64 +18,60 @@ import com.actionbarsherlock.app.SherlockFragment;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
- * information about the members of the group: nickname, rating of current song,
- * etc.
+ * the list of the tracks of the playlist.
  *
  * @author lum
  */
-public class SoloPlaylistFragment extends SherlockFragment implements MainActivity.OnGroupInfoListener {
+public class SoloPlaylistFragment extends SherlockFragment 
+    implements SoloMainActivity.OnPlaylistInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
-    // TODO(lum) Improve this mess.
-    private static final float TEN = 10f;
-    private static final float TWO = 2f;
-
-    private ListView mUsersList;
+    private ListView mTracksList;
     private TextView mTrackTitle;
 
-    private MainActivity mActivity;
+    private SoloMainActivity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.stats, container, false);
+        View v = inflater.inflate(R.layout.list, container, false);
 
-        mUsersList = (ListView) v.findViewById(R.id.usersList);
-        mTrackTitle = (TextView) v.findViewById(R.id.trackTitle);
+        mTracksList = (ListView) v.findViewById(R.id.listList);
+        mTrackTitle = (TextView) v.findViewById(R.id.listTitle);
 
         return v;
     }
 
     @Override
-    public void onGroupInfo(JsonStruct.Group groupInfo) {
-        if (groupInfo.track != null && groupInfo.track.title != null) {
-            mTrackTitle.setText(groupInfo.track.title);
+    public void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo) {
+        if (playlistInfo.title != null) {
+            mTrackTitle.setText(playlistInfo.title);
         }
-        mUsersList.setAdapter(new StatsAdapter(groupInfo));
+        mTracksList.setAdapter(new TracksAdapter(playlistInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (MainActivity) activity;
-        mActivity.registerGroupInfoListener(this);
+        mActivity = (SoloMainActivity) activity;
+        mActivity.registerPlaylistInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mActivity.unregisterGroupInfoListener(this);
+        mActivity.unregisterPlaylistInfoListener(this);
     }
 
     /** ArrayAdapter that displays the stats associated with each user in the group. */
-    private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
+    private class TracksAdapter extends ArrayAdapter<JsonStruct.Track> {
 
-        public static final int ROW_LAYOUT = R.layout.stats_row;
+        public static final int ROW_LAYOUT = R.layout.track_row;
 
-        public StatsAdapter(JsonStruct.Group group) {
-            super(SoloPlaylistFragment.this.getActivity(), 0, group.users);
+        public TracksAdapter(JsonStruct.PlaylistJS playlist) {
+            super(SoloPlaylistFragment.this.getActivity(), 0, playlist.tracks);
         }
 
         @Override
@@ -86,22 +82,12 @@ public class SoloPlaylistFragment extends SherlockFragment implements MainActivi
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.username)).setText(getItem(position).nickname);
-            int score = 0;
-            if (getItem(position).score != null) {
-                score = getItem(position).score;
+            ((TextView) view.findViewById(R.id.username)).setText(getItem(position).title);
+            int rating = 0;
+            if (getItem(position).rating != null) {
+                rating = getItem(position).rating;
             }
-            float rating = Math.round(score / TEN) / TWO;
-            ((RatingBar) view.findViewById(R.id.liking)).setRating(rating);
-
-            TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
-            if (getItem(position).score == null || getItem(position).predicted == null) {
-                explanation.setText(R.string.rating_unknown);
-            } else if (getItem(position).predicted) {
-                explanation.setText(R.string.rating_predicted);
-            } else {
-                explanation.setText(R.string.rating_true);
-            }
+            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
 
             return view;
         }

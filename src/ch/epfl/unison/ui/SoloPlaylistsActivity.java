@@ -15,6 +15,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,8 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
-import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.Playlist;
 import ch.epfl.unison.R;
@@ -41,13 +43,13 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /*
  * TODO
@@ -69,18 +71,17 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
-    // private static SeedType smSeedType;
-    // private static ArrayList<Integer> smSeeds = new ArrayList<Integer>();
-    // private static HashMap<SeedType, ArrayList<Integer>> smRawSeeds;
-
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
 
     private Playlist mPlaylist;
     private UnisonDB mDb;
+    private ArrayList<Playlist> mPLsLocal;
+    private ArrayList<Playlist> mPLsRemote;
 
     // GUI specific
-    private ListView mPlaylistsList;
+    private ListView mPlaylistsListLocal;
+    private ListView mPlaylistsListRemote;
     private Menu mMenu;
 
     private boolean mIsForeground = false;
@@ -120,8 +121,14 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         ((Button) findViewById(R.id.createPlaylistBtn))
                 .setOnClickListener(new OnCreatePlaylistListener());
 
-        mPlaylistsList = (ListView) findViewById(R.id.soloPlaylistsList);
-        mPlaylistsList.setOnItemClickListener(new OnPlaylistSelectedListener());
+        mPlaylistsListLocal = (ListView) findViewById(R.id.soloPlaylistsListLocal);
+        mPlaylistsListLocal.setOnItemClickListener(new OnPlaylistSelectedListener());
+        registerForContextMenu(mPlaylistsListLocal);
+        // Load local PLs
+
+        mPlaylistsListRemote = (ListView) findViewById(R.id.soloPlaylistsListRemote);
+        mPlaylistsListRemote.setOnItemClickListener(new OnPlaylistSelectedListener());
+        registerForContextMenu(mPlaylistsListRemote);
 
         // // Actions that should be taken when activity is started.
         // if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
@@ -166,6 +173,27 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         unregisterReceiver(mLogoutReceiver);
     };
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        android.view.MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.playlist_local_context_menu, menu);
+    }
+    
+//    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.playlist_context_menu_item_edit:
+                 return true;
+            case R.id.playlist_context_menu_item_delete:
+                return true;
+            default:
+                return super.onContextItemSelected((android.view.MenuItem) item);
+        }
+    }
+    
     /*
      * Could be refactorized (non-Javadoc)
      * @see
@@ -199,8 +227,9 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                     @Override
                     public void callback(PlaylistsList struct) {
                         try {
-                            SoloPlaylistsActivity.this.mPlaylistsList
-                                    .setAdapter(new PlaylistsAdapter(struct));
+                            mPLsRemote = struct.toObject();
+                            SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                    .setAdapter(new PlaylistsAdapter(mPLsRemote));
                             SoloPlaylistsActivity.this.repaintRefresh(false);
                         } catch (NullPointerException e) {
                             Log.w(TAG, "playlist or activity is null?", e);
@@ -325,36 +354,36 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     // }
 
     /** Adapter used to populate the ListView listing the playlists. */
-    private class PlaylistsAdapter extends ArrayAdapter<JsonStruct.Playlist> {
+    private class PlaylistsAdapter extends ArrayAdapter<Playlist> {
 
-        public static final int ROW_LAYOUT = R.layout.solo_playlists_row;
+        public static final int ROW_LAYOUT = R.layout.list_row;
 
-        public PlaylistsAdapter(JsonStruct.PlaylistsList list) {
-            super(SoloPlaylistsActivity.this, 0, list.playlists);
+        public PlaylistsAdapter(ArrayList<Playlist> list) {
+            super(SoloPlaylistsActivity.this, 0);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            JsonStruct.Playlist playlist = getItem(position);
+            Playlist playlist = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
                         .getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.playlistName)).setText(playlist.name);
+            ((TextView) view.findViewById(R.id.lr_title)).setText(playlist.getTitle());
             String subtitle = null;
-            if (playlist.listeners > 0) {
+            if (playlist.getListeners() > 0) {
                 String plural = "s";
-                if (playlist.listeners == 1) {
+                if (playlist.getListeners() == 1) {
                     plural = "";
                 }
-                subtitle = String.format("%d tracks - %d listener" + plural, playlist.size,
-                        playlist.listeners);
+                subtitle = String.format("%d tracks - %d listener" + plural, playlist.getSize(),
+                        playlist.getListeners());
             } else {
-                subtitle = String.format("%d tracks", playlist.size);
+                subtitle = String.format("%d tracks", playlist.getSize());
             }
-            ((TextView) view.findViewById(R.id.nbTracks)).setText(subtitle);
+            ((TextView) view.findViewById(R.id.lr_notifRight)).setText(subtitle);
 
             view.setTag(playlist);
             return view;
@@ -417,8 +446,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                             @Override
                             public void callback(PlaylistsList struct) {
                                 Log.i(TAG, "Playlist created!");
-                                SoloPlaylistsActivity.this.mPlaylistsList
-                                        .setAdapter(new PlaylistsAdapter(struct));
+                                SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                        .setAdapter(new PlaylistsAdapter(struct.toObject()));
                             }
 
                             @Override
@@ -590,13 +619,18 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     }
 
     /**
-     * When clicking on a playlist, send a request to the server and start
-     * MainActivity.
+     * When clicking on a playlist, start MainActivity.
      */
     private class OnPlaylistSelectedListener implements OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
+                    SoloMainActivity.class).putExtra(Const.Strings.PLID,
+                    ((Playlist) view.getTag()).getPlId()).putExtra(Const.Strings.NAME,
+                    ((Playlist) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
+            // view.getTag());
             // UnisonAPI api =
             // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
             // long uid =

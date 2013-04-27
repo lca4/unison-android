@@ -92,7 +92,7 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnGr
                 score = getItem(position).score;
             }
             float rating = Math.round(score / TEN) / TWO;
-            ((RatingBar) view.findViewById(R.id.liking)).setRating(rating);
+            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
 
             TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
             if (getItem(position).score == null || getItem(position).predicted == null) {

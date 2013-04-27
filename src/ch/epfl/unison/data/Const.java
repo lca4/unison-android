@@ -10,9 +10,11 @@ import android.provider.BaseColumns;
  */
 final class Const {
 
+    // Global definitions
     static final String DATABASE_NAME = "unison.db";
     static final int DATABASE_VERSION = 1;
 
+    
     static final String LIBE_TABLE_NAME = "lib_entry"; // Prefix: LIBE_
     // lib_entry table fields here
     static final String LIBE_C_ID = BaseColumns._ID;
@@ -20,21 +22,31 @@ final class Const {
     static final String LIBE_C_ARTIST = "artist";
     static final String LIBE_C_TITLE = "title";
 
+    
     static final String TAGS_TABLE_NAME = "tags"; // Prefix: TAGS_
     // tags table fields here
     static final String TAGS_C_ID = BaseColumns._ID;
     static final String TAGS_C_NAME = "name";
     static final String TAGS_C_REMOTE_ID = "remote_id";
 
+    
     static final String MOODS_TABLE_NAME = "mood"; // Prefix: MOOD_
     // moods table fields here
     static final String MOOD_C_ID = BaseColumns._ID;
     static final String MOOD_C_NAME = "name";
 
+    
     static final String MOODS_TAGS_TABLE_NAME = "moods_tags"; // Prefix: MOTA_
     // moods-tags table fields here
     static final String MOTA_C_MOOD_ID = "mood_id";
     static final String MOTA_C_TAG_ID = "tag_id";
+    
+    
+    /*
+     * The playlists table will just be used to store additional data about the
+     * playlists that has to be persistent. These infos include for e.g. isSynced
+     */
+    static final String PLAYLISTS_TABLE_NAME = "playlists";
 
     private Const() {
         // TODO Auto-generated constructor stub

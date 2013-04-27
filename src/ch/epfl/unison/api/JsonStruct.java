@@ -1,8 +1,11 @@
 package ch.epfl.unison.api;
 
 import ch.epfl.unison.data.TagItem;
+import ch.epfl.unison.Playlist;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * POJOs for JSON serialization / deserialization.
@@ -101,19 +104,43 @@ public abstract class JsonStruct {
     }
     
     /** Information about a playlist (used in both directions). */
-    public static class Playlist extends JsonStruct {
+    public static class PlaylistJS extends JsonStruct {
 
-        public Long plid;
-        public String name;
-        //TODO complete
+        public Long id;
+        public String title;
+        public Calendar created;
+        public Calendar updated;
+        public String image; // Not used for now
+        public Integer authorId;
+        //public String authorName; //TODO
         public Integer size;
+        public Track[] tracks;
+        public Integer rating;
+        public String comment;
         public Integer listeners;
+        public Double avgRating;
+        public Boolean shared;
+        public Boolean synced;
+        
+        public Playlist toObject() {
+            //TODO complete
+            return new Playlist.Builder().id(id).title(title).tracks(tracks).build();
+        }
+        
     }
 
     /** List of playlists. */
     public static class PlaylistsList extends JsonStruct {
 
-        public Playlist[] playlists;
+        public PlaylistJS[] playlists;
+        
+        public ArrayList<Playlist> toObject() {
+            ArrayList<Playlist> al = new ArrayList<Playlist>();
+            for (int i = 0; i < playlists.length; i++) {
+                al.add(playlists[i].toObject());
+            }
+            return al;
+        }
     }
     
     /** Information about a tag (used in both directions). */

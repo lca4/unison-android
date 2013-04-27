@@ -23,6 +23,7 @@ public final class Const {
     /** Various other strings, e.g. keys for Intent extras. */
     public final class Strings {
         public static final String GID = "gid";
+        public static final String PLID = "plid";
         public static final String NAME = "name";
         public static final String LOGOUT = "logout";
         public static final String GROUP = "group"; // not sure if GID and NAME
