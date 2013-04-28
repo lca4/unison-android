@@ -50,6 +50,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * TODO
@@ -115,7 +116,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
         mPlaylist = new Playlist();
         mDb = new UnisonDB(this);
-        mDb.open();
+        // mDb.open();
+        mDb.openW();
 
         setContentView(R.layout.solo_playlists);
         ((Button) findViewById(R.id.createPlaylistBtn))
@@ -175,25 +177,25 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenuInfo menuInfo) {
+            ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.playlist_local_context_menu, menu);
     }
-    
-//    @Override
+
+    // @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
-                 return true;
+                return true;
             case R.id.playlist_context_menu_item_delete:
                 return true;
             default:
                 return super.onContextItemSelected((android.view.MenuItem) item);
         }
     }
-    
+
     /*
      * Could be refactorized (non-Javadoc)
      * @see
@@ -256,6 +258,10 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
                     @Override
                     public void callback(TagsList struct) {
+
+                        // TODO remove after tests
+                        // mDb.emptyTags();
+
                         for (int i = 0; i < struct.tags.length; i++) {
                             mDb.insert(struct.tags[i].getTagItem());
                         }
@@ -555,7 +561,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 "ValidFragment", "NewApi"
         })
         private class PickTagsDialogFragment extends android.support.v4.app.DialogFragment {
-            private final ArrayList<Integer> mSelectedItems;
+            private ArrayList<Integer> mSelectedItems;
 
             public PickTagsDialogFragment() {
                 mSelectedItems = new ArrayList<Integer>();
@@ -563,45 +569,14 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
-                // Where we track the selected items
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                // Set the dialog title
                 Cursor cursor = mDb.getTagItemsCursor();
-                builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
-                        // Specify the list array, the items to be selected by
-                        // default (null for none), and the listener through
-                        // which
-                        // to receive callbacks when items are selected
-                        .setMultiChoiceItems(cursor, null, mDb.getTagNameColumnLabel(),
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which,
-                                            boolean isChecked) {
-                                        if (isChecked) {
-                                            // If the user checked the item, add
-                                            // it
-                                            // to the selected items
-                                            mSelectedItems.add(which);
-                                        } else if (mSelectedItems.contains(which)) {
-                                            // Else, if the item is already in
-                                            // the array, remove it
-                                            mSelectedItems.remove(Integer.valueOf(which));
-                                        }
-                                    }
-                                })
-                        // Set the action buttons
+                AlertDialog.Builder builder = new AlertDialog.Builder(SoloPlaylistsActivity.this);
+                builder.setTitle("My Title")
                         .setPositiveButton(R.string.generic_ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // User clicked OK, so save the
-                                        // mSelectedItems
-                                        // results somewhere or return them to
-                                        // the component
-                                        // that opened the dialog
                                         Log.i(TAG, mSelectedItems.toString());
-                                        // storeRawSeeds(SeedType.TAGS,
-                                        // mSelectedItems);
                                         mPlaylist.addRawTags(mSelectedItems);
                                         OnCreatePlaylistListener.this.generatePlaylist();
                                     }
@@ -610,7 +585,48 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // TODO
+                                        mSelectedItems.clear();
+                                    }
+                                })
+                        // .setMultiChoiceItems(
+                        // mDb.getTags(),
+                        // null,
+                        // new DialogInterface.OnMultiChoiceClickListener() {
+                        // @Override
+                        // public void onClick(DialogInterface dialog,
+                        // int which, boolean isChecked) {
+                        // if (isChecked) {
+                        // mSelectedItems.add(which);
+                        // } else if (mSelectedItems.contains(which)) {
+                        // mSelectedItems.remove(Integer.valueOf(which));
+                        // }
+                        // }
+                        // });
+                        /*
+                         * I don't know why, but using a cursor doesn't work and
+                         * generates a NullPointerException
+                         */
+                        .setMultiChoiceItems(cursor, mDb.getTagIsCheckedColumnLabel(),
+                                mDb.getTagNameColumnLabel(),
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which,
+                                            boolean isChecked) {
+                                        Log.i(TAG, "hello world");
+                                        if (isChecked) {
+                                            // If the user checked the item, add
+                                            // it
+                                            // to the selected items
+                                            
+                                            //TODO update is_checked field in DB
+                                            
+                                            mSelectedItems.add(which);
+                                        } else if
+                                        (mSelectedItems.contains(which)) {
+                                            // Else, if the item is already in
+                                            // the array, remove it
+                                            mSelectedItems.remove(Integer.valueOf(which));
+                                        }
                                     }
                                 });
                 return builder.create();

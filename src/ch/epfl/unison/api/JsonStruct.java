@@ -146,12 +146,12 @@ public abstract class JsonStruct {
     /** Information about a tag (used in both directions). */
     public static class Tag extends JsonStruct {
 
-        public int tid;
+//        public int tid;
         public String name;
         public Long refId;
         
         public TagItem getTagItem() {
-            return new TagItem(tid, name, refId);
+            return new TagItem(name, refId);
         }
     }
 

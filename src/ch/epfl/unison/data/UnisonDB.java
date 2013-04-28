@@ -5,10 +5,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,37 +28,53 @@ public class UnisonDB {
 
     private static final String LIBE_WHERE_ALL = Const.LIBE_C_LOCAL_ID + " = ? AND "
             + Const.LIBE_C_ARTIST + " = ? AND " + Const.LIBE_C_TITLE + " = ?";
-    private static final String TAGS_WHERE_ALL = Const.TAGS_C_ID + " = ? AND "
-            + Const.TAGS_C_NAME + " = ?";
+    private static final String TAGS_WHERE_ALL = Const.TAG_C_ID + " = ? AND "
+            + Const.TAG_C_NAME + " = ? AND "
+            + Const.TAG_C_IS_CHECKED + " = ?";
+    // private static final String TAGS_WHERE_REMOTE_ID = Const.TAG_C_REMOTE_ID
+    // + " = ?";
+    private static final String TAGS_WHERE_NAME = Const.TAG_C_NAME + " = ?";
+
+    // private static final String TAGS_WHERE_C_ID = Const.TAGS_C_ID + " = ?";
 
     public UnisonDB(Context c) {
         mContext = c;
+        mContext.deleteDatabase(Const.DATABASE_NAME);
         mDbHelper = new UnisonDBHelper(mContext, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);
     }
 
     public void open() {
-        try {
-            mDb = mDbHelper.getWritableDatabase();
-        } catch (SQLiteException e) {
-            Log.v(TAG, e.getMessage()); // "Open database exception caught"
-            mDb = mDbHelper.getReadableDatabase();
-        }
+        Log.i(TAG, "open database in read-only mode");
+        mDb = mDbHelper.getReadableDatabase();
+    }
+
+    public void openW() {
+        Log.i(TAG, "open database in writable mode");
+        mDb = mDbHelper.getWritableDatabase();
     }
 
     public void close() {
         mDb.close();
     }
 
+    private Cursor getCursor(String table, String[] columns) {
+        open();
+        return mDb.query(table, columns, null, null, null, null, null);
+    }
+
+    public void closeCursor(Cursor openCursor) {
+        openCursor.close();
+        close();
+    }
+
     /*
      * lib_entry specific methods
      */
     public Set<MusicItem> getMusicItems() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cur = db.query(Const.LIBE_TABLE_NAME,
+        Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
                 new String[] {
                         Const.LIBE_C_LOCAL_ID, Const.LIBE_C_ARTIST, Const.LIBE_C_TITLE
-                },
-                null, null, null, null, null);
+                });
         Set<MusicItem> set = new HashSet<MusicItem>();
         if (cur != null && cur.moveToFirst()) {
             int colId = cur.getColumnIndex(Const.LIBE_C_LOCAL_ID);
@@ -68,21 +85,17 @@ public class UnisonDB {
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
         }
-        cur.close();
-        db.close();
+        closeCursor(cur);
         return set;
     }
 
     public boolean libeIsEmpty() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cur = db.query(Const.LIBE_TABLE_NAME,
+        Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
                 new String[] {
                         Const.LIBE_C_LOCAL_ID, Const.LIBE_C_ARTIST, Const.LIBE_C_TITLE
-                },
-                null, null, null, null, null);
+                });
         boolean isEmpty = !cur.moveToFirst();
-        cur.close();
-        db.close();
+        closeCursor(cur);
         return isEmpty;
     }
 
@@ -92,23 +105,23 @@ public class UnisonDB {
         values.put(Const.LIBE_C_ARTIST, item.artist);
         values.put(Const.LIBE_C_TITLE, item.title);
 
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.insert(Const.LIBE_TABLE_NAME, null, values);
-        db.close();
+        openW();
+        mDb.insert(Const.LIBE_TABLE_NAME, null, values);
+        close();
     }
 
     public void delete(MusicItem item) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
+        openW();
+        mDb.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.artist, item.title
                 });
-        db.close();
+        close();
     }
 
     public boolean exists(MusicItem item) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor c = db.query(Const.LIBE_TABLE_NAME,
+        open();
+        Cursor cur = mDb.query(Const.LIBE_TABLE_NAME,
                 new String[] {
                     Const.LIBE_C_LOCAL_ID
                 },
@@ -117,64 +130,93 @@ public class UnisonDB {
                         String.valueOf(item.localId), item.artist, item.title
                 },
                 null, null, null, "1"); // LIMIT 1
-        boolean exists = c.moveToFirst();
-        c.close();
-        db.close();
+        boolean exists = cur.moveToFirst();
+        closeCursor(cur);
         return exists;
     }
 
     public void libeTruncate() {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(Const.LIBE_TABLE_NAME, null, null);
-        db.close();
+        openW();
+        mDb.delete(Const.LIBE_TABLE_NAME, null, null);
+        close();
     }
 
     /*
      * Tags specific methods
      */
 
+    /**
+     * Don't forget to close the cursor!
+     * 
+     * @return
+     */
     public Cursor getTagItemsCursor() {
-        return mDb.query(Const.TAGS_TABLE_NAME, null, null, null, null, null, null);
-    }
-    
-    public TagItem getTagItem(int index) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-//        Cursor cur = db.qu
-        return null;
+        open();
+        Cursor cursor = mDb.query(Const.TAG_TABLE_NAME, new String[] {
+                Const.TAG_C_ID, Const.TAG_C_NAME, Const.TAG_C_IS_CHECKED
+        },
+                null, null, null, null, null);
+        return cursor;
     }
 
+    public CharSequence[] getTags() {
+        Cursor cursor = getCursor(Const.TAG_TABLE_NAME, new String[] {
+                Const.TAG_C_ID, Const.TAG_C_NAME
+        });
+        List<CharSequence> tags = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            tags = new ArrayList<CharSequence>();
+            // int colId = cursor.getColumnIndex(Const.TAGS_C_ID);
+            int colName = cursor.getColumnIndex(Const.TAG_C_NAME);
+            do {
+                tags.add(cursor.getString(colName));
+            } while (cursor.moveToNext());
+        }
+        closeCursor(cursor);
+        return tags.toArray(new CharSequence[tags.size()]);
+    }
+
+    // public TagItem getTagItem(int index) {
+    // open();
+    // Cursor c = mDb.query(Const.TAGS_TABLE_NAME,
+    // new String[] {
+    // Const.TAGS_C_ID, Const.TAGS_C_NAME, Const.TAGS_C_REMOTE_ID
+    // },
+    // TAGS_WHERE_C_ID,
+    // new String[] {
+    // String.valueOf(index)
+    // },
+    // null, null, null, "1");
+    // // TODO some stuff
+    // return null;
+    // }
+
     public Set<TagItem> getTagItems() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cur = db.query(Const.TAGS_TABLE_NAME,
+        Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
-                        Const.TAGS_C_ID, Const.TAGS_C_NAME
-                },
-                null, null, null, null, null);
+                        Const.TAG_C_ID, Const.TAG_C_NAME
+                });
         Set<TagItem> set = new HashSet<TagItem>();
         if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(Const.TAGS_C_ID);
-            int colName = cur.getColumnIndex(Const.TAGS_C_NAME);
-            int colRemoteId = cur.getColumnIndex(Const.TAGS_C_REMOTE_ID);
+            int colId = cur.getColumnIndex(Const.TAG_C_ID);
+            int colName = cur.getColumnIndex(Const.TAG_C_NAME);
+            int colRemoteId = cur.getColumnIndex(Const.TAG_C_REMOTE_ID);
             do {
                 set.add(new TagItem(cur.getInt(colId),
                         cur.getString(colName), cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
         }
-        cur.close();
-        db.close();
+        closeCursor(cur);
         return set;
     }
 
     public boolean tagsIsEmpty() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cur = db.query(Const.TAGS_TABLE_NAME,
+        Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
-                        Const.TAGS_C_ID, Const.TAGS_C_NAME
-                },
-                null, null, null, null, null);
+                        Const.TAG_C_ID, Const.TAG_C_NAME
+                });
         boolean isEmpty = !cur.moveToFirst();
-        cur.close();
-        db.close();
+        closeCursor(cur);
         return isEmpty;
     }
 
@@ -184,44 +226,56 @@ public class UnisonDB {
      * @param item
      */
     public void insert(TagItem item) {
+        Log.i(TAG, "insert");
         ContentValues values = new ContentValues();
-        values.put(Const.TAGS_C_ID, item.localId);
-        values.put(Const.TAGS_C_NAME, item.name);
+        // values.put(Const.TAGS_C_ID, item.localId);
+        values.put(Const.TAG_C_NAME, item.name);
+        // values.put(Const.TAG_C_REMOTE_ID, item.remoteId);
 
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         if (!exists(item)) {
-            db.insert(Const.LIBE_TABLE_NAME, null, values);
+            openW();
+            long newid = mDb.insert(Const.TAG_TABLE_NAME, null, values);
+            Log.i(TAG, "new inserted tag id: " + newid);
+            close();
         }
-        db.close();
     }
 
     public void delete(TagItem item) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.delete(Const.TAGS_TABLE_NAME, TAGS_WHERE_ALL,
+        openW();
+        mDb.delete(Const.TAG_TABLE_NAME, TAGS_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.name
                 });
-        db.close();
+        close();
     }
 
     public boolean exists(TagItem item) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor c = db.query(Const.TAGS_TABLE_NAME,
+        open();
+        Cursor cur = mDb.query(Const.TAG_TABLE_NAME,
                 new String[] {
-                    Const.TAGS_C_ID
+                    Const.TAG_C_ID
                 },
-                TAGS_WHERE_ALL,
+                TAGS_WHERE_NAME,
                 new String[] {
-                        String.valueOf(item.localId), item.name, String.valueOf(item.remoteId)
+                    String.valueOf(item.name)
                 },
                 null, null, null, "1"); // LIMIT 1
-        boolean exists = c.moveToFirst();
-        c.close();
-        db.close();
+        boolean exists = cur.moveToFirst();
+        closeCursor(cur);
         return exists;
     }
-    
+
+    public String getTagIsCheckedColumnLabel() {
+        return Const.TAG_C_IS_CHECKED;
+    }
+
     public String getTagNameColumnLabel() {
-        return Const.TAGS_C_NAME;
+        return Const.TAG_C_NAME;
+    }
+
+    public void emptyTags() {
+        openW();
+        mDb.delete(Const.TAG_TABLE_NAME, null, null);
+        close();
     }
 }

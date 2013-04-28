@@ -15,20 +15,19 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "ch.epfl.unison.UnisonDBHelper";
 
-    // private static LinkedList<String> smSchemas = new LinkedList<String>();
-
-    private static final String LIBE_SCHEMA = "CREATE TABLE "
+    private static final String LIBE_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + Const.LIBE_TABLE_NAME + " ("
             + Const.LIBE_C_ID + " int PRIMARY KEY, "
             + Const.LIBE_C_LOCAL_ID + " int UNIQUE, "
             + Const.LIBE_C_ARTIST + " text, "
             + Const.LIBE_C_TITLE + " text)";
 
-    private static final String TAGS_SCHEMA = "CREATE TABLE "
-            + Const.TAGS_TABLE_NAME + " ("
-            + Const.TAGS_C_ID + " int PRIMARY KEY, "
-            + Const.TAGS_C_NAME + " text, "
-            + Const.TAGS_C_REMOTE_ID + " bigint "
+    private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
+            + Const.TAG_TABLE_NAME + " ("
+            + Const.TAG_C_ID + " int PRIMARY KEY, "
+            + Const.TAG_C_NAME + " text UNIQUE NOT NULL, "
+            + Const.TAG_C_REMOTE_ID + " bigint UNIQUE, "
+            + Const.TAG_C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
             + ");";
 
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
@@ -37,14 +36,11 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // init();
         try {
+            Log.i(TAG, "Creates lib_entry table");
             db.execSQL(LIBE_SCHEMA);
-            db.execSQL(TAGS_SCHEMA);
-            // Iterator<String> i = smSchemas.iterator();
-            // while (i.hasNext()) {
-            // db.execSQL(i.next());
-            // }
+            Log.i(TAG, "Creates tag table");
+            db.execSQL(TAG_SCHEMA);
         } catch (SQLiteException e) {
             Log.v(TAG, e.getMessage()); // "Create table exception"
         }
@@ -55,12 +51,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
         // TODO Auto-generated method stub
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + Const.TAGS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Const.TAG_TABLE_NAME);
         onCreate(db);
     }
-
-    // private void init() {
-    // smSchemas.add(LIBE_SCHEMA);
-    // smSchemas.add(TAGS_SCHEMA);
-    // }
 }

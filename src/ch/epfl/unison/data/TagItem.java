@@ -11,10 +11,16 @@ public class TagItem implements Comparable<TagItem> {
     public final String name;
     public final Long remoteId; // id on GS database, hash in fact
     
+    public TagItem(String n, Long rid) {
+        this.localId = -1;
+        this.name = n;
+        this.remoteId = rid;
+    }
+    
     public TagItem(int lid, String n, Long rid) {
-        localId = lid;
-        name = n;
-        remoteId = rid;
+        this.localId = lid;
+        this.name = n;
+        this.remoteId = rid;
     }
 
     @Override

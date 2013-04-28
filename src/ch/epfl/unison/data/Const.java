@@ -23,20 +23,21 @@ final class Const {
     static final String LIBE_C_TITLE = "title";
 
     
-    static final String TAGS_TABLE_NAME = "tags"; // Prefix: TAGS_
+    static final String TAG_TABLE_NAME = "tag"; // Prefix: TAG_
     // tags table fields here
-    static final String TAGS_C_ID = BaseColumns._ID;
-    static final String TAGS_C_NAME = "name";
-    static final String TAGS_C_REMOTE_ID = "remote_id";
+    static final String TAG_C_ID = BaseColumns._ID;
+    static final String TAG_C_NAME = "name";
+    static final String TAG_C_REMOTE_ID = "remote_id"; // may be useless
+    static final String TAG_C_IS_CHECKED = "is_checked";
 
     
-    static final String MOODS_TABLE_NAME = "mood"; // Prefix: MOOD_
+    static final String MOOD_TABLE_NAME = "mood"; // Prefix: MOOD_
     // moods table fields here
     static final String MOOD_C_ID = BaseColumns._ID;
     static final String MOOD_C_NAME = "name";
 
     
-    static final String MOODS_TAGS_TABLE_NAME = "moods_tags"; // Prefix: MOTA_
+    static final String MOOD_TAG_TABLE_NAME = "moods_tags"; // Prefix: MOTA_
     // moods-tags table fields here
     static final String MOTA_C_MOOD_ID = "mood_id";
     static final String MOTA_C_TAG_ID = "tag_id";

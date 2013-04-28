@@ -179,13 +179,11 @@ public class Playlist {
         JSONObject json = new JSONObject();
 
         // Tags
-//        TypedArray tags = res.obtainTypedArray(R.array.tags);
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < mRawTagsId.size(); i++) {
 //            jsonArray.put(tags.getString(i));
             jsonArray.put(JSONObject.NULL);
         }
-//        tags.recycle();
 
         // Tracks
         // TODO
