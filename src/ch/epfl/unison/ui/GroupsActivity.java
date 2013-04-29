@@ -374,7 +374,6 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         
         AppData data = AppData.getInstance(GroupsActivity.this);
         UnisonAPI api = data.getAPI();
-        long uid = data.getUid();
         
         Location currentLoc = data.getLocation();
         
@@ -382,7 +381,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         if (currentLoc != null) {
             double lat = currentLoc.getLatitude();
             double lon = currentLoc.getLongitude();
-            api.getSuggestion(uid, lat, lon, mSuggestionHandler);
+            api.getSuggestion(lat, lon, mSuggestionHandler);
         } 
     }
 
