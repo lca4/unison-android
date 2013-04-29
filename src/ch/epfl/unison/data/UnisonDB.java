@@ -7,8 +7,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import ch.epfl.unison.Const.SeedType;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +30,7 @@ public class UnisonDB {
 
     private static final String TAG = "ch.epfl.unison.UnisonDB";
 
-    private SQLiteDatabase mDb;
+    private SQLiteDatabase mDB;
     private final Context mContext;
     private final UnisonDBHelper mDbHelper;
 
@@ -33,7 +41,7 @@ public class UnisonDB {
             + Const.TAG_C_IS_CHECKED + " = ?";
     // private static final String TAGS_WHERE_REMOTE_ID = Const.TAG_C_REMOTE_ID
     // + " = ?";
-    private static final String TAGS_WHERE_NAME = Const.TAG_C_NAME + " = ?";
+    private static final String TAG_WHERE_NAME = Const.TAG_C_NAME + " LIKE ? ";
 
     // private static final String TAGS_WHERE_C_ID = Const.TAGS_C_ID + " = ?";
 
@@ -43,27 +51,46 @@ public class UnisonDB {
         mDbHelper = new UnisonDBHelper(mContext, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);
     }
 
-    public void open() {
+    private void open() {
         Log.i(TAG, "open database in read-only mode");
-        mDb = mDbHelper.getReadableDatabase();
+        mDB = mDbHelper.getReadableDatabase();
     }
 
-    public void openW() {
+    private void openW() {
         Log.i(TAG, "open database in writable mode");
-        mDb = mDbHelper.getWritableDatabase();
+        mDB = mDbHelper.getWritableDatabase();
     }
 
-    public void close() {
-        mDb.close();
+    private void close() {
+        mDB.close();
     }
 
     private Cursor getCursor(String table, String[] columns) {
         open();
-        return mDb.query(table, columns, null, null, null, null, null);
+        return mDB.query(table, columns, null, null, null, null, null);
     }
 
-    public void closeCursor(Cursor openCursor) {
+    private Cursor getCursor(String table, String[] columns, String selection,
+            String[] selectionArgs) {
+        open();
+        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
+    }
+
+    private Cursor getCursorW(String table, String[] columns) {
+        openW();
+        return mDB.query(table, columns, null, null, null, null, null);
+    }
+
+    private void closeCursor(Cursor openCursor) {
         openCursor.close();
+        close();
+    }
+
+    private void resetIsChecked(String table) {
+        openW();
+        ContentValues values = new ContentValues();
+        values.put(Const.C_IS_CHECKED, Const.FALSE);
+        mDB.update(table, values, null, null);
         close();
     }
 
@@ -106,13 +133,13 @@ public class UnisonDB {
         values.put(Const.LIBE_C_TITLE, item.title);
 
         openW();
-        mDb.insert(Const.LIBE_TABLE_NAME, null, values);
+        mDB.insert(Const.LIBE_TABLE_NAME, null, values);
         close();
     }
 
     public void delete(MusicItem item) {
         openW();
-        mDb.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
+        mDB.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.artist, item.title
                 });
@@ -121,7 +148,7 @@ public class UnisonDB {
 
     public boolean exists(MusicItem item) {
         open();
-        Cursor cur = mDb.query(Const.LIBE_TABLE_NAME,
+        Cursor cur = mDB.query(Const.LIBE_TABLE_NAME,
                 new String[] {
                     Const.LIBE_C_LOCAL_ID
                 },
@@ -137,8 +164,12 @@ public class UnisonDB {
 
     public void libeTruncate() {
         openW();
-        mDb.delete(Const.LIBE_TABLE_NAME, null, null);
+        mDB.delete(Const.LIBE_TABLE_NAME, null, null);
         close();
+    }
+
+    public JSONObject libeGetCheckedItems() {
+        return getCheckedItems(Const.LIBE_TABLE_NAME, Const.C_IS_CHECKED, SeedType.TRACKS);
     }
 
     /*
@@ -150,30 +181,67 @@ public class UnisonDB {
      * 
      * @return
      */
-    public Cursor getTagItemsCursor() {
-        open();
-        Cursor cursor = mDb.query(Const.TAG_TABLE_NAME, new String[] {
-                Const.TAG_C_ID, Const.TAG_C_NAME, Const.TAG_C_IS_CHECKED
-        },
-                null, null, null, null, null);
+    public Cursor tagGetItemsCursor() {
+        Cursor cursor = getCursor(Const.TAG_TABLE_NAME, new String[] {
+                Const.TAG_C_ID, Const.TAG_C_NAME, Const.C_IS_CHECKED
+        });
         return cursor;
     }
 
-    public CharSequence[] getTags() {
+    public void tagSetChecked(int tagId, boolean isChecked) {
+        openW();
+        ContentValues values = new ContentValues();
+        if (isChecked) {
+            values.put(Const.C_IS_CHECKED, Const.TRUE);
+        } else {
+            values.put(Const.C_IS_CHECKED, Const.FALSE);
+        }
+        Log.i(TAG, "updates row id=" + tagId + " to is_checked=" + values.valueSet().toString());
+        mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
+                String.valueOf(tagId)
+        });
+        close();
+    }
+
+    public void tagSetChecked(LinkedHashMap<String, Integer> items, boolean[] checked) {
+        openW();
+        ContentValues values = new ContentValues();
+        Set<String> keys = items.keySet();
+        Iterator<String> it = keys.iterator();
+        int index = 0;
+        while (it.hasNext()) {
+            if (checked[index]) {
+                values.put(Const.C_IS_CHECKED, Const.TRUE);
+            } else {
+                values.put(Const.C_IS_CHECKED, Const.FALSE);
+            }
+            int tagId = items.get(it);
+            Log.i(TAG, "Updates row id=" + tagId + " to is_checked=" + values.valueSet().toString());
+            mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
+                    String.valueOf(tagId)
+            });
+            index++;
+        }
+        close();
+    }
+
+    public LinkedHashMap<String, Integer> getTags() {
         Cursor cursor = getCursor(Const.TAG_TABLE_NAME, new String[] {
                 Const.TAG_C_ID, Const.TAG_C_NAME
         });
-        List<CharSequence> tags = null;
+        LinkedHashMap<String, Integer> tags = null;
+        // List<CharSequence> tags = null;
         if (cursor != null && cursor.moveToFirst()) {
-            tags = new ArrayList<CharSequence>();
-            // int colId = cursor.getColumnIndex(Const.TAGS_C_ID);
+            tags = new LinkedHashMap<String, Integer>();
+            int colId = cursor.getColumnIndex(Const.C_ID);
             int colName = cursor.getColumnIndex(Const.TAG_C_NAME);
             do {
-                tags.add(cursor.getString(colName));
+                tags.put(cursor.getString(colName), cursor.getInt(colId));
             } while (cursor.moveToNext());
         }
         closeCursor(cursor);
-        return tags.toArray(new CharSequence[tags.size()]);
+        // return tags.toArray(new CharSequence[tags.size()]);
+        return tags;
     }
 
     // public TagItem getTagItem(int index) {
@@ -191,7 +259,7 @@ public class UnisonDB {
     // return null;
     // }
 
-    public Set<TagItem> getTagItems() {
+    public Set<TagItem> tagGetItems() {
         Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
                         Const.TAG_C_ID, Const.TAG_C_NAME
@@ -200,17 +268,48 @@ public class UnisonDB {
         if (cur != null && cur.moveToFirst()) {
             int colId = cur.getColumnIndex(Const.TAG_C_ID);
             int colName = cur.getColumnIndex(Const.TAG_C_NAME);
+            int colIsChecked = cur.getColumnIndex(Const.TAG_C_IS_CHECKED);
             int colRemoteId = cur.getColumnIndex(Const.TAG_C_REMOTE_ID);
             do {
                 set.add(new TagItem(cur.getInt(colId),
-                        cur.getString(colName), cur.getLong(colRemoteId)));
+                        cur.getString(colName), cur.getInt(colIsChecked),
+                        cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
         }
         closeCursor(cur);
         return set;
     }
 
-    public boolean tagsIsEmpty() {
+    public JSONObject tagGetCheckedItems() {
+        return getCheckedItems(Const.TAG_TABLE_NAME, Const.C_IS_CHECKED, SeedType.TAGS);
+    }
+
+    private JSONObject getCheckedItems(String table, String selection, SeedType key) {
+        JSONObject json = null;
+        Cursor cur = getCursor(table, new String[] {
+                selection
+        }, Const.C_IS_CHECKED + " = ? ", new String[] {
+                String.valueOf(Const.TRUE)
+        });
+        if (cur != null && cur.moveToFirst()) {
+            json = new JSONObject();
+            int colName = cur.getColumnIndex(selection);
+            do {
+                try {
+                    json.put(key.getLabel(), cur.getString(colName));
+                    Log.i(TAG, "added seed: " + cur.getString(colName) + " to " + key.getLabel());
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    Log.i(TAG, e.getMessage());
+                }
+            } while (cur.moveToNext());
+        }
+        closeCursor(cur);
+        resetIsChecked(table);
+        return json;
+    }
+
+    public boolean tagIsEmpty() {
         Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
                         Const.TAG_C_ID, Const.TAG_C_NAME
@@ -234,7 +333,7 @@ public class UnisonDB {
 
         if (!exists(item)) {
             openW();
-            long newid = mDb.insert(Const.TAG_TABLE_NAME, null, values);
+            long newid = mDB.insert(Const.TAG_TABLE_NAME, null, values);
             Log.i(TAG, "new inserted tag id: " + newid);
             close();
         }
@@ -242,7 +341,7 @@ public class UnisonDB {
 
     public void delete(TagItem item) {
         openW();
-        mDb.delete(Const.TAG_TABLE_NAME, TAGS_WHERE_ALL,
+        mDB.delete(Const.TAG_TABLE_NAME, TAGS_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.name
                 });
@@ -251,13 +350,13 @@ public class UnisonDB {
 
     public boolean exists(TagItem item) {
         open();
-        Cursor cur = mDb.query(Const.TAG_TABLE_NAME,
+        Cursor cur = mDB.query(Const.TAG_TABLE_NAME,
                 new String[] {
-                    Const.TAG_C_ID
+                        Const.TAG_C_NAME
                 },
-                TAGS_WHERE_NAME,
+                TAG_WHERE_NAME,
                 new String[] {
-                    String.valueOf(item.name)
+                    item.name
                 },
                 null, null, null, "1"); // LIMIT 1
         boolean exists = cur.moveToFirst();
@@ -265,17 +364,21 @@ public class UnisonDB {
         return exists;
     }
 
-    public String getTagIsCheckedColumnLabel() {
-        return Const.TAG_C_IS_CHECKED;
+    public String getColumnLabelRowId() {
+        return Const.C_ID;
     }
 
-    public String getTagNameColumnLabel() {
+    public String tagGetColumnLabelIsChecked() {
+        return Const.C_IS_CHECKED;
+    }
+
+    public String tagGetColumnLabelName() {
         return Const.TAG_C_NAME;
     }
 
-    public void emptyTags() {
+    public void tagEmpty() {
         openW();
-        mDb.delete(Const.TAG_TABLE_NAME, null, null);
+        mDB.delete(Const.TAG_TABLE_NAME, null, null);
         close();
     }
 }

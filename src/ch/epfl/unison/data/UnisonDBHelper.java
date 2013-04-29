@@ -17,18 +17,22 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
 
     private static final String LIBE_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + Const.LIBE_TABLE_NAME + " ("
-            + Const.LIBE_C_ID + " int PRIMARY KEY, "
+            + Const.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + Const.LIBE_C_LOCAL_ID + " int UNIQUE, "
             + Const.LIBE_C_ARTIST + " text, "
-            + Const.LIBE_C_TITLE + " text)";
+            + Const.LIBE_C_TITLE + " text, "
+            + Const.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
+    		+ ")";
 
     private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + Const.TAG_TABLE_NAME + " ("
-            + Const.TAG_C_ID + " int PRIMARY KEY, "
+            + Const.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + Const.TAG_C_NAME + " text UNIQUE NOT NULL, "
             + Const.TAG_C_REMOTE_ID + " bigint UNIQUE, "
-            + Const.TAG_C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
-            + ");";
+            + Const.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
+            + "); "
+            + "CREATE INDEX IF NOT EXISTS " + Const.TAG_INDEX_NAME + " ON " + Const.TAG_TABLE_NAME
+            + " (" + Const.TAG_C_NAME + ");";
 
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);

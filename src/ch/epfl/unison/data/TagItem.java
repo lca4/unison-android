@@ -9,17 +9,24 @@ public class TagItem implements Comparable<TagItem> {
     
     public final int localId;
     public final String name;
+    public boolean isChecked;
     public final Long remoteId; // id on GS database, hash in fact
     
     public TagItem(String n, Long rid) {
         this.localId = -1;
         this.name = n;
+        this.isChecked = false;
         this.remoteId = rid;
     }
     
-    public TagItem(int lid, String n, Long rid) {
+    public TagItem(int lid, String n, int checked, Long rid) {
         this.localId = lid;
         this.name = n;
+        if (checked == 0) {
+            this.isChecked = false;
+        } else {
+            this.isChecked = true;
+        }
         this.remoteId = rid;
     }
 

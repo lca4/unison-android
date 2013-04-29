@@ -4,6 +4,7 @@ package ch.epfl.unison;
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.google.gson.JsonNull;
@@ -12,6 +13,7 @@ import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Track;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.UnisonDB;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +51,7 @@ public class Playlist {
     // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
     // TODO mRawTracks
+    private UnisonDB mDB;
     private HashMap<String, Object> mOptions;
     
     private LinkedList<MusicItem> mPlaylist;   

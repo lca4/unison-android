@@ -4,12 +4,10 @@ package ch.epfl.unison.api;
 import android.util.Base64;
 import android.util.Log;
 
-import ch.epfl.unison.Const.Filter;
-import ch.epfl.unison.Const.Sorting;
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
@@ -229,14 +227,17 @@ public class UnisonAPI {
     // ---------------
     // PLAYLISTS
     
-    public void generatePlaylist(long uid, JSONObject seeds,
+    public void generatePlaylist(long uid, JSONObject seeds, JsonObject options,
             Handler<JsonStruct.PlaylistsList> handler) {
         Log.i(TAG, "Ready to get!");
-        // TODO add options
-        JSONObject options = new JSONObject();
-        URL url = urlFor("/solo/%d/playlist", uid);
-        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .setAuth(mAuth).addParam("seeds", seeds).addParam("options", options).doPOST();
+        if (seeds != null) {
+            URL url = urlFor("/solo/%d/playlist", uid);
+            AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                    .setAuth(mAuth).addParam("seeds", seeds).addParam("options", options).doPOST();
+        } else {
+            throw new IllegalArgumentException();
+        }
+            
     }
 
     public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {

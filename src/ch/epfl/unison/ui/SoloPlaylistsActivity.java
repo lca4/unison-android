@@ -35,6 +35,7 @@ import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.Playlist;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.PlaylistsList;
 import ch.epfl.unison.api.JsonStruct.TagsList;
@@ -50,7 +51,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 /*
  * TODO
@@ -76,7 +81,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     // "ch.epfl.unison.action.LEAVE_GROUP";
 
     private Playlist mPlaylist;
-    private UnisonDB mDb;
+    private UnisonDB mDB;
     private ArrayList<Playlist> mPLsLocal;
     private ArrayList<Playlist> mPLsRemote;
 
@@ -115,9 +120,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         mPlaylist = new Playlist();
-        mDb = new UnisonDB(this);
-        // mDb.open();
-        mDb.openW();
+        mDB = new UnisonDB(this);
 
         setContentView(R.layout.solo_playlists);
         ((Button) findViewById(R.id.createPlaylistBtn))
@@ -171,7 +174,6 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDb.close();
         unregisterReceiver(mLogoutReceiver);
     };
 
@@ -260,10 +262,10 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                     public void callback(TagsList struct) {
 
                         // TODO remove after tests
-                        // mDb.emptyTags();
+                        mDB.tagEmpty();
 
                         for (int i = 0; i < struct.tags.length; i++) {
-                            mDb.insert(struct.tags[i].getTagItem());
+                            mDB.insert(struct.tags[i].getTagItem());
                         }
                     }
 
@@ -441,65 +443,63 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
          */
         @SuppressLint("NewApi")
         protected void generatePlaylist() {
+            JSONObject json = Uutils.merge(mDB.tagGetCheckedItems(), mDB.libeGetCheckedItems());
+
             AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
+            data.getAPI().generatePlaylist(data.getUid(), json, null,
+                    new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
+                        @Override
+                        public void callback(PlaylistsList struct) {
+                            Log.i(TAG, "Playlist created!");
+                            SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                    .setAdapter(new PlaylistsAdapter(struct.toObject()));
+                        }
 
-            JSONObject json = mPlaylist.export(getResources());
-            Log.i(TAG, "json: " + json + "\n");
-
-            if (json != null) {
-                data.getAPI().generatePlaylist(data.getUid(), json,
-                        new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
-                            @Override
-                            public void callback(PlaylistsList struct) {
-                                Log.i(TAG, "Playlist created!");
-                                SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                        .setAdapter(new PlaylistsAdapter(struct.toObject()));
+                        @Override
+                        public void onError(Error error) {
+                            Log.d(TAG, error.toString());
+                            if (SoloPlaylistsActivity.this != null) {
+                                Toast.makeText(SoloPlaylistsActivity.this,
+                                        R.string.error_creating_playlist,
+                                        Toast.LENGTH_LONG).show();
                             }
-
-                            @Override
-                            public void onError(Error error) {
-                                Log.d(TAG, error.toString());
-                                if (SoloPlaylistsActivity.this != null) {
-                                    Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_creating_playlist,
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-            }
+                        }
+                    });
         }
 
-        /**
-         * Helper to convert a TypedArray to a String in JSONObject format. The
-         * TypedArray values are treated as Strings. Only the values with index
-         * from indexes are selected.
-         * 
-         * @param key
-         * @param values
-         * @param indexes
-         * @return null in case of failure
-         */
-        @SuppressLint("NewApi")
-        private JSONObject export(String key, int array,
-                ArrayList<Integer> indexes) {
-            TypedArray tags = getResources().obtainTypedArray(array);
-            String valuesInString = "";
-            for (int i = 0; i < indexes.size(); i++) {
-                if (!valuesInString.isEmpty()) {
-                    valuesInString = valuesInString.concat(",");
-                }
-                valuesInString = valuesInString.concat(tags.getString(i));
-            }
-            tags.recycle();
-            JSONObject json = new JSONObject();
-            try {
-                json.put("tags", valuesInString);
-                return json;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+        // /**
+        // * Helper to convert a TypedArray to a String in JSONObject format.
+        // The
+        // * TypedArray values are treated as Strings. Only the values with
+        // index
+        // * from indexes are selected.
+        // *
+        // * @param key
+        // * @param values
+        // * @param indexes
+        // * @return null in case of failure
+        // */
+        // @SuppressLint("NewApi")
+        // private JSONObject export(String key, int array,
+        // ArrayList<Integer> indexes) {
+        // TypedArray tags = getResources().obtainTypedArray(array);
+        // String valuesInString = "";
+        // for (int i = 0; i < indexes.size(); i++) {
+        // if (!valuesInString.isEmpty()) {
+        // valuesInString = valuesInString.concat(",");
+        // }
+        // valuesInString = valuesInString.concat(tags.getString(i));
+        // }
+        // tags.recycle();
+        // JSONObject json = new JSONObject();
+        // try {
+        // json.put("tags", valuesInString);
+        // return json;
+        // } catch (JSONException e) {
+        // e.printStackTrace();
+        // }
+        // return null;
+        // }
 
         /**
          * @author marc
@@ -569,15 +569,28 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
-                Cursor cursor = mDb.getTagItemsCursor();
+                // final Cursor cursor = mDB.tagGetItemsCursor();
+                // cursor.moveToFirst();
+                LinkedHashMap<String, Integer> items = mDB.getTags();
+                final boolean[] checkedItems = new boolean[items.size()];
+                for (int i = 0; i < checkedItems.length; i++) {
+                    checkedItems[i] = false;
+                }
+                List<CharSequence> tags = new ArrayList<CharSequence>();
+                Set<String> keys = items.keySet();
+                Iterator<String> it = keys.iterator();
+                while (it.hasNext()) {
+                    tags.add(it.next());
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(SoloPlaylistsActivity.this);
-                builder.setTitle("My Title")
+                builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
                         .setPositiveButton(R.string.generic_ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
                                         Log.i(TAG, mSelectedItems.toString());
-                                        mPlaylist.addRawTags(mSelectedItems);
+//                                        mPlaylist.addRawTags(mSelectedItems);
                                         OnCreatePlaylistListener.this.generatePlaylist();
                                     }
                                 })
@@ -588,47 +601,52 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                                         mSelectedItems.clear();
                                     }
                                 })
-                        // .setMultiChoiceItems(
-                        // mDb.getTags(),
-                        // null,
-                        // new DialogInterface.OnMultiChoiceClickListener() {
-                        // @Override
-                        // public void onClick(DialogInterface dialog,
-                        // int which, boolean isChecked) {
-                        // if (isChecked) {
-                        // mSelectedItems.add(which);
-                        // } else if (mSelectedItems.contains(which)) {
-                        // mSelectedItems.remove(Integer.valueOf(which));
-                        // }
-                        // }
-                        // });
-                        /*
-                         * I don't know why, but using a cursor doesn't work and
-                         * generates a NullPointerException
-                         */
-                        .setMultiChoiceItems(cursor, mDb.getTagIsCheckedColumnLabel(),
-                                mDb.getTagNameColumnLabel(),
-                                new DialogInterface.OnMultiChoiceClickListener() {
+                        .setMultiChoiceItems(tags.toArray(new CharSequence[tags.size()]),
+                                checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which,
                                             boolean isChecked) {
-                                        Log.i(TAG, "hello world");
                                         if (isChecked) {
-                                            // If the user checked the item, add
-                                            // it
-                                            // to the selected items
-                                            
-                                            //TODO update is_checked field in DB
-                                            
+                                            checkedItems[which] = true;
                                             mSelectedItems.add(which);
                                         } else if
                                         (mSelectedItems.contains(which)) {
                                             // Else, if the item is already in
                                             // the array, remove it
+                                            checkedItems[which] = false;
                                             mSelectedItems.remove(Integer.valueOf(which));
                                         }
                                     }
                                 });
+
+                // .setMultiChoiceItems(cursor,
+                // mDB.tagGetColumnLabelIsChecked(),
+                // mDB.tagGetColumnLabelName(),
+                // new DialogInterface.OnMultiChoiceClickListener() {
+                // @Override
+                // public void onClick(DialogInterface dialog, int which,
+                // boolean isChecked) {
+                // cursor.moveToPosition(which);
+                // mDB.tagSetChecked(cursor.getInt(cursor.getColumnIndex(mDB
+                // .getColumnLabelRowId())), isChecked);
+                // // if (isChecked) {
+                // // // If the user checked the item, add
+                // // // it
+                // // // to the selected items
+                // //
+                // // //TODO update is_checked field in DB
+                // // cursor.move(which);
+                // // int tagId = cursor.getInt(0);
+                // // mDb.tagSetChecked(tagId, isChecked);
+                // // mSelectedItems.add(which);
+                // // } else if
+                // // (mSelectedItems.contains(which)) {
+                // // // Else, if the item is already in
+                // // // the array, remove it
+                // // mSelectedItems.remove(Integer.valueOf(which));
+                // // }
+                // }
+                // });
                 return builder.create();
             }
         }
