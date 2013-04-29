@@ -154,8 +154,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     public void onRefresh() {
         repaintRefresh(true);
         UnisonAPI.Handler<JsonStruct.GroupsList> handler
-                = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
-            
+                = new UnisonAPI.Handler<JsonStruct.GroupsList>() {          
             @Override
             public void callback(GroupsList struct) {
                 try {
@@ -180,9 +179,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             }
         };
         AppData data = AppData.getInstance(this);
-        if (data.getLocation() != null) {
-            double lat = data.getLocation().getLatitude();
-            double lon = data.getLocation().getLongitude();
+        Location currentLoc = data.getLocation();
+        if (currentLoc != null) {
+            double lat = currentLoc.getLatitude();
+            double lon = currentLoc.getLongitude();
             data.getAPI().listGroups(lat, lon, handler);            
         } else {
             data.getAPI().listGroups(handler);
@@ -466,9 +466,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             } else {
                 AppData data = AppData.getInstance(GroupsActivity.this);
                 double lat, lon;
-                if (data.getLocation() != null) {
-                    lat = data.getLocation().getLatitude();
-                    lon = data.getLocation().getLongitude();
+                Location currentLoc = data.getLocation();
+                if (currentLoc != null) {
+                    lat = currentLoc.getLatitude();
+                    lon = currentLoc.getLongitude();
                 } else {
                     lat = DEFAULT_LATITUDE;
                     lon = DEFAULT_LONGITUDE;

@@ -473,7 +473,7 @@ public class PlayerFragment extends SherlockFragment implements
         } else {
             dropDJSeat();
         }
-        mIsDJ = wantsToBeDJ;
+        setIsDj(wantsToBeDJ);
     }
 
     /**
@@ -568,4 +568,13 @@ public class PlayerFragment extends SherlockFragment implements
             mHandler.postDelayed(this, UPDATE_INTERVAL);
         }
     };
+    
+    public boolean getIsDj() {
+        return mIsDJ;
+    }
+    
+    private void setIsDj(boolean isdj) {
+        mIsDJ = isdj;
+        mActivity.setDJ(isdj);
+    }
 }

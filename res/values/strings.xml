@@ -12,6 +12,7 @@
     <string name="activity_title_solo">Single-user mode</string>
     <string name="activity_title_signup">Sign Up</string>
     <string name="activity_title_history">Group History</string>
+    <string name="activity_title_manage">Set Password</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>

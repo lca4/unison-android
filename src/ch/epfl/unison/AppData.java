@@ -13,6 +13,8 @@ import android.util.Pair;
 
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.ui.GroupsActivity;
+import ch.epfl.unison.ui.MainActivity;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,10 +39,17 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private static final String TAG = "ch.epfl.unison.AppData";
 //    private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
 //    For testing purpose, TODO: set multiple intervals
-    private static final int LOCATION_INTERVAL = 30 * 1000;  // In ms.
+//    private static final int LOCATION_INTERVAL = 30 * 1000;  // In ms.
     private static final int LOCATION_EXPIRATION_TIME = 10 * 60 * 1000;  // In ms.
     private static final int MAX_LOCATION_HISTORY_SIZE = 3;
     private static final int MAX_HISTORY_SIZE = 10;
+    
+    private static final int SLOW = 20 * 60 * 1000;
+    private static final int MEDIUM = 60 * 1000;
+    private static final int FAST = 10 * 1000;
+    
+    
+    private static int sCurrentSpeed = SLOW;
 
     private static AppData sInstance;
 
@@ -65,6 +74,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     }
 
     private AppData setupLocation() {
+        Log.d(TAG, "Calling SetupLocation()");
         if (mLocationMgr == null) {
             mLocationMgr = (LocationManager) mContext.getSystemService(
                     Context.LOCATION_SERVICE);
@@ -72,20 +82,32 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         // try to set up the network location listener.
         if (mNetworkListener == null
                 && mLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            Log.d(TAG, "NetworkListener was null");
             mNetworkListener = new UnisonLocationListener(LocationManager.NETWORK_PROVIDER);
             mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_INTERVAL, 1f, mNetworkListener);
+                    sCurrentSpeed, 1f, mNetworkListener);
             mNetworkLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.NETWORK_PROVIDER);
         }
         // try to set up the GPS location listener.
         if (mGpsListener == null
                 && mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.d(TAG, "GpsListener was null");
             mGpsListener = new UnisonLocationListener(LocationManager.GPS_PROVIDER);
             mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    LOCATION_INTERVAL, 1f, mGpsListener);
+                    sCurrentSpeed, 1f, mGpsListener);
             mGpsLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.GPS_PROVIDER);
+        }
+        
+        
+        if (mLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    sCurrentSpeed, 1f, mNetworkListener);
+        } 
+        if (mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    sCurrentSpeed, 1f, mGpsListener);
         }
         return this;
     }
@@ -200,6 +222,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         if (sInstance == null) {
             sInstance = new AppData(c.getApplicationContext());
         }
+        if (c instanceof GroupsActivity) {
+            sCurrentSpeed = FAST;
+        } else if (c instanceof MainActivity) {
+            sCurrentSpeed = MEDIUM;
+        } else {
+            sCurrentSpeed = SLOW;
+        }
+        Log.d(TAG, "location refresh speed = " + sCurrentSpeed);
         return sInstance.setupLocation();
     }
 

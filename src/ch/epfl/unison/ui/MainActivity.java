@@ -73,6 +73,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
     private JsonStruct.Group mGroup;
+    
+    private boolean mIsDj = false;
 
     public long getGroupId() {
         return mGroup.gid;
@@ -340,5 +342,14 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         public void onTabUnselected(Tab tab, FragmentTransaction ft) { }
         @Override
         public void onTabReselected(Tab tab, FragmentTransaction ft) { }
+    }
+    
+    public void setDJ(boolean dj) {
+        mIsDj = dj;
+        mMenu.findItem(R.id.menu_item_manage_group).setVisible(dj);
+    }
+    
+    public boolean getDJ() {
+        return mIsDj;
     }
 }

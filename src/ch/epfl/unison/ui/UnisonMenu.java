@@ -19,6 +19,9 @@ import com.actionbarsherlock.view.MenuItem;
  * @author lum
  */
 public abstract class UnisonMenu {
+    
+    @SuppressWarnings("unused")
+    private static final String TAG = "ch.epfl.chunison.ui.UnisonMenu";
 
     public static final String ACTION_LOGOUT = "ch.epfl.unison.action.LOGOUT";
 
@@ -30,7 +33,7 @@ public abstract class UnisonMenu {
 
     public static boolean onCreateOptionsMenu(SherlockFragmentActivity activity, Menu menu) {
         MenuInflater inflater = activity.getSupportMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menu, menu);  
         return true;
     }
 
