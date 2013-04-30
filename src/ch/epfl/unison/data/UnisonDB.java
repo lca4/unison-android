@@ -12,12 +12,15 @@ import ch.epfl.unison.Const.SeedType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -168,8 +171,24 @@ public class UnisonDB {
         close();
     }
 
-    public JSONObject libeGetCheckedItems() {
-        return getCheckedItems(Const.LIBE_TABLE_NAME, Const.C_IS_CHECKED, SeedType.TRACKS);
+    public LinkedHashMap<String, Integer> getLibEntries() {
+        Cursor cursor = getCursor(Const.LIBE_TABLE_NAME, new String[] {
+                Const.TAG_C_ID, Const.LIBE_C_TITLE, Const.LIBE_C_ARTIST
+        });
+        LinkedHashMap<String, Integer> tags = null;
+        // List<CharSequence> tags = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            tags = new LinkedHashMap<String, Integer>();
+            int colId = cursor.getColumnIndex(Const.C_ID);
+            int colTitle = cursor.getColumnIndex(Const.LIBE_C_TITLE);
+            int colArtist = cursor.getColumnIndex(Const.LIBE_C_ARTIST);
+            do {
+                tags.put(cursor.getString(colTitle) + " - " + cursor.getString(colArtist),
+                        cursor.getInt(colId));
+            } while (cursor.moveToNext());
+        }
+        closeCursor(cursor);
+        return tags;
     }
 
     /*
@@ -200,28 +219,6 @@ public class UnisonDB {
         mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
                 String.valueOf(tagId)
         });
-        close();
-    }
-
-    public void tagSetChecked(LinkedHashMap<String, Integer> items, boolean[] checked) {
-        openW();
-        ContentValues values = new ContentValues();
-        Set<String> keys = items.keySet();
-        Iterator<String> it = keys.iterator();
-        int index = 0;
-        while (it.hasNext()) {
-            if (checked[index]) {
-                values.put(Const.C_IS_CHECKED, Const.TRUE);
-            } else {
-                values.put(Const.C_IS_CHECKED, Const.FALSE);
-            }
-            int tagId = items.get(it);
-            Log.i(TAG, "Updates row id=" + tagId + " to is_checked=" + values.valueSet().toString());
-            mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
-                    String.valueOf(tagId)
-            });
-            index++;
-        }
         close();
     }
 
@@ -280,35 +277,6 @@ public class UnisonDB {
         return set;
     }
 
-    public JSONObject tagGetCheckedItems() {
-        return getCheckedItems(Const.TAG_TABLE_NAME, Const.C_IS_CHECKED, SeedType.TAGS);
-    }
-
-    private JSONObject getCheckedItems(String table, String selection, SeedType key) {
-        JSONObject json = null;
-        Cursor cur = getCursor(table, new String[] {
-                selection
-        }, Const.C_IS_CHECKED + " = ? ", new String[] {
-                String.valueOf(Const.TRUE)
-        });
-        if (cur != null && cur.moveToFirst()) {
-            json = new JSONObject();
-            int colName = cur.getColumnIndex(selection);
-            do {
-                try {
-                    json.put(key.getLabel(), cur.getString(colName));
-                    Log.i(TAG, "added seed: " + cur.getString(colName) + " to " + key.getLabel());
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    Log.i(TAG, e.getMessage());
-                }
-            } while (cur.moveToNext());
-        }
-        closeCursor(cur);
-        resetIsChecked(table);
-        return json;
-    }
-
     public boolean tagIsEmpty() {
         Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
@@ -348,11 +316,17 @@ public class UnisonDB {
         close();
     }
 
+    /**
+     * Doesn't work, why?
+     * 
+     * @param item
+     * @return
+     */
     public boolean exists(TagItem item) {
         open();
         Cursor cur = mDB.query(Const.TAG_TABLE_NAME,
                 new String[] {
-                        Const.TAG_C_NAME
+                    Const.TAG_C_NAME
                 },
                 TAG_WHERE_NAME,
                 new String[] {
@@ -380,5 +354,113 @@ public class UnisonDB {
         openW();
         mDB.delete(Const.TAG_TABLE_NAME, null, null);
         close();
+    }
+
+    /*
+     * COMMON
+     */
+
+    /**
+     * @param type
+     * @param items
+     * @param checked
+     */
+    public void setChecked(SeedType type, LinkedHashMap<String, Integer> items,
+            boolean[] checked) throws IllegalArgumentException {
+        openW();
+        String table = null;
+        switch (type) {
+            case TAGS:
+                table = Const.TAG_TABLE_NAME;
+                break;
+            case TRACKS:
+                table = Const.LIBE_TABLE_NAME;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        ContentValues values = new ContentValues();
+        Iterator it = items.entrySet().iterator();
+        int index = 0;
+        while (it.hasNext()) {
+            if (checked[index]) {
+                values.put(Const.C_IS_CHECKED, Const.TRUE);
+            } else {
+                values.put(Const.C_IS_CHECKED, Const.FALSE);
+            }
+            Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>) it.next();
+            int tagId = pair.getValue();
+            Log.i(TAG, table + " : updates row id=" + tagId + " to is_checked="
+                    + values.valueSet().toString());
+            mDB.update(table, values, Const.C_ID + " = ? ", new String[] {
+                    String.valueOf(tagId)
+            });
+            index++;
+        }
+        close();
+    }
+
+    public JSONObject getCheckedItems(SeedType key) {
+        String table = null;
+        String[] columns = null;
+        switch (key) {
+            case TAGS:
+                table = Const.TAG_TABLE_NAME;
+                columns = new String[] {
+                        Const.TAG_C_NAME
+                };
+                break;
+            case TRACKS:
+                table = Const.LIBE_TABLE_NAME;
+                columns = new String[] {
+                        Const.LIBE_C_TITLE, Const.LIBE_C_ARTIST
+                };
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        Cursor cur = getCursor(table, columns, Const.C_IS_CHECKED + " = ? ", new String[] {
+                String.valueOf(Const.TRUE)
+        });
+
+        JSONObject json = null;
+        if (cur != null && cur.moveToFirst()) {
+            json = new JSONObject();
+            switch (key) {
+                case TAGS:
+                    int colName = cur.getColumnIndex(Const.TAG_C_NAME);
+                    do {
+                        try {
+                            json.accumulate(key.getLabel(), cur.getString(colName));
+                            Log.i(TAG, "added seed: " + cur.getString(colName) + " to "
+                                    + key.getLabel());
+                        } catch (JSONException e) {
+                            Log.i(TAG, e.getMessage());
+                        }
+                    } while (cur.moveToNext());
+                    break;
+                case TRACKS:
+                    int colTitle = cur.getColumnIndex(Const.LIBE_C_TITLE);
+                    int colArtist = cur.getColumnIndex(Const.LIBE_C_ARTIST);
+                    JSONObject track = new JSONObject();
+                    do {
+                        try {
+                            track.put("title", cur.getString(colTitle));
+                            track.put("artist", cur.getString(colArtist));
+                            json.accumulate(key.getLabel(), track.toString());
+                            Log.i(TAG, "added seed: " + track.toString() + " to "
+                                    + key.getLabel());
+                        } catch (JSONException e) {
+                            Log.i(TAG, e.getMessage());
+                        }
+                    } while (cur.moveToNext());
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+        closeCursor(cur);
+        resetIsChecked(table);
+        return json;
     }
 }

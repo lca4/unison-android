@@ -46,6 +46,13 @@ public final class Uutils {
     
     public static JSONObject merge(JSONObject json1, JSONObject json2) {
         JSONObject merged = new JSONObject();
+        if (json1 == null && json2 == null) {
+            return null;
+        } else if (json1 == null) {
+            return json2;
+        } else if (json2 == null) {
+            return json1;
+        }
         JSONObject[] objs = new JSONObject[] { json1, json2 };
         for (JSONObject obj : objs) {
             Iterator<String> it = obj.keys();

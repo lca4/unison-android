@@ -106,7 +106,7 @@ public abstract class JsonStruct {
     /** Information about a playlist (used in both directions). */
     public static class PlaylistJS extends JsonStruct {
 
-        public Long id;
+        public int id;
         public String title;
         public Calendar created;
         public Calendar updated;
@@ -124,7 +124,7 @@ public abstract class JsonStruct {
         
         public Playlist toObject() {
             //TODO complete
-            return new Playlist.Builder().id(id).title(title).tracks(tracks).build();
+            return new Playlist.Builder().plId(id).title(title).tracks(tracks).build();
         }
         
     }

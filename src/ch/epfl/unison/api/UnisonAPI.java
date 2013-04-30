@@ -227,7 +227,7 @@ public class UnisonAPI {
     // ---------------
     // PLAYLISTS
     
-    public void generatePlaylist(long uid, JSONObject seeds, JsonObject options,
+    public void generatePlaylist(long uid, JSONObject seeds, JSONObject options,
             Handler<JsonStruct.PlaylistsList> handler) {
         Log.i(TAG, "Ready to get!");
         if (seeds != null) {

@@ -56,9 +56,22 @@ final class Const {
     /*
      * The playlists table will just be used to store additional data about the
      * playlists that has to be persistent. These infos include for e.g. isSynced
+     * 
+     * Be careful, the playlists can modified outside of GroupStreamer, since they're stored in the 
+     * shared android playlists database!
      */
-    static final String PLAYLISTS_TABLE_NAME = "playlists";
+    static final String PLAYLISTS_TABLE_NAME = "playlists"; // Prefix: PLYL_
+    static final String PLYL_C_ID = C_ID;
+    static final String PLYL_C_LOCAL_ID = "local_id";
+    static final String PLYL_C_LOCAL_UPDATE_TIME = "update_time"; // =PlaylistsColumns.DATE_MODIFIED
+    static final String PLYL_C_CREATED_BY_GS = "created_by_gs"; // was PL created using GS?
+    static final String PLYL_C_REMOTE_ID = "gs_playlist_id"; // if created by GroupStreamer
+    static final String PLYL_C_GS_CREATION_TIME = "gs_creation_time"; // if created by GS
+    // Update the android playlists only if requested, thus track last update
+    static final String PLYL_C_GS_UPDATE_TIME = "gs_update_time"; // if created by GS
+    static final String PLYL_C_GS_IS_SYNCED = "gs_is_synced";
 
+    // Const class can't be instanciated
     private Const() {
         // TODO Auto-generated constructor stub
     }

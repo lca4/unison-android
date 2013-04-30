@@ -32,8 +32,8 @@ import java.util.LinkedList;
  */
 public class Playlist {
 
-    private Long mLocalId; // Android sqlite
-    private Long mPlId; // GS database id
+    private int mLocalId; // Android sqlite
+    private int mPLId; // GS database id
     private String mTitle;
     private Calendar mCreated;
     private Calendar mLastUpdated;
@@ -69,8 +69,8 @@ public class Playlist {
      * TODO complete
      */
     public static class Builder {
-        private Long mLocalId; // Android sqlite
-        private Long mId; // GS database id
+        private int mLocalId; // Android sqlite
+        private int mPLId; // GS database id
         private String mTitle;
         private Calendar mCreated;
         private Calendar mLastUpdated;
@@ -85,13 +85,13 @@ public class Playlist {
         private boolean mIsShared;
         private boolean mIsSynced;
         
-        public Builder localId(Long id) {
+        public Builder localId(int id) {
             this.mLocalId = id;
             return this;
         }
         
-        public Builder id(Long id) {
-            this.mId = id;
+        public Builder plId(int id) {
+            this.mPLId = id;
             return this;
         }
         
@@ -145,7 +145,7 @@ public class Playlist {
     }
     
     private Playlist(Builder builder) {
-        this.mPlId = builder.mId;
+        this.mPLId = builder.mPLId;
         this.mTitle = builder.mTitle;
         this.mCreated = builder.mCreated;
         this.mLastUpdated = builder.mLastUpdated;
@@ -272,13 +272,13 @@ public class Playlist {
     }
 
 
-    public Long getLocalId() {
+    public int getLocalId() {
         return mLocalId;
     }
 
 
-    public Long getPlId() {
-        return mPlId;
+    public int getPLId() {
+        return mPLId;
     }
 
 
