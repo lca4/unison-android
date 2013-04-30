@@ -35,7 +35,7 @@ final class Const {
     // tags table fields here
     static final String TAG_C_ID = C_ID;
     static final String TAG_C_NAME = "name";
-    static final String TAG_C_REMOTE_ID = "remote_id"; // may be useless
+    static final String TAG_C_REMOTE_ID = "gs_tag_id"; // may be useless
     static final String TAG_C_IS_CHECKED = "is_checked";
     // index
     static final String TAG_INDEX_NAME = "tag_name_idx";
