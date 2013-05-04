@@ -103,7 +103,7 @@ public class MusicService extends Service
     }
 
     private void toggle() {
-        Log.i(TAG, "blablablablabl");
+        Log.i(TAG, "PLAY/PAUSE button pressed");
         if (mState == State.Paused) {
             play();
         } else if (mState == State.Playing) {
@@ -112,7 +112,7 @@ public class MusicService extends Service
     }
 
     private void load(Intent intent) {
-        Log.i(TAG, "doodlelidoo");
+        Log.i(TAG, "loading track");
         mState = State.Stopped;
         relaxResources(false);
         tryToGetAudioFocus();

@@ -65,7 +65,13 @@
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/activity_title_main"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask" />
+        <!-- See doc on singleTask:
+        http://developer.android.com/guide/components/tasks-and-back-stack.html 
+        One could alternatively use the intent flag:
+        FLAG_ACTIVITY_REORDER_TO_FRONT
+        when creating the pending intent in MusicService for the notification -->
         
 
         <!-- Services. -->
