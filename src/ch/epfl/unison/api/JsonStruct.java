@@ -39,6 +39,27 @@ public abstract class JsonStruct {
         public Integer score;
         public Boolean predicted; // or isPredicted?
     }
+    
+    /** Cluster as used on the server to regroup users. */
+    public static class Cluster extends JsonStruct {
+        
+        public Long cid;
+        public Double lat;
+        public Double lon;
+        public Long gid;
+    }
+    
+    /** Group Suggestion from the server. */
+    public static class GroupSuggestion extends JsonStruct {
+        
+        public boolean suggestion;
+        public Cluster cluster;
+        
+        public Group group;
+        //Note that the users are not the same as the Users Field of the group as it
+        //may also contain users that are not in the group.
+        public String[] users;
+    }
 
     /** Information about a track (used in both directions). */
     public static class Track extends JsonStruct {
@@ -80,6 +101,12 @@ public abstract class JsonStruct {
         public User master;
         public User[] users;
         public Integer nbUsers;
+        
+        //Linked to automatic groups. We use default values for backwards compatibility.
+        public boolean automatic = false;
+        public Double lat = 0.0;
+        public Double lon = 0.0;
+        
     }
 
     /** List of groups. */

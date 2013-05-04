@@ -18,6 +18,7 @@
     <string name="activity_title_solo_playlists">Single-user mode</string>
     <string name="activity_title_signup">Sign Up</string>
     <string name="activity_title_history">Group History</string>
+    <string name="activity_title_manage">Set Password</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
@@ -31,6 +32,7 @@
     <string name="pref_title_nickname">Nickname</string>
     <string name="pref_summary_nickname">Lets other users identify you.</string>
     <string name="pref_title_uid">UUID</string>
+     <string name="pref_title_suggestion_enabled">Enable Suggestions</string>
 
     <!-- Ratings -->
     <string name="ratings_improve_gs">Ratings improve GroupStreamer\'s effectiveness.</string>
@@ -59,22 +61,16 @@
     <string name="groups_helpdialog_chkbox">Don\'t show this again</string>
     <string name="groups_helpdialog_yesBtn">Yes</string>
     <string name="groups_helpdialog_noBtn">No, thanks</string>
+    <string name="groups_suggestion_title">Would you like to join a group with the following user(s)</string>
+    <string name="groups_suggestion_yesBtn">Yes</string>
+    <string name="groups_suggestion_noBtn">No, thanks</string>
+    <string name="groups_suggestion_cBx">Do not ask me again</string>
     <string name="groups_alert_newgroup_title">New Group</string>
     <string name="groups_alert_newgroup_message">Pick a name for the group:</string>
     <string name="groups_alert_newgroup_ok">OK</string>
     <string name="groups_alert_newgroup_cancel">Cancel</string>
     <string name="groups_createBtn">Create group</string>
     <string name="groups_chooseGrp">or select one below :</string>
-
-    <!-- Single user mode -->
-<!-- <string name="solo_playlists_helpdialog_title">Welcome</string>
-    <string name="solo_playlists_helpdialog_message">Want to learn how to use the application ?</string>
-    <string name="solo_playlists_helpdialog_chkbox">Don\'t show this again</string>
-    <string name="solo_playlists_helpdialog_yesBtn">Yes</string>
-    <string name="solo_playlists_helpdialog_noBtn">No, thanks</string>
-    <string name="solo_playlists_alert_newplaylist_message">Pick a name for the playlist:</string>
-    <string name="solo_playlists_alert_newplaylist_ok">OK</string>
-    <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string> -->
     
     <!-- Solo playlists --> 
     <string name="solo_playlists_createBtn">Create playlist</string>

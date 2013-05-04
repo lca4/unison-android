@@ -107,6 +107,12 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(mAuth).doGET();
     }
+    
+    public void getSuggestion(double lat, double lon,
+            Handler<JsonStruct.GroupSuggestion> handler) {
+        URL url = urlFor(String.format("/groups/suggestion?lat=%f&lon=%f", lat, lon));
+        AsyncRequest.of(url, handler, JsonStruct.GroupSuggestion.class).setAuth(mAuth).doGET();   
+    }
 
     public void listGroups(double lat, double lon, Handler<JsonStruct.GroupsList> handler) {
         URL url = urlFor("/groups?lat=%f&lon=%f", lat, lon);

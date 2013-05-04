@@ -13,6 +13,8 @@ import android.util.Pair;
 
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.ui.GroupsActivity;
+import ch.epfl.unison.ui.MainActivity;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -23,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,15 +37,29 @@ import java.util.Map;
 public final class AppData implements OnSharedPreferenceChangeListener {
 
     private static final String TAG = "ch.epfl.unison.AppData";
-    private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
+//    private static final int LOCATION_INTERVAL = 20 * 60 * 1000;  // In ms.
+//    For testing purpose, TODO: set multiple intervals
+//    private static final int LOCATION_INTERVAL = 30 * 1000;  // In ms.
+    private static final int LOCATION_EXPIRATION_TIME = 10 * 60 * 1000;  // In ms.
+    private static final int MAX_LOCATION_HISTORY_SIZE = 3;
     private static final int MAX_HISTORY_SIZE = 10;
+    
+    private static final int SLOW = 20 * 60 * 1000;
+    private static final int MEDIUM = 60 * 1000;
+    private static final int FAST = 10 * 1000;
+    
+    
+    private static int sCurrentSpeed = SLOW;
 
     private static AppData sInstance;
 
     private Context mContext;
     private UnisonAPI mApi;
     private SharedPreferences mPrefs;
-    private Type mapType = new TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() { } .getType();
+    private Type mGroupHistoryMapType = new 
+            TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() { } .getType();
+    private Type mLocationHistoryQueueType = new 
+            TypeToken<LinkedList<Pair<Pair<Double, Double>, Date>>>() { } .getType(); 
 
     private LocationManager mLocationMgr;
     private UnisonLocationListener mGpsListener;
@@ -57,6 +74,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     }
 
     private AppData setupLocation() {
+        Log.d(TAG, "Calling SetupLocation()");
         if (mLocationMgr == null) {
             mLocationMgr = (LocationManager) mContext.getSystemService(
                     Context.LOCATION_SERVICE);
@@ -64,20 +82,32 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         // try to set up the network location listener.
         if (mNetworkListener == null
                 && mLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            Log.d(TAG, "NetworkListener was null");
             mNetworkListener = new UnisonLocationListener(LocationManager.NETWORK_PROVIDER);
             mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_INTERVAL, 1f, mNetworkListener);
+                    sCurrentSpeed, 1f, mNetworkListener);
             mNetworkLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.NETWORK_PROVIDER);
         }
         // try to set up the GPS location listener.
         if (mGpsListener == null
                 && mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.d(TAG, "GpsListener was null");
             mGpsListener = new UnisonLocationListener(LocationManager.GPS_PROVIDER);
             mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    LOCATION_INTERVAL, 1f, mGpsListener);
+                    sCurrentSpeed, 1f, mGpsListener);
             mGpsLocation = mLocationMgr.getLastKnownLocation(
                     LocationManager.GPS_PROVIDER);
+        }
+        
+        
+        if (mLocationMgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    sCurrentSpeed, 1f, mNetworkListener);
+        } 
+        if (mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    sCurrentSpeed, 1f, mGpsListener);
         }
         return this;
     }
@@ -106,18 +136,100 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     public void setShowHelpDialog(boolean value) {
         mPrefs.edit().putBoolean(Const.PrefKeys.HELPDIALOG, value).commit();
     }
-
-    public Location getLocation() {
-        if (mGpsLocation != null) {
-            return mGpsLocation;  // Prefer GPS locations over network locations.
+    
+    public boolean showGroupSuggestion() {
+        return mPrefs.getBoolean(Const.PrefKeys.GROUP_SUGGESTION, true);
+    }
+    
+    public void setShowGroupSuggestion(boolean value) {
+        mPrefs.edit().putBoolean(Const.PrefKeys.GROUP_SUGGESTION, value).commit();
+    }
+    
+    private LinkedList<Pair<Pair<Double, Double>, Date>> extractQueueFromString(String value) {
+        if (value == null) {
+            return new LinkedList<Pair<Pair<Double, Double>, Date>>();
+        } else {
+            return new GsonBuilder().create().fromJson(value, mLocationHistoryQueueType);
         }
-        return mNetworkLocation;
+    }
+    
+    private LinkedList<Pair<Pair<Double, Double>, Date>> removeOutdatedLocations(
+            LinkedList<Pair<Pair<Double, Double>, Date>> queue, double currentTime)
+    {
+        int n = 0;
+        while (!queue.isEmpty() && n < MAX_LOCATION_HISTORY_SIZE) {
+            //Clear location history according to threshold
+            if (currentTime - queue.peek().second.getTime() 
+                    > LOCATION_EXPIRATION_TIME) {
+                queue.remove();
+            }        
+            ++n;
+        }
+        
+        return queue;
+    }
+    
+    public Location getLocation() {
+        String value = mPrefs.getString(Const.PrefKeys.LOCATION_HISTORY, null);
+        LinkedList<Pair<Pair<Double, Double>, Date>> positionHistoryQueue = 
+                extractQueueFromString(value);      
+        Location lastLocation = chooseLocationOrigin();
+        //This means that we never had a location... 
+        if (lastLocation == null) {
+            return null;
+        }      
+        Date lastLocationTimestamp = new Date();
+        positionHistoryQueue = 
+                removeOutdatedLocations(positionHistoryQueue, lastLocationTimestamp.getTime());
+        if (positionHistoryQueue.size() >= MAX_LOCATION_HISTORY_SIZE) {
+            positionHistoryQueue.remove();
+        }
+        positionHistoryQueue.offer(new Pair<Pair<Double, Double>, Date>(
+                new Pair<Double, Double>(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                lastLocationTimestamp));
+        
+        double meanLat = 0.0, meanLon = 0.0;
+        
+        for (Pair<Pair<Double, Double>, Date> p : positionHistoryQueue) {
+            meanLat += p.first.first;
+            meanLon += p.first.second;
+        }
+        meanLat /= (double) (positionHistoryQueue.size());
+        meanLon /= (double) (positionHistoryQueue.size());
+        
+        Location meanLocation = new Location(lastLocation); //we must copy an old location...
+        meanLocation.setLatitude(meanLat);
+        meanLocation.setLongitude(meanLon);        
+        
+        value = new GsonBuilder().create().toJson(positionHistoryQueue, mLocationHistoryQueueType);
+        if (value != null) {
+            mPrefs.edit().putString(Const.PrefKeys.LOCATION_HISTORY, value).commit();
+            Log.d(TAG, "location added in Queue!");
+        }
+        
+        return meanLocation;
+    }
+    
+    private Location chooseLocationOrigin() {
+        if (mGpsLocation != null) {
+            return mGpsLocation;
+        } else {
+            return mNetworkLocation;
+        }
     }
 
     public static synchronized AppData getInstance(Context c) {
         if (sInstance == null) {
             sInstance = new AppData(c.getApplicationContext());
         }
+        if (c instanceof GroupsActivity) {
+            sCurrentSpeed = FAST;
+        } else if (c instanceof MainActivity) {
+            sCurrentSpeed = MEDIUM;
+        } else {
+            sCurrentSpeed = SLOW;
+        }
+        Log.d(TAG, "location refresh speed = " + sCurrentSpeed);
         return sInstance.setupLocation();
     }
 
@@ -147,7 +259,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         history.put(Long.valueOf(group.gid), new Pair<JsonStruct.Group, Date>(group, new Date()));
         
         //Possible optimization heres
-        String value = new GsonBuilder().create().toJson(history, mapType);
+        String value = new GsonBuilder().create().toJson(history, mGroupHistoryMapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
     
@@ -157,7 +269,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         if (value == null) {
             return null;
         }
-        return new GsonBuilder().create().fromJson(value, mapType);
+        return new GsonBuilder().create().fromJson(value, mGroupHistoryMapType);
     }
     
     /**
