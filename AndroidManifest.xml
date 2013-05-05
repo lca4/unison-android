@@ -40,6 +40,9 @@
         <activity
             android:name=".ui.SoloPlaylistsActivity"
             android:label="@string/activity_title_solo_playlists" />
+        <activity
+            android:name=".ui.HomeActivity"
+            android:label="@string/activity_title_home" />
         
         <activity
             android:name=".ui.LoginActivity"

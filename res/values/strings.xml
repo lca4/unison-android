@@ -19,6 +19,7 @@
     <string name="activity_title_signup">Sign Up</string>
     <string name="activity_title_history">Group History</string>
     <string name="activity_title_manage">Set Password</string>
+    <string name="activity_title_home">GroupStreamer</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
@@ -86,6 +87,9 @@
     <string name="playlist_context_menu_item_delete">Delete</string>
     <string name="playlist_context_menu_item_share">Share with other users</string>
     <string name="playlist_context_menu_item_edit">Edit</string>
+    
+    <!-- Home -->
+    <string name="home_title">What kind of party?</string>
     
     <!-- Solo player -->
     

@@ -159,7 +159,8 @@ public class LoginActivity extends SherlockActivity {
                     .putExtra(Const.Strings.GID, user.gid));
         } else {
             // Display list of groups.
-            startActivity(new Intent(this, GroupsActivity.class));
+//            startActivity(new Intent(this, GroupsActivity.class));
+            startActivity(new Intent(this, HomeActivity.class));
         }
         // Close this activity.
         finish();

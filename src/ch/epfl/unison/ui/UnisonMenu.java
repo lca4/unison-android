@@ -70,9 +70,10 @@ public abstract class UnisonMenu {
                 break;
             case android.R.id.home: // if using home button from menu: R.id.home 
                 // app icon in Action Bar clicked; go home
-                activity.startActivity(new Intent(activity, GroupsActivity.class)
-                        .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                activity.startActivity(new Intent(activity, HomeActivity.class));
+//                activity.startActivity(new Intent(activity, GroupsActivity.class)
+//                        .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
+//                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 // Make sure the activity is finished, even if it was at the
                 // bottom of the stack.
                 activity.finish();
