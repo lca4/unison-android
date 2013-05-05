@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
@@ -341,7 +342,9 @@ public class PlayerFragment extends SherlockFragment implements
         Uri uri = ContentUris.withAppendedId(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);
         mActivity.startService(new Intent(MusicService.ACTION_LOAD)
-                .setData(uri));
+                .setData(uri)
+                .putExtra(Const.Strings.SONG_ARTIST_TITLE,
+                        String.format("%s - %s", item.artist, item.title)));
         mCurrentTrack = item;
         mStatus = Status.Playing;
 

@@ -31,6 +31,7 @@ public final class Const {
         public static final String GROUP = "group"; // not sure if GID and NAME
                                                     // are used anymore
         public static final String CALLER = "caller";
+        public static final String SONG_ARTIST_TITLE = "songat";
 
         private Strings() {
         } // Non-instantiable.

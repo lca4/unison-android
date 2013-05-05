@@ -108,7 +108,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private void handleExtras(Bundle extras) {
         if (extras == null || !extras.containsKey(Const.Strings.GROUP)) {
             // Should never happen. If it does, redirect the user to the groups list.
-            Log.d(TAG, "Tried creating mainActivity without coming from groupsActivity! Going to close");
+            Log.d(TAG, "Tried creating mainActivity"
+                    + " without coming from groupsActivity! Going to close");
             startActivity(new Intent(this, GroupsActivity.class));
             finish();
         } else {
