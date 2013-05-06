@@ -53,6 +53,7 @@
     <string name="login_signup">New to GroupStreamer ?</string>
     <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
     <string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
+    <string name="login_menu_signup">Sign Up</string>
 
 
     <!-- Groups -->

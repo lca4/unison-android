@@ -7,7 +7,6 @@ import android.util.Log;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
@@ -21,7 +20,6 @@ import java.net.URL;
  */
 public class UnisonAPI {
 
-    @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.UnisonAPI";
 
     // TODO: revert to production server (make it a preference?).
@@ -98,6 +96,7 @@ public class UnisonAPI {
     
     public void joinProtectedGroup(long uid, long gid,
             String password, Handler<JsonStruct.Success> handler) {
+        Log.d(TAG, "joining group protected and using password: " + password);
         URL url = urlFor("/users/%d/group", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
         .addParam("gid", gid)

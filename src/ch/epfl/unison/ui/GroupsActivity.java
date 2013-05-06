@@ -520,7 +520,8 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
         long uid = AppData.getInstance(GroupsActivity.this).getUid();
         
-        UnisonAPI.Handler<JsonStruct.Success> handler = new UnisonAPI.Handler<JsonStruct.Success>() {
+        UnisonAPI.Handler<JsonStruct.Success> handler = 
+                new UnisonAPI.Handler<JsonStruct.Success>() {
 
             @Override
             public void callback(Success struct) {
