@@ -68,6 +68,7 @@ public abstract class UnisonMenu {
                 // logged in.
                 activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
                 break;
+<<<<<<< HEAD
             case R.id.menu_item_manage_group:
                 if (activity instanceof MainActivity && ((MainActivity) activity).getDJ()) {
                     // TODO is it a problem if we call this here?
@@ -75,6 +76,9 @@ public abstract class UnisonMenu {
                 }
                 break;
             case android.R.id.home:
+=======
+            case R.id.home:
+>>>>>>> 748536526c6bc76e391be851229abe0822ab89e3
                 // app icon in Action Bar clicked; go home
                 activity.startActivity(new Intent(activity, GroupsActivity.class)
                         .setAction(GroupsActivity.ACTION_LEAVE_GROUP)

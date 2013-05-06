@@ -1,4 +1,4 @@
-package ch.epfl.unison;
+package ch.epfl.unison.data;
 
 /**
  * Simple POJO used to store, compare and process a track. It is represented

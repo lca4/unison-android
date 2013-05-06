@@ -6,9 +6,9 @@ import android.os.Handler;
 import android.util.Log;
 
 import ch.epfl.unison.AppData;
-import ch.epfl.unison.MusicItem;
 import ch.epfl.unison.api.JsonStruct.TracksList;
 import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.MusicItem;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;

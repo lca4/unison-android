@@ -1,17 +1,22 @@
+
 package ch.epfl.unison.api;
 
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * Java interface to the Unison RESTful HTTP API.
- *
+ * 
  * @author lum
  */
 public class UnisonAPI {
@@ -29,18 +34,21 @@ public class UnisonAPI {
     private String mAuth;
 
     /** No-args constructor for use without authentication. */
-    public UnisonAPI() { }
+    public UnisonAPI() {
+    }
 
     public UnisonAPI(String email, String password) {
         setAuth(email, password);
     }
 
     public UnisonAPI setAuth(String email, String password) {
-        // It is safe to call getBytes without charset, as the default (on Android) is UTF-8.
+        // It is safe to call getBytes without charset, as the default (on
+        // Android) is UTF-8.
         String encEmail = Base64.encodeToString(email.getBytes(), Base64.NO_WRAP);
         String encPassword = Base64.encodeToString(password.getBytes(), Base64.NO_WRAP);
 
-        // At this point, it should be encoded using ISO-8859-1, but the string is ASCII anyways.
+        // At this point, it should be encoded using ISO-8859-1, but the string
+        // is ASCII anyways.
         mAuth = Base64.encodeToString((encEmail + ':' + encPassword).getBytes(), Base64.NO_WRAP);
         return this;
     }
@@ -224,24 +232,6 @@ public class UnisonAPI {
                 .addParam("artist", artist).addParam("title", title)
                 .addParam("rating", rating).doPOST();
     }
-    
-    public void createPlaylist(String name, Handler<JsonStruct.PlaylistsList> handler) {
-        URL url = urlFor("/playlist");
-        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .addParam("name", name).setAuth(mAuth).doPOST();
-        //TODO adapt
-    }
-    
-    public void listPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
-        URL url = urlFor("/playlists");
-        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
-                .setAuth(mAuth).doGET();
-    }
-    
-    public void generatePlaylist(String type, String seed) {
-//        URL url = urlFor("/playlist");
-        
-    }
 
     private static URL urlFor(String suffix, Object... objects) {
         try {
@@ -251,9 +241,45 @@ public class UnisonAPI {
         }
     }
 
+    /*
+     * Solo mode
+     */
+
+    // ---------------
+    // PLAYLISTS
+    
+    public void generatePlaylist(long uid, JSONObject seeds, JSONObject options,
+            Handler<JsonStruct.PlaylistsList> handler) {
+        Log.i(TAG, "Ready to get!");
+        if (seeds != null) {
+            URL url = urlFor("/solo/%d/playlist", uid);
+            AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                    .setAuth(mAuth).addParam("seeds", seeds).addParam("options", options).doPOST();
+        } else {
+            throw new IllegalArgumentException();
+        }
+            
+    }
+
+    public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
+        URL url = urlFor("/solo/%d/playlists", uid);
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+                .setAuth(mAuth).doGET();
+    }
+
+    // ---------------
+    // TAGS
+    
+    public void listTags(long uid, Handler<JsonStruct.TagsList> handler) {
+        URL url = urlFor("/solo/tags", uid);
+        AsyncRequest.of(url, handler, JsonStruct.TagsList.class)
+                .setAuth(mAuth).doGET();
+    }
+
     /** Simple interface for async calls. */
     public interface Handler<S> {
         void callback(S struct);
+
         void onError(Error error);
     }
 

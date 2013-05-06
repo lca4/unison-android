@@ -6,8 +6,12 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 
 /**
  * Small utilities needed here and there.
@@ -38,6 +42,31 @@ public final class Uutils {
 
     public static void setBitmapFromURL(ImageView image, String url) {
         new BitmapFromURL(image, url).execute();
+    }
+    
+    public static JSONObject merge(JSONObject json1, JSONObject json2) {
+        JSONObject merged = new JSONObject();
+        if (json1 == null && json2 == null) {
+            return null;
+        } else if (json1 == null) {
+            return json2;
+        } else if (json2 == null) {
+            return json1;
+        }
+        JSONObject[] objs = new JSONObject[] { json1, json2 };
+        for (JSONObject obj : objs) {
+            Iterator<String> it = obj.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                try {
+                    merged.put(key, obj.get(key));
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    Log.i(TAG, e.getMessage());
+                }
+            }
+        }
+        return merged;
     }
 
     /**

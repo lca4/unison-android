@@ -67,7 +67,7 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
         }
     };
 
-    private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
+    private Set<OnPlaylistInfoListener> mListeners = new HashSet<OnPlaylistInfoListener>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -193,21 +193,21 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
     }
 
     /** Simple interface to be notified about group info updates. */
-    public interface OnGroupInfoListener {
-        void onGroupInfo(JsonStruct.Group groupInfo);
+    public interface OnPlaylistInfoListener {
+        void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
     }
 
-    public void dispatchGroupInfo(JsonStruct.Group groupInfo) {
-        for (OnGroupInfoListener listener : mListeners) {
-            listener.onGroupInfo(groupInfo);
+    public void dispatchPlaylistInfo(JsonStruct.PlaylistJS playlistInfo) {
+        for (OnPlaylistInfoListener listener : mListeners) {
+            listener.onPlaylistInfo(playlistInfo);
         }
     }
 
-    public void registerGroupInfoListener(OnGroupInfoListener listener) {
+    public void registerPlaylistInfoListener(OnPlaylistInfoListener listener) {
         mListeners.add(listener);
     }
 
-    public void unregisterGroupInfoListener(OnGroupInfoListener listener) {
+    public void unregisterPlaylistInfoListener(OnPlaylistInfoListener listener) {
         mListeners.remove(listener);
     }
 

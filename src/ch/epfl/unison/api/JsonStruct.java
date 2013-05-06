@@ -1,10 +1,16 @@
+
 package ch.epfl.unison.api;
 
+import ch.epfl.unison.data.TagItem;
+import ch.epfl.unison.Playlist;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * POJOs for JSON serialization / deserialization.
- *
+ * 
  * @author lum
  */
 public abstract class JsonStruct {
@@ -31,7 +37,7 @@ public abstract class JsonStruct {
         public String password;
         public Long gid;
         public Integer score;
-        public Boolean predicted;  // or isPredicted?
+        public Boolean predicted; // or isPredicted?
     }
     
     /** Cluster as used on the server to regroup users. */
@@ -64,7 +70,8 @@ public abstract class JsonStruct {
         public Integer localId;
         public Integer rating;
 
-        public Track() { }
+        public Track() {
+        }
 
         public Track(int id, String a, String t) {
             localId = id;
@@ -86,8 +93,8 @@ public abstract class JsonStruct {
         /**
 		 * 
 		 */
-		private static final long serialVersionUID = 1L;
-		public Long gid;
+        private static final long serialVersionUID = 1L;
+        public Long gid;
         public String name;
         public Track track;
         public Float distance;
@@ -118,27 +125,71 @@ public abstract class JsonStruct {
         public String type;
         public Track entry;
 
-        public Delta() { }
+        public Delta() {
+        }
 
         public Delta(String t, int localId, String artist, String title) {
             this.type = t;
             this.entry = new Track(localId, artist, title);
         }
     }
-    
-    /** Information about a playlist (used in both directions). */
-    public static class Playlist extends JsonStruct {
 
-        public Long plid;
-        public String name;
-        //TODO complete
+    /** Information about a playlist (used in both directions). */
+    public static class PlaylistJS extends JsonStruct {
+
+        public int gsPlaylistId;
+        public String title;
+        public Calendar created;
+        public Calendar updated;
+        public String image; // Not used for now
+        public Integer authorId;
+        // public String authorName; //TODO
         public Integer size;
+        public Track[] tracks;
+        public Integer rating;
+        public String comment;
         public Integer listeners;
+        public Double avgRating;
+        public Boolean shared;
+        public Boolean synced;
+
+        public Playlist toObject() {
+            // TODO complete
+            return new Playlist.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
+                    .size(size).build();
+        }
+
     }
 
-    /** List of groups. */
+    /** List of playlists. */
     public static class PlaylistsList extends JsonStruct {
 
-        public Playlist[] playlists;
+        public PlaylistJS[] playlists;
+
+        public ArrayList<Playlist> toObject() {
+            ArrayList<Playlist> al = new ArrayList<Playlist>();
+            for (int i = 0; i < playlists.length; i++) {
+                al.add(playlists[i].toObject());
+            }
+            return al;
+        }
+    }
+
+    /** Information about a tag (used in both directions). */
+    public static class Tag extends JsonStruct {
+
+        // public int tid;
+        public String name;
+        public Long refId;
+
+        public TagItem getTagItem() {
+            return new TagItem(name, refId);
+        }
+    }
+
+    /** List of tags. */
+    public static class TagsList extends JsonStruct {
+
+        public Tag[] tags;
     }
 }

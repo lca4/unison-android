@@ -24,11 +24,11 @@ import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.LibraryHelper;
-import ch.epfl.unison.MusicItem;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.MusicItem;
 
 import com.actionbarsherlock.app.SherlockActivity;
 

@@ -3,6 +3,7 @@ package ch.epfl.unison.music;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.MainActivity;
 
@@ -68,6 +70,9 @@ public class MusicService extends Service
     }
     private AudioFocus mFocus = AudioFocus.NoFocusNoDuck;
 
+    private String mTrackBeingPlayed = "Group Streamer"; //should always be updated before displayed
+
+    
     @Override
     public void onCreate() {
         mFocusHelper = new AudioFocusHelper(getApplicationContext(), this);
@@ -86,6 +91,11 @@ public class MusicService extends Service
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        CharSequence cs = intent.getCharSequenceExtra(Const.Strings.SONG_ARTIST_TITLE);
+        if (cs != null) {
+           mTrackBeingPlayed = cs.toString(); 
+        }
+        
         String action = intent.getAction();
         if (action.equals(ACTION_TOGGLE_PLAYBACK)) {
             toggle();
@@ -103,7 +113,7 @@ public class MusicService extends Service
     }
 
     private void toggle() {
-        Log.i(TAG, "blablablablabl");
+        Log.i(TAG, "PLAY/PAUSE button pressed");
         if (mState == State.Paused) {
             play();
         } else if (mState == State.Playing) {
@@ -112,7 +122,7 @@ public class MusicService extends Service
     }
 
     private void load(Intent intent) {
-        Log.i(TAG, "doodlelidoo");
+        Log.i(TAG, "loading track");
         mState = State.Stopped;
         relaxResources(false);
         tryToGetAudioFocus();
@@ -128,7 +138,8 @@ public class MusicService extends Service
             // Calls OnPreparedListener when ready.
             mMediaPlayer.prepareAsync();
 
-            setUpAsForeground("Unison"); // TODO Change notification text.
+            //setUpAsForeground("Unison"); // TODO Change notification text.
+            setUpAsForeground(mTrackBeingPlayed); 
         } catch (IOException ioe) {
             Log.e(TAG, "Couldn't load resource.");
         }
@@ -137,7 +148,8 @@ public class MusicService extends Service
     private void play() {
         if (mState == State.Paused) {
             tryToGetAudioFocus();
-            setUpAsForeground("Unison"); // TODO Change notification text
+//            setUpAsForeground("Unison"); // TODO Change notification text
+            setUpAsForeground(mTrackBeingPlayed);
             mState = State.Playing;
             configAndStartMediaPlayer();
         }
@@ -205,6 +217,7 @@ public class MusicService extends Service
     }
 
     private void setUpAsForeground(String text) {
+        Context context = getApplicationContext();
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -212,7 +225,7 @@ public class MusicService extends Service
         mNotification.tickerText = text;
         mNotification.icon = R.drawable.ic_media_play;
         mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
-        mNotification.setLatestEventInfo(getApplicationContext(), "Unison",
+        mNotification.setLatestEventInfo(context,  context.getString(R.string.app_name),
                 text, pi);
         startForeground(NOTIFICATION_ID, mNotification);
     }

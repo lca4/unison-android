@@ -52,8 +52,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
-    //Distance treshold in meters.
-    private static final double MAX_DISTANCE = 1000;
+    //Distance threshold between the user and the automatic group in meters.
+    private static final double MAX_DISTANCE = 2000;
     
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
@@ -116,6 +116,8 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private void handleExtras(Bundle extras) {
         if (extras == null || !extras.containsKey(Const.Strings.GROUP)) {
             // Should never happen. If it does, redirect the user to the groups list.
+            Log.d(TAG, "Tried creating mainActivity"
+                    + " without coming from groupsActivity! Going to close");
             startActivity(new Intent(this, GroupsActivity.class));
             finish();
         } else {
@@ -168,12 +170,13 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     
     private void autoLeave() {
         AppData data = AppData.getInstance(this);
-        if (data.getLocation() != null 
+        Location currentLoc = data.getLocation();
+        if (currentLoc != null 
                 && mGroup.lat != null 
                 && mGroup.lon != null 
                 && mGroup.automatic) {
-            double lat = data.getLocation().getLatitude();
-            double lon = data.getLocation().getLongitude();
+            double lat = currentLoc.getLatitude();
+            double lon = currentLoc.getLongitude();
             float[] res = new float[1];
             
             Location.distanceBetween(mGroup.lat, mGroup.lon, lat, lon, res);

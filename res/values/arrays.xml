@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="seedtypes">
+        <item>Tags</item>
+        <item>Tracks</item>
+    </array>
+
+    <array name="tags">
+        <item>Pop</item>
+        <item>Rock</item>
+        <item>Electro</item>
+        <item>Metal</item>
+        <item>Classic</item>
+    </array>
+</resources>

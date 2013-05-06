@@ -14,6 +14,7 @@ import android.util.Log;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.data.MusicItem;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -124,8 +125,10 @@ public class LibraryService extends Service {
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
             }
+            if (!cur.isClosed()) {
+                cur.close();
+            }
 
-            cur.close();
             return set;
         }
     }

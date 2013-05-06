@@ -300,6 +300,9 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 R.layout.group_suggestion_user_row, 
                 R.id.group_suggestion_username, mSuggestion.users);
         userView.setAdapter(userAdapter);
+        userView.setSelector(android.R.color.transparent);
+      //this is a bit too much, the user cannot scroll the list anymore
+//        userView.setEnabled(false); //this is a bit too much, the user cannot scroll the list anymore
         
         mSuggestionClick = 
                 new DialogInterface.OnClickListener() {
