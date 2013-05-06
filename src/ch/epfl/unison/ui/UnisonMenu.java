@@ -74,7 +74,7 @@ public abstract class UnisonMenu {
                     ((MainActivity) activity).displayPasswordDialog();
                 }
                 break;
-            case android.R.id.home:
+            case android.R.id.home: // if using home button from menu: R.id.home 
                 // app icon in Action Bar clicked; go home
                 activity.startActivity(new Intent(activity, GroupsActivity.class)
                         .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
