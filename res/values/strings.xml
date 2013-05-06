@@ -65,6 +65,9 @@
     <string name="groups_alert_newgroup_cancel">Cancel</string>
     <string name="groups_createBtn">Create group</string>
     <string name="groups_chooseGrp">or select one below :</string>
+    <string name="groups_password_dialog_title">Enter group password</string>
+    <string name="groups_password_OK">OK</string>
+    <string name="groups_password_cancel">Cancel</string>
 
     <!-- Single user mode -->
    	<string name="solo_playlists_helpdialog_title">Welcome</string>
@@ -78,6 +81,13 @@
     <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
     <string name="solo_playlists_createBtn">Create playlist</string>
     <string name="solo_playlists_choosePL">or select one below :</string>
+    
+    <!-- Main -->
+ 	<string name="main_set_password_title">Choose PIN</string>
+	<string name="main_password_hint">Group Password</string>
+	<string name="main_password_ok">OK</string>
+	<string name="main_password_cancel">Cancel</string>
+	<string name="main_success_setting_password">Successfully set Password</string>
 
     <!-- Player -->
     <string name="player_unknown">unknown</string>
@@ -121,6 +131,7 @@
 	<string name="history_delete_label">Delete History</string>
 
     <!-- Errors. -->
+    <string name="error_setting_password">Unable to set password</string>
     <string name="error_loading_groups">Unable to load the list of groups.</string>
     <string name="error_loading_playlists">Unable to load the list of playlists</string>
     <string name="error_joining_group">Unable to join the group.</string>

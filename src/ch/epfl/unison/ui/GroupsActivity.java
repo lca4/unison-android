@@ -10,6 +10,8 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -500,31 +502,88 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
-            UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
-            long uid = AppData.getInstance(GroupsActivity.this).getUid();
+            
             final JsonStruct.Group group = (JsonStruct.Group) view.getTag();
+            
+            if (group.password) {
+                promptForPassword(group);
+            } else {
+                joinGroup(group, null);
+            }
+        }
+    }
+    
+    private void joinGroup(final JsonStruct.Group group, String password) {
+        UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
+        long uid = AppData.getInstance(GroupsActivity.this).getUid();
+        
+        UnisonAPI.Handler<JsonStruct.Success> handler = new UnisonAPI.Handler<JsonStruct.Success>() {
 
-          //TODO modularize
-            api.joinGroup(uid, group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                @Override
-                public void callback(Success struct) {
-                	                	
-                    GroupsActivity.this.startActivity(
-                            new Intent(GroupsActivity.this, MainActivity.class)
-                            .putExtra(Const.Strings.GROUP, group));
+            @Override
+            public void callback(Success struct) {
+                                    
+                GroupsActivity.this.startActivity(
+                        new Intent(GroupsActivity.this, MainActivity.class)
+                        .putExtra(Const.Strings.GROUP, group));
+            }
+           
+            @Override
+            public void onError(Error error) {
+                Log.d(TAG, error.toString());
+                if (GroupsActivity.this != null) {
+                    Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
+                            Toast.LENGTH_LONG).show();
                 }
-               
+            }
+
+        };
+        if (group.password && password != null) {
+            api.joinProtectedGroup(uid, group.gid, password, handler);
+        } else {
+            api.joinGroup(uid, group.gid, handler);
+        }
+    }
+    
+    
+    private void promptForPassword(final JsonStruct.Group group) {
+        if (group.password) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
+            builder.setTitle(R.string.groups_password_dialog_title);
+            LayoutInflater layoutInflater = (LayoutInflater) 
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View dialogView = layoutInflater.inflate(R.layout.password_prompt_dialog, null);
+            builder.setView(dialogView);
+            final EditText password = (EditText) 
+                    dialogView.findViewById(R.id.groupPassword);           
+            DialogInterface.OnClickListener passwordClick = new DialogInterface.OnClickListener() {
                 @Override
-                public void onError(Error error) {
-                    Log.d(TAG, error.toString());
-                    if (GroupsActivity.this != null) {
-                        Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
-                                Toast.LENGTH_LONG).show();
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == Dialog.BUTTON_POSITIVE) {
+                        joinGroup(group, password.getText().toString());                  
                     }
                 }
-
-            });
+            };           
+            builder.setPositiveButton(getString(R.string.main_password_ok), passwordClick);
+            builder.setNegativeButton(getString(R.string.main_password_cancel), passwordClick);
+            final AlertDialog dialog = builder.create();
+            password.addTextChangedListener(new TextWatcher() {            
+             @Override
+             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                 dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                         .setEnabled(s.length() == AppData.getInstance(GroupsActivity.this)
+                                 .getGroupPasswordLength());
+             }            
+             @Override
+             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                 //Do nothing
+             }            
+             @Override
+             public void afterTextChanged(Editable arg0) {
+                 //Do nothing
+             }
+         });           
+            dialog.show();
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
         }
     }
 }

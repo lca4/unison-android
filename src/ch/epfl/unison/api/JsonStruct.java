@@ -94,6 +94,7 @@ public abstract class JsonStruct {
         public User master;
         public User[] users;
         public Integer nbUsers;
+        public boolean password = false;
         
         //Linked to automatic groups. We use default values for backwards compatibility.
         public boolean automatic = false;
