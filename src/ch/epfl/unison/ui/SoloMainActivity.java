@@ -53,12 +53,12 @@ public class SoloMainActivity extends UnisonFragmentActivity {
 //        }
 //    };
 
-    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
+//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            finish();
+//        }
+//    };
 
     private Set<OnPlaylistInfoListener> mListeners = new HashSet<OnPlaylistInfoListener>();
 
@@ -68,9 +68,10 @@ public class SoloMainActivity extends UnisonFragmentActivity {
         handleExtras(getIntent().getExtras());
         
         setReloadInterval(RELOAD_INTERVAL);
+        setTag(TAG);
 
         // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         // Set up the tabs & stuff.
         mViewPager = new ViewPager(this);
@@ -85,7 +86,7 @@ public class SoloMainActivity extends UnisonFragmentActivity {
         mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_player_fragment_title),
                 SoloPlayerFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_playlist_fragment_title),
-                SoloPlaylistFragment.class, null);
+                SoloTracksFragment.class, null);
     }
 
     private void handleExtras(Bundle extras) {

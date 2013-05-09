@@ -227,7 +227,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                             //using the history. This is in case of wrong automatic behavior.
                             group.automatic = false;
                             GroupsHistoryActivity.this.startActivity(
-                                    new Intent(GroupsHistoryActivity.this, MainActivity.class)
+                                    new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
                                     .putExtra(Const.Strings.GROUP, group));
                             finish();
                         }

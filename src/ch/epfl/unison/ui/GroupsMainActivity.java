@@ -1,20 +1,16 @@
 package ch.epfl.unison.ui;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
@@ -26,9 +22,6 @@ import ch.epfl.unison.api.UnisonAPI;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,36 +32,37 @@ import java.util.Set;
  *
  * @author lum
  */
-public class MainActivity extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
+public class GroupsMainActivity extends UnisonFragmentActivity { 
+//extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
-    private static final int INITIAL_DELAY = 500; // in ms.
+//    private static final int INITIAL_DELAY = 500; // in ms.
     //Distance threshold between the user and the automatic group in meters.
     private static final double MAX_DISTANCE = 2000;
     
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
-    private Menu mMenu;
+//    private Menu mMenu;
 
-    private boolean mIsForeground = false;
-    private Handler mHandler = new Handler();
-    private Runnable mUpdater = new Runnable() {
-        @Override
-        public void run() {
-            if (mIsForeground) {
-                onRefresh();
-                mHandler.postDelayed(this, RELOAD_INTERVAL);
-            }
-        }
-    };
+//    private boolean mIsForeground = false;
+//    private Handler mHandler = new Handler();
+//    private Runnable mUpdater = new Runnable() {
+//        @Override
+//        public void run() {
+//            if (mIsForeground) {
+//                onRefresh();
+//                mHandler.postDelayed(this, RELOAD_INTERVAL);
+//            }
+//        }
+//    };
 
-    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
+//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            finish();
+//        }
+//    };
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
@@ -85,9 +79,11 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         super.onCreate(savedInstanceState);
         handleExtras(getIntent().getExtras());
         
+        setReloadInterval(RELOAD_INTERVAL);
+        setTag(TAG);
 
         // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         // Set up the tabs & stuff.
         mViewPager = new ViewPager(this);
@@ -100,9 +96,9 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mTabsAdapter = new TabsAdapter(this, mViewPager);
         mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
-                PlayerFragment.class, null);
+                GroupsPlayerFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
-                StatsFragment.class, null);
+                GroupsStatsFragment.class, null);
     }
 
     private void handleExtras(Bundle extras) {
@@ -122,43 +118,43 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mIsForeground = true;
-        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        mIsForeground = true;
+//        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
+//    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mIsForeground = false;
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        mIsForeground = false;
+//    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mLogoutReceiver);
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterReceiver(mLogoutReceiver);
+//    }
 
-    public void repaintRefresh(boolean isRefreshing) {
-        if (mMenu == null) {
-            return;
-        }
-
-        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-        if (refreshItem != null) {
-            if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(
-                        R.layout.actionbar_indeterminate_progress, null);
-                refreshItem.setActionView(refreshView);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        }
-    }
+//    public void repaintRefresh(boolean isRefreshing) {
+//        if (mMenu == null) {
+//            return;
+//        }
+//
+//        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
+//        if (refreshItem != null) {
+//            if (isRefreshing) {
+//                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
+//                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                View refreshView = inflater.inflate(
+//                        R.layout.actionbar_indeterminate_progress, null);
+//                refreshItem.setActionView(refreshView);
+//            } else {
+//                refreshItem.setActionView(null);
+//            }
+//        }
+//    }
     
     private void autoLeave() {
         AppData data = AppData.getInstance(this);
@@ -192,9 +188,9 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             @Override
             public void callback(JsonStruct.Group struct) {
                 try {
-                    MainActivity.this.onGroupInfo(struct);
-                    MainActivity.this.dispatchGroupInfo(struct);
-                    MainActivity.this.repaintRefresh(false);
+                    GroupsMainActivity.this.onGroupInfo(struct);
+                    GroupsMainActivity.this.dispatchGroupInfo(struct);
+                    GroupsMainActivity.this.repaintRefresh(false);
                 } catch (NullPointerException e) {
                     Log.w(TAG, "group or activity is null?", e);
                 }
@@ -203,10 +199,10 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
             @Override
             public void onError(UnisonAPI.Error error) {
                 Log.d(TAG, error.toString());
-                if (MainActivity.this != null) {
-                    Toast.makeText(MainActivity.this, R.string.error_loading_info,
+                if (GroupsMainActivity.this != null) {
+                    Toast.makeText(GroupsMainActivity.this, R.string.error_loading_info,
                             Toast.LENGTH_LONG).show();
-                    MainActivity.this.repaintRefresh(false);
+                    GroupsMainActivity.this.repaintRefresh(false);
                 }
             }
 
@@ -217,16 +213,16 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
         setTitle(group.name);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mMenu = menu;
-        return UnisonMenu.onCreateOptionsMenu(this, menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        mMenu = menu;
+//        return UnisonMenu.onCreateOptionsMenu(this, menu);
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UnisonMenu.onOptionsItemSelected(this, this, item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        return UnisonMenu.onOptionsItemSelected(this, this, item);
+//    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -349,7 +345,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     
     public void setDJ(boolean dj) {
         mIsDj = dj;
-        mMenu.findItem(R.id.menu_item_manage_group).setVisible(dj);
+        getMenu().findItem(R.id.menu_item_manage_group).setVisible(dj);
     }
     
     public boolean getDJ() {

@@ -46,7 +46,7 @@ public abstract class UnisonMenu {
                 }
                 break;
             case R.id.menu_item_ratings:
-                activity.startActivity(new Intent(activity, RatingsActivity.class));
+                activity.startActivity(new Intent(activity, GroupsRatingsActivity.class));
                 break;
             case R.id.menu_item_prefs:
                 activity.startActivity(new Intent(activity, PrefsActivity.class));

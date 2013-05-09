@@ -22,7 +22,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  *
  * @author lum
  */
-public class SoloPlaylistFragment extends SherlockFragment 
+public class SoloTracksFragment extends SherlockFragment 
     implements SoloMainActivity.OnPlaylistInfoListener {
 
     @SuppressWarnings("unused")
@@ -71,14 +71,14 @@ public class SoloPlaylistFragment extends SherlockFragment
         public static final int ROW_LAYOUT = R.layout.track_row;
 
         public TracksAdapter(JsonStruct.PlaylistJS playlist) {
-            super(SoloPlaylistFragment.this.getActivity(), 0, playlist.tracks);
+            super(SoloTracksFragment.this.getActivity(), 0, playlist.tracks);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) SoloPlaylistFragment.this.getActivity()
+                LayoutInflater inflater = (LayoutInflater) SoloTracksFragment.this.getActivity()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }

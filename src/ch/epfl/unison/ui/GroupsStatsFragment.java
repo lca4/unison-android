@@ -23,7 +23,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  *
  * @author lum
  */
-public class StatsFragment extends SherlockFragment implements MainActivity.OnGroupInfoListener {
+public class GroupsStatsFragment extends SherlockFragment implements GroupsMainActivity.OnGroupInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
@@ -35,7 +35,7 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnGr
     private ListView mUsersList;
     private TextView mTrackTitle;
 
-    private MainActivity mActivity;
+    private GroupsMainActivity mActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +59,7 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnGr
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (MainActivity) activity;
+        mActivity = (GroupsMainActivity) activity;
         mActivity.registerGroupInfoListener(this);
     }
 
@@ -75,14 +75,14 @@ public class StatsFragment extends SherlockFragment implements MainActivity.OnGr
         public static final int ROW_LAYOUT = R.layout.stats_row;
 
         public StatsAdapter(JsonStruct.Group group) {
-            super(StatsFragment.this.getActivity(), 0, group.users);
+            super(GroupsStatsFragment.this.getActivity(), 0, group.users);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) StatsFragment.this.getActivity()
+                LayoutInflater inflater = (LayoutInflater) GroupsStatsFragment.this.getActivity()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }

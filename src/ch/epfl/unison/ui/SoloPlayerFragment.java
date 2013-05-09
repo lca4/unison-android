@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -37,28 +38,29 @@ import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.music.MusicService;
 import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). It contains
  * the UI of the music player (media player buttons, cover art, ...).
- *
- * @author lum
+ * 
+ * @author marc
  */
-public class SoloPlayerFragment extends SherlockFragment implements
-        OnClickListener, SoloMainActivity.OnPlaylistInfoListener {
+public class SoloPlayerFragment extends UnisonPlayerFragment
+        implements SoloMainActivity.OnPlaylistInfoListener {
+    // extends SherlockFragment implements OnClickListener,
+    // SoloMainActivity.OnPlaylistInfoListener {
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000; // In milliseconds.
-    private static final int UPDATE_INTERVAL = 1000;  // In milliseconds.
-    private static final int SEEK_BAR_MAX = 100;  // mSeekBar goes from 0 to SEEK_BAR_MAX.
+    private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
+    private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to
+                                                 // SEEK_BAR_MAX.
 
     private SoloMainActivity mActivity;
 
-//    private Button mDjBtn;
+    // private Button mDjBtn;
     private Button mRatingBtn;
     private Button mToggleBtn;
     private Button mNextBtn;
@@ -85,6 +87,7 @@ public class SoloPlayerFragment extends SherlockFragment implements
     private enum Status {
         Stopped, Playing, Paused
     }
+
     private Status mStatus = Status.Stopped;
 
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
@@ -108,7 +111,8 @@ public class SoloPlayerFragment extends SherlockFragment implements
         mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) { }
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
+            }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -138,8 +142,8 @@ public class SoloPlayerFragment extends SherlockFragment implements
         mNextBtn.setOnClickListener(this);
         mPrevBtn = (Button) v.findViewById(R.id.musicPrevBtn);
         mPrevBtn.setOnClickListener(this);
-//        mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
-//        mDjBtn.setOnClickListener(this);
+        // mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
+        // mDjBtn.setOnClickListener(this);
         mRatingBtn = (Button) v.findViewById(R.id.ratingBtn);
         mRatingBtn.setOnClickListener(new OnRatingClickListener());
 
@@ -162,7 +166,7 @@ public class SoloPlayerFragment extends SherlockFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = (SoloMainActivity) activity;
-//        mActivity.registerGroupInfoListener(this);
+        // mActivity.registerGroupInfoListener(this);
         mActivity.registerReceiver(mCompletedReceiver,
                 new IntentFilter(MusicService.ACTION_COMPLETED));
     }
@@ -170,7 +174,7 @@ public class SoloPlayerFragment extends SherlockFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-//        mActivity.unregisterGroupInfoListener(this);
+        // mActivity.unregisterGroupInfoListener(this);
         mActivity.unregisterReceiver(mCompletedReceiver);
     }
 
@@ -181,7 +185,7 @@ public class SoloPlayerFragment extends SherlockFragment implements
         if (!mIsDJ) {
             // Just to make sure, when the activity is recreated.
             mButtons.setVisibility(View.INVISIBLE);
-//            mDjBtn.setText(getString(R.string.player_become_dj));
+            // mDjBtn.setText(getString(R.string.player_become_dj));
             mSeekBar.setVisibility(View.INVISIBLE);
         } else {
             mSeekBar.setVisibility(View.VISIBLE);
@@ -209,35 +213,35 @@ public class SoloPlayerFragment extends SherlockFragment implements
         getActivity().startService(new Intent(MusicService.ACTION_STOP));
     }
 
-//    @Override
-//    public void onGroupInfo(JsonStruct.Group groupInfo) {
-//        // Check that we're consistent with respect to the DJ position.
-//        Long uid = AppData.getInstance(mActivity).getUid();
-//        if (!mIsDJ && groupInfo.master != null
-//                && uid.equals(groupInfo.master.uid)) {
-//            setDJ(true);
-//        } else if (mIsDJ
-//                && (groupInfo.master == null || !uid
-//                        .equals(groupInfo.master.uid))) {
-//            setDJ(false);
-//        }
-//
-//        // Update track information.
-//        if (groupInfo.track != null) {
-//            mArtistTxt.setText(groupInfo.track.artist);
-//            mTitleTxt.setText(groupInfo.track.title);
-//            mCurrentTrack = new MusicItem(-1, groupInfo.track.artist,
-//                    groupInfo.track.title);
-//            if (groupInfo.track.image != null) {
-//                Uutils.setBitmapFromURL(mCoverImg, groupInfo.track.image);
-//            } else {
-//                mCoverImg.setImageResource(R.drawable.cover);
-//            }
-//        } else {
-//            mCurrentTrack = null;
-//            mCoverImg.setImageResource(R.drawable.cover);
-//        }
-//    }
+    // @Override
+    // public void onGroupInfo(JsonStruct.Group groupInfo) {
+    // // Check that we're consistent with respect to the DJ position.
+    // Long uid = AppData.getInstance(mActivity).getUid();
+    // if (!mIsDJ && groupInfo.master != null
+    // && uid.equals(groupInfo.master.uid)) {
+    // setDJ(true);
+    // } else if (mIsDJ
+    // && (groupInfo.master == null || !uid
+    // .equals(groupInfo.master.uid))) {
+    // setDJ(false);
+    // }
+    //
+    // // Update track information.
+    // if (groupInfo.track != null) {
+    // mArtistTxt.setText(groupInfo.track.artist);
+    // mTitleTxt.setText(groupInfo.track.title);
+    // mCurrentTrack = new MusicItem(-1, groupInfo.track.artist,
+    // groupInfo.track.title);
+    // if (groupInfo.track.image != null) {
+    // Uutils.setBitmapFromURL(mCoverImg, groupInfo.track.image);
+    // } else {
+    // mCoverImg.setImageResource(R.drawable.cover);
+    // }
+    // } else {
+    // mCurrentTrack = null;
+    // mCoverImg.setImageResource(R.drawable.cover);
+    // }
+    // }
 
     @Override
     public void onClick(View v) {
@@ -252,10 +256,10 @@ public class SoloPlayerFragment extends SherlockFragment implements
         } else if (v == mPrevBtn) {
             prev();
         }
-//        } else if (v == mDjBtn) {
-//            Log.d(TAG, "Clicked DJ button");
-////            setDJ(!mIsDJ);
-//        }
+        // } else if (v == mDjBtn) {
+        // Log.d(TAG, "Clicked DJ button");
+        // // setDJ(!mIsDJ);
+        // }
     }
 
     private void seek(int progress) {
@@ -350,129 +354,129 @@ public class SoloPlayerFragment extends SherlockFragment implements
         mSeekBar.setMax(SEEK_BAR_MAX);
         updateProgressBar();
 
-        notifyPlay(item);  // Notify the server.
+        notifyPlay(item); // Notify the server.
     }
 
     private void notifyPlay(MusicItem item) {
         UnisonAPI api = AppData.getInstance(mActivity).getAPI();
-//        api.setCurrentTrack(mActivity.getGroupId(), item.artist,
-//                item.title, new UnisonAPI.Handler<JsonStruct.Success>() {
-//
-//                    @Override
-//                    public void callback(JsonStruct.Success struct) {
-//                        // Automatically refresh the content (in particular, to
-//                        // get the cover art).
-//                        mActivity.onRefresh();
-//                    }
-//
-//                    @Override
-//                    public void onError(Error error) {
-//                        Log.d(TAG, error.toString());
-//                        if (getActivity() != null) {
-//                            Toast.makeText(getActivity(),
-//                                    R.string.error_sending_track,
-//                                    Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//                });
+        // api.setCurrentTrack(mActivity.getGroupId(), item.artist,
+        // item.title, new UnisonAPI.Handler<JsonStruct.Success>() {
+        //
+        // @Override
+        // public void callback(JsonStruct.Success struct) {
+        // // Automatically refresh the content (in particular, to
+        // // get the cover art).
+        // mActivity.onRefresh();
+        // }
+        //
+        // @Override
+        // public void onError(Error error) {
+        // Log.d(TAG, error.toString());
+        // if (getActivity() != null) {
+        // Toast.makeText(getActivity(),
+        // R.string.error_sending_track,
+        // Toast.LENGTH_LONG).show();
+        // }
+        // }
+        // });
     }
 
     private void notifySkip() {
         UnisonAPI api = AppData.getInstance(mActivity).getAPI();
-//        api.skipTrack(mActivity.getGroupId(),
-//                new UnisonAPI.Handler<JsonStruct.Success>() {
-//                    @Override
-//                    public void callback(JsonStruct.Success struct) {
-//                    }
-//
-//                    @Override
-//                    public void onError(Error error) {
-//                        Log.d(TAG, error.toString());
-//                    }
-//                });
+        // api.skipTrack(mActivity.getGroupId(),
+        // new UnisonAPI.Handler<JsonStruct.Success>() {
+        // @Override
+        // public void callback(JsonStruct.Success struct) {
+        // }
+        //
+        // @Override
+        // public void onError(Error error) {
+        // Log.d(TAG, error.toString());
+        // }
+        // });
     }
 
-//    /** Don't call this directly. Call setDJ() instead. */
-//    private void grabDJSeat() {
-//        final long gid = ((MainActivity) getActivity()).getGroupId();
-//        AppData data = AppData.getInstance(getActivity());
-//        double lat, lon;
-//        if (data.getLocation() != null) {
-//            lat = data.getLocation().getLatitude();
-//            lon = data.getLocation().getLongitude();
-//        } else {
-//            lat = DEFAULT_LATITUDE;
-//            lon = DEFAULT_LONGITUDE;
-//            Log.i(TAG, "location was null, using default values");
-//        }
-//
-//        data.getAPI().becomeMaster(gid, data.getUid(), lat, lon,
-//                new UnisonAPI.Handler<JsonStruct.Success>() {
-//
-//                    @Override
-//                    public void callback(Success structure) {
-//                        mDjBtn.setText(getString(R.string.player_leave_dj));
-//                        mToggleBtn.setBackgroundResource(R.drawable.btn_play);
-//                        mButtons.setVisibility(View.VISIBLE);
-//                        mSeekBar.setVisibility(View.VISIBLE);
-//                        mSeekBar.setEnabled(true);
-//                        mTrackQueue = new TrackQueue(getActivity(), gid).start();
-//                    }
-//
-//                    @Override
-//                    public void onError(Error error) {
-//                        Log.d(TAG, error.toString());
-//                        if (getActivity() != null) {
-//                            Toast.makeText(getActivity(),
-//                                    R.string.error_becoming_dj, Toast.LENGTH_LONG).show();
-//                        }
-//                        SoloPlayerFragment.this.setDJ(false);
-//                    }
-//                });
-//    }
+    // /** Don't call this directly. Call setDJ() instead. */
+    // private void grabDJSeat() {
+    // final long gid = ((MainActivity) getActivity()).getGroupId();
+    // AppData data = AppData.getInstance(getActivity());
+    // double lat, lon;
+    // if (data.getLocation() != null) {
+    // lat = data.getLocation().getLatitude();
+    // lon = data.getLocation().getLongitude();
+    // } else {
+    // lat = DEFAULT_LATITUDE;
+    // lon = DEFAULT_LONGITUDE;
+    // Log.i(TAG, "location was null, using default values");
+    // }
+    //
+    // data.getAPI().becomeMaster(gid, data.getUid(), lat, lon,
+    // new UnisonAPI.Handler<JsonStruct.Success>() {
+    //
+    // @Override
+    // public void callback(Success structure) {
+    // mDjBtn.setText(getString(R.string.player_leave_dj));
+    // mToggleBtn.setBackgroundResource(R.drawable.btn_play);
+    // mButtons.setVisibility(View.VISIBLE);
+    // mSeekBar.setVisibility(View.VISIBLE);
+    // mSeekBar.setEnabled(true);
+    // mTrackQueue = new TrackQueue(getActivity(), gid).start();
+    // }
+    //
+    // @Override
+    // public void onError(Error error) {
+    // Log.d(TAG, error.toString());
+    // if (getActivity() != null) {
+    // Toast.makeText(getActivity(),
+    // R.string.error_becoming_dj, Toast.LENGTH_LONG).show();
+    // }
+    // SoloPlayerFragment.this.setDJ(false);
+    // }
+    // });
+    // }
 
-//    /** Don't call this directly. Call setDJ() instead. */
-//    private void dropDJSeat() {
-//        final long gid = ((MainActivity) getActivity()).getGroupId();
-//        AppData data = AppData.getInstance(getActivity());
-//
-//        if (mTrackQueue != null) {
-//            mTrackQueue.stop();
-//        }
-//        data.getAPI().resignMaster(gid, data.getUid(),
-//                new UnisonAPI.Handler<JsonStruct.Success>() {
-//
-//                    @Override
-//                    public void callback(Success structure) {
-//                        mDjBtn.setText(getString(R.string.player_become_dj));
-//                        mButtons.setVisibility(View.INVISIBLE);
-//                        mSeekBar.setVisibility(View.INVISIBLE);
-//                        mSeekBar.setEnabled(false);
-//
-//                        getActivity().startService(
-//                                new Intent(MusicService.ACTION_STOP));
-//                        mStatus = Status.Stopped;
-//                    }
-//
-//                    @Override
-//                    public void onError(Error error) {
-//                        Log.d(TAG, error.toString());
-//                    }
-//                });
-//    }
+    // /** Don't call this directly. Call setDJ() instead. */
+    // private void dropDJSeat() {
+    // final long gid = ((MainActivity) getActivity()).getGroupId();
+    // AppData data = AppData.getInstance(getActivity());
+    //
+    // if (mTrackQueue != null) {
+    // mTrackQueue.stop();
+    // }
+    // data.getAPI().resignMaster(gid, data.getUid(),
+    // new UnisonAPI.Handler<JsonStruct.Success>() {
+    //
+    // @Override
+    // public void callback(Success structure) {
+    // mDjBtn.setText(getString(R.string.player_become_dj));
+    // mButtons.setVisibility(View.INVISIBLE);
+    // mSeekBar.setVisibility(View.INVISIBLE);
+    // mSeekBar.setEnabled(false);
+    //
+    // getActivity().startService(
+    // new Intent(MusicService.ACTION_STOP));
+    // mStatus = Status.Stopped;
+    // }
+    //
+    // @Override
+    // public void onError(Error error) {
+    // Log.d(TAG, error.toString());
+    // }
+    // });
+    // }
 
-//    private void setDJ(boolean wantsToBeDJ) {
-//        if (wantsToBeDJ) {
-//            grabDJSeat();
-//        } else {
-//            dropDJSeat();
-//        }
-//        mIsDJ = wantsToBeDJ;
-//    }
+    // private void setDJ(boolean wantsToBeDJ) {
+    // if (wantsToBeDJ) {
+    // grabDJSeat();
+    // } else {
+    // dropDJSeat();
+    // }
+    // mIsDJ = wantsToBeDJ;
+    // }
 
     /**
-     * Handles instant ratings (when the user clicks on the rating button in
-     * the player interface).
+     * Handles instant ratings (when the user clicks on the rating button in the
+     * player interface).
      */
     private class OnRatingClickListener implements OnClickListener {
 
@@ -481,20 +485,21 @@ public class SoloPlayerFragment extends SherlockFragment implements
                     item.artist, item.title, rating));
 
             UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
-//            api.instantRate(mActivity.getGroupId(), item.artist, item.title, rating,
-//                    new UnisonAPI.Handler<JsonStruct.Success>() {
-//                        @Override
-//                        public void callback(JsonStruct.Success struct) { }
-//
-//                        @Override
-//                        public void onError(Error error) {
-//                            Log.d(TAG, error.toString());
-//                            if (getActivity() != null) {
-//                                Toast.makeText(getActivity(),
-//                                        R.string.error_sending_rating, Toast.LENGTH_LONG).show();
-//                            }
-//                        }
-//                    });
+            // api.instantRate(mActivity.getGroupId(), item.artist, item.title,
+            // rating,
+            // new UnisonAPI.Handler<JsonStruct.Success>() {
+            // @Override
+            // public void callback(JsonStruct.Success struct) { }
+            //
+            // @Override
+            // public void onError(Error error) {
+            // Log.d(TAG, error.toString());
+            // if (getActivity() != null) {
+            // Toast.makeText(getActivity(),
+            // R.string.error_sending_rating, Toast.LENGTH_LONG).show();
+            // }
+            // }
+            // });
         }
 
         @Override
@@ -531,7 +536,10 @@ public class SoloPlayerFragment extends SherlockFragment implements
         }
     }
 
-    /** Listens to broadcasts from the media player indicating when a track is over. */
+    /**
+     * Listens to broadcasts from the media player indicating when a track is
+     * over.
+     */
     private class TrackCompletedReceiver extends BroadcastReceiver {
 
         @Override
@@ -566,6 +574,6 @@ public class SoloPlayerFragment extends SherlockFragment implements
     @Override
     public void onPlaylistInfo(PlaylistJS playlistInfo) {
         // TODO Auto-generated method stub
-        
+
     }
 }

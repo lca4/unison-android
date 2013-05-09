@@ -113,6 +113,7 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
         super.onCreate(savedInstanceState);
         
         setReloadInterval(RELOAD_INTERVAL);
+        setTag(TAG);
 
         // This activity should finish on logout.
         registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));

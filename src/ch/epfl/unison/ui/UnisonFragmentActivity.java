@@ -16,13 +16,15 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 /**
+ * Provides some default behaviors.
+ * Not supposed to be instantiated directly, but to be extended.
  * 
  * @author marc
  *
  */
 public class UnisonFragmentActivity extends SherlockFragmentActivity implements OnRefreshListener {
     
-    private static final String TAG = "ch.epfl.unison.UnisonFragmentActivity";
+    private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
     private static int smReloadInterval;
     private boolean mIsForeground = false;
     private Menu mMenu;
@@ -39,6 +41,7 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
             }
         }
     };
+    
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -79,7 +82,7 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
     
     public void repaintRefresh(boolean isRefreshing) {
         if (mMenu == null) {
-            Log.d(TAG, "repaintRefresh: mMenu is null");
+            Log.d(smTag, "repaintRefresh: mMenu is null");
             return;
         }
 
@@ -95,25 +98,30 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
                 refreshItem.setActionView(null);
             }
         } else {
-            Log.d(TAG, "repaintRefresh: menu_item_refresh not found");
+            Log.d(smTag, "repaintRefresh: menu_item_refresh not found");
         }
     }
     
+    /**
+     * Default implementation.
+     * Should be overridden to suitable behavior.
+     * 
+     * Default implementation: repaintRefresh(true)
+     */
     @Override
     public void onRefresh() {
-        // TODO Auto-generated method stub
         repaintRefresh(true);
     }
 
-    public boolean isForeground() {
+    protected boolean isForeground() {
         return mIsForeground;
     }
 
-    public void setToForeground(boolean isForeground) {
+    protected void setToForeground(boolean isForeground) {
         this.mIsForeground = isForeground;
     }
 
-    public BroadcastReceiver getLogoutReceiver() {
+    protected BroadcastReceiver getLogoutReceiver() {
         return mLogoutReceiver;
     }
 
@@ -121,24 +129,32 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
 //        return RELOAD_INTERVAL;
 //    }
 
-    public Handler getHandler() {
+    protected Handler getHandler() {
         return mHandler;
     }
 
-    public static int getInitialDelay() {
+    protected static int getInitialDelay() {
         return INITIAL_DELAY;
     }
 
-    public static int getReloadInterval() {
+    protected static int getReloadInterval() {
         return smReloadInterval;
     }
 
-    public static void setReloadInterval(int reloadInterval) {
-        UnisonFragmentActivity.smReloadInterval = reloadInterval;
+    protected static void setReloadInterval(int reloadInterval) {
+        smReloadInterval = reloadInterval;
     }
 
-    public Runnable getUpdater() {
+    protected Runnable getUpdater() {
         return mUpdater;
+    }
+    
+    protected static void setTag(String tag) {
+        smTag = tag;
+    }
+    
+    protected Menu getMenu() {
+        return mMenu;
     }
 
 //    public void setUpdater(Runnable updater) {

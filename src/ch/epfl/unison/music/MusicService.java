@@ -18,7 +18,7 @@ import android.util.Log;
 
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
-import ch.epfl.unison.ui.MainActivity;
+import ch.epfl.unison.ui.GroupsMainActivity;
 
 import java.io.IOException;
 
@@ -219,7 +219,7 @@ public class MusicService extends Service
     private void setUpAsForeground(String text) {
         Context context = getApplicationContext();
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                new Intent(getApplicationContext(), MainActivity.class),
+                new Intent(getApplicationContext(), GroupsMainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         mNotification = new Notification();
         mNotification.tickerText = text;

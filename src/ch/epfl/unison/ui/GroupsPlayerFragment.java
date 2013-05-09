@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -41,30 +42,31 @@ import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.music.MusicService;
 import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). It contains
  * the UI of the music player (media player buttons, cover art, ...).
- *
+ * 
  * @author lum
  */
-public class PlayerFragment extends SherlockFragment implements
-        OnClickListener, MainActivity.OnGroupInfoListener {
+public class GroupsPlayerFragment extends UnisonPlayerFragment
+        implements GroupsMainActivity.OnGroupInfoListener {
+    // extends SherlockFragment implements OnClickListener,
+    // GroupsMainActivity.OnGroupInfoListener {
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000; // In milliseconds.
-    private static final int UPDATE_INTERVAL = 1000;  // In milliseconds.
-    private static final int SEEK_BAR_MAX = 100;  // mSeekBar goes from 0 to SEEK_BAR_MAX.
+    private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
+    private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to
+                                                 // SEEK_BAR_MAX.
 
     // EPFL Polydome.
     private static final double DEFAULT_LATITUDE = 46.52147800207456;
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
 
-    private MainActivity mActivity;
+    private GroupsMainActivity mActivity;
 
     private Button mDjBtn;
     private Button mRatingBtn;
@@ -93,6 +95,7 @@ public class PlayerFragment extends SherlockFragment implements
     private enum Status {
         Stopped, Playing, Paused
     }
+
     private Status mStatus = Status.Stopped;
 
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
@@ -116,7 +119,8 @@ public class PlayerFragment extends SherlockFragment implements
         mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) { }
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
+            }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -169,7 +173,7 @@ public class PlayerFragment extends SherlockFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (MainActivity) activity;
+        mActivity = (GroupsMainActivity) activity;
         mActivity.registerGroupInfoListener(this);
         mActivity.registerReceiver(mCompletedReceiver,
                 new IntentFilter(MusicService.ACTION_COMPLETED));
@@ -359,7 +363,7 @@ public class PlayerFragment extends SherlockFragment implements
         mSeekBar.setMax(SEEK_BAR_MAX);
         updateProgressBar();
 
-        notifyPlay(item);  // Notify the server.
+        notifyPlay(item); // Notify the server.
     }
 
     private void notifyPlay(MusicItem item) {
@@ -403,7 +407,7 @@ public class PlayerFragment extends SherlockFragment implements
 
     /** Don't call this directly. Call setDJ() instead. */
     private void grabDJSeat() {
-        final long gid = ((MainActivity) getActivity()).getGroupId();
+        final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
         AppData data = AppData.getInstance(getActivity());
         double lat, lon;
         if (data.getLocation() != null) {
@@ -435,14 +439,14 @@ public class PlayerFragment extends SherlockFragment implements
                             Toast.makeText(getActivity(),
                                     R.string.error_becoming_dj, Toast.LENGTH_LONG).show();
                         }
-                        PlayerFragment.this.setDJ(false);
+                        GroupsPlayerFragment.this.setDJ(false);
                     }
                 });
     }
 
     /** Don't call this directly. Call setDJ() instead. */
     private void dropDJSeat() {
-        final long gid = ((MainActivity) getActivity()).getGroupId();
+        final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
         AppData data = AppData.getInstance(getActivity());
 
         if (mTrackQueue != null) {
@@ -480,8 +484,8 @@ public class PlayerFragment extends SherlockFragment implements
     }
 
     /**
-     * Handles instant ratings (when the user clicks on the rating button in
-     * the player interface).
+     * Handles instant ratings (when the user clicks on the rating button in the
+     * player interface).
      */
     private class OnRatingClickListener implements OnClickListener {
 
@@ -493,7 +497,8 @@ public class PlayerFragment extends SherlockFragment implements
             api.instantRate(mActivity.getGroupId(), item.artist, item.title, rating,
                     new UnisonAPI.Handler<JsonStruct.Success>() {
                         @Override
-                        public void callback(JsonStruct.Success struct) { }
+                        public void callback(JsonStruct.Success struct) {
+                        }
 
                         @Override
                         public void onError(Error error) {
@@ -540,14 +545,17 @@ public class PlayerFragment extends SherlockFragment implements
         }
     }
 
-    /** Listens to broadcasts from the media player indicating when a track is over. */
+    /**
+     * Listens to broadcasts from the media player indicating when a track is
+     * over.
+     */
     private class TrackCompletedReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            PlayerFragment.this.mStatus = Status.Stopped;
+            GroupsPlayerFragment.this.mStatus = Status.Stopped;
             Log.i(TAG, "track has completed, send the next one.");
-            PlayerFragment.this.next();
+            GroupsPlayerFragment.this.next();
         }
 
     }
@@ -571,11 +579,11 @@ public class PlayerFragment extends SherlockFragment implements
             mHandler.postDelayed(this, UPDATE_INTERVAL);
         }
     };
-    
+
     public boolean getIsDj() {
         return mIsDJ;
     }
-    
+
     private void setIsDj(boolean isdj) {
         mIsDJ = isdj;
         mActivity.setDJ(isdj);

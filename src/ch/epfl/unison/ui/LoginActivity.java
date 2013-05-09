@@ -155,7 +155,7 @@ public class LoginActivity extends SherlockActivity {
     private void nextActivity(JsonStruct.User user) {
         if (user.gid != null) {
             // Directly go into group.
-            startActivity(new Intent(this, MainActivity.class)
+            startActivity(new Intent(this, GroupsMainActivity.class)
                     .putExtra(Const.Strings.GID, user.gid));
         } else {
             // Display list of groups.

@@ -44,7 +44,7 @@ import java.util.Map;
  *
  * @author lum
  */
-public class RatingsActivity extends SherlockActivity {
+public class GroupsRatingsActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.RatingsActivity";
 
@@ -118,8 +118,8 @@ public class RatingsActivity extends SherlockActivity {
             @Override
             public void onError(Error error) {
                 Log.d(TAG, error.toString());
-                if (RatingsActivity.this != null) {
-                    Toast.makeText(RatingsActivity.this, R.string.error_loading_ratings,
+                if (GroupsRatingsActivity.this != null) {
+                    Toast.makeText(GroupsRatingsActivity.this, R.string.error_loading_ratings,
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -157,11 +157,11 @@ public class RatingsActivity extends SherlockActivity {
 
         public static final int ROW_LAYOUT = R.layout.ratings_row;
 
-        private RatingsActivity mActivity;
+        private GroupsRatingsActivity mActivity;
 
         public RatingsAdapter(List<MusicItem> ratings) {
-            super(RatingsActivity.this, 0, ratings);
-            mActivity = RatingsActivity.this;
+            super(GroupsRatingsActivity.this, 0, ratings);
+            mActivity = GroupsRatingsActivity.this;
         }
 
         @Override
@@ -194,7 +194,7 @@ public class RatingsActivity extends SherlockActivity {
     private class OnChangeRatingListener implements OnItemClickListener {
 
         public void sendRating(final MusicItem item, final int rating, final int position) {
-            AppData data = AppData.getInstance(RatingsActivity.this);
+            AppData data = AppData.getInstance(GroupsRatingsActivity.this);
             data.getAPI().rate(data.getUid(), item.artist, item.title, rating,
                     new UnisonAPI.Handler<JsonStruct.Success>() {
 
@@ -207,8 +207,8 @@ public class RatingsActivity extends SherlockActivity {
                         @Override
                         public void onError(Error error) {
                             Log.d(TAG, error.toString());
-                            if (RatingsActivity.this != null) {
-                                Toast.makeText(RatingsActivity.this,
+                            if (GroupsRatingsActivity.this != null) {
+                                Toast.makeText(GroupsRatingsActivity.this,
                                         R.string.error_updating_rating,
                                         Toast.LENGTH_LONG).show();
                             }
@@ -225,12 +225,12 @@ public class RatingsActivity extends SherlockActivity {
             }
             final int oldRating = tempRating;
 
-            AlertDialog.Builder alert = new AlertDialog.Builder(RatingsActivity.this);
+            AlertDialog.Builder alert = new AlertDialog.Builder(GroupsRatingsActivity.this);
 
             alert.setTitle(item.title);
             alert.setMessage(getString(R.string.ratings_like));
 
-            LayoutInflater inflater = (LayoutInflater) RatingsActivity.this
+            LayoutInflater inflater = (LayoutInflater) GroupsRatingsActivity.this
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View layout = inflater.inflate(R.layout.rating_dialog, null);
             final RatingBar bar = (RatingBar) layout.findViewById(R.id.ratingBar);

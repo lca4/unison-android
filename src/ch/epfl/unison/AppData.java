@@ -14,7 +14,7 @@ import android.util.Pair;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.ui.GroupsActivity;
-import ch.epfl.unison.ui.MainActivity;
+import ch.epfl.unison.ui.GroupsMainActivity;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -224,7 +224,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         }
         if (c instanceof GroupsActivity) {
             sCurrentSpeed = FAST;
-        } else if (c instanceof MainActivity) {
+        } else if (c instanceof GroupsMainActivity) {
             sCurrentSpeed = MEDIUM;
         } else {
             sCurrentSpeed = SLOW;
