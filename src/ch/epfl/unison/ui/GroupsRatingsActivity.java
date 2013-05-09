@@ -29,6 +29,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
@@ -127,10 +128,12 @@ public class GroupsRatingsActivity extends SherlockActivity {
     }
 
     private void initItems() {
-        LibraryHelper helper = new LibraryHelper(this);
-        mItems = new ArrayList<MusicItem>(helper.getEntries());
+        UnisonDB db = new UnisonDB(this);
+        mItems = new ArrayList<MusicItem>(db.getMusicItems());
+//        LibraryHelper helper = new LibraryHelper(this);
+//        mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);
-        helper.close();
+//        helper.close();
     }
 
     private void refreshList() {

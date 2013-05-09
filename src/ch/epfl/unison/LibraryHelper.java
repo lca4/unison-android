@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.UnisonDB;
 
 import java.util.HashSet;
 import java.util.Set;

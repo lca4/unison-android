@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -292,7 +293,7 @@ public class UnisonDB {
 
         if (!exists(item)) {
             openW();
-            long newid = mDB.insert(Const.TAG_TABLE_NAME, null, values);
+            mDB.insert(Const.TAG_TABLE_NAME, null, values);
             close();
         }
     }
@@ -370,7 +371,7 @@ public class UnisonDB {
                 throw new IllegalArgumentException();
         }
         ContentValues values = new ContentValues();
-        Iterator it = items.entrySet().iterator();
+        Iterator<Entry<String, Integer>> it = items.entrySet().iterator();
         int index = 0;
         while (it.hasNext()) {
             if (checked[index]) {

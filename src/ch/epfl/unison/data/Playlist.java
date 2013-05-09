@@ -3,14 +3,7 @@ package ch.epfl.unison.data;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
-import com.google.gson.JsonNull;
-
 import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Track;
 
 import org.json.JSONArray;
@@ -49,7 +42,7 @@ public class Playlist {
     // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
     // TODO mRawTracks
-    private UnisonDB mDB;
+//    private UnisonDB mDB;
     private HashMap<String, Object> mOptions;
     
     private LinkedList<MusicItem> mPlaylist;   
@@ -210,8 +203,8 @@ public class Playlist {
     }
 
 
-    public void setTitle(String mTitle) {
-        this.mTitle = mTitle;
+    public void setTitle(String title) {
+        this.mTitle = title;
     }
 
 
@@ -220,8 +213,8 @@ public class Playlist {
     }
 
 
-    public void setLastUpdated(Calendar mLastUpdated) {
-        this.mLastUpdated = mLastUpdated;
+    public void setLastUpdated(Calendar lastUpdated) {
+        this.mLastUpdated = lastUpdated;
     }
 
 
@@ -230,8 +223,8 @@ public class Playlist {
     }
 
 
-    public void setUserRating(int mUserRating) {
-        this.mUserRating = mUserRating;
+    public void setUserRating(int userRating) {
+        this.mUserRating = userRating;
     }
 
 
@@ -240,8 +233,8 @@ public class Playlist {
     }
 
 
-    public void setUserComment(String mUserComment) {
-        this.mUserComment = mUserComment;
+    public void setUserComment(String userComment) {
+        this.mUserComment = userComment;
     }
 
 
@@ -250,8 +243,8 @@ public class Playlist {
     }
 
 
-    public void setIsShared(boolean mIsShared) {
-        this.mIsShared = mIsShared;
+    public void setIsShared(boolean isShared) {
+        this.mIsShared = isShared;
     }
 
 
@@ -260,13 +253,13 @@ public class Playlist {
     }
 
 
-    public void setIsSynced(boolean mIsSynced) {
-        this.mIsSynced = mIsSynced;
+    public void setIsSynced(boolean isSynced) {
+        this.mIsSynced = isSynced;
     }
 
 
-    public void setRawTagsId(ArrayList<Integer> mRawTagsId) {
-        this.mRawTagsId = mRawTagsId;
+    public void setRawTagsId(ArrayList<Integer> rawTagsId) {
+        this.mRawTagsId = rawTagsId;
     }
 
 
