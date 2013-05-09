@@ -72,12 +72,12 @@ import java.util.Set;
  * 
  * @author marc bourqui
  */
-public class SoloPlaylistsActivity extends SherlockFragmentActivity
-        implements UnisonMenu.OnRefreshListener {
+public class SoloPlaylistsActivity extends UnisonFragmentActivity {
+// extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
-    private static final int INITIAL_DELAY = 500; // in ms.
+//    private static final int INITIAL_DELAY = 500; // in ms.
 
     // public static final String ACTION_LEAVE_GROUP =
     // "ch.epfl.unison.action.LEAVE_GROUP";
@@ -90,36 +90,38 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
     // GUI specific
     private ListView mPlaylistsListLocal;
     private ListView mPlaylistsListRemote;
-    private Menu mMenu;
+//    private Menu mMenu;
 
-    private boolean mIsForeground = false;
-    private Handler mHandler = new Handler();
-    private Runnable mUpdater = new Runnable() {
-        @Override
-        public void run() {
-            if (mIsForeground) {
-                onRefresh();
-                mHandler.postDelayed(this, RELOAD_INTERVAL);
-            }
-        }
-    };
+//    private boolean mIsForeground = false;
+//    private Handler mHandler = new Handler();
+//    private Runnable mUpdater = new Runnable() {
+//        @Override
+//        public void run() {
+//            if (isForeground()) {
+//                onRefresh();
+//                getHandler().postDelayed(this, RELOAD_INTERVAL);
+//            }
+//        }
+//    };
 
     /*
      * Coulde be refactorized
      */
-    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
+//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            finish();
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        setReloadInterval(RELOAD_INTERVAL);
 
         // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
@@ -167,37 +169,33 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         // }
     }
 
-    /*
-     * Could be refactorized (non-Javadoc)
-     * @see android.app.Activity#onResume()
-     */
     @Override
     public void onResume() {
         super.onResume();
-        mIsForeground = true;
+//        setToForeground(true);
         startService(new Intent(LibraryService.ACTION_UPDATE));
-        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
+//        getHandler().postDelayed(getUpdater(), getInitialDelay());
     }
 
     /*
      * Could be refactorized (non-Javadoc)
      * @see com.actionbarsherlock.app.SherlockActivity#onPause()
      */
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mIsForeground = false;
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        mIsForeground = false;
+//    }
 
     /*
      * Could be refactorized (non-Javadoc)
      * @see com.actionbarsherlock.app.SherlockActivity#onDestroy()
      */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mLogoutReceiver);
-    };
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterReceiver(mLogoutReceiver);
+//    };
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -226,11 +224,11 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
      * com.actionbarsherlock.app.SherlockActivity#onCreateOptionsMenu(android
      * .view.Menu)
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mMenu = menu;
-        return UnisonMenu.onCreateOptionsMenu(this, menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        mMenu = menu;
+//        return UnisonMenu.onCreateOptionsMenu(this, menu);
+//    }
 
     /*
      * Could be refactorized (non-Javadoc)
@@ -238,10 +236,10 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
      * com.actionbarsherlock.app.SherlockActivity#onOptionsItemSelected(android
      * .view.MenuItem)
      */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UnisonMenu.onOptionsItemSelected(this, this, item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        return UnisonMenu.onOptionsItemSelected(this, this, item);
+//    }
 
     @Override
     public void onRefresh() {
@@ -321,27 +319,27 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         data.getAPI().listTags(data.getUid(), tagsHandler);
     }
 
-    public void repaintRefresh(boolean isRefreshing) {
-        if (mMenu == null) {
-            Log.d(TAG, "repaintRefresh: mMenu is null");
-            return;
-        }
-
-        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-        if (refreshItem != null) {
-            if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(
-                        R.layout.actionbar_indeterminate_progress, null);
-                refreshItem.setActionView(refreshView);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        } else {
-            Log.d(TAG, "repaintRefresh: menu_item_refresh not found");
-        }
-    }
+//    public void repaintRefresh(boolean isRefreshing) {
+//        if (mMenu == null) {
+//            Log.d(TAG, "repaintRefresh: mMenu is null");
+//            return;
+//        }
+//
+//        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
+//        if (refreshItem != null) {
+//            if (isRefreshing) {
+//                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
+//                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                View refreshView = inflater.inflate(
+//                        R.layout.actionbar_indeterminate_progress, null);
+//                refreshItem.setActionView(refreshView);
+//            } else {
+//                refreshItem.setActionView(null);
+//            }
+//        } else {
+//            Log.d(TAG, "repaintRefresh: menu_item_refresh not found");
+//        }
+//    }
 
     // private void leaveGroup() {
     // // Make sure the user is not marked as present in any group.
@@ -401,12 +399,10 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
         public PlaylistsAdapter(ArrayList<Playlist> list) {
             super(SoloPlaylistsActivity.this, 0, list);
-            Log.i(TAG, "PlaylistAdapter: got in!");
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            Log.i(TAG, "PlaylistAdapter.getView: got in!");
             Playlist playlist = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
@@ -856,7 +852,7 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
 
             SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
                     SoloMainActivity.class).putExtra(Const.Strings.PLID,
-                    ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.NAME,
+                    ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
                     ((Playlist) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
             // view.getTag());
             // UnisonAPI api =

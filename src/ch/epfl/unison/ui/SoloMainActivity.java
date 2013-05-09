@@ -37,28 +37,28 @@ import java.util.Set;
  * 
  * @author lum
  */
-public class SoloMainActivity extends SherlockFragmentActivity implements
-        UnisonMenu.OnRefreshListener {
+public class SoloMainActivity extends UnisonFragmentActivity { 
+// extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.SoloMainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000; // in ms.
-    private static final int INITIAL_DELAY = 500; // in ms.
+//    private static final int INITIAL_DELAY = 500; // in ms.
 
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
-    private Menu mMenu;
+//    private Menu mMenu;
 
-    private boolean mIsForeground = false;
-    private Handler mHandler = new Handler();
-    private Runnable mUpdater = new Runnable() {
-        @Override
-        public void run() {
-            if (mIsForeground) {
-                onRefresh();
-                mHandler.postDelayed(this, RELOAD_INTERVAL);
-            }
-        }
-    };
+//    private boolean mIsForeground = false;
+//    private Handler mHandler = new Handler();
+//    private Runnable mUpdater = new Runnable() {
+//        @Override
+//        public void run() {
+//            if (isForeground()) {
+//                onRefresh();
+//                getHandler().postDelayed(this, RELOAD_INTERVAL);
+//            }
+//        }
+//    };
 
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
@@ -73,6 +73,8 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleExtras(getIntent().getExtras());
+        
+        setReloadInterval(RELOAD_INTERVAL);
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
@@ -87,64 +89,64 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
         ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mTabsAdapter = new TabsAdapter(this, mViewPager);
-        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
+        mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_player_fragment_title),
                 PlayerFragment.class, null);
-        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
+        mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_playlist_fragment_title),
                 StatsFragment.class, null);
     }
 
     private void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey(Const.Strings.GID)) {
+        if (extras == null || !extras.containsKey(Const.Strings.PLID)) {
             // Should never happen. If it does, redirect the user to the groups
             // list.
-            startActivity(new Intent(this, GroupsActivity.class));
+            startActivity(new Intent(this, SoloPlaylistsActivity.class));
             finish();
         } else {
             // mGroupId = extras.getLong(Const.Strings.GID);
             // Log.i(TAG, "joined group " + mGroupId);
-            if (extras.containsKey(Const.Strings.NAME)) {
-                setTitle(extras.getString(Const.Strings.NAME));
+            if (extras.containsKey(Const.Strings.TITLE)) {
+                setTitle(extras.getString(Const.Strings.TITLE));
             }
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mIsForeground = true;
-        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        setToForeground(true);
+//        getHandler().postDelayed(getUpdater(), getInitialDelay());
+//    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mIsForeground = false;
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        mIsForeground = false;
+//    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mLogoutReceiver);
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterReceiver(mLogoutReceiver);
+//    }
 
-    public void repaintRefresh(boolean isRefreshing) {
-        if (mMenu == null) {
-            return;
-        }
-
-        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-        if (refreshItem != null) {
-            if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(
-                        R.layout.actionbar_indeterminate_progress, null);
-                refreshItem.setActionView(refreshView);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        }
-    }
+//    public void repaintRefresh(boolean isRefreshing) {
+//        if (mMenu == null) {
+//            return;
+//        }
+//
+//        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
+//        if (refreshItem != null) {
+//            if (isRefreshing) {
+//                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
+//                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                View refreshView = inflater.inflate(
+//                        R.layout.actionbar_indeterminate_progress, null);
+//                refreshItem.setActionView(refreshView);
+//            } else {
+//                refreshItem.setActionView(null);
+//            }
+//        }
+//    }
 
     /*
      * Could be refactorized (non-Javadoc)
@@ -155,6 +157,8 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
         repaintRefresh(true);
         UnisonAPI api = AppData.getInstance(this).getAPI();
 
+        //TODO
+        
     }
 
     /*
@@ -163,11 +167,11 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
      * com.actionbarsherlock.app.SherlockFragmentActivity#onCreateOptionsMenu
      * (android.view.Menu)
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        mMenu = menu;
-        return UnisonMenu.onCreateOptionsMenu(this, menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        mMenu = menu;
+//        return UnisonMenu.onCreateOptionsMenu(this, menu);
+//    }
 
     /*
      * Could be refactorized (non-Javadoc)
@@ -175,10 +179,10 @@ public class SoloMainActivity extends SherlockFragmentActivity implements
      * com.actionbarsherlock.app.SherlockFragmentActivity#onOptionsItemSelected
      * (android.view.MenuItem)
      */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UnisonMenu.onOptionsItemSelected(this, this, item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        return UnisonMenu.onOptionsItemSelected(this, this, item);
+//    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

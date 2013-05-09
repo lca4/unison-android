@@ -24,6 +24,8 @@
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
+    <string name="solo_player_fragment_title">Music</string>
+    <string name="solo_playlist_fragment_title">Tracks</string>
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
