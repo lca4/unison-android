@@ -1,5 +1,5 @@
 
-package ch.epfl.unison;
+package ch.epfl.unison.data;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
@@ -12,8 +12,6 @@ import com.google.gson.JsonNull;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Track;
-import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.UnisonDB;
 
 import org.json.JSONArray;
 import org.json.JSONException;

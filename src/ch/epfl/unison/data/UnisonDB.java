@@ -50,12 +50,10 @@ public class UnisonDB {
     }
 
     private void open() {
-        Log.i(TAG, "open database in read-only mode");
         mDB = mDbHelper.getReadableDatabase();
     }
 
     private void openW() {
-        Log.i(TAG, "open database in writable mode");
         mDB = mDbHelper.getWritableDatabase();
     }
 
@@ -210,7 +208,6 @@ public class UnisonDB {
         } else {
             values.put(Const.C_IS_CHECKED, Const.FALSE);
         }
-        Log.i(TAG, "updates row id=" + tagId + " to is_checked=" + values.valueSet().toString());
         mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
                 String.valueOf(tagId)
         });
@@ -288,7 +285,6 @@ public class UnisonDB {
      * @param item
      */
     public void insert(TagItem item) {
-        Log.i(TAG, "insert");
         ContentValues values = new ContentValues();
         // values.put(Const.TAGS_C_ID, item.localId);
         values.put(Const.TAG_C_NAME, item.name);
@@ -297,7 +293,6 @@ public class UnisonDB {
         if (!exists(item)) {
             openW();
             long newid = mDB.insert(Const.TAG_TABLE_NAME, null, values);
-            Log.i(TAG, "new inserted tag id: " + newid);
             close();
         }
     }
@@ -385,8 +380,6 @@ public class UnisonDB {
             }
             Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>) it.next();
             int tagId = pair.getValue();
-            Log.i(TAG, table + " : updates row id=" + tagId + " to is_checked="
-                    + values.valueSet().toString());
             mDB.update(table, values, Const.C_ID + " = ? ", new String[] {
                     String.valueOf(tagId)
             });
@@ -427,8 +420,6 @@ public class UnisonDB {
                     do {
                         try {
                             json.accumulate(key.getLabel(), cur.getString(colName));
-                            Log.i(TAG, "added seed: " + cur.getString(colName) + " to "
-                                    + key.getLabel());
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }
@@ -443,8 +434,6 @@ public class UnisonDB {
                             track.put("title", cur.getString(colTitle));
                             track.put("artist", cur.getString(colArtist));
                             json.accumulate(key.getLabel(), track.toString());
-                            Log.i(TAG, "added seed: " + track.toString() + " to "
-                                    + key.getLabel());
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }

@@ -35,7 +35,6 @@ import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
-import ch.epfl.unison.Playlist;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
@@ -44,6 +43,7 @@ import ch.epfl.unison.api.JsonStruct.TagsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.Playlist;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -146,6 +146,8 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
                 mPLsLocal.add(new Playlist.Builder().localId(cur.getInt(colId))
                         .title(cur.getString(colName)).build());
             } while (cur.moveToNext());
+        } else {
+            mPLsLocal = new ArrayList<Playlist>();
         }
         if (!cur.isClosed()) {
             cur.close();
@@ -248,16 +250,24 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         SoloPlaylistsActivity.this.mPlaylistsListLocal
                 .setAdapter(new PlaylistsAdapter(mPLsLocal));
 
+        // Update playlists
         UnisonAPI.Handler<JsonStruct.PlaylistsList> playlistsHandler =
                 new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
 
                     @Override
                     public void callback(PlaylistsList struct) {
                         try {
-                            mPLsRemote = struct.toObject();
-                            SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                    .setAdapter(new PlaylistsAdapter(mPLsRemote));
-                            SoloPlaylistsActivity.this.repaintRefresh(false);
+                            if (struct.isEmtpy()) {
+                                //TODO display row item to tell no playlist is available
+                                Toast.makeText(SoloPlaylistsActivity.this,
+                                        R.string.solo_playlists_noRemotePL,
+                                        Toast.LENGTH_LONG).show();
+                            } else {
+                                mPLsRemote = struct.toObject();
+                                SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                        .setAdapter(new PlaylistsAdapter(mPLsRemote));
+                                SoloPlaylistsActivity.this.repaintRefresh(false);
+                            }
                         } catch (NullPointerException e) {
                             Log.w(TAG, "playlist or activity is null?", e);
                         }
@@ -390,11 +400,13 @@ public class SoloPlaylistsActivity extends SherlockFragmentActivity
         public static final int ROW_LAYOUT = R.layout.list_row;
 
         public PlaylistsAdapter(ArrayList<Playlist> list) {
-            super(SoloPlaylistsActivity.this, 0);
+            super(SoloPlaylistsActivity.this, 0, list);
+            Log.i(TAG, "PlaylistAdapter: got in!");
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
+            Log.i(TAG, "PlaylistAdapter.getView: got in!");
             Playlist playlist = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
