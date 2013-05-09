@@ -90,9 +90,9 @@ public class SoloMainActivity extends UnisonFragmentActivity {
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mTabsAdapter = new TabsAdapter(this, mViewPager);
         mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_player_fragment_title),
-                PlayerFragment.class, null);
+                SoloPlayerFragment.class, null);
         mTabsAdapter.addTab(bar.newTab().setText(R.string.solo_playlist_fragment_title),
-                StatsFragment.class, null);
+                SoloPlaylistFragment.class, null);
     }
 
     private void handleExtras(Bundle extras) {
