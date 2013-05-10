@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="10dp"
+      android:background="#3FFF">
+    <TextView
+        android:id="@+id/listTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/stats_not_playing"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <TextView
+        android:id="@+id/listSubTitle"
+        android:layout_width="match_parent"
+        android:layout_below="@id/listTitle"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="@string/stats_taste" />
+  </RelativeLayout>
+
+
+
+    <!-- Text output wrapper -->
+    <ListView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/listList" />
+
+
+</LinearLayout>

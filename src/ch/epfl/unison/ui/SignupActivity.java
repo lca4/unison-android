@@ -11,43 +11,50 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
+/**
+ * Activity that allows the user to sign up for the service.
+ *
+ * @author lum
+ */
 public class SignupActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.SignupActivity";
+    private static final int MIN_PASSWORD_LENGTH = 6;
 
-    private Button submitBtn;
-    private TextView email;
-    private TextView password;
-    private TextView password2;
-    private CheckBox tou;
+    private Button mSubmitBtn;
+    private TextView mEmail;
+    private TextView mPassword;
+    private TextView mPassword2;
+    private CheckBox mTou;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.signup);
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.signup);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.submitBtn = (Button) this.findViewById(R.id.submitBtn);
-        this.submitBtn.setOnClickListener(new SubmitListener());
+        mSubmitBtn = (Button) findViewById(R.id.submitBtn);
+        mSubmitBtn.setOnClickListener(new SubmitListener());
 
-        this.email = (TextView) this.findViewById(R.id.email);
-        this.password = (TextView) this.findViewById(R.id.password);
-        this.password2 = (TextView) this.findViewById(R.id.password2);
-        this.tou = (CheckBox) this.findViewById(R.id.touCbox);
+        mEmail = (TextView) findViewById(R.id.email);
+        mPassword = (TextView) findViewById(R.id.password);
+        mPassword2 = (TextView) findViewById(R.id.password2);
+        mTou = (CheckBox) findViewById(R.id.touCbox);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) { // if using home button from menu: R.id.home 
             // app icon in Action Bar clicked; go home
             startActivity(new Intent(this, LoginActivity.class)
                     .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
@@ -59,20 +66,23 @@ public class SignupActivity extends SherlockActivity {
     public void signup(final String email, final String password) {
         final ProgressDialog dialog = ProgressDialog.show(
                 SignupActivity.this, null, getString(R.string.signup_signing_up));
-        this.submitBtn.setEnabled(false);
+        mSubmitBtn.setEnabled(false);
 
         UnisonAPI api = AppData.getInstance(this).getAPI();
         api.createUser(email, password, new UnisonAPI.Handler<JsonStruct.User>() {
 
+            @Override
             public void onError(UnisonAPI.Error error) {
                 handleError(error);
-                submitBtn.setEnabled(true);
+                mSubmitBtn.setEnabled(true);
                 dialog.dismiss();
             }
 
+            @Override
             public void callback(JsonStruct.User struct) {
                 startActivity(new Intent(SignupActivity.this, LoginActivity.class)
-                        .putExtra(PreferenceKeys.EMAIL_KEY, email).putExtra(PreferenceKeys.PASSWORD_KEY, password));
+                        .putExtra(Const.PrefKeys.EMAIL, email)
+                        .putExtra(Const.PrefKeys.PASSWORD, password));
                 dialog.dismiss();
             }
         });
@@ -86,38 +96,40 @@ public class SignupActivity extends SherlockActivity {
         Log.d(TAG, error.toString());
         if (error.hasJsonError()) {
             if (UnisonAPI.ErrorCodes.MISSING_FIELD == error.jsonError.error) {
-                this.showError(getString(R.string.signup_form_missing_fields));
+                showError(getString(R.string.signup_form_missing_fields));
 
             } else if (UnisonAPI.ErrorCodes.EXISTING_USER == error.jsonError.error) {
-                this.showError(getString(R.string.signup_form_email_in_use));
+                showError(getString(R.string.signup_form_email_in_use));
 
             } else if (UnisonAPI.ErrorCodes.INVALID_EMAIL == error.jsonError.error) {
-                this.showError(getString(R.string.signup_form_email_invalid));
+                showError(getString(R.string.signup_form_email_invalid));
 
             } else if (UnisonAPI.ErrorCodes.INVALID_PASSWORD == error.jsonError.error) {
-                this.showError(getString(R.string.signup_form_password_invalid));
+                showError(getString(R.string.signup_form_password_invalid));
             }
             return;
         }
         // Last resort.
-        this.showError(getString(R.string.signup_form_unable_to_create));
+        showError(getString(R.string.signup_form_unable_to_create));
     }
 
+    /** Validates the data before submitting it to the back-end. */
     private class SubmitListener implements OnClickListener {
 
+        @Override
         public void onClick(View v) {
-            if (TextUtils.isEmpty(email.getText())
-                    || TextUtils.isEmpty(password.getText())
-                    || TextUtils.isEmpty(password2.getText())) {
+            if (TextUtils.isEmpty(mEmail.getText())
+                    || TextUtils.isEmpty(mPassword.getText())
+                    || TextUtils.isEmpty(mPassword2.getText())) {
                 showError(getString(R.string.signup_form_fillout_fields));
-            } else if (!password.getText().toString().equals(password2.getText().toString())) {
+            } else if (!mPassword.getText().toString().equals(mPassword2.getText().toString())) {
                 showError(getString(R.string.signup_form_password_match));
-            } else if (password.length() < 6) {
+            } else if (mPassword.length() < MIN_PASSWORD_LENGTH) {
                 showError(getString(R.string.signup_form_password_short));
-            } else if (!tou.isChecked()) {
+            } else if (!mTou.isChecked()) {
                 showError(getString(R.string.signup_form_tou));
             } else {
-                signup(email.getText().toString(), password.getText().toString());
+                signup(mEmail.getText().toString(), mPassword.getText().toString());
             }
         }
 

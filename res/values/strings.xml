@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">[dev]Group Streamer</string>
+
+    <string name="app_name">Group Streamer</string>
+    
+    <!-- Generic values -->
+    <string name="generic_ok">OK</string>
+    <string name="generic_cancel">Cancel</string>
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>
@@ -8,11 +13,19 @@
     <string name="activity_title_prefs">Settings</string>
     <string name="activity_title_main">Group</string>
     <string name="activity_title_help">Help</string>
+    <string name="activity_title_solo">Single-user mode</string>
+    <string name="activity_title_solo_main">Solo player</string>
+    <string name="activity_title_solo_playlists">Single-user mode</string>
     <string name="activity_title_signup">Sign Up</string>
+    <string name="activity_title_history">Group History</string>
+    <string name="activity_title_manage">Set Password</string>
+    <string name="activity_title_home">GroupStreamer</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
+    <string name="solo_player_fragment_title">Music</string>
+    <string name="solo_playlist_fragment_title">Tracks</string>
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
@@ -22,83 +35,118 @@
     <string name="pref_title_nickname">Nickname</string>
     <string name="pref_summary_nickname">Lets other users identify you.</string>
     <string name="pref_title_uid">UUID</string>
-    
+     <string name="pref_title_suggestion_enabled">Enable Suggestions</string>
+
     <!-- Ratings -->
     <string name="ratings_improve_gs">Ratings improve GroupStreamer\'s effectiveness.</string>
     <string name="ratings_show_unrated_only">Show only unrated songs</string>
     <string name="ratings_like">How do you like this song ?</string>
-   	<string name="ratings_ok">OK</string>
-   	<string name="ratings_cancel">Cancel</string>
+    <string name="ratings_ok">OK</string>
+    <string name="ratings_cancel">Cancel</string>
 
     <!-- Statistics -->
     <string name="rating_predicted">predicted from musical profile</string>
     <string name="rating_true">explicit user rating</string>
     <string name="rating_unknown">not yet computed</string>
-    
+
     <!-- Login -->
     <string name="login_email_hint">E-mail address</string>
     <string name="login_password_hint">Password</string>
-	<string name="login_loginBtn">Log In</string>
-	<string name="login_signup">New to GroupStreamer ?</string>
-	<string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
-	<string name="login_signing_in">Signing in...</string>
-    
+    <string name="login_loginBtn">Log In</string>
+    <string name="login_signup">New to GroupStreamer ?</string>
+    <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
+    <string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
+
+
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>
     <string name="groups_helpdialog_message">Want to learn how to use the application ?</string>
-   	<string name="groups_helpdialog_chkbox">Don\'t show this again</string>
-   	<string name="groups_helpdialog_yesBtn">Yes</string>
-   	<string name="groups_helpdialog_noBtn">No, thanks</string>
-   	<string name="groups_alert_newgroup_title">New Group</string>
-   	<string name="groups_alert_newgroup_message">Pick a name for the group:</string>
-   	<string name="groups_alert_newgroup_ok">OK</string>
-   	<string name="groups_alert_newgroup_cancel">Cancel</string>
-   	<string name="groups_createBtn">Create group</string>
-   	<string name="groups_chooseGrp">or select one below :</string>
+    <string name="groups_helpdialog_chkbox">Don\'t show this again</string>
+    <string name="groups_helpdialog_yesBtn">Yes</string>
+    <string name="groups_helpdialog_noBtn">No, thanks</string>
+    <string name="groups_suggestion_title">Would you like to join a group with the following user(s)</string>
+    <string name="groups_suggestion_yesBtn">Yes</string>
+    <string name="groups_suggestion_noBtn">No, thanks</string>
+    <string name="groups_suggestion_cBx">Do not ask me again</string>
+    <string name="groups_alert_newgroup_title">New Group</string>
+    <string name="groups_alert_newgroup_message">Pick a name for the group:</string>
+    <string name="groups_alert_newgroup_ok">OK</string>
+    <string name="groups_alert_newgroup_cancel">Cancel</string>
+    <string name="groups_createBtn">Create group</string>
+    <string name="groups_chooseGrp">or select one below :</string>
     
+    <!-- Solo playlists --> 
+    <string name="solo_playlists_createBtn">Create playlist</string>
+    <string name="solo_playlists_choosePL">or select one below :</string>
+    <string name="solo_playlists_localPL">My playlists</string>
+    <string name="solo_playlists_remotePL">Available playlists</string>
+    <string name="solo_playlists_noRemotePL">Sorry, no playlist is available</string>
+    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
+    <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
+    <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
+    <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
+    
+    <!-- Solo playlist context menu -->
+    <string name="playlist_context_menu_item_delete">Delete</string>
+    <string name="playlist_context_menu_item_share">Share with other users</string>
+    <string name="playlist_context_menu_item_edit">Edit</string>
+    
+    <!-- Home -->
+    <string name="home_title">What kind of party?</string>
+    
+    <!-- Solo player -->
+    
+
     <!-- Player -->
-   	<string name="player_unknown">unknown</string>
-   	<string name="player_not_playing">No track playing</string>
-   	<string name="player_become_dj">Become the DJ</string>
-   	<string name="player_leave_dj">Leave DJ seat</string>
-   	<string name="player_rating">Rating</string>
-   	<string name="player_cover">album cover</string>
-   	<string name="player_rate">Rate this song</string>
-   	<string name="player_rate_it">Rate it!</string>
-   	<string name="player_like">How do you like this song ?</string>
-   	<string name="player_ok">OK</string>
-   	<string name="player_cancel">Cancel</string>
-   	
-   	<!-- SignUp -->
-   	<string name="signup_signup">Sign up for GroupStreamer</string>
-   	<string name="signup_incentive">It takes mere seconds.</string>
-   	<string name="signup_email_hint">E-mail address</string>
-   	<string name="signup_password_hint">Password</string>
-   	<string name="signup_password_confirm_hint">Confirm password</string>
-   	<string name="signup_tou">I agree to the Terms of Use</string>
-   	<string name="signup_signupBtn">Sign Up</string>
-   	<string name="signup_signing_up">Signing up...</string>
-   	
-   	<!-- SignUpForm -->
-   	<string name="signup_form_missing_fields">Fields are missing.</string>
-   	<string name="signup_form_email_in_use">User already exists (e-mail address in use).</string>
-   	<string name="signup_form_email_invalid">E-mail address is invalid.</string>
-   	<string name="signup_form_password_invalid">Password is invalid.</string>
-   	<string name="signup_form_unable_to_create">Unable to create new user, please try again.</string>
-   	<string name="signup_form_fillout_fields">Please fill out all the fields.</string>
-   	<string name="signup_form_password_match">Passwords don\'t match.</string>
-   	<string name="signup_form_password_short">Password is too short.</string>
-   	<string name="signup_form_tou">You need to agree to the terms of use.</string>
-   	
-   	<!-- Stats -->
-   	<string name="stats_not_playing">No track playing</string>
-   	<string name="stats_taste">How do people like this song ?</string>
-   	
+    <string name="player_unknown">unknown</string>
+    <string name="player_not_playing">No track playing</string>
+    <string name="player_become_dj">Become the DJ</string>
+    <string name="player_leave_dj">Leave DJ seat</string>
+    <string name="player_cover">album cover</string>
+    <string name="player_rate">Rate this song</string>
+    <string name="player_rate_it">Rate it!</string>
+    <string name="player_like">How do you like this song ?</string>
+    <string name="player_ok">OK</string>
+    <string name="player_cancel">Cancel</string>
+
+    <!-- SignUp -->
+    <string name="signup_signup">Sign up for GroupStreamer</string>
+    <string name="signup_incentive">It takes mere seconds.</string>
+    <string name="signup_email_hint">E-mail address</string>
+    <string name="signup_password_hint">Password</string>
+    <string name="signup_password_confirm_hint">Confirm password</string>
+    <string name="signup_tou">I agree to the Terms of Use</string>
+    <string name="signup_signupBtn">Sign Up</string>
+    <string name="signup_signing_up">Signing up&#8230;</string> <!-- &#8230; is "..." -->
+
+
+    <!-- SignUpForm -->
+    <string name="signup_form_missing_fields">Fields are missing.</string>
+    <string name="signup_form_email_in_use">User already exists (e-mail address in use).</string>
+    <string name="signup_form_email_invalid">E-mail address is invalid.</string>
+    <string name="signup_form_password_invalid">Password is invalid.</string>
+    <string name="signup_form_unable_to_create">Unable to create new user, please try again.</string>
+    <string name="signup_form_fillout_fields">Please fill out all the fields.</string>
+    <string name="signup_form_password_match">Passwords don\'t match.</string>
+    <string name="signup_form_password_short">Password is too short.</string>
+    <string name="signup_form_tou">You need to agree to the terms of use.</string>
+
+    <!-- Stats -->
+    <string name="stats_not_playing">No track playing</string>
+    <string name="stats_taste">How do people like this song ?</string>
+    
+    <!--  History -->
+	<string name="history_delete_label">Delete History</string>
+
     <!-- Errors. -->
     <string name="error_loading_groups">Unable to load the list of groups.</string>
+    <string name="error_loading_playlists">Unable to load the list of playlists</string>
+    <string name="error_loading_tags">Unable to load the list of tags</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
+    <string name="error_creating_playlist">Unable to create the playlist.</string>
     <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
+    <string name="error_creating_playlist_empty_name">Unable to create a group with empty name.</string>
     <string name="error_unauthorized">Incorrect password or e-mail address.</string>
     <string name="error_login_general">Unable to log in. Are you connected ?</string>
     <string name="error_loading_info">Unable to load the information.</string>
@@ -109,4 +157,8 @@
     <string name="error_sending_track">Unable to send play notification to the server.</string>
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
+
 </resources>

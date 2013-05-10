@@ -1,14 +1,16 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +25,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.PreferenceKeys;
+import ch.epfl.unison.api.JsonStruct.GroupSuggestion;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
@@ -37,12 +41,16 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.gson.JsonArray;
 
+/**
+ * Listing of the groups.
+ * 
+ * @author lum
+ */
 public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.GroupsActivity";
-    private static final int RELOAD_INTERVAL = 120 * 1000;  // in ms.
+    private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
 
     // EPFL Polydome.
@@ -51,21 +59,27 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
 
-    private ListView groupsList;
-    private Menu menu;
+    private ListView mGroupsList;
+    private Menu mMenu;
 
-    private boolean isForeground = false;
-    private Handler handler = new Handler();
-    private Runnable updater = new Runnable() {
+    private JsonStruct.GroupSuggestion mSuggestion;
+
+    private boolean mDismissedHelp = false;
+    private boolean mSuggestionIsForeground = false;
+
+    private boolean mIsForeground = false;
+    private Handler mHandler = new Handler();
+    private Runnable mUpdater = new Runnable() {
+        @Override
         public void run() {
-            if (isForeground) {
+            if (mIsForeground) {
                 onRefresh();
-                handler.postDelayed(this, RELOAD_INTERVAL);
+                mHandler.postDelayed(this, RELOAD_INTERVAL);
             }
         }
     };
 
-    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
@@ -75,51 +89,61 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "GroupsActivity is being created.");
 
         // This activity should finish on logout.
-        this.registerReceiver(this.logoutReceiver,
-                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        this.setContentView(R.layout.groups);
+        setContentView(R.layout.groups);
 
-        ((Button)this.findViewById(R.id.createGroupBtn))
+        ((Button) findViewById(R.id.createGroupBtn))
                 .setOnClickListener(new OnCreateGroupListener());
 
-        this.groupsList = (ListView)this.findViewById(R.id.groupsList);
-        this.groupsList.setOnItemClickListener(new OnGroupSelectedListener());
+        mGroupsList = (ListView) findViewById(R.id.groupsList);
+        mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
 
         // Actions that should be taken whe activity is started.
-        if (ACTION_LEAVE_GROUP.equals(this.getIntent().getAction())) {
-            // We are coming back from a group - let's make sure the back-end knows.
-            this.leaveGroup();
+        if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
+            // We are coming back from a group - let's make sure the back-end
+            // knows.
+            leaveGroup();
+            mDismissedHelp = true;
         } else if (AppData.getInstance(this).showHelpDialog()) {
-            this.showHelpDialog();
+            showHelpDialog();
+        } else {
+            mDismissedHelp = true;
         }
+
+        if (AppData.getInstance(this).showGroupSuggestion() && mDismissedHelp) {
+            showGroupSuggestion();
+        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        this.isForeground = true;
-        this.startService(new Intent(LibraryService.ACTION_UPDATE));
-        this.handler.postDelayed(this.updater, INITIAL_DELAY);
+        // mDismissedHelp = true;
+        mIsForeground = true;
+        startService(new Intent(LibraryService.ACTION_UPDATE));
+        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        this.isForeground = false;
+        mIsForeground = false;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(this.logoutReceiver);
+        unregisterReceiver(mLogoutReceiver);
     };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
+        mMenu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
     }
 
@@ -128,20 +152,25 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         return UnisonMenu.onOptionsItemSelected(this, this, item);
     }
 
+    @Override
     public void onRefresh() {
-        this.repaintRefresh(true);
-
-        UnisonAPI.Handler<JsonStruct.GroupsList> handler
-                = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
-
+        repaintRefresh(true);
+        UnisonAPI.Handler<JsonStruct.GroupsList> handler = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
+            @Override
             public void callback(GroupsList struct) {
-                GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
-                GroupsActivity.this.repaintRefresh(false);
+                try {
+                    GroupsActivity.this.mGroupsList
+                            .setAdapter(new GroupsAdapter(struct));
+                    GroupsActivity.this.repaintRefresh(false);
+                } catch (NullPointerException e) {
+                    Log.w(TAG, "group or activity is null?", e);
+                }
             }
 
+            @Override
             public void onError(UnisonAPI.Error error) {
-                if(error != null) {
-                	Log.d(TAG, error.toString());
+                if (error != null) {
+                    Log.d(TAG, error.toString());
                 }
                 if (GroupsActivity.this != null) {
                     Toast.makeText(GroupsActivity.this, R.string.error_loading_groups,
@@ -150,29 +179,33 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 }
             }
         };
-
         AppData data = AppData.getInstance(this);
-        if (data.getLocation() != null) {
-            double lat = data.getLocation().getLatitude();
-            double lon = data.getLocation().getLongitude();
+        Location currentLoc = data.getLocation();
+        if (currentLoc != null) {
+            double lat = currentLoc.getLatitude();
+            double lon = currentLoc.getLongitude();
             data.getAPI().listGroups(lat, lon, handler);
         } else {
             data.getAPI().listGroups(handler);
         }
+        if (mDismissedHelp && data.showGroupSuggestion()) {
+            showGroupSuggestion();
+        }
     }
 
     public void repaintRefresh(boolean isRefreshing) {
-        if (this.menu == null) {
-            Log.d(TAG, "repaintRefresh: this.menu is null");
+        if (mMenu == null) {
+            Log.d(TAG, "repaintRefresh: mMenu is null");
             return;
         }
 
-        MenuItem refreshItem = this.menu.findItem(R.id.menu_item_refresh);
+        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
         if (refreshItem != null) {
             if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater)getSupportActionBar()
+                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
                         .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(R.layout.actionbar_indeterminate_progress, null);
+                View refreshView = inflater.inflate(
+                        R.layout.actionbar_indeterminate_progress, null);
                 refreshItem.setActionView(refreshView);
             } else {
                 refreshItem.setActionView(null);
@@ -187,10 +220,12 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         AppData data = AppData.getInstance(this);
         data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
+            @Override
             public void callback(Success struct) {
                 Log.d(TAG, "successfully left group");
             }
 
+            @Override
             public void onError(Error error) {
                 Log.d(TAG, error.toString());
             }
@@ -209,7 +244,9 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
         DialogInterface.OnClickListener click = new DialogInterface.OnClickListener() {
 
+            @Override
             public void onClick(DialogInterface dialog, int which) {
+                mDismissedHelp = true;
                 if (cbox.isChecked()) {
                     // Don't show the dialog again in the future.
                     AppData.getInstance(GroupsActivity.this).setShowHelpDialog(false);
@@ -225,6 +262,138 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         alert.show();
     }
 
+    private DialogInterface.OnClickListener mSuggestionClick;
+
+    private UnisonAPI.Handler<JsonStruct.Success> mAcceptSuggestionHandler =
+            new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                @Override
+                public void callback(Success struct) {
+                    GroupsActivity.this.startActivity(
+                            new Intent(GroupsActivity.this, GroupsMainActivity.class)
+                                    .putExtra(Const.Strings.GROUP, mSuggestion.group));
+                }
+
+                @Override
+                public void onError(Error error) {
+                    Log.d(TAG, error.toString());
+                    if (GroupsActivity.this != null) {
+                        Toast.makeText(GroupsActivity.this,
+                                R.string.error_joining_group,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+            };
+
+    private AlertDialog.Builder prepareSuggestionBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
+        builder.setTitle(getString(R.string.groups_suggestion_title));
+        LayoutInflater layoutInflater = (LayoutInflater)
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dialogView = layoutInflater.inflate(R.layout.suggestion_dialog, null);
+        builder.setView(dialogView);
+        ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
+        final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
+                R.layout.group_suggestion_user_row,
+                R.id.group_suggestion_username, mSuggestion.users);
+        userView.setAdapter(userAdapter);
+        userView.setSelector(android.R.color.transparent);
+        // this is a bit too much, the user cannot scroll the list anymore
+        // userView.setEnabled(false); //this is a bit too much, the user cannot
+        // scroll the list anymore
+
+        mSuggestionClick =
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSuggestionIsForeground = false;
+
+                        if (cbox.isChecked()) {
+                            AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
+                        }
+                        if (DialogInterface.BUTTON_POSITIVE == which) {
+                            UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
+                            long uid = AppData.getInstance(GroupsActivity.this).getUid();
+                            api.joinGroup(uid, mSuggestion.group.gid, mAcceptSuggestionHandler);
+                        }
+                    }
+                };
+
+        return builder;
+    }
+
+    private UnisonAPI.Handler<JsonStruct.GroupSuggestion> mSuggestionHandler =
+            new UnisonAPI.Handler<JsonStruct.GroupSuggestion>() {
+
+                @Override
+                public void callback(GroupSuggestion struct) {
+                    mSuggestion = struct;
+                    if (mSuggestion == null || GroupsActivity.this == null
+                            || !mSuggestion.suggestion
+                            || mSuggestion.users == null
+                            || mSuggestion.cluster == null
+                            || mSuggestion.group == null) {
+                        return;
+                    }
+                    AlertDialog.Builder builder = prepareSuggestionBuilder();
+
+                    // This is supposed to handle the situation where the user
+                    // presses the BACK key too.
+                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            mSuggestionIsForeground = false;
+
+                            // We could handle here whether the checkbox was
+                            // checked or not,
+                            // but it makes more sense to do so only when the
+                            // user presses a button.
+                        }
+                    });
+
+                    builder.setPositiveButton(getString(R.string.groups_suggestion_yesBtn),
+                            mSuggestionClick);
+                    builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn),
+                            mSuggestionClick);
+
+                    mSuggestionIsForeground = true;
+                    final Dialog dialog = builder.create();
+                    dialog.show();
+                }
+
+                @Override
+                public void onError(Error error) {
+                    mSuggestion = null;
+                    // Do nothing, errors silently happen in the background.
+                }
+            };
+
+    /**
+     * Pass information as arguments for now for easy testing. They could be
+     * written as class variables.
+     */
+    private void showGroupSuggestion() {
+        if (mSuggestionIsForeground) {
+            return;
+        }
+
+        AppData data = AppData.getInstance(GroupsActivity.this);
+        UnisonAPI api = data.getAPI();
+
+        Location currentLoc = data.getLocation();
+
+        // Only do suggestions based on location for now.
+        if (currentLoc != null) {
+            double lat = currentLoc.getLatitude();
+            double lon = currentLoc.getLongitude();
+            api.getSuggestion(lat, lon, mSuggestionHandler);
+        }
+    }
+
+    /** Adapter used to populate the ListView listing the groups. */
     private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
         public static final int ROW_LAYOUT = R.layout.groups_row;
@@ -235,7 +404,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            JsonStruct.Group group = this.getItem(position);
+            JsonStruct.Group group = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) GroupsActivity.this.getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
@@ -247,7 +416,11 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
                 subtitle = String.format("%s away - %d people.",
                         Uutils.distToString(group.distance), group.nbUsers);
             } else {
-                subtitle = String.format("%d " + (group.nbUsers > 1 ? "people." : "person."), group.nbUsers);
+                String format = "%d person.";
+                if (group.nbUsers > 1) {
+                    format = "%d people.";
+                }
+                subtitle = String.format(format, group.nbUsers);
             }
             ((TextView) view.findViewById(R.id.nbParticipants)).setText(subtitle);
 
@@ -256,8 +429,13 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         }
     }
 
+    /**
+     * When clicking on "create new group", trigger an AlertView that asks for a
+     * group name and creates the group on the back-end through the API.
+     */
     private class OnCreateGroupListener implements OnClickListener {
 
+        @Override
         public void onClick(View v) {
             AlertDialog.Builder alert = new AlertDialog.Builder(GroupsActivity.this);
 
@@ -268,64 +446,91 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
             final EditText input = new EditText(GroupsActivity.this);
             alert.setView(input);
 
-            alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok), new DialogInterface.OnClickListener() {
+            // When clicking on "OK", create the group.
+            alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok),
+                    new DialogInterface.OnClickListener() {
 
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    String name = input.getText().toString().trim();
-                    if (name == null || name.equals("")) {
-                    	Toast.makeText(GroupsActivity.this, R.string.error_creating_group_empty_name,
-                    			Toast.LENGTH_LONG).show();                    	
-                    } else {
-                    	
-	                    AppData data = AppData.getInstance(GroupsActivity.this);
-	
-	                    double lat, lon;
-	                    if (data.getLocation() != null) {
-	                        lat = data.getLocation().getLatitude();
-	                        lon = data.getLocation().getLongitude();
-	                    } else {
-	                        lat = DEFAULT_LATITUDE;
-	                        lon = DEFAULT_LONGITUDE;
-	                        Log.i(TAG, "location was null, using default values");
-	                    }
-	                    data.getAPI().createGroup(name, lat, lon,
-	                            new UnisonAPI.Handler<JsonStruct.GroupsList>() {
-	
-	                        public void callback(GroupsList struct) {
-	                            GroupsActivity.this.groupsList.setAdapter(new GroupsAdapter(struct));
-	                        }
-	
-	                        public void onError(Error error) {
-	                            Log.d(TAG, error.toString());
-	                            if (GroupsActivity.this != null) {
-	                                Toast.makeText(GroupsActivity.this, R.string.error_creating_group,
-	                                        Toast.LENGTH_LONG).show();
-	                            }
-	                        }
-	                    });
-                    }
-                }
-            });
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String name = input.getText().toString().trim();
+                            OnCreateGroupListener.this.createGroup(name);
+                        }
+                    });
 
             alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
             alert.show();
         }
+
+        /**
+         * Creates a group on the back-end. If it succeeds, the ListView
+         * containing the list of groups is updated. If it fails, a toast
+         * notification is shown.
+         * 
+         * @param name the name of the group to be created
+         */
+        private void createGroup(String name) {
+            if (name == null || name.equals("")) {
+                Toast.makeText(GroupsActivity.this,
+                        R.string.error_creating_group_empty_name, Toast.LENGTH_LONG).show();
+            } else {
+                AppData data = AppData.getInstance(GroupsActivity.this);
+                double lat, lon;
+                Location currentLoc = data.getLocation();
+                if (currentLoc != null) {
+                    lat = currentLoc.getLatitude();
+                    lon = currentLoc.getLongitude();
+                } else {
+                    lat = DEFAULT_LATITUDE;
+                    lon = DEFAULT_LONGITUDE;
+                    Log.i(TAG, "location was null, using default values");
+                }
+
+                data.getAPI().createGroup(name, lat, lon,
+                        new UnisonAPI.Handler<JsonStruct.GroupsList>() {
+                            @Override
+                            public void callback(GroupsList struct) {
+                                GroupsActivity.this.mGroupsList
+                                        .setAdapter(new GroupsAdapter(struct));
+                            }
+
+                            @Override
+                            public void onError(Error error) {
+                                Log.d(TAG, error.toString());
+                                if (GroupsActivity.this != null) {
+                                    Toast.makeText(GroupsActivity.this,
+                                            R.string.error_creating_group,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+            }
+        }
     }
 
+    /**
+     * When clicking on a group, send a request to the server and start
+     * MainActivity.
+     */
     private class OnGroupSelectedListener implements OnItemClickListener {
 
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)  {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
             long uid = AppData.getInstance(GroupsActivity.this).getUid();
             final JsonStruct.Group group = (JsonStruct.Group) view.getTag();
 
+            // TODO modularize
             api.joinGroup(uid, group.gid, new UnisonAPI.Handler<JsonStruct.Success>() {
 
+                @Override
                 public void callback(Success struct) {
-                    GroupsActivity.this.startActivity(new Intent(GroupsActivity.this, MainActivity.class)
-                            .putExtra(PreferenceKeys.GID_KEY, group.gid).putExtra(PreferenceKeys.NAME_KEY, group.name));
+
+                    GroupsActivity.this.startActivity(
+                            new Intent(GroupsActivity.this, GroupsMainActivity.class)
+                                    .putExtra(Const.Strings.GROUP, group));
                 }
 
+                @Override
                 public void onError(Error error) {
                     Log.d(TAG, error.toString());
                     if (GroupsActivity.this != null) {

@@ -1,8 +1,5 @@
 package ch.epfl.unison;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +7,20 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import ch.epfl.unison.data.MusicItem;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @deprecated use {@link UnisonDB} instead.<br />
+ * 
+ * Helper class for accessing / managing the music library. Note: we are talking
+ * about the one *that GroupStreamer owns*, not the Android content provider which
+ * gives access to the music files.
+ *
+ * @author lum
+ */
 public class LibraryHelper {
 
     @SuppressWarnings("unused")
@@ -27,14 +38,14 @@ public class LibraryHelper {
     private static final String WHERE_ALL = C_LOCAL_ID + " = ? AND "
             + C_ARTIST + " = ? AND " + C_TITLE + " = ?";
 
-    private final OpenHelper dbHelper;
+    private final OpenHelper mDbHelper;
 
     public LibraryHelper(Context context) {
-        this.dbHelper = new OpenHelper(context);
+        mDbHelper = new OpenHelper(context);
     }
 
     public Set<MusicItem> getEntries() {
-        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(TABLE_NAME,
                 new String[] { C_LOCAL_ID, C_ARTIST, C_TITLE },
                 null, null, null, null, null);
@@ -48,16 +59,18 @@ public class LibraryHelper {
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
         }
+        cur.close();
         db.close();
         return set;
     }
 
     public boolean isEmpty() {
-        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(TABLE_NAME,
                 new String[] { C_LOCAL_ID, C_ARTIST, C_TITLE },
                 null, null, null, null, null);
         boolean isEmpty = !cur.moveToFirst();
+        cur.close();
         db.close();
         return isEmpty;
     }
@@ -68,40 +81,47 @@ public class LibraryHelper {
         values.put(C_ARTIST, item.artist);
         values.put(C_TITLE, item.title);
 
-        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.insert(TABLE_NAME, null, values);
         db.close();
     }
 
     public void delete(MusicItem item) {
-        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, WHERE_ALL,
                 new String[] { String.valueOf(item.localId), item.artist, item.title});
         db.close();
     }
 
     public boolean exists(MusicItem item) {
-        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME,
                 new String[] { C_LOCAL_ID },
                 WHERE_ALL,
                 new String[] { String.valueOf(item.localId), item.artist, item.title},
                 null, null, null, "1");  // LIMIT 1
         boolean exists = c.moveToFirst();
+        c.close();
         db.close();
         return exists;
     }
 
     public void truncate() {
-        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, null, null);
         db.close();
     }
 
     public void close() {
-        this.dbHelper.close();
+        mDbHelper.close();
     }
 
+    /**
+     * Simple SQLiteOpenHelper implementation that takes care of initializing the
+     * database on installation and app updates.
+     *
+     * @author lum
+     */
     private static class OpenHelper extends SQLiteOpenHelper {
         private static final String DATABASE_SCHEMA = "CREATE TABLE " + TABLE_NAME + " ("
                 + C_ID + " int PRIMARY KEY, " + C_LOCAL_ID + " int UNIQUE, "
@@ -119,7 +139,7 @@ public class LibraryHelper {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-            this.onCreate(db);
+            onCreate(db);
         }
     }
 

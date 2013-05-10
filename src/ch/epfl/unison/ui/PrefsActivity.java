@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.content.BroadcastReceiver;
@@ -8,20 +9,26 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.util.Log;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.PreferenceKeys;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
+/**
+ * Activity to manage the application's settings (i.e. preferences).
+ * 
+ * @author lum
+ */
 public class PrefsActivity extends SherlockPreferenceActivity {
 
     private static final String TAG = "ch.epfl.unison.PrefsActivity";
 
-    private BroadcastReceiver logoutReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
@@ -33,50 +40,54 @@ public class PrefsActivity extends SherlockPreferenceActivity {
         super.onCreate(savedInstanceState);
 
         // This activity should finish on logout.
-        this.registerReceiver(this.logoutReceiver,
+        registerReceiver(this.mLogoutReceiver,
                 new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
-        this.setTitle(R.string.activity_title_prefs);
-        this.addPreferencesFromResource(R.xml.prefs);
+        setTitle(R.string.activity_title_prefs);
+        addPreferencesFromResource(R.xml.prefs);
 
-        this.findPreference(PreferenceKeys.NICKNAME_KEY).setOnPreferenceChangeListener(
+        findPreference(Const.PrefKeys.NICKNAME).setOnPreferenceChangeListener(
                 new NicknameChangeListener());
 
-        this.findPreference(PreferenceKeys.UID_KEY).setSummary(
-                String.format("your UID is: %d", AppData.getInstance(this).getUid()));
+        findPreference(Const.PrefKeys.UID).setSummary(
+                String.valueOf(AppData.getInstance(this).getUid()));
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(this.logoutReceiver);
+        unregisterReceiver(mLogoutReceiver);
     }
 
+    /** Update information on the back-end when nickname is changed. */
     private class NicknameChangeListener implements Preference.OnPreferenceChangeListener {
 
+        @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             final String newNick = newValue.toString();
             AppData data = AppData.getInstance(PrefsActivity.this);
             data.getAPI().setNickname(data.getUid(), newNick,
                     new UnisonAPI.Handler<JsonStruct.Success>() {
 
-                public void callback(JsonStruct.Success struct) {
-                    Log.i(TAG, String.format("changed nickname to %s", newNick));
-                }
+                        @Override
+                        public void callback(JsonStruct.Success struct) {
+                            Log.i(TAG, String.format("changed nickname to %s", newNick));
+                        }
 
-                public void onError(Error error) {
-                    Log.w(TAG, String.format("couldn't set new nickname %s", newNick));
-                    Log.d(TAG, error.toString());
-                    if (PrefsActivity.this != null) {
-                        Toast.makeText(PrefsActivity.this, R.string.error_updating_nick,
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
+                        @Override
+                        public void onError(Error error) {
+                            Log.w(TAG, String.format("couldn't set new nickname %s", newNick));
+                            Log.d(TAG, error.toString());
+                            if (PrefsActivity.this != null) {
+                                Toast.makeText(PrefsActivity.this, R.string.error_updating_nick,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
             return true;
         }
 
     }
-
 
 }
