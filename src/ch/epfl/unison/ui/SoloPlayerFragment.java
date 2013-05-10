@@ -52,63 +52,31 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     // extends SherlockFragment implements OnClickListener,
     // SoloMainActivity.OnPlaylistInfoListener {
 
-    private static final String TAG = "ch.epfl.unison.PlayerFragment";
+    private static final String TAG = "ch.epfl.unison.SoloPlayerFragment";
     private static final int CLICK_INTERVAL = 5 * 1000; // In milliseconds.
-    private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
-    private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to
-                                                 // SEEK_BAR_MAX.
+    
+    
 
-    private SoloMainActivity mActivity;
+    
 
     // private Button mDjBtn;
     private Button mRatingBtn;
     private Button mToggleBtn;
-    private Button mNextBtn;
-    private Button mPrevBtn;
-
-    private SeekBar mSeekBar;
-    // private TrackProgress progressTracker = null;
-    private Handler mHandler = new Handler();
-
-    private View mButtons;
-    private TextView mArtistTxt;
-    private TextView mTitleTxt;
-    private ImageView mCoverImg;
 
     private boolean mIsDJ;
 
-    private TrackQueue mTrackQueue;
 
     private MusicItem mCurrentTrack;
     private List<MusicItem> mHistory;
     private int mHistPointer;
 
-    /** State of the music player (from the UI point of view). */
-    private enum Status {
-        Stopped, Playing, Paused
-    }
+    
+    
 
-    private Status mStatus = Status.Stopped;
-
-    private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
-    private MusicServiceBinder mMusicService;
-    private boolean mIsBound;
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mMusicService = (MusicServiceBinder) service;
-            mIsBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mIsBound = false;
-        }
-    };
+    
 
     private void initSeekBar() {
-        mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+        getSeekBar().setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
@@ -116,15 +84,15 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mHandler.removeCallbacks(mUpdateProgressTask);
+                getHandler().removeCallbacks(getUpdateProgressTask());
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mHandler.removeCallbacks(mUpdateProgressTask);
+                getHandler().removeCallbacks(getUpdateProgressTask());
                 int currentPosition = seekBar.getProgress();
 
-                seek(currentPosition * (mMusicService.getDuration() / SEEK_BAR_MAX));
+                seek(currentPosition * (getMusicService().getDuration() / getSeekBarMax()));
 
                 updateProgressBar();
             }
@@ -138,23 +106,23 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
 
         mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
         mToggleBtn.setOnClickListener(this);
-        mNextBtn = (Button) v.findViewById(R.id.musicNextBtn);
-        mNextBtn.setOnClickListener(this);
-        mPrevBtn = (Button) v.findViewById(R.id.musicPrevBtn);
-        mPrevBtn.setOnClickListener(this);
+        setNextBtn((Button) v.findViewById(R.id.musicNextBtn));
+        getNextBtn().setOnClickListener(this);
+        setPrevBtn((Button) v.findViewById(R.id.musicPrevBtn));
+        getPrevBtn().setOnClickListener(this);
         // mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
         // mDjBtn.setOnClickListener(this);
         mRatingBtn = (Button) v.findViewById(R.id.ratingBtn);
         mRatingBtn.setOnClickListener(new OnRatingClickListener());
 
-        mSeekBar = (SeekBar) v.findViewById(R.id.musicProgBar);
+        setSeekBar((SeekBar) v.findViewById(R.id.musicProgBar));
         initSeekBar();
 
-        mButtons = v.findViewById(R.id.musicButtons);
+        setButtons(v.findViewById(R.id.musicButtons));
 
-        mArtistTxt = (TextView) v.findViewById(R.id.musicArtist);
-        mTitleTxt = (TextView) v.findViewById(R.id.musicTitle);
-        mCoverImg = (ImageView) v.findViewById(R.id.musicCover);
+        setArtistTxt((TextView) v.findViewById(R.id.musicArtist));
+        setTitleTxt((TextView) v.findViewById(R.id.musicTitle));
+        setCoverImg((ImageView) v.findViewById(R.id.musicCover));
 
         mHistory = new ArrayList<MusicItem>();
         mHistPointer = 0;
@@ -165,9 +133,9 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (SoloMainActivity) activity;
+        setMainActivity((SoloMainActivity) activity);
         // mActivity.registerGroupInfoListener(this);
-        mActivity.registerReceiver(mCompletedReceiver,
+        getMainActivity().registerReceiver(mCompletedReceiver,
                 new IntentFilter(MusicService.ACTION_COMPLETED));
     }
 
@@ -175,43 +143,14 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     public void onDetach() {
         super.onDetach();
         // mActivity.unregisterGroupInfoListener(this);
-        mActivity.unregisterReceiver(mCompletedReceiver);
+        getMainActivity().unregisterReceiver(mCompletedReceiver);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mSeekBar.setEnabled(mIsDJ);
-        if (!mIsDJ) {
-            // Just to make sure, when the activity is recreated.
-            mButtons.setVisibility(View.INVISIBLE);
-            // mDjBtn.setText(getString(R.string.player_become_dj));
-            mSeekBar.setVisibility(View.INVISIBLE);
-        } else {
-            mSeekBar.setVisibility(View.VISIBLE);
-        }
-        mActivity.bindService(
-                new Intent(mActivity, MusicService.class), mConnection,
-                Context.BIND_AUTO_CREATE);
-    }
+    
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mIsBound) {
-            mActivity.unbindService(mConnection);
-        }
-        if (mTrackQueue != null) {
-            mTrackQueue.stop();
-        }
-    }
+    
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mHandler.removeCallbacks(mUpdateProgressTask);
-        getActivity().startService(new Intent(MusicService.ACTION_STOP));
-    }
+    
 
     // @Override
     // public void onGroupInfo(JsonStruct.Group groupInfo) {
@@ -246,14 +185,14 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     @Override
     public void onClick(View v) {
         if (v == mToggleBtn) {
-            if (mStatus == Status.Stopped) {
+            if (getStatus() == Status.Stopped) {
                 next();
             } else { // Paused or Playing.
                 toggle();
             }
-        } else if (v == mNextBtn) {
+        } else if (v == getNextBtn()) {
             next();
-        } else if (v == mPrevBtn) {
+        } else if (v == getPrevBtn()) {
             prev();
         }
         // } else if (v == mDjBtn) {
@@ -263,15 +202,15 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     }
 
     private void seek(int progress) {
-        if ((mStatus == Status.Playing || mStatus == Status.Paused) && mIsDJ) {
-            mMusicService.setCurrentPosition(progress);
+        if ((getStatus() == Status.Playing || getStatus() == Status.Paused) && mIsDJ) {
+            getMusicService().setCurrentPosition(progress);
         }
     }
 
     private void prev() {
         int curPos = 0;
-        if (mIsBound) {
-            curPos = mMusicService.getCurrentPosition();
+        if (isBound()) {
+            curPos = getMusicService().getCurrentPosition();
         }
         if (curPos < CLICK_INTERVAL
                 && mHistPointer < mHistory.size() - 1) {
@@ -287,7 +226,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     private void next() {
         if (!mHistory.isEmpty()
                 && mHistPointer == 0
-                && (mStatus == Status.Playing || mStatus == Status.Paused)) {
+                && (getStatus() == Status.Playing || getStatus() == Status.Paused)) {
             // We're skipping a song that is heard for the first time. Notify
             // the server.
             notifySkip();
@@ -298,7 +237,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
             play(mHistory.get(mHistPointer));
         } else {
             // We need a new track.
-            mTrackQueue.get(new TrackQueue.Callback() {
+            getTrackQueue().get(new TrackQueue.Callback() {
 
                 @Override
                 public void callback(MusicItem item) {
@@ -319,15 +258,15 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     }
 
     private void toggle() {
-        if (mStatus == Status.Playing) {
+        if (getStatus() == Status.Playing) {
             getActivity().startService(
                     new Intent(MusicService.ACTION_PAUSE));
-            mStatus = Status.Paused;
+            setStatus(Status.Paused);
             mToggleBtn.setBackgroundResource(R.drawable.btn_play);
-        } else if (mStatus == Status.Paused) {
+        } else if (getStatus() == Status.Paused) {
             getActivity().startService(
                     new Intent(MusicService.ACTION_PLAY));
-            mStatus = Status.Playing;
+            setStatus(Status.Playing);
             mToggleBtn.setBackgroundResource(R.drawable.btn_pause);
 
         }
@@ -338,27 +277,27 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
         // Send the song to the music player service.
         Uri uri = ContentUris.withAppendedId(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);
-        mActivity.startService(new Intent(MusicService.ACTION_LOAD)
+        getMainActivity().startService(new Intent(MusicService.ACTION_LOAD)
                 .setData(uri));
         mCurrentTrack = item;
-        mStatus = Status.Playing;
+        setStatus(Status.Playing);
 
         // Update the interface.
         mToggleBtn.setBackgroundResource(R.drawable.btn_pause);
-        mCoverImg.setImageResource(R.drawable.cover);
-        mArtistTxt.setText(item.artist);
-        mTitleTxt.setText(item.title);
+        getCoverImg().setImageResource(R.drawable.cover);
+        getArtistTxt().setText(item.artist);
+        getTitleTxt().setText(item.title);
 
         // Log.d(TAG, "musicService gave us a duration of " + duration + " ms");
-        mSeekBar.setProgress(0);
-        mSeekBar.setMax(SEEK_BAR_MAX);
+        getSeekBar().setProgress(0);
+        getSeekBar().setMax(getSeekBarMax());
         updateProgressBar();
 
         notifyPlay(item); // Notify the server.
     }
 
     private void notifyPlay(MusicItem item) {
-        UnisonAPI api = AppData.getInstance(mActivity).getAPI();
+        UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
         // api.setCurrentTrack(mActivity.getGroupId(), item.artist,
         // item.title, new UnisonAPI.Handler<JsonStruct.Success>() {
         //
@@ -382,7 +321,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
     }
 
     private void notifySkip() {
-        UnisonAPI api = AppData.getInstance(mActivity).getAPI();
+        UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
         // api.skipTrack(mActivity.getGroupId(),
         // new UnisonAPI.Handler<JsonStruct.Success>() {
         // @Override
@@ -536,40 +475,9 @@ public class SoloPlayerFragment extends UnisonPlayerFragment
         }
     }
 
-    /**
-     * Listens to broadcasts from the media player indicating when a track is
-     * over.
-     */
-    private class TrackCompletedReceiver extends BroadcastReceiver {
+    
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            SoloPlayerFragment.this.mStatus = Status.Stopped;
-            Log.i(TAG, "track has completed, send the next one.");
-            SoloPlayerFragment.this.next();
-        }
-
-    }
-
-    public void updateProgressBar() {
-        mHandler.postDelayed(mUpdateProgressTask, UPDATE_INTERVAL);
-    }
-
-    private Runnable mUpdateProgressTask = new Runnable() {
-
-        @Override
-        public void run() {
-            int currentPosition = mMusicService.getCurrentPosition();
-            int total = mMusicService.getDuration();
-
-            if (total == 0) {
-                total = Integer.MAX_VALUE;
-            }
-
-            mSeekBar.setProgress((SEEK_BAR_MAX * currentPosition) / total);
-            mHandler.postDelayed(this, UPDATE_INTERVAL);
-        }
-    };
+    
 
     @Override
     public void onPlaylistInfo(PlaylistJS playlistInfo) {
