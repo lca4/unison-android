@@ -32,37 +32,15 @@ import java.util.Set;
  *
  * @author lum
  */
-public class GroupsMainActivity extends UnisonFragmentActivity { 
-//extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
+public class GroupsMainActivity extends UnisonFragmentActivity {
 
     private static final String TAG = "ch.epfl.unison.MainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000;  // in ms.
-//    private static final int INITIAL_DELAY = 500; // in ms.
     //Distance threshold between the user and the automatic group in meters.
     private static final double MAX_DISTANCE = 2000;
     
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
-//    private Menu mMenu;
-
-//    private boolean mIsForeground = false;
-//    private Handler mHandler = new Handler();
-//    private Runnable mUpdater = new Runnable() {
-//        @Override
-//        public void run() {
-//            if (mIsForeground) {
-//                onRefresh();
-//                mHandler.postDelayed(this, RELOAD_INTERVAL);
-//            }
-//        }
-//    };
-
-//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            finish();
-//        }
-//    };
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
 
@@ -77,31 +55,30 @@ public class GroupsMainActivity extends UnisonFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handleExtras(getIntent().getExtras());
         
         setReloadInterval(RELOAD_INTERVAL);
         setTag(TAG);
 
-        // This activity should finish on logout.
-        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
-
-        // Set up the tabs & stuff.
-        mViewPager = new ViewPager(this);
-        mViewPager.setId(R.id.realtabcontent); // TODO change
-        setContentView(mViewPager);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        ActionBar bar = getSupportActionBar();
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mTabsAdapter = new TabsAdapter(this, mViewPager);
-        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_player),
+//        // This activity should finish on logout.
+//        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+//
+//        // Set up the tabs & stuff.
+//        mViewPager = new ViewPager(this);
+//        mViewPager.setId(R.id.realtabcontent); // TODO change
+//        setContentView(mViewPager);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//
+//        ActionBar bar = getSupportActionBar();
+//        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        mTabsAdapter = new TabsAdapter(this, mViewPager);
+        mTabsAdapter.addTab(getSupportActBar().newTab().setText(R.string.fragment_title_player),
                 GroupsPlayerFragment.class, null);
-        mTabsAdapter.addTab(bar.newTab().setText(R.string.fragment_title_stats),
+        mTabsAdapter.addTab(getSupportActBar().newTab().setText(R.string.fragment_title_stats),
                 GroupsStatsFragment.class, null);
     }
 
-    private void handleExtras(Bundle extras) {
+    protected void handleExtras(Bundle extras) {
         if (extras == null || !extras.containsKey(Const.Strings.GROUP)) {
             // Should never happen. If it does, redirect the user to the groups list.
             Log.d(TAG, "Tried creating mainActivity"
@@ -117,44 +94,6 @@ public class GroupsMainActivity extends UnisonFragmentActivity {
              
         }
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        mIsForeground = true;
-//        mHandler.postDelayed(mUpdater, INITIAL_DELAY);
-//    }
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        mIsForeground = false;
-//    }
-
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        unregisterReceiver(mLogoutReceiver);
-//    }
-
-//    public void repaintRefresh(boolean isRefreshing) {
-//        if (mMenu == null) {
-//            return;
-//        }
-//
-//        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-//        if (refreshItem != null) {
-//            if (isRefreshing) {
-//                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-//                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                View refreshView = inflater.inflate(
-//                        R.layout.actionbar_indeterminate_progress, null);
-//                refreshItem.setActionView(refreshView);
-//            } else {
-//                refreshItem.setActionView(null);
-//            }
-//        }
-//    }
     
     private void autoLeave() {
         AppData data = AppData.getInstance(this);
@@ -178,7 +117,7 @@ public class GroupsMainActivity extends UnisonFragmentActivity {
 
     @Override
     public void onRefresh() {
-        repaintRefresh(true);
+    	super.onRefresh();
         UnisonAPI api = AppData.getInstance(this).getAPI();
         
         autoLeave();
@@ -211,29 +150,6 @@ public class GroupsMainActivity extends UnisonFragmentActivity {
 
     private void onGroupInfo(JsonStruct.Group group) {
         setTitle(group.name);
-    }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        mMenu = menu;
-//        return UnisonMenu.onCreateOptionsMenu(this, menu);
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        return UnisonMenu.onOptionsItemSelected(this, this, item);
-//    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            startActivity(new Intent(this, GroupsActivity.class)
-                    .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     /** Simple interface to be notified about group info updates. */

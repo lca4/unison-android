@@ -3,14 +3,20 @@ package ch.epfl.unison.ui;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import ch.epfl.unison.R;
+import ch.epfl.unison.ui.SoloMainActivity.TabsAdapter;
 import ch.epfl.unison.ui.UnisonMenu.OnRefreshListener;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -25,11 +31,14 @@ import com.actionbarsherlock.view.MenuItem;
 public abstract class UnisonFragmentActivity extends SherlockFragmentActivity implements OnRefreshListener {
     
     private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
+    private static final int INITIAL_DELAY = 500; // in ms.
     private static int smReloadInterval;
     private boolean mIsForeground = false;
     private Menu mMenu;
-//    private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
-    private static final int INITIAL_DELAY = 500; // in ms.
+    
+    private TabsAdapter mTabsAdapter;
+    private ViewPager mViewPager;
+    ActionBar mSuuportActionBar;
     
     private boolean mIsDJ = false;
     
@@ -72,6 +81,30 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
     }
     
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        handleExtras(getIntent().getExtras());
+        
+        setReloadInterval(30 * 1000);
+
+        // This activity should finish on logout.
+        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+
+        // Set up the tabs & stuff.
+        mViewPager = new ViewPager(this);
+        mViewPager.setId(R.id.realtabcontent); // TODO change
+        setContentView(mViewPager);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mSuuportActionBar = getSupportActionBar();
+        mSuuportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mTabsAdapter = new TabsAdapter(this, mViewPager);
+    }
+    
+    protected abstract void handleExtras(Bundle extras);
+    
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         return UnisonMenu.onCreateOptionsMenu(this, menu);
@@ -80,6 +113,18 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return UnisonMenu.onOptionsItemSelected(this, this, item);
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            startActivity(new Intent(this, GroupsActivity.class)
+                    .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
     
     public void repaintRefresh(boolean isRefreshing) {
@@ -127,10 +172,6 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
         return mLogoutReceiver;
     }
 
-//    public static int getReloadInterval() {
-//        return RELOAD_INTERVAL;
-//    }
-
     protected Handler getHandler() {
         return mHandler;
     }
@@ -159,25 +200,13 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
         return mMenu;
     }
     
-    public void setDJ(boolean dj) {
+    protected void setDJ(boolean dj) {
         mIsDJ = dj;
         getMenu().findItem(R.id.menu_item_manage_group).setVisible(dj);
     }
     
-    public boolean getDJ() {
-        return mIsDJ;
+    protected ActionBar getSupportActBar() {
+    	return mSuuportActionBar;
     }
-
-//    public void setUpdater(Runnable updater) {
-//        this.mUpdater = updater;
-//    }
-
-//    public void setHandler(Handler mHandler) {
-//        this.mHandler = mHandler;
-//    }
-
-//    public void setLogoutReceiver(BroadcastReceiver mLogoutReceiver) {
-//        this.mLogoutReceiver = mLogoutReceiver;
-//    }
 
 }
