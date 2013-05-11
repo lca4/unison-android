@@ -22,7 +22,7 @@ import com.actionbarsherlock.view.MenuItem;
  * @author marc
  *
  */
-public class UnisonFragmentActivity extends SherlockFragmentActivity implements OnRefreshListener {
+public abstract class UnisonFragmentActivity extends SherlockFragmentActivity implements OnRefreshListener {
     
     private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
     private static int smReloadInterval;
@@ -30,6 +30,8 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
     private Menu mMenu;
 //    private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
     private static final int INITIAL_DELAY = 500; // in ms.
+    
+    private boolean mIsDJ = false;
     
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -155,6 +157,15 @@ public class UnisonFragmentActivity extends SherlockFragmentActivity implements 
     
     protected Menu getMenu() {
         return mMenu;
+    }
+    
+    public void setDJ(boolean dj) {
+        mIsDJ = dj;
+        getMenu().findItem(R.id.menu_item_manage_group).setVisible(dj);
+    }
+    
+    public boolean getDJ() {
+        return mIsDJ;
     }
 
 //    public void setUpdater(Runnable updater) {
