@@ -44,7 +44,7 @@ import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 import com.actionbarsherlock.app.SherlockFragment;
 
 /**
- * Fragment that is displayed inside {@link UnisonFragmentActivity} (one of the
+ * Fragment that is displayed inside {@link UnisonMainActivity} (one of the
  * tabs). It contains the UI of the music player (media player buttons, cover
  * art, ...). <br />
  * Provides:
@@ -159,7 +159,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		return SEEK_BAR_MAX;
 	}
 
-	private UnisonFragmentActivity mMainActivity;
+	private UnisonMainActivity mMainActivity;
 
 	private Button mNextBtn;
 	private Button mPrevBtn;
@@ -252,7 +252,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		return mHandler;
 	}
 
-	protected UnisonFragmentActivity getMainActivity() {
+	protected UnisonMainActivity getMainActivity() {
 		return mMainActivity;
 	}
 
@@ -349,7 +349,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		setMainActivity((UnisonFragmentActivity) activity);
+		setMainActivity((UnisonMainActivity) activity);
 		getMainActivity().registerReceiver(mCompletedReceiver,
 				new IntentFilter(MusicService.ACTION_COMPLETED));
 	}
@@ -561,7 +561,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	private void setMainActivity(UnisonFragmentActivity mActivity) {
+	private void setMainActivity(UnisonMainActivity mActivity) {
 		this.mMainActivity = mActivity;
 	}
 

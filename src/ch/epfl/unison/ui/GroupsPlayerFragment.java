@@ -27,7 +27,7 @@ import ch.epfl.unison.music.MusicService;
 /**
  * Specialized Fragment for {@link GroupsMainFragment}.
  * 
- * @see UnisonFragmentActivity
+ * @see UnisonMainActivity
  * 
  * @author lum
  */

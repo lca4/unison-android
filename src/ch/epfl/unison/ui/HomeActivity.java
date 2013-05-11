@@ -31,40 +31,11 @@ public class HomeActivity extends UnisonFragmentActivity {
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
-//    private static final int INITIAL_DELAY = 500; // in ms.
 
-    // public static final String ACTION_LEAVE_GROUP =
-    // "ch.epfl.unison.action.LEAVE_GROUP";
-
-    // GUI specific
-//    private ListView mActivitiesList;
-//    private Menu mMenu;
-
-//    private boolean mIsForeground = false;
-//    private Handler mHandler = new Handler();
-//    private Runnable mUpdater = new Runnable() {
-//        @Override
-//        public void run() {
-//            if (mIsForeground) {
-//                onRefresh();
-//                mHandler.postDelayed(this, RELOAD_INTERVAL);
-//            }
-//        }
-//    };
-
-    /*
-     * Coulde be refactorized
-     */
-//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            finish();
-//        }
-//    };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         
         setTag(TAG);
@@ -127,10 +98,5 @@ public class HomeActivity extends UnisonFragmentActivity {
 
     }
 
-    @Override
-    public void onRefresh() {
-        // TODO Auto-generated method stub
-
-    }
 
 }

@@ -27,9 +27,11 @@ import java.util.Set;
  * Activity that is displayed once you're inside the group. Displays the music
  * player and information about the group (through fragments).
  * 
+ * @see UnisonMainActivity
+ * 
  * @author lum
  */
-public class SoloMainActivity extends UnisonFragmentActivity {
+public class SoloMainActivity extends UnisonMainActivity {
 
     private static final String TAG = "ch.epfl.unison.SoloMainActivity";
     private static final int RELOAD_INTERVAL = 30 * 1000; // in ms.

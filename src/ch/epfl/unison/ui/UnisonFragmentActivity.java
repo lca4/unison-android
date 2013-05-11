@@ -38,9 +38,6 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
     
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
-    ActionBar mSuuportActionBar;
-    
-    private boolean mIsDJ = false;
     
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -83,26 +80,7 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handleExtras(getIntent().getExtras());
-        
-        setReloadInterval(30 * 1000);
-
-        // This activity should finish on logout.
-        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
-
-        // Set up the tabs & stuff.
-        mViewPager = new ViewPager(this);
-        mViewPager.setId(R.id.realtabcontent); // TODO change
-        setContentView(mViewPager);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mSuuportActionBar = getSupportActionBar();
-        mSuuportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mTabsAdapter = new TabsAdapter(this, mViewPager);
     }
-    
-    protected abstract void handleExtras(Bundle extras);
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -200,13 +178,20 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity im
         return mMenu;
     }
     
-    protected void setDJ(boolean dj) {
-        mIsDJ = dj;
-        getMenu().findItem(R.id.menu_item_manage_group).setVisible(dj);
+    protected TabsAdapter getTabsAdapter() {
+    	return mTabsAdapter;
     }
     
-    protected ActionBar getSupportActBar() {
-    	return mSuuportActionBar;
+    protected void setTabsAdapter(TabsAdapter ta) {
+    	this.mTabsAdapter = ta;
+    }
+    
+    protected ViewPager getViewPager() {
+    	return mViewPager;
+    }
+    
+    protected void setViewPager(ViewPager vp) {
+    	this.mViewPager = vp; 
     }
 
 }

@@ -20,7 +20,7 @@ import ch.epfl.unison.data.MusicItem;
 /**
  * Specialized Fragment for {@link SoloMainFragment}.
  * 
- * @see UnisonFragmentActivity
+ * @see UnisonMainActivity
  * 
  * @author marc
  */
