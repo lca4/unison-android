@@ -18,15 +18,14 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
 
 /**
- * Fragment that is displayed inside MainActivity (one of the tabs). It contains
- * the UI of the music player (media player buttons, cover art, ...).
+ * Specialized Fragment for {@link SoloMainFragment}.
+ * 
+ * @see UnisonFragmentActivity
  * 
  * @author marc
  */
 public class SoloPlayerFragment extends UnisonPlayerFragment implements
 		SoloMainActivity.OnPlaylistInfoListener {
-	// extends SherlockFragment implements OnClickListener,
-	// SoloMainActivity.OnPlaylistInfoListener {
 
 	/**
 	 * Handles instant ratings (when the user clicks on the rating button in the
@@ -94,6 +93,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment implements
 
 	private static final String TAG = "ch.epfl.unison.SoloPlayerFragment";
 
+	@Override
 	protected void notifyPlay(MusicItem item) {
 		UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
 		// api.setCurrentTrack(mActivity.getGroupId(), item.artist,
@@ -118,6 +118,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment implements
 		// });
 	}
 
+	@Override
 	protected void notifySkip() {
 		UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
 		// api.skipTrack(mActivity.getGroupId(),
@@ -144,6 +145,7 @@ public class SoloPlayerFragment extends UnisonPlayerFragment implements
 			Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 		setTag(TAG);
+		setHistory(null); // TODO fetch a real playlist
 		return v;
 	}
 
@@ -159,11 +161,6 @@ public class SoloPlayerFragment extends UnisonPlayerFragment implements
 	}
 
 	@Override
-	protected void setIsDJ(boolean wantsToBeDJ) {
-		// Unused, since there is not DJ
-	}
-
-	@Override
 	protected boolean requestTrack() {
 		/*
 		 * Since the playlist is generate once and all the tracks are known
@@ -171,5 +168,10 @@ public class SoloPlayerFragment extends UnisonPlayerFragment implements
 		 * fly.
 		 */
 		return false;
+	}
+
+	@Override
+	protected void setIsDJ(boolean wantsToBeDJ) {
+		// Unused, since there is not DJ
 	}
 }

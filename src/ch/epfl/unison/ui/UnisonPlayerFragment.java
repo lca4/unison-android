@@ -34,6 +34,7 @@ import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.TrackQueue;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
@@ -43,11 +44,15 @@ import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 import com.actionbarsherlock.app.SherlockFragment;
 
 /**
- * Provides the standard stuff about handling the music player.
- * 
- * Provides basic support for dj.
- * 
- * Does not offer a data structure
+ * Fragment that is displayed inside {@link UnisonFragmentActivity} (one of the
+ * tabs). It contains the UI of the music player (media player buttons, cover
+ * art, ...). <br />
+ * Provides:
+ * <ul>
+ * <li>the standard stuff for handling the music player.
+ * <li>basic support for dj.
+ * </ul>
+ * Does not offer a data structure for dynammic queues, like {@link TrackQueue}.
  * 
  * @author marc
  * 
@@ -150,7 +155,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to
 
 	// SEEK_BAR_MAX.
-	public static int getSeekBarMax() {
+	private static int getSeekBarMax() {
 		return SEEK_BAR_MAX;
 	}
 
@@ -163,14 +168,12 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	private Button mDjBtn;
 
 	private SeekBar mSeekBar;
-	// private TrackProgress progressTracker = null;
 	private Handler mHandler = new Handler();
 	private View mButtons;
 
 	private TextView mArtistTxt;
 	private TextView mTitleTxt;
 	private ImageView mCoverImg;
-//	private TrackQueue mTrackQueue;
 
 	private MusicItem mCurrentTrack;
 	private List<MusicItem> mHistory;
@@ -217,83 +220,71 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	};
 
-	public void addToHistory(MusicItem item) {
+	protected void addToHistory(MusicItem item) {
 		mHistory.add(0, item);
 	}
 
-	public TextView getArtistTxt() {
+	protected TextView getArtistTxt() {
 		return mArtistTxt;
 	}
 
-	public View getButtons() {
+	View getButtons() {
 		return mButtons;
 	}
 
-	public ServiceConnection getConnection() {
+	private ServiceConnection getConnection() {
 		return mConnection;
 	}
 
-	public ImageView getCoverImg() {
+	protected ImageView getCoverImg() {
 		return mCoverImg;
 	}
 
-	public MusicItem getCurrentTrack() {
+	MusicItem getCurrentTrack() {
 		return mCurrentTrack;
 	}
-	
-	public Button getDJBtn() {
+
+	Button getDJBtn() {
 		return mDjBtn;
 	}
-	
-	public Handler getHandler() {
+
+	private Handler getHandler() {
 		return mHandler;
 	}
-	
-	public List<MusicItem> getHistory() {
-		return mHistory;
-	}
 
-	public int getHistPointer() {
-		return mHistPointer;
-	}
-
-	public UnisonFragmentActivity getMainActivity() {
+	protected UnisonFragmentActivity getMainActivity() {
 		return mMainActivity;
 	}
 
-	public MusicServiceBinder getMusicService() {
+	private MusicServiceBinder getMusicService() {
 		return mMusicService;
 	}
 
-	public Button getNextBtn() {
+	private Button getNextBtn() {
 		return mNextBtn;
 	}
 
-	public Button getPrevBtn() {
+	private Button getPrevBtn() {
 		return mPrevBtn;
 	}
 
-	public SeekBar getSeekBar() {
+	SeekBar getSeekBar() {
 		return mSeekBar;
 	}
 
-	public Status getStatus() {
+	private Status getStatus() {
 		return mStatus;
 	}
 
-	public TextView getTitleTxt() {
+	protected TextView getTitleTxt() {
 		return mTitleTxt;
 	}
 
-	public Button getToggleBtn() {
+	Button getToggleBtn() {
 		return mToggleBtn;
 	}
 
-//	public TrackQueue getTrackQueue() {
-//		return mTrackQueue;
-//	}
-
-	public Runnable getUpdateProgressTask() {
+	private Runnable getUpdateProgressTask() {
 		return mUpdateProgressTask;
 	}
 
@@ -323,11 +314,11 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		});
 	}
 
-	public boolean isBound() {
+	private boolean isBound() {
 		return mIsBound;
 	}
 
-	public boolean isDJ() {
+	protected boolean isDJ() {
 		return mIsDJ;
 	}
 
@@ -453,9 +444,6 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		if (isBound()) {
 			getMainActivity().unbindService(getConnection());
 		}
-//		if (getTrackQueue() != null) {
-//			getTrackQueue().stop();
-//		}
 	}
 
 	protected void play(MusicItem item) {
@@ -500,10 +488,10 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	}
 
 	/**
-	 * Does not return explicitly a new track. A track should be added the 
-	 * history through {@link #addToHistory(MusicItem)}.
-	 * In case of success, return true.
-	 * Else, return false.
+	 * Does not return explicitly a new track. A track should be added the
+	 * history through {@link #addToHistory(MusicItem)}. In case of success,
+	 * return true. Else, return false.
+	 * 
 	 * @return
 	 */
 	protected abstract boolean requestTrack();
@@ -514,27 +502,23 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	public void setArtistTxt(TextView mArtistTxt) {
+	private void setArtistTxt(TextView mArtistTxt) {
 		this.mArtistTxt = mArtistTxt;
 	}
 
-	public void setBound(boolean mIsBound) {
+	private void setBound(boolean mIsBound) {
 		this.mIsBound = mIsBound;
 	}
 
-	public void setButtons(View mButtons) {
+	private void setButtons(View mButtons) {
 		this.mButtons = mButtons;
 	}
 
-	public void setConnection(ServiceConnection mConnection) {
-		this.mConnection = mConnection;
-	}
-
-	public void setCoverImg(ImageView mCoverImg) {
+	private void setCoverImg(ImageView mCoverImg) {
 		this.mCoverImg = mCoverImg;
 	}
 
-	public void setCurrentTrack(MusicItem mCurrentTrack) {
+	protected void setCurrentTrack(MusicItem mCurrentTrack) {
 		this.mCurrentTrack = mCurrentTrack;
 	}
 
@@ -543,7 +527,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	 * 
 	 * @param djSupport
 	 */
-	public void setDJSupport(boolean djSupport) {
+	protected void setDJSupport(boolean djSupport) {
 		mDJSupport = djSupport;
 		if (mDJSupport) {
 			mDjBtn.setVisibility(View.VISIBLE);
@@ -552,15 +536,13 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	public void setHandler(Handler mHandler) {
-		this.mHandler = mHandler;
-	}
-
-	public void setHistPointer(int val) {
-		mHistPointer = val;
-	}
-	
-	public void setHistory(List<MusicItem> history) {
+	/**
+	 * Initialize the history, for example when giving a playlist from the
+	 * android database
+	 * 
+	 * @param history
+	 */
+	protected void setHistory(List<MusicItem> history) {
 		mHistory = history;
 	}
 
@@ -583,40 +565,32 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		this.mMainActivity = mActivity;
 	}
 
-	public void setMusicService(MusicServiceBinder mMusicService) {
+	private void setMusicService(MusicServiceBinder mMusicService) {
 		this.mMusicService = mMusicService;
 	}
 
-	public void setNextBtn(Button mNextBtn) {
+	private void setNextBtn(Button mNextBtn) {
 		this.mNextBtn = mNextBtn;
 	}
 
-	public void setPrevBtn(Button mPrevBtn) {
+	private void setPrevBtn(Button mPrevBtn) {
 		this.mPrevBtn = mPrevBtn;
 	}
 
-	public void setSeekBar(SeekBar mSeekBar) {
+	private void setSeekBar(SeekBar mSeekBar) {
 		this.mSeekBar = mSeekBar;
 	}
 
-	public void setStatus(Status mStatus) {
+	protected void setStatus(Status mStatus) {
 		this.mStatus = mStatus;
 	}
-
-//	public void setTrackQueue(TrackQueue mTrackQueue) {
-//		this.mTrackQueue = mTrackQueue;
-//	}
 
 	protected void setTag(String tag) {
 		smTag = tag;
 	}
-	
-	public void setTitleTxt(TextView mTitleTxt) {
-		this.mTitleTxt = mTitleTxt;
-	}
 
-	public void setUpdateProgressTask(Runnable mUpdateProgressTask) {
-		this.mUpdateProgressTask = mUpdateProgressTask;
+	private void setTitleTxt(TextView mTitleTxt) {
+		this.mTitleTxt = mTitleTxt;
 	}
 
 	private void toggle() {
@@ -632,7 +606,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	public void updateProgressBar() {
+	private void updateProgressBar() {
 		getHandler().postDelayed(getUpdateProgressTask(), UPDATE_INTERVAL);
 	}
 }
