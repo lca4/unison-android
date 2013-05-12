@@ -1,12 +1,11 @@
 
 package ch.epfl.unison.api;
 
-import ch.epfl.unison.data.Playlist;
-import ch.epfl.unison.data.TagItem;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
+
+import ch.epfl.unison.data.Playlist;
+import ch.epfl.unison.data.TagItem;
 
 /**
  * POJOs for JSON serialization / deserialization.

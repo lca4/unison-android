@@ -1,13 +1,20 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -28,10 +35,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
-import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.Const;
+import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -45,13 +51,6 @@ import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.MenuItem;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 
 /*
  * TODO
@@ -71,10 +70,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
-//    private static final int INITIAL_DELAY = 500; // in ms.
-
-    // public static final String ACTION_LEAVE_GROUP =
-    // "ch.epfl.unison.action.LEAVE_GROUP";
 
     private Playlist mPlaylist;
     private UnisonDB mDB;
@@ -84,39 +79,17 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
     // GUI specific
     private ListView mPlaylistsListLocal;
     private ListView mPlaylistsListRemote;
-//    private Menu mMenu;
 
-//    private boolean mIsForeground = false;
-//    private Handler mHandler = new Handler();
-//    private Runnable mUpdater = new Runnable() {
-//        @Override
-//        public void run() {
-//            if (isForeground()) {
-//                onRefresh();
-//                getHandler().postDelayed(this, RELOAD_INTERVAL);
-//            }
-//        }
-//    };
-
-    /*
-     * Coulde be refactorized
-     */
-//    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            finish();
-//        }
-//    };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         setReloadInterval(RELOAD_INTERVAL);
         setTag(TAG);
 
         // This activity should finish on logout.
-        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+//        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
@@ -336,56 +309,7 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
 //        }
 //    }
 
-    // private void leaveGroup() {
-    // // Make sure the user is not marked as present in any group.
-    // AppData data = AppData.getInstance(this);
-    // data.getAPI().leaveGroup(data.getUid(), new
-    // UnisonAPI.Handler<JsonStruct.Success>() {
-    //
-    // @Override
-    // public void callback(Success struct) {
-    // Log.d(TAG, "successfully left group");
-    // }
-    //
-    // @Override
-    // public void onError(Error error) {
-    // Log.d(TAG, error.toString());
-    // }
-    // });
-    // }
 
-    // private void showHelpDialog() {
-    // AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    //
-    // alert.setTitle(getString(R.string.groups_helpdialog_title));
-    // alert.setMessage(getString(R.string.groups_helpdialog_message));
-    //
-    // final CheckBox cbox = new CheckBox(this);
-    // cbox.setText(getString(R.string.groups_helpdialog_chkbox));
-    // alert.setView(cbox);
-    //
-    // DialogInterface.OnClickListener click = new
-    // DialogInterface.OnClickListener() {
-    //
-    // @Override
-    // public void onClick(DialogInterface dialog, int which) {
-    // if (cbox.isChecked()) {
-    // // Don't show the dialog again in the future.
-    // AppData.getInstance(SoloPlaylistsActivity.this).setShowHelpDialog(false);
-    // }
-    // if (DialogInterface.BUTTON_POSITIVE == which) {
-    // startActivity(new Intent(SoloPlaylistsActivity.this,
-    // HelpActivity.class));
-    // }
-    // }
-    // };
-    //
-    // alert.setPositiveButton(getString(R.string.groups_helpdialog_yesBtn),
-    // click);
-    // alert.setNegativeButton(getString(R.string.groups_helpdialog_noBtn),
-    // click);
-    // alert.show();
-    // }
 
     /** Adapter used to populate the ListView listing the playlists. */
     private class PlaylistsAdapter extends ArrayAdapter<Playlist> {
@@ -462,39 +386,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
             // alert.show();
         }
 
-        // /**
-        // * Helper to convert a TypedArray to a String in JSONObject format.
-        // The
-        // * TypedArray values are treated as Strings. Only the values with
-        // index
-        // * from indexes are selected.
-        // *
-        // * @param key
-        // * @param values
-        // * @param indexes
-        // * @return null in case of failure
-        // */
-        // @SuppressLint("NewApi")
-        // private JSONObject export(String key, int array,
-        // ArrayList<Integer> indexes) {
-        // TypedArray tags = getResources().obtainTypedArray(array);
-        // String valuesInString = "";
-        // for (int i = 0; i < indexes.size(); i++) {
-        // if (!valuesInString.isEmpty()) {
-        // valuesInString = valuesInString.concat(",");
-        // }
-        // valuesInString = valuesInString.concat(tags.getString(i));
-        // }
-        // tags.recycle();
-        // JSONObject json = new JSONObject();
-        // try {
-        // json.put("tags", valuesInString);
-        // return json;
-        // } catch (JSONException e) {
-        // e.printStackTrace();
-        // }
-        // return null;
-        // }
 
         /**
          * @author marc
@@ -547,173 +438,7 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
             }
         }
 
-        // /**
-        // * @author marc
-        // */
-        // @SuppressLint({
-        // "ValidFragment", "NewApi"
-        // })
-        // private class PickTagsDialogFragment extends
-        // android.support.v4.app.DialogFragment {
-        // private ArrayList<Integer> mSelectedItems;
-        //
-        // public PickTagsDialogFragment() {
-        // mSelectedItems = new ArrayList<Integer>();
-        // }
-        //
-        // @Override
-        // public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // // final Cursor cursor = mDB.tagGetItemsCursor();
-        // // cursor.moveToFirst();
-        // LinkedHashMap<String, Integer> items = mDB.getTags();
-        // final boolean[] checkedItems = new boolean[items.size()];
-        // for (int i = 0; i < checkedItems.length; i++) {
-        // checkedItems[i] = false;
-        // }
-        // List<CharSequence> tags = new ArrayList<CharSequence>();
-        // Set<String> keys = items.keySet();
-        // Iterator<String> it = keys.iterator();
-        // while (it.hasNext()) {
-        // tags.add(it.next());
-        // }
-        //
-        // AlertDialog.Builder builder = new
-        // AlertDialog.Builder(SoloPlaylistsActivity.this);
-        // builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
-        // .setPositiveButton(R.string.generic_ok,
-        // new DialogInterface.OnClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int id) {
-        // Log.i(TAG, mSelectedItems.toString());
-        // // mPlaylist.addRawTags(mSelectedItems);
-        // OnCreatePlaylistListener.this.generatePlaylist();
-        // }
-        // })
-        // .setNegativeButton(R.string.generic_cancel,
-        // new DialogInterface.OnClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int id) {
-        // mSelectedItems.clear();
-        // }
-        // })
-        // .setMultiChoiceItems(tags.toArray(new CharSequence[tags.size()]),
-        // checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int which,
-        // boolean isChecked) {
-        // if (isChecked) {
-        // checkedItems[which] = true;
-        // mSelectedItems.add(which);
-        // } else if
-        // (mSelectedItems.contains(which)) {
-        // // Else, if the item is already in
-        // // the array, remove it
-        // checkedItems[which] = false;
-        // mSelectedItems.remove(Integer.valueOf(which));
-        // }
-        // }
-        // });
-        //
-        // // .setMultiChoiceItems(cursor,
-        // // mDB.tagGetColumnLabelIsChecked(),
-        // // mDB.tagGetColumnLabelName(),
-        // // new DialogInterface.OnMultiChoiceClickListener() {
-        // // @Override
-        // // public void onClick(DialogInterface dialog, int which,
-        // // boolean isChecked) {
-        // // cursor.moveToPosition(which);
-        // // mDB.tagSetChecked(cursor.getInt(cursor.getColumnIndex(mDB
-        // // .getColumnLabelRowId())), isChecked);
-        // // // if (isChecked) {
-        // // // // If the user checked the item, add
-        // // // // it
-        // // // // to the selected items
-        // // //
-        // // // //TODO update is_checked field in DB
-        // // // cursor.move(which);
-        // // // int tagId = cursor.getInt(0);
-        // // // mDb.tagSetChecked(tagId, isChecked);
-        // // // mSelectedItems.add(which);
-        // // // } else if
-        // // // (mSelectedItems.contains(which)) {
-        // // // // Else, if the item is already in
-        // // // // the array, remove it
-        // // // mSelectedItems.remove(Integer.valueOf(which));
-        // // // }
-        // // }
-        // // });
-        // return builder.create();
-        // }
-        // }
-
-        // /**
-        // * @author marc
-        // */
-        // @SuppressLint({
-        // "ValidFragment", "NewApi"
-        // })
-        // private class PickTracksDialogFragment extends
-        // android.support.v4.app.DialogFragment {
-        // private ArrayList<Integer> mSelectedItems;
-        //
-        // public PickTracksDialogFragment() {
-        // mSelectedItems = new ArrayList<Integer>();
-        // }
-        //
-        // @Override
-        // public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // LinkedHashMap<String, Integer> items = mDB.getLibEntries();
-        // final boolean[] checkedItems = new boolean[items.size()];
-        // for (int i = 0; i < checkedItems.length; i++) {
-        // checkedItems[i] = false;
-        // }
-        // List<CharSequence> libEntries = new ArrayList<CharSequence>();
-        // Set<String> keys = items.keySet();
-        // Iterator<String> it = keys.iterator();
-        // while (it.hasNext()) {
-        // libEntries.add(it.next());
-        // }
-        //
-        // AlertDialog.Builder builder = new
-        // AlertDialog.Builder(SoloPlaylistsActivity.this);
-        // builder.setTitle(R.string.solo_playlists_dialog_pick_seeds)
-        // .setPositiveButton(R.string.generic_ok,
-        // new DialogInterface.OnClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int id) {
-        // Log.i(TAG, mSelectedItems.toString());
-        // // mPlaylist.addRawTags(mSelectedItems);
-        // OnCreatePlaylistListener.this.generatePlaylist();
-        // }
-        // })
-        // .setNegativeButton(R.string.generic_cancel,
-        // new DialogInterface.OnClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int id) {
-        // mSelectedItems.clear();
-        // }
-        // })
-        // .setMultiChoiceItems(libEntries.toArray(new
-        // CharSequence[libEntries.size()]),
-        // checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-        // @Override
-        // public void onClick(DialogInterface dialog, int which,
-        // boolean isChecked) {
-        // if (isChecked) {
-        // checkedItems[which] = true;
-        // mSelectedItems.add(which);
-        // } else if
-        // (mSelectedItems.contains(which)) {
-        // // Else, if the item is already in
-        // // the array, remove it
-        // checkedItems[which] = false;
-        // mSelectedItems.remove(Integer.valueOf(which));
-        // }
-        // }
-        // });
-        // return builder.create();
-        // }
-        // }
+       
 
         /**
          * @author marc
@@ -881,5 +606,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
             // });
         }
     }
+
 
 }
