@@ -27,11 +27,11 @@ import ch.epfl.unison.music.MusicService;
 /**
  * Specialized Fragment for {@link GroupsMainFragment}.
  * 
- * @see UnisonMainActivity
+ * @see AbstractMainActivity
  * 
  * @author lum
  */
-public class GroupsPlayerFragment extends UnisonPlayerFragment implements
+public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 		GroupsMainActivity.OnGroupInfoListener {
 
 	private static final String TAG = "ch.epfl.unison.PlayerFragment";

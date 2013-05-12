@@ -61,7 +61,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
         setContentView(R.layout.group_history);
 
         mGroupsList = (ListView) findViewById(R.id.groupHistoryList);

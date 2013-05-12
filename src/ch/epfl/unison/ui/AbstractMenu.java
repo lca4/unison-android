@@ -17,7 +17,7 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * @author lum
  */
-public abstract class UnisonMenu {
+public abstract class AbstractMenu {
     
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.chunison.ui.UnisonMenu";

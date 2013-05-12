@@ -44,7 +44,7 @@ import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 import com.actionbarsherlock.app.SherlockFragment;
 
 /**
- * Fragment that is displayed inside {@link UnisonMainActivity} (one of the
+ * Fragment that is displayed inside {@link AbstractMainActivity} (one of the
  * tabs). It contains the UI of the music player (media player buttons, cover
  * art, ...). <br />
  * Provides:
@@ -57,7 +57,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  * @author marc
  * 
  */
-public abstract class UnisonPlayerFragment extends SherlockFragment implements
+public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		OnClickListener {
 
 	/**
@@ -139,9 +139,9 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			UnisonPlayerFragment.this.setStatus(Status.Stopped);
+			AbstractPlayerFragment.this.setStatus(Status.Stopped);
 			Log.i(smTag, "track has completed, send the next one.");
-			UnisonPlayerFragment.this.next();
+			AbstractPlayerFragment.this.next();
 		}
 
 	}
@@ -159,7 +159,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		return SEEK_BAR_MAX;
 	}
 
-	private UnisonMainActivity mMainActivity;
+	private AbstractMainActivity mMainActivity;
 
 	private Button mNextBtn;
 	private Button mPrevBtn;
@@ -252,7 +252,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		return mHandler;
 	}
 
-	protected UnisonMainActivity getMainActivity() {
+	protected AbstractMainActivity getMainActivity() {
 		return mMainActivity;
 	}
 
@@ -349,7 +349,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		setMainActivity((UnisonMainActivity) activity);
+		setMainActivity((AbstractMainActivity) activity);
 		getMainActivity().registerReceiver(mCompletedReceiver,
 				new IntentFilter(MusicService.ACTION_COMPLETED));
 	}
@@ -561,7 +561,7 @@ public abstract class UnisonPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	private void setMainActivity(UnisonMainActivity mActivity) {
+	private void setMainActivity(AbstractMainActivity mActivity) {
 		this.mMainActivity = mActivity;
 	}
 
