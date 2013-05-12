@@ -68,7 +68,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver,
-                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+                new IntentFilter(AbstractMenu.ACTION_LOGOUT));
 
         setContentView(R.layout.ratings);
         setTitle(R.string.activity_title_ratings);

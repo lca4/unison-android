@@ -20,11 +20,11 @@ import ch.epfl.unison.data.MusicItem;
 /**
  * Specialized Fragment for {@link SoloMainFragment}.
  * 
- * @see UnisonMainActivity
+ * @see AbstractMainActivity
  * 
  * @author marc
  */
-public class SoloPlayerFragment extends UnisonPlayerFragment implements
+public class SoloPlayerFragment extends AbstractPlayerFragment implements
 		SoloMainActivity.OnPlaylistInfoListener {
 
 	/**

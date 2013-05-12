@@ -65,7 +65,7 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * @author marc bourqui
  */
-public class SoloPlaylistsActivity extends UnisonFragmentActivity {
+public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 // extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
@@ -87,9 +87,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
         
         setReloadInterval(RELOAD_INTERVAL);
         setTag(TAG);
-
-        // This activity should finish on logout.
-//        registerReceiver(getLogoutReceiver(), new IntentFilter(UnisonMenu.ACTION_LOGOUT));
 
         mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
@@ -140,30 +137,9 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
     @Override
     public void onResume() {
         super.onResume();
-//        setToForeground(true);
         startService(new Intent(LibraryService.ACTION_UPDATE));
-//        getHandler().postDelayed(getUpdater(), getInitialDelay());
     }
 
-    /*
-     * Could be refactorized (non-Javadoc)
-     * @see com.actionbarsherlock.app.SherlockActivity#onPause()
-     */
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        mIsForeground = false;
-//    }
-
-    /*
-     * Could be refactorized (non-Javadoc)
-     * @see com.actionbarsherlock.app.SherlockActivity#onDestroy()
-     */
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        unregisterReceiver(mLogoutReceiver);
-//    };
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -185,29 +161,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
                 return super.onContextItemSelected((android.view.MenuItem) item);
         }
     }
-
-    /*
-     * Could be refactorized (non-Javadoc)
-     * @see
-     * com.actionbarsherlock.app.SherlockActivity#onCreateOptionsMenu(android
-     * .view.Menu)
-     */
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        mMenu = menu;
-//        return UnisonMenu.onCreateOptionsMenu(this, menu);
-//    }
-
-    /*
-     * Could be refactorized (non-Javadoc)
-     * @see
-     * com.actionbarsherlock.app.SherlockActivity#onOptionsItemSelected(android
-     * .view.MenuItem)
-     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        return UnisonMenu.onOptionsItemSelected(this, this, item);
-//    }
 
     @Override
     public void onRefresh() {
@@ -286,29 +239,6 @@ public class SoloPlaylistsActivity extends UnisonFragmentActivity {
         data.getAPI().listPlaylists(data.getUid(), playlistsHandler);
         data.getAPI().listTags(data.getUid(), tagsHandler);
     }
-
-//    public void repaintRefresh(boolean isRefreshing) {
-//        if (mMenu == null) {
-//            Log.d(TAG, "repaintRefresh: mMenu is null");
-//            return;
-//        }
-//
-//        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-//        if (refreshItem != null) {
-//            if (isRefreshing) {
-//                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-//                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                View refreshView = inflater.inflate(
-//                        R.layout.actionbar_indeterminate_progress, null);
-//                refreshItem.setActionView(refreshView);
-//            } else {
-//                refreshItem.setActionView(null);
-//            }
-//        } else {
-//            Log.d(TAG, "repaintRefresh: menu_item_refresh not found");
-//        }
-//    }
-
 
 
     /** Adapter used to populate the ListView listing the playlists. */

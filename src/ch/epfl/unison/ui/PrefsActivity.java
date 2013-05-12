@@ -40,7 +40,7 @@ public class PrefsActivity extends SherlockPreferenceActivity {
 
         // This activity should finish on logout.
         registerReceiver(this.mLogoutReceiver,
-                new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+                new IntentFilter(AbstractMenu.ACTION_LOGOUT));
 
         setTitle(R.string.activity_title_prefs);
         addPreferencesFromResource(R.xml.prefs);

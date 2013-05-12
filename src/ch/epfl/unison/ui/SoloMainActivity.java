@@ -16,11 +16,11 @@ import ch.epfl.unison.api.UnisonAPI;
  * Activity that is displayed once you're inside the group. Displays the music
  * player and information about the group (through fragments).
  * 
- * @see UnisonMainActivity
+ * @see AbstractMainActivity
  * 
  * @author lum
  */
-public class SoloMainActivity extends UnisonMainActivity {
+public class SoloMainActivity extends AbstractMainActivity {
 
     /** Simple interface to be notified about group info updates. */
     public interface OnPlaylistInfoListener {

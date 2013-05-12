@@ -27,7 +27,7 @@ import ch.epfl.unison.R;
  * 
  * @author marc bourqui
  */
-public class HomeActivity extends UnisonFragmentActivity {
+public class HomeActivity extends AbstractFragmentActivity {
 //extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";

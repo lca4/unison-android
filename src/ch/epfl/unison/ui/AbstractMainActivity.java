@@ -10,12 +10,12 @@ import com.actionbarsherlock.app.ActionBar;
  * Provides some default behaviors. Not supposed to be instantiated directly,
  * but to be extended.
  * 
- * @see UnisonFragmentActivity
+ * @see AbstractFragmentActivity
  * 
  * @author marc
  * 
  */
-public abstract class UnisonMainActivity extends UnisonFragmentActivity {
+public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
 	private static final String TAG = "ch.epfl.unison.UnisonMainActivity";
 

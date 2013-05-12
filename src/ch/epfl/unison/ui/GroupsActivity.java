@@ -46,7 +46,7 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * @author lum
  */
-public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRefreshListener {
+public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnRefreshListener {
 
     private static final String TAG = "ch.epfl.unison.GroupsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
@@ -91,7 +91,7 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         Log.d(TAG, "GroupsActivity is being created.");
 
         // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
 
         setContentView(R.layout.groups);
 
@@ -143,12 +143,12 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
-        return UnisonMenu.onCreateOptionsMenu(this, menu);
+        return AbstractMenu.onCreateOptionsMenu(this, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return UnisonMenu.onOptionsItemSelected(this, this, item);
+        return AbstractMenu.onOptionsItemSelected(this, this, item);
     }
 
     @Override

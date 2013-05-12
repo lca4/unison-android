@@ -17,7 +17,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import ch.epfl.unison.R;
-import ch.epfl.unison.ui.UnisonMenu.OnRefreshListener;
+import ch.epfl.unison.ui.AbstractMenu.OnRefreshListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -32,7 +32,7 @@ import com.actionbarsherlock.view.MenuItem;
  * @author marc
  * 
  */
-public abstract class UnisonFragmentActivity extends SherlockFragmentActivity
+public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 		implements OnRefreshListener {
 
 	private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
@@ -89,7 +89,7 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity
 
 		// This activity should finish on logout.
 		registerReceiver(getLogoutReceiver(), new IntentFilter(
-				UnisonMenu.ACTION_LOGOUT));
+				AbstractMenu.ACTION_LOGOUT));
 
 		// Set up the tabs & stuff.
 		setViewPager(new ViewPager(this));
@@ -101,12 +101,12 @@ public abstract class UnisonFragmentActivity extends SherlockFragmentActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		mMenu = menu;
-		return UnisonMenu.onCreateOptionsMenu(this, menu);
+		return AbstractMenu.onCreateOptionsMenu(this, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		return UnisonMenu.onOptionsItemSelected(this, this, item);
+		return AbstractMenu.onOptionsItemSelected(this, this, item);
 	}
 
 	@Override
