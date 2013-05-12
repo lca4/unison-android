@@ -1,6 +1,10 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,9 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import ch.epfl.unison.R;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /*
  * TODO
@@ -35,7 +36,7 @@ public class HomeActivity extends UnisonFragmentActivity {
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         
         setTag(TAG);
@@ -96,6 +97,11 @@ public class HomeActivity extends UnisonFragmentActivity {
             return true;
         }
 
+    }
+    
+    @Override
+    public void onRefresh() {
+    	
     }
 
 

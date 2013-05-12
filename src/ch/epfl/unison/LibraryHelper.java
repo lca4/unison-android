@@ -1,16 +1,16 @@
 package ch.epfl.unison;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-
 import ch.epfl.unison.data.MusicItem;
-
-import java.util.HashSet;
-import java.util.Set;
+import ch.epfl.unison.data.UnisonDB;
 
 /**
  * @deprecated use {@link UnisonDB} instead.<br />

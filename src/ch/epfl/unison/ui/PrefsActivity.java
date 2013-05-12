@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.util.Log;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;

@@ -1,19 +1,19 @@
 
 package ch.epfl.unison.data;
 
-import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.api.JsonStruct.Track;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedList;
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import ch.epfl.unison.Const.SeedType;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
