@@ -20,7 +20,6 @@ import com.google.gson.GsonBuilder;
  */
 public class UnisonAPI {
 
-    @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.UnisonAPI";
 
     // TODO: revert to production server (make it a preference?).
@@ -94,6 +93,15 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("gid", gid).setAuth(mAuth).doPUT();
     }
+    
+    public void joinProtectedGroup(long uid, long gid,
+            String password, Handler<JsonStruct.Success> handler) {
+        Log.d(TAG, "joining group protected and using password: " + password);
+        URL url = urlFor("/users/%d/group", uid);
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
+        .addParam("gid", gid)
+        .addParam("password", password).setAuth(mAuth).doPUT();
+    }
 
     public void leaveGroup(long uid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/group", uid);
@@ -117,6 +125,13 @@ public class UnisonAPI {
         URL url = urlFor("/groups?lat=%f&lon=%f", lat, lon);
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(mAuth).doGET();
+    }
+    
+    public void setGroupPassword(long gid, String password, Handler<JsonStruct.Success> handler) {
+        URL url = urlFor("/groups/%d", gid);
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
+                .addParam("password", password)
+                .setAuth(mAuth).doPUT();
     }
 
     public void createGroup(String name, double lat, double lon,

@@ -22,6 +22,9 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Log into the application (checks username / password against the back-end).
@@ -31,6 +34,8 @@ import com.actionbarsherlock.app.SherlockActivity;
 public class LoginActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.LoginActivity";
+    
+    private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
     private TextView mSignupTxt;
@@ -42,6 +47,8 @@ public class LoginActivity extends SherlockActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        
+        Log.d(TAG, "Calling LoginActivity.onCreate");
 
         mEmail = (EditText) findViewById(R.id.email);
         mPassword = (EditText) findViewById(R.id.password);
@@ -68,6 +75,25 @@ public class LoginActivity extends SherlockActivity {
 
         // Initialize the AppData instance.
         AppData.getInstance(this);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = LoginActivity.this.getSupportMenuInflater();
+        inflater.inflate(R.menu.login_menu, menu);  
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.login_menu_item_signup:
+                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     private void logout() {
@@ -107,6 +133,7 @@ public class LoginActivity extends SherlockActivity {
     public void onStart() {
         super.onStart();
 
+        Log.d(TAG, "Calling LoginActivity.onStart");
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.getBoolean(Const.Strings.LOGOUT)) {
             logout();
@@ -162,6 +189,8 @@ public class LoginActivity extends SherlockActivity {
             startActivity(new Intent(this, HomeActivity.class));
         }
         // Close this activity.
+        
+        Log.d(TAG, "Going to finish LoginActiviy");
         finish();
     }
 

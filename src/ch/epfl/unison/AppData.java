@@ -47,6 +47,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private static final int MEDIUM = 60 * 1000;
     private static final int FAST = 10 * 1000;
     
+    private static final int GROUP_PASSWORD_LENGTH = 4;
     
     private static int sCurrentSpeed = SLOW;
 
@@ -271,6 +272,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         return new GsonBuilder().create().fromJson(value, mGroupHistoryMapType);
     }
     
+    public int getGroupPasswordLength() {
+        return GROUP_PASSWORD_LENGTH;
+    }
+    
     /**
      * This method checks whether the history has become too long and,
      * if so, deletes the oldest entries. It should be called in the
@@ -340,6 +345,7 @@ public final class AppData implements OnSharedPreferenceChangeListener {
             Log.i(TAG, String.format("Got location (%s): lat=%f, lon=%f",
                     mProvider, location.getLatitude(), location.getLongitude()));
         }
+        
 
         @Override
         public void onProviderDisabled(String provider) { }

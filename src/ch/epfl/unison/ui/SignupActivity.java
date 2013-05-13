@@ -80,6 +80,7 @@ public class SignupActivity extends SherlockActivity {
             @Override
             public void callback(JsonStruct.User struct) {
                 startActivity(new Intent(SignupActivity.this, LoginActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         .putExtra(Const.PrefKeys.EMAIL, email)
                         .putExtra(Const.PrefKeys.PASSWORD, password));
                 dialog.dismiss();
