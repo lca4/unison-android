@@ -1,29 +1,27 @@
+
 package ch.epfl.unison.api;
-
-import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.util.Log;
-
-import ch.epfl.unison.AppData;
-import ch.epfl.unison.api.JsonStruct.TracksList;
-import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.MusicItem;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Log;
+import ch.epfl.unison.AppData;
+import ch.epfl.unison.api.JsonStruct.TracksList;
+import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.MusicItem;
+
 /**
  * Implements an "infinite" playlist. Tracks are buffered locally such that we
- * can always start playing the next song. The buffer is periodically updated with
- * fresh tracks from the server.
- *
- * As a track might not be readily available, the get() method works asynchronously
- * and returns as soon as we have something in the buffer (in most cases, hopefully
- * immediately).
- *
+ * can always start playing the next song. The buffer is periodically updated
+ * with fresh tracks from the server. As a track might not be readily available,
+ * the get() method works asynchronously and returns as soon as we have
+ * something in the buffer (in most cases, hopefully immediately).
+ * 
  * @author lum
  */
 public class TrackQueue {
@@ -34,12 +32,14 @@ public class TrackQueue {
     private static final int POLL_INTERVAL = 30000; // in ms.
 
     /** Number of attempts to get an element from the queue. **/
-    private static final int MAX_RETRIES = 15;  // To be multiplied by SLEEP_INTERVAL.
+    private static final int MAX_RETRIES = 15; // To be multiplied by
+                                               // SLEEP_INTERVAL.
 
     /** Max number of requests to get a track from the server. */
     private static final int MAX_REQUESTS = 10;
 
-    private Set<MusicItem> mPlaylist;  // Is a set, but insertion order is important!
+    private Set<MusicItem> mPlaylist; // Is a set, but insertion order is
+                                      // important!
     private String mPlaylistId;
     private int mNextPtr;
 
@@ -70,14 +70,15 @@ public class TrackQueue {
     }
 
     public void stop() {
-       this.mIsActive = false;
-       this.mPlaylist.clear();
-       this.mNextPtr = 0;
+        this.mIsActive = false;
+        this.mPlaylist.clear();
+        this.mNextPtr = 0;
     }
 
     /** Simple callback for the asynchronous get() method. */
     public interface Callback {
         void callback(MusicItem item);
+
         void onError();
     }
 
@@ -154,7 +155,10 @@ public class TrackQueue {
                     for (JsonStruct.Track track : chunk.tracks) {
                         Log.d(TAG, String.format("Adding %s - %s to the queue",
                                 track.artist, track.title));
-                        mPlaylist.add(new MusicItem(track.localId, track.artist, track.title));
+                        if (!mPlaylist.add(new MusicItem(track.localId, track.artist,
+                                track.title))) {
+                            mNextPtr = 0;
+                        }
                     }
                 }
             }
@@ -172,7 +176,9 @@ public class TrackQueue {
 
         @Override
         public void run() {
-            if (!mIsActive) { return; }
+            if (!mIsActive) {
+                return;
+            }
 
             Log.d(TAG, "Polling for a new playlist...");
             UnisonAPI api = AppData.getInstance(mContext).getAPI();

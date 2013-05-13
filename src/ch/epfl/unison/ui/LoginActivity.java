@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
@@ -182,11 +181,12 @@ public class LoginActivity extends SherlockActivity {
     private void nextActivity(JsonStruct.User user) {
         if (user.gid != null) {
             // Directly go into group.
-            startActivity(new Intent(this, MainActivity.class)
+            startActivity(new Intent(this, GroupsMainActivity.class)
                     .putExtra(Const.Strings.GID, user.gid));
         } else {
             // Display list of groups.
-            startActivity(new Intent(this, GroupsActivity.class));
+//            startActivity(new Intent(this, GroupsActivity.class));
+            startActivity(new Intent(this, HomeActivity.class));
         }
         // Close this activity.
         

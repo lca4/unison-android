@@ -19,10 +19,13 @@
     <string name="activity_title_signup">Sign Up</string>
     <string name="activity_title_history">Group History</string>
     <string name="activity_title_manage">Set Password</string>
+    <string name="activity_title_home">GroupStreamer</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
+    <string name="solo_player_fragment_title">Music</string>
+    <string name="solo_playlist_fragment_title">Tracks</string>
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
@@ -106,6 +109,7 @@
     <string name="solo_playlists_choosePL">or select one below :</string>
     <string name="solo_playlists_localPL">My playlists</string>
     <string name="solo_playlists_remotePL">Available playlists</string>
+    <string name="solo_playlists_noRemotePL">Sorry, no playlist is available</string>
     <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
@@ -115,6 +119,10 @@
     <string name="playlist_context_menu_item_delete">Delete</string>
     <string name="playlist_context_menu_item_share">Share with other users</string>
     <string name="playlist_context_menu_item_edit">Edit</string>
+    <string name="playlist_context_menu_item_save">Save to phone</string>
+    
+    <!-- Home -->
+    <string name="home_title">What kind of party?</string>
     
     <!-- Solo player -->
 

@@ -3,9 +3,9 @@ package ch.epfl.unison.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
 /**
@@ -41,9 +41,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            Log.i(TAG, "Creates lib_entry table");
             db.execSQL(LIBE_SCHEMA);
-            Log.i(TAG, "Creates tag table");
             db.execSQL(TAG_SCHEMA);
         } catch (SQLiteException e) {
             Log.v(TAG, e.getMessage()); // "Create table exception"

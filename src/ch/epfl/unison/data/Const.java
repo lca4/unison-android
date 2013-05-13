@@ -63,13 +63,17 @@ final class Const {
     static final String PLAYLISTS_TABLE_NAME = "playlists"; // Prefix: PLYL_
     static final String PLYL_C_ID = C_ID;
     static final String PLYL_C_LOCAL_ID = "local_id";
-    static final String PLYL_C_LOCAL_UPDATE_TIME = "update_time"; // =PlaylistsColumns.DATE_MODIFIED
+    static final String PLYL_C_GS_SIZE = "gs_size";
+    //static final String PLYL_C_LOCAL_UPDATE_TIME = "update_time"; // =PlaylistsColumns.DATE_MODIFIED
     static final String PLYL_C_CREATED_BY_GS = "created_by_gs"; // was PL created using GS?
     static final String PLYL_C_REMOTE_ID = "gs_playlist_id"; // if created by GroupStreamer
     static final String PLYL_C_GS_CREATION_TIME = "gs_creation_time"; // if created by GS
     // Update the android playlists only if requested, thus track last update
     static final String PLYL_C_GS_UPDATE_TIME = "gs_update_time"; // if created by GS
+    static final String PLYL_C_GS_AVG_RATING = "gs_avg_rating";
+    static final String PLYL_C_GS_IS_SHARED = "gs_is_shared";
     static final String PLYL_C_GS_IS_SYNCED = "gs_is_synced";
+    
 
     // Const class can't be instanciated
     private Const() {
