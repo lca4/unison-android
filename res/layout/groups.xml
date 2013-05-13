@@ -30,8 +30,8 @@
       android:id="@+id/displaySuggestion"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="@string/groups_display_suggestion"
-      android:visibility="gone" />
+      android:text="@string/groups_display_suggestion_disabled"
+      android:enabled="false" />
 
   <!-- Text output wrapper -->
   <ListView

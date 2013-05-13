@@ -66,7 +66,8 @@
     <string name="groups_suggestion_yesBtn">Yes</string>
     <string name="groups_suggestion_noBtn">No, thanks</string>
     <string name="groups_suggestion_cBx">Do not ask me again</string>
-    <string name="groups_display_suggestion">Join users near me</string>
+    <string name="groups_display_suggestion_enabled">Join users near me</string>
+    <string name="groups_display_suggestion_disabled">No users near me</string>
     <string name="groups_alert_newgroup_title">New Group</string>
     <string name="groups_alert_newgroup_message">Pick a name for the group:</string>
     <string name="groups_alert_newgroup_ok">OK</string>
@@ -77,12 +78,14 @@
     <string name="groups_password_OK">OK</string>
     <string name="groups_password_cancel">Cancel</string>
     
+    
     <!-- Main -->
  	<string name="main_set_password_title">Choose PIN</string>
 	<string name="main_password_hint">Group Password</string>
 	<string name="main_password_ok">OK</string>
 	<string name="main_password_cancel">Cancel</string>
 	<string name="main_success_setting_password">Successfully set Password</string>
+	<string name="main_password_reset">Reset Password</string>
 
     <!-- Single user mode -->
    	<string name="solo_playlists_helpdialog_title">Welcome</string>
