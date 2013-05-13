@@ -3,17 +3,28 @@ package ch.epfl.unison.ui;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
+import ch.epfl.unison.api.JsonStruct.Success;
+import ch.epfl.unison.api.UnisonAPI.Error;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
@@ -145,4 +156,80 @@ public class GroupsMainActivity extends AbstractMainActivity {
 	public void unregisterGroupInfoListener(OnGroupInfoListener listener) {
 		mListeners.remove(listener);
 	}
+	
+	private DialogInterface.OnClickListener mPasswordClick = new DialogInterface.OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == Dialog.BUTTON_POSITIVE) {
+                AppData data = AppData.getInstance(GroupsMainActivity.this);
+                UnisonAPI api = data.getAPI();
+                String password = ((EditText) ((Dialog) dialog).findViewById(R.id.groupPassword))
+                        .getText().toString();
+                api.setGroupPassword(mGroup.gid, password, 
+                        new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                    @Override
+                    public void callback(Success struct) {
+                        if (GroupsMainActivity.this != null) {
+                            Toast.makeText(GroupsMainActivity.this, 
+                                    R.string.main_success_setting_password,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Error error) {
+                        if (GroupsMainActivity.this != null) {
+                            Toast.makeText(GroupsMainActivity.this, 
+                                    R.string.error_setting_password,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });   
+            }
+        }
+    };
+    
+	
+	public void displayPasswordDialog() {
+	       if (getDJ()) {
+	           AlertDialog.Builder builder = new AlertDialog.Builder(GroupsMainActivity.this);
+	           builder.setTitle(R.string.main_set_password_title);
+	           LayoutInflater layoutInflater = (LayoutInflater) 
+	                   getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	           View dialogView = layoutInflater.inflate(R.layout.set_password_dialog, null);
+	           builder.setView(dialogView);
+	           EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
+	           
+	           builder.setPositiveButton(getString(R.string.main_password_ok), mPasswordClick);
+	           builder.setNegativeButton(getString(R.string.main_password_cancel), mPasswordClick);
+
+	           final AlertDialog dialog = builder.create();
+	                
+	           password.addTextChangedListener(new TextWatcher() {
+	            
+	            @Override
+	            public void onTextChanged(CharSequence s, int start, int before, int count) {
+	                dialog.getButton(Dialog.BUTTON_POSITIVE)
+	                        .setEnabled(s.length() == AppData
+	                                .getInstance(GroupsMainActivity.this).getGroupPasswordLength());
+	            }
+	            
+	            @Override
+	            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+	                //Do nothing
+	            }
+	            
+	            @Override
+	            public void afterTextChanged(Editable arg0) {
+	                //Do nothing
+	            }
+	        });
+	           
+	           dialog.show();
+	           dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
+	       }
+	    }
+
 }

@@ -229,7 +229,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                             //using the history. This is in case of wrong automatic behavior.
                             group.automatic = false;
                             GroupsHistoryActivity.this.startActivity(
-                                    new Intent(GroupsHistoryActivity.this, MainActivity.class)
+                                    new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
                                     .putExtra(Const.Strings.GROUP, group)
                                     .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 //                            finish();
@@ -296,7 +296,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
             public void callback(Success struct) {
                                     
                 GroupsHistoryActivity.this.startActivity(
-                        new Intent(GroupsHistoryActivity.this, MainActivity.class)
+                        new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
                         .putExtra(Const.Strings.GROUP, group)
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }

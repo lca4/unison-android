@@ -65,9 +65,9 @@ public abstract class AbstractMenu {
                 activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
                 break;
             case R.id.menu_item_manage_group:
-                if (activity instanceof MainActivity && ((MainActivity) activity).getDJ()) {
+                if (activity instanceof GroupsMainActivity && ((GroupsMainActivity) activity).getDJ()) {
                     // TODO is it a problem if we call this here?
-                    ((MainActivity) activity).displayPasswordDialog();
+                    ((GroupsMainActivity) activity).displayPasswordDialog();
                 }
                 break;
             case android.R.id.home: // if using home button from menu: R.id.home 
