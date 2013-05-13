@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -58,6 +59,27 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
     private Menu mMenu;
+    
+    private UnisonAPI.Handler<JsonStruct.Success> mSetPasswordHandler = new UnisonAPI.Handler<JsonStruct.Success>() {
+
+        @Override
+        public void callback(Success struct) {
+            if (MainActivity.this != null) {
+                Toast.makeText(MainActivity.this,
+                        R.string.main_success_setting_password,
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onError(Error error) {
+            if (MainActivity.this != null) {
+                Toast.makeText(MainActivity.this,
+                        R.string.error_setting_password,
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    };
 
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -246,27 +268,7 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
                 UnisonAPI api = data.getAPI();
                 String password = ((EditText) ((Dialog) dialog).findViewById(R.id.groupPassword))
                         .getText().toString();
-                api.setGroupPassword(mGroup.gid, password, 
-                        new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                    @Override
-                    public void callback(Success struct) {
-                        if (MainActivity.this != null) {
-                            Toast.makeText(MainActivity.this, 
-                                    R.string.main_success_setting_password,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        if (MainActivity.this != null) {
-                            Toast.makeText(MainActivity.this, 
-                                    R.string.error_setting_password,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });   
+                api.setGroupPassword(mGroup.gid, password, mSetPasswordHandler);   
             }
         }
     };
@@ -275,16 +277,32 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
        if (getDJ()) {
            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
            builder.setTitle(R.string.main_set_password_title);
+           
            LayoutInflater layoutInflater = (LayoutInflater) 
                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+           
            View dialogView = layoutInflater.inflate(R.layout.set_password_dialog, null);
            builder.setView(dialogView);
-           EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
            
+           EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
+           Button resetButton = (Button) dialogView.findViewById(R.id.rstPassword);
+           
+         
            builder.setPositiveButton(getString(R.string.main_password_ok), mPasswordClick);
            builder.setNegativeButton(getString(R.string.main_password_cancel), mPasswordClick);
 
            final AlertDialog dialog = builder.create();
+           
+           resetButton.setOnClickListener(new View.OnClickListener() {
+
+               @Override
+               public void onClick(View v) {
+                   AppData data = AppData.getInstance(MainActivity.this);
+                   UnisonAPI api = data.getAPI();
+                   api.setGroupPassword(mGroup.gid, "", mSetPasswordHandler);
+                   dialog.dismiss();
+               }
+           });
                 
            password.addTextChangedListener(new TextWatcher() {
             
