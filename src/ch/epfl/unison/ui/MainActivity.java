@@ -131,6 +131,18 @@ public class MainActivity extends SherlockFragmentActivity implements UnisonMenu
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //First choice: we restart the activity:
+        startActivity(intent);
+        finish();
+        
+        //Second choice:
+//        setIntent(intent); //optional
+//        handleExtras(intent.getExtras());
+    }
+    
+    @Override
     protected void onResume() {
         super.onResume();
         mIsForeground = true;
