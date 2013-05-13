@@ -190,6 +190,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         } else {
             data.getAPI().listGroups(handler);
         }
+        switchSuggestionButtonState(data.showGroupSuggestion());
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
         }
@@ -264,6 +265,15 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         alert.show();
     }
 
+    private void switchSuggestionButtonState(boolean enabled) {
+        Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion); 
+        reDisplaySuggestion.setEnabled(enabled);
+        if (enabled) {
+            reDisplaySuggestion.setText(R.string.groups_display_suggestion_enabled);
+        } else {
+            reDisplaySuggestion.setText(R.string.groups_display_suggestion_disabled);
+        }
+    }
 
     private AlertDialog.Builder prepareSuggestionBuilder() {
         AlertDialog.Builder builder = new AlertDialog.Builder(GroupsActivity.this);
@@ -313,12 +323,10 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         builder.setOnCancelListener(new DialogInterface.OnCancelListener() {         
             @Override
             public void onCancel(DialogInterface dialog) {
-                mSuggestion = null;
+//                mSuggestion = null;
                 mSuggestionIsForeground = false;
-                
-                Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion); 
-                reDisplaySuggestion.setVisibility(View.GONE);
-                
+
+//                switchSuggestionButtonState(false);
                 //We could handle here whether the checkbox was checked or not,
                 //but it makes more sense to do so only when the user presses a button.
             }
@@ -331,7 +339,6 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         
         Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion);
         
-        reDisplaySuggestion.setVisibility(View.VISIBLE);
         reDisplaySuggestion.setOnClickListener(new OnClickListener() {
             
             @Override
@@ -340,9 +347,19 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             }
         });
         
+        switchSuggestionButtonState(true);
+        
 //        mSuggestionIsForeground = true;
         final Dialog dialog = builder.create();
         dialog.show();
+    }
+    
+    private boolean validSuggestion(JsonStruct.GroupSuggestion sugg) {
+        return !(sugg == null || GroupsActivity.this == null
+                || !sugg.suggestion
+                || sugg.users == null
+                || sugg.cluster == null
+                || sugg.group == null);
     }
 
     private UnisonAPI.Handler<JsonStruct.GroupSuggestion> mSuggestionHandler = 
@@ -351,29 +368,23 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         @Override
         public void callback(GroupSuggestion struct) {
             //If we get the same suggestion twice we don't want to show the pop up again.
-            if (mSuggestion != null && struct != null && struct.group != null) {
+            if (validSuggestion(struct) && validSuggestion(mSuggestion)) {
                 if (mSuggestion.group.gid.equals(struct.group.gid)) {
                     mSuggestionIsForeground = false;
-
+                    mSuggestion = struct;
                     return;
                 }
             }
             
             //Sanity check on the Suggestion we just received.
             mSuggestion = struct;           
-            if (mSuggestion == null || GroupsActivity.this == null
-                    || !mSuggestion.suggestion
-                    || mSuggestion.users == null
-                    || mSuggestion.cluster == null
-                    || mSuggestion.group == null) {
+            if (!validSuggestion(struct)) {
                 mSuggestion = null;
                 mSuggestionIsForeground = false;
                 
-                Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion); 
-                reDisplaySuggestion.setVisibility(View.GONE);
+                switchSuggestionButtonState(false);
                 return;
-            }           
-            
+            }
             showSuggestionDialog();
         }
 
@@ -381,8 +392,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         public void onError(Error error) {
             mSuggestionIsForeground = false;
             
-            Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion); 
-            reDisplaySuggestion.setVisibility(View.GONE);
+            switchSuggestionButtonState(false);
             //Do nothing, errors silently happen in the background.
         }
     };
