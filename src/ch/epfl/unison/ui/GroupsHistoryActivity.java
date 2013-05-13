@@ -234,8 +234,9 @@ public class GroupsHistoryActivity extends SherlockActivity {
                             group.automatic = false;
                             GroupsHistoryActivity.this.startActivity(
                                     new Intent(GroupsHistoryActivity.this, MainActivity.class)
-                                    .putExtra(Const.Strings.GROUP, group));
-                            finish();
+                                    .putExtra(Const.Strings.GROUP, group)
+                                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+//                            finish();
                         }
 
                         @Override
@@ -249,11 +250,11 @@ public class GroupsHistoryActivity extends SherlockActivity {
                         }
                     };
 
-            if (mAlreadyInGroup) {
-                leaveThenJoinGroup(enterGroup, uid, group);
+            if (group.password) {
+                promptForPassword(group);
             } else {
-                if (group.password) {
-                    promptForPassword(group);
+                if (mAlreadyInGroup) {
+                    leaveThenJoinGroup(enterGroup, uid, group, null);
                 } else {
                     api.joinGroup(uid, group.gid, enterGroup);
                 }
@@ -263,21 +264,21 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
     private void leaveThenJoinGroup(final UnisonAPI.Handler<JsonStruct.Success> enterGroup, 
             final long uid,
-            final JsonStruct.Group group) {
+            final JsonStruct.Group group,
+            final String password) {
         // Make sure the user is not marked as present in any group.
         AppData data = AppData.getInstance(this);
-        UnisonAPI api = data.getAPI();
+        final UnisonAPI api = data.getAPI();
         api.leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
             @Override
             public void callback(Success struct) {
                 Log.d(TAG, "successfully left group");
-                
-                if (group.password) {
-                    promptForPassword(group);
+
+                if (password != null && group.password) {
+                    api.joinProtectedGroup(uid, group.gid, password, enterGroup);
                 } else {
-                    AppData.getInstance(GroupsHistoryActivity.this).getAPI()
-                            .joinGroup(uid, group.gid, enterGroup);
+                    api.joinGroup(uid, group.gid, enterGroup);
                 }
             }
 
@@ -300,7 +301,8 @@ public class GroupsHistoryActivity extends SherlockActivity {
                                     
                 GroupsHistoryActivity.this.startActivity(
                         new Intent(GroupsHistoryActivity.this, MainActivity.class)
-                        .putExtra(Const.Strings.GROUP, group));
+                        .putExtra(Const.Strings.GROUP, group)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
            
             @Override
@@ -314,7 +316,11 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
         };
         if (group.password && password != null) {
-            api.joinProtectedGroup(uid, group.gid, password, handler);
+            if (mAlreadyInGroup) {
+                leaveThenJoinGroup(handler, uid, group, password);
+            } else {
+                api.joinProtectedGroup(uid, group.gid, password, handler);
+            }
         } else {
             api.joinGroup(uid, group.gid, handler);
         }

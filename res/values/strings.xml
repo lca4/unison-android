@@ -66,6 +66,7 @@
     <string name="groups_suggestion_yesBtn">Yes</string>
     <string name="groups_suggestion_noBtn">No, thanks</string>
     <string name="groups_suggestion_cBx">Do not ask me again</string>
+    <string name="groups_display_suggestion">Join users near me</string>
     <string name="groups_alert_newgroup_title">New Group</string>
     <string name="groups_alert_newgroup_message">Pick a name for the group:</string>
     <string name="groups_alert_newgroup_ok">OK</string>
