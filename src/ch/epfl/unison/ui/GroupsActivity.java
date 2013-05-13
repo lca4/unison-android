@@ -323,10 +323,10 @@ public class GroupsActivity extends SherlockActivity implements UnisonMenu.OnRef
         builder.setOnCancelListener(new DialogInterface.OnCancelListener() {         
             @Override
             public void onCancel(DialogInterface dialog) {
-                mSuggestion = null;
+//                mSuggestion = null;
                 mSuggestionIsForeground = false;
 
-                switchSuggestionButtonState(false);
+//                switchSuggestionButtonState(false);
                 //We could handle here whether the checkbox was checked or not,
                 //but it makes more sense to do so only when the user presses a button.
             }
