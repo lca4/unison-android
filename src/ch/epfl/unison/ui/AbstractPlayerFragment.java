@@ -384,9 +384,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
 		mToggleBtn.setOnClickListener(this);
 		setNextBtn((Button) v.findViewById(R.id.musicNextBtn));
-		getNextBtn().setOnClickListener(this);
+		mNextBtn.setOnClickListener(this);
 		setPrevBtn((Button) v.findViewById(R.id.musicPrevBtn));
-		getPrevBtn().setOnClickListener(this);
+		mPrevBtn.setOnClickListener(this);
 		mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
 		mDjBtn.setOnClickListener(this);
 		mDjBtn.setVisibility(View.INVISIBLE);
@@ -460,9 +460,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 		// Update the interface.
 		mToggleBtn.setBackgroundResource(R.drawable.btn_pause);
-		getCoverImg().setImageResource(R.drawable.cover);
-		getArtistTxt().setText(item.artist);
-		getTitleTxt().setText(item.title);
+		mCoverImg.setImageResource(R.drawable.cover);
+		mArtistTxt.setText(item.artist);
+		mTitleTxt.setText(item.title);
 
 		// Log.d(TAG, "musicService gave us a duration of " + duration + " ms");
 		getSeekBar().setProgress(0);
@@ -502,24 +502,24 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		}
 	}
 
-	private void setArtistTxt(TextView mArtistTxt) {
-		this.mArtistTxt = mArtistTxt;
+	private void setArtistTxt(TextView artistTxt) {
+		this.mArtistTxt = artistTxt;
 	}
 
-	private void setBound(boolean mIsBound) {
-		this.mIsBound = mIsBound;
+	private void setBound(boolean isBound) {
+		this.mIsBound = isBound;
 	}
 
-	private void setButtons(View mButtons) {
-		this.mButtons = mButtons;
+	private void setButtons(View buttons) {
+		this.mButtons = buttons;
 	}
 
-	private void setCoverImg(ImageView mCoverImg) {
-		this.mCoverImg = mCoverImg;
+	private void setCoverImg(ImageView coverImg) {
+		this.mCoverImg = coverImg;
 	}
 
-	protected void setCurrentTrack(MusicItem mCurrentTrack) {
-		this.mCurrentTrack = mCurrentTrack;
+	protected void setCurrentTrack(MusicItem currentTrack) {
+		this.mCurrentTrack = currentTrack;
 	}
 
 	/**
@@ -538,7 +538,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 	/**
 	 * Initialize the history, for example when giving a playlist from the
-	 * android database
+	 * android database.
 	 * 
 	 * @param history
 	 */
@@ -565,32 +565,32 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		this.mMainActivity = mActivity;
 	}
 
-	private void setMusicService(MusicServiceBinder mMusicService) {
-		this.mMusicService = mMusicService;
+	private void setMusicService(MusicServiceBinder musicService) {
+		this.mMusicService = musicService;
 	}
 
-	private void setNextBtn(Button mNextBtn) {
-		this.mNextBtn = mNextBtn;
+	private void setNextBtn(Button nextBtn) {
+		this.mNextBtn = nextBtn;
 	}
 
-	private void setPrevBtn(Button mPrevBtn) {
-		this.mPrevBtn = mPrevBtn;
+	private void setPrevBtn(Button prevBtn) {
+		this.mPrevBtn = prevBtn;
 	}
 
-	private void setSeekBar(SeekBar mSeekBar) {
-		this.mSeekBar = mSeekBar;
+	private void setSeekBar(SeekBar seekBar) {
+		this.mSeekBar = seekBar;
 	}
 
-	protected void setStatus(Status mStatus) {
-		this.mStatus = mStatus;
+	protected void setStatus(Status status) {
+		this.mStatus = status;
 	}
 
 	protected void setTag(String tag) {
 		smTag = tag;
 	}
 
-	private void setTitleTxt(TextView mTitleTxt) {
-		this.mTitleTxt = mTitleTxt;
+	private void setTitleTxt(TextView titleTxt) {
+		this.mTitleTxt = titleTxt;
 	}
 
 	private void toggle() {

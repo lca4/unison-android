@@ -96,7 +96,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 .setOnClickListener(new OnCreatePlaylistListener());
 
         mPlaylistsListLocal = (ListView) findViewById(R.id.soloPlaylistsListLocal);
-        mPlaylistsListLocal.setOnItemClickListener(new OnPlaylistSelectedListener());
+        mPlaylistsListLocal.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
         registerForContextMenu(mPlaylistsListLocal);
         // TODO Load local PLs
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
@@ -121,7 +121,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
 
         mPlaylistsListRemote = (ListView) findViewById(R.id.soloPlaylistsListRemote);
-        mPlaylistsListRemote.setOnItemClickListener(new OnPlaylistSelectedListener());
+        mPlaylistsListRemote.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
         registerForContextMenu(mPlaylistsListRemote);
 
         // // Actions that should be taken when activity is started.
@@ -146,7 +146,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         android.view.MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.playlist_local_context_menu, menu);
+        if (v == mPlaylistsListLocal) {
+            inflater.inflate(R.menu.playlist_local_context_menu, menu);
+        } else {
+            inflater.inflate(R.menu.playlist_remote_context_menu, menu);
+        }
     }
 
     // @Override
@@ -156,6 +160,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             case R.id.playlist_context_menu_item_edit:
                 return true;
             case R.id.playlist_context_menu_item_delete:
+                return true;
+            case R.id.playlist_context_menu_item_save:
+                savePlaylist(info.position);
                 return true;
             default:
                 return super.onContextItemSelected((android.view.MenuItem) item);
@@ -495,7 +502,52 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     /**
      * When clicking on a playlist, start MainActivity.
      */
-    private class OnPlaylistSelectedListener implements OnItemClickListener {
+    private class OnRemotePlaylistSelectedListener implements OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
+                    SoloMainActivity.class).putExtra(Const.Strings.PLID,
+                    ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
+                    ((Playlist) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
+            // view.getTag());
+            // UnisonAPI api =
+            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
+            // long uid =
+            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
+            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
+            // view.getTag();
+
+            // api.joinGroup(uid, playlist.plid, new
+            // UnisonAPI.Handler<JsonStruct.Success>() {
+            //
+            // @Override
+            // public void callback(Success struct) {
+            // SoloPlaylistsActivity.this.startActivity(
+            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
+            // .putExtra(Const.Strings.GID, playlist.plid)
+            // .putExtra(Const.Strings.NAME, playlist.name));
+            // }
+            //
+            // @Override
+            // public void onError(Error error) {
+            // Log.d(TAG, error.toString());
+            // if (SoloPlaylistsActivity.this != null) {
+            // Toast.makeText(SoloPlaylistsActivity.this,
+            // R.string.error_joining_group,
+            // Toast.LENGTH_LONG).show();
+            // }
+            // }
+            //
+            // });
+        }
+    }
+    
+    /**
+     * When clicking on a playlist, start MainActivity.
+     */
+    private class OnLocalPlaylistSelectedListener implements OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -537,5 +589,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
+    private void savePlaylist(int position) {
+        
+    }
 
 }

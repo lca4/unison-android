@@ -163,7 +163,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
 	@Override
 	protected boolean requestTrack() {
 		/*
-		 * Since the playlist is generate once and all the tracks are known
+		 * Since the playlist is generated once and all the tracks are known
 		 * before playing, there is no need to request for new tracks on the
 		 * fly.
 		 */
@@ -172,6 +172,6 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
 
 	@Override
 	protected void setIsDJ(boolean wantsToBeDJ) {
-		// Unused, since there is not DJ
+		// Unused, since there is no DJ
 	}
 }

@@ -116,6 +116,7 @@
     <string name="playlist_context_menu_item_delete">Delete</string>
     <string name="playlist_context_menu_item_share">Share with other users</string>
     <string name="playlist_context_menu_item_edit">Edit</string>
+    <string name="playlist_context_menu_item_save">Save to phone</string>
     
     <!-- Home -->
     <string name="home_title">What kind of party?</string>

@@ -41,7 +41,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 	private static final double DEFAULT_LONGITUDE = 6.568992733955383;
 
 	private TrackQueue mTrackQueue;
-	private boolean trackAdded;
+	private boolean mTrackAdded;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -296,8 +296,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 			@Override
 			public void callback(MusicItem item) {
 				addToHistory(item);
-				trackAdded = true;
-
+				mTrackAdded = true;
 			}
 
 			@Override
@@ -307,9 +306,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 					Toast.makeText(c, R.string.error_getting_track,
 							Toast.LENGTH_LONG).show();
 				}
-				trackAdded = false;
+				mTrackAdded = false;
 			}
 		});
-		return trackAdded;
+		return mTrackAdded;
 	}
 }
