@@ -94,6 +94,18 @@ public class GroupsMainActivity extends AbstractMainActivity {
 		}
 	}
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //First choice: we restart the activity:
+        startActivity(intent);
+        finish();
+        
+        //Second choice:
+//        setIntent(intent); //optional
+//        handleExtras(intent.getExtras());
+    }
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

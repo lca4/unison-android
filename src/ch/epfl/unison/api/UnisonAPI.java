@@ -134,10 +134,18 @@ public class UnisonAPI {
                 .setAuth(mAuth).doPUT();
     }
 
-    public void createGroup(String name, double lat, double lon,
+    public void getGroupListAfterCreateGroup(String name, double lat, double lon,
             Handler<JsonStruct.GroupsList> handler) {
         URL url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
+                .addParam("name", name).addParam("lat", lat)
+                .addParam("lon", lon).addParam("list", "True").setAuth(mAuth).doPOST();
+    }
+    
+    public void createGroup(String name, double lat, double lon,
+            Handler<JsonStruct.Group> handler) {
+        URL url = urlFor("/groups");
+        AsyncRequest.of(url, handler, JsonStruct.Group.class)
                 .addParam("name", name).addParam("lat", lat)
                 .addParam("lon", lon).setAuth(mAuth).doPOST();
     }

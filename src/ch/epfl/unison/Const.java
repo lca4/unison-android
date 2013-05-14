@@ -33,6 +33,7 @@ public final class Const {
                                                     // are used anymore
         public static final String CALLER = "caller";
         public static final String SONG_ARTIST_TITLE = "songat";
+        public static final String GROUP_TO_CREATE_NAME = "gtcn";
 
         private Strings() {
         } // Non-instantiable.
