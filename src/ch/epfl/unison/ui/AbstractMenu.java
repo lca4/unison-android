@@ -3,7 +3,6 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
@@ -18,7 +17,7 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * @author lum
  */
-public abstract class UnisonMenu {
+public abstract class AbstractMenu {
     
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.chunison.ui.UnisonMenu";
@@ -41,12 +40,10 @@ public abstract class UnisonMenu {
             OnRefreshListener listener, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_refresh:
-                if (listener != null) {
-                    listener.onRefresh();
-                }
+                if (listener != null) { listener.onRefresh(); }
                 break;
             case R.id.menu_item_ratings:
-                activity.startActivity(new Intent(activity, RatingsActivity.class));
+                activity.startActivity(new Intent(activity, GroupsRatingsActivity.class));
                 break;
             case R.id.menu_item_prefs:
                 activity.startActivity(new Intent(activity, PrefsActivity.class));
@@ -64,28 +61,25 @@ public abstract class UnisonMenu {
             case R.id.menu_item_logout:
                 activity.startActivity(new Intent(activity, LoginActivity.class)
                         .putExtra(Const.Strings.LOGOUT, true));
-                // Send broadcast to all activities that can only be used when
-                // logged in.
+                // Send broadcast to all activities that can only be used when logged in.
                 activity.sendBroadcast(new Intent().setAction(ACTION_LOGOUT));
                 break;
             case R.id.menu_item_manage_group:
-                if (activity instanceof MainActivity && ((MainActivity) activity).getDJ()) {
+                if (activity instanceof GroupsMainActivity && ((GroupsMainActivity) activity).getDJ()) {
                     // TODO is it a problem if we call this here?
-                    ((MainActivity) activity).displayPasswordDialog();
+                    ((GroupsMainActivity) activity).displayPasswordDialog();
                 }
                 break;
             case android.R.id.home: // if using home button from menu: R.id.home 
                 // app icon in Action Bar clicked; go home
-                activity.startActivity(new Intent(activity, GroupsActivity.class)
-                        .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                // Make sure the activity is finished, even if it was at the
-                // bottom of the stack.
+                activity.startActivity(new Intent(activity, HomeActivity.class));
+//                activity.startActivity(new Intent(activity, GroupsActivity.class)
+//                        .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
+//                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                // Make sure the activity is finished, even if it was at the bottom of the stack.
                 activity.finish();
                 break;
-            default:
-                // Should never happen.
-                break;
+            default: break; // Should never happen.
         }
         return true;
     }

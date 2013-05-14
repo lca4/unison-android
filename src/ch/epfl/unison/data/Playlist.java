@@ -1,28 +1,19 @@
 
-package ch.epfl.unison;
-
-import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
-import com.google.gson.JsonNull;
-
-import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.Track;
-import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.UnisonDB;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+package ch.epfl.unison.data;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import ch.epfl.unison.Const.SeedType;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -51,7 +42,7 @@ public class Playlist {
     // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
     // TODO mRawTracks
-    private UnisonDB mDB;
+//    private UnisonDB mDB;
     private HashMap<String, Object> mOptions;
     
     private LinkedList<MusicItem> mPlaylist;   
@@ -212,8 +203,8 @@ public class Playlist {
     }
 
 
-    public void setTitle(String mTitle) {
-        this.mTitle = mTitle;
+    public void setTitle(String title) {
+        this.mTitle = title;
     }
 
 
@@ -222,8 +213,8 @@ public class Playlist {
     }
 
 
-    public void setLastUpdated(Calendar mLastUpdated) {
-        this.mLastUpdated = mLastUpdated;
+    public void setLastUpdated(Calendar lastUpdated) {
+        this.mLastUpdated = lastUpdated;
     }
 
 
@@ -232,8 +223,8 @@ public class Playlist {
     }
 
 
-    public void setUserRating(int mUserRating) {
-        this.mUserRating = mUserRating;
+    public void setUserRating(int userRating) {
+        this.mUserRating = userRating;
     }
 
 
@@ -242,8 +233,8 @@ public class Playlist {
     }
 
 
-    public void setUserComment(String mUserComment) {
-        this.mUserComment = mUserComment;
+    public void setUserComment(String userComment) {
+        this.mUserComment = userComment;
     }
 
 
@@ -252,8 +243,8 @@ public class Playlist {
     }
 
 
-    public void setIsShared(boolean mIsShared) {
-        this.mIsShared = mIsShared;
+    public void setIsShared(boolean isShared) {
+        this.mIsShared = isShared;
     }
 
 
@@ -262,13 +253,13 @@ public class Playlist {
     }
 
 
-    public void setIsSynced(boolean mIsSynced) {
-        this.mIsSynced = mIsSynced;
+    public void setIsSynced(boolean isSynced) {
+        this.mIsSynced = isSynced;
     }
 
 
-    public void setRawTagsId(ArrayList<Integer> mRawTagsId) {
-        this.mRawTagsId = mRawTagsId;
+    public void setRawTagsId(ArrayList<Integer> rawTagsId) {
+        this.mRawTagsId = rawTagsId;
     }
 
 

@@ -1,12 +1,11 @@
 
 package ch.epfl.unison.api;
 
-import ch.epfl.unison.data.TagItem;
-import ch.epfl.unison.Playlist;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
+
+import ch.epfl.unison.data.Playlist;
+import ch.epfl.unison.data.TagItem;
 
 /**
  * POJOs for JSON serialization / deserialization.
@@ -69,6 +68,7 @@ public abstract class JsonStruct {
         public String image;
         public Integer localId;
         public Integer rating;
+        public Integer playOrder;
 
         public Track() {
         }
@@ -137,26 +137,26 @@ public abstract class JsonStruct {
     /** Information about a playlist (used in both directions). */
     public static class PlaylistJS extends JsonStruct {
 
-        public int gsPlaylistId;
+        public int plid;
+        public String created; // ISO format
+        public String updated; // ISO format
         public String title;
-        public Calendar created;
-        public Calendar updated;
         public String image; // Not used for now
         public Integer authorId;
-        // public String authorName; //TODO
+        public String authorName;
         public Integer size;
         public Track[] tracks;
-        public Integer rating;
-        public String comment;
         public Integer listeners;
         public Double avgRating;
-        public Boolean shared;
-        public Boolean synced;
+        public Boolean isShared;
+        public Boolean isSynced;
+        public Integer rating;
+        public String comment;
 
         public Playlist toObject() {
             // TODO complete
-            return new Playlist.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
-                    .size(size).build();
+            return new Playlist.Builder().plId(plid).title(title).tracks(tracks)
+                    .size(size).listeners(listeners).build();
         }
 
     }
@@ -172,6 +172,13 @@ public abstract class JsonStruct {
                 al.add(playlists[i].toObject());
             }
             return al;
+        }
+        
+        public boolean isEmtpy() {
+            if (playlists.length == 0) {
+                return true;
+            }
+            return false;
         }
     }
 

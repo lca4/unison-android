@@ -1,17 +1,17 @@
 package ch.epfl.unison;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Iterator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Iterator;
 
 /**
  * Small utilities needed here and there.

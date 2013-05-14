@@ -2,6 +2,7 @@ package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -53,27 +54,27 @@ import java.util.Map;
  *
  */
 public class GroupsHistoryActivity extends SherlockActivity {
-	
-	private static final String TAG = "ch.epfl.unison.GroupHistoryActivity";
-	private Menu mMenu;
-	private List<JsonStruct.Group> mGroupsHistory = null;
-	private ListView mGroupsList;
-	private boolean mAlreadyInGroup = false;
-	
-	private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
+
+    private static final String TAG = "ch.epfl.unison.GroupHistoryActivity";
+    private Menu mMenu;
+    private List<JsonStruct.Group> mGroupsHistory = null;
+    private ListView mGroupsList;
+    private boolean mAlreadyInGroup = false;
+
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
         }
     };
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);        
-     // This activity should finish on logout.
-        registerReceiver(mLogoutReceiver, new IntentFilter(UnisonMenu.ACTION_LOGOUT));
+        super.onCreate(savedInstanceState);
+        // This activity should finish on logout.
+        registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
         setContentView(R.layout.group_history);
-        
+
         mGroupsList = (ListView) findViewById(R.id.groupHistoryList);
         mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
         
@@ -81,9 +82,9 @@ public class GroupsHistoryActivity extends SherlockActivity {
 //                .setOnClickListener(new OnDeleteHistoryListener());
         
         String caller = getIntent().getStringExtra(Const.Strings.CALLER);
-        
+
         Log.d(TAG, "called by" + caller);
-        
+
         if (caller != null) {
             mAlreadyInGroup = caller.contains("MainActivity");
         }
@@ -97,7 +98,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
         } else {
             mapOfGroupsToArrayListWithSort(mapOfGroups);
         }
-        
+
         try {
             mGroupsList.setAdapter(new GroupsAdapter());
             repaintRefresh(false);
@@ -105,21 +106,21 @@ public class GroupsHistoryActivity extends SherlockActivity {
             Log.w(TAG, "group or activity is null?", e);
         }
     }
-    
+
     private void mapOfGroupsToArrayListWithSort(Map<Long, Pair<JsonStruct.Group, Date>> map) {
-        List<Pair<JsonStruct.Group, Date>> listOfGroups = 
+        List<Pair<JsonStruct.Group, Date>> listOfGroups =
                 new ArrayList<Pair<JsonStruct.Group, Date>>(
                         map.values());
         sortChronological(listOfGroups);
-        
+
         mGroupsHistory = new ArrayList<JsonStruct.Group>();
-        
-        for (Pair<JsonStruct.Group, Date> p: listOfGroups) {
+
+        for (Pair<JsonStruct.Group, Date> p : listOfGroups) {
             mGroupsHistory.add(p.first);
         }
-        
+
     }
-    
+
     private void sortChronological(List<Pair<JsonStruct.Group, Date>> list) {
         Collections.sort(list,
                 new Comparator<Pair<JsonStruct.Group, Date>>() {
@@ -130,7 +131,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                 });
     }
 
-//    @Override
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mLogoutReceiver);
@@ -152,7 +153,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
         public static final int ROW_LAYOUT = R.layout.group_history_row;
 
-        
         public GroupsAdapter() {
             super(GroupsHistoryActivity.this, 0, mGroupsHistory);
         }
@@ -197,19 +197,19 @@ public class GroupsHistoryActivity extends SherlockActivity {
 	            return;
 	        }
 
-	        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-	        if (refreshItem != null) {
-	            if (isRefreshing) {
-	                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-	                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	                View refreshView = inflater.inflate(
-	                        R.layout.actionbar_indeterminate_progress, null);
-	                refreshItem.setActionView(refreshView);
-	            } else {
-	                refreshItem.setActionView(null);
-	            }
-	        }
-	    }
+        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
+        if (refreshItem != null) {
+            if (isRefreshing) {
+                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
+                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View refreshView = inflater.inflate(
+                        R.layout.actionbar_indeterminate_progress, null);
+                refreshItem.setActionView(refreshView);
+            } else {
+                refreshItem.setActionView(null);
+            }
+        }
+    }
 
     /**
      * When clicking on a group, send a request to the server and start
@@ -234,7 +234,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                             //This is in case of wrong automatic behavior.
                             group.automatic = false;
                             GroupsHistoryActivity.this.startActivity(
-                                    new Intent(GroupsHistoryActivity.this, MainActivity.class)
+                                    new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
                                     .putExtra(Const.Strings.GROUP, group)
                                     .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 //                            finish();
@@ -299,7 +299,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
             public void callback(Success struct) {
                                     
                 GroupsHistoryActivity.this.startActivity(
-                        new Intent(GroupsHistoryActivity.this, MainActivity.class)
+                        new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
                         .putExtra(Const.Strings.GROUP, group)
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
@@ -307,7 +307,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
             @Override
             public void onError(Error error) {
                 Log.d(TAG, error.toString());
-                
                 if (GroupsHistoryActivity.this != null) {
                     
                     if (error.hasJsonError()

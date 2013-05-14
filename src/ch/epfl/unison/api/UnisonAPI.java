@@ -1,17 +1,17 @@
 
 package ch.epfl.unison.api;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.json.JSONObject;
+
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Java interface to the Unison RESTful HTTP API.
