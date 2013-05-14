@@ -329,12 +329,13 @@ public class UnisonAPI {
         }
     }
 
-    /** Corresponds to JSON error codes - synced with back-end. */
+    /** Corresponds to JSON error codes - synced with back-end. (not so much)*/
     public static final class ErrorCodes {
         public static final int MISSING_FIELD = 1;
         public static final int EXISTING_USER = 2;
         public static final int INVALID_EMAIL = 4;
         public static final int INVALID_PASSWORD = 5;
+        public static final int INVALID_GROUP = 6;
     }
 
 }

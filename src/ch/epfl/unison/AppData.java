@@ -320,6 +320,16 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         return mPrefs.edit().remove(Const.PrefKeys.HISTORY).commit();
     }
 
+    public boolean removeOneHistoryItem(Long gid) {
+        Map<Long, Pair<JsonStruct.Group, Date>> history = getHistory();
+        
+        history.remove(gid);
+        
+      //Possible optimization heres
+        String value = new GsonBuilder().create().toJson(history, mGroupHistoryMapType);
+        return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
+    }
+    
     /**
      * Simple LocationListener that differentiates updates from the
      * network provider and those from the GPS provider.
