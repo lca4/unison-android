@@ -23,8 +23,8 @@ import ch.epfl.unison.api.JsonStruct.Track;
  */
 public class Playlist {
 
-    private int mLocalId; // Android sqlite
-    private int mPLId; // GS database id
+    private int mLocalId = 0; // Android sqlite
+    private int mGSPLId; // GS database id
     private String mTitle;
     private Calendar mCreated;
     private Calendar mLastUpdated;
@@ -61,12 +61,12 @@ public class Playlist {
      */
     public static class Builder {
         private int mLocalId; // Android sqlite
-        private int mPLId; // GS database id
+        private int mGSPLId; // GS database id
         private String mTitle;
         private Calendar mCreated;
         private Calendar mLastUpdated;
         private int mAuthorId;
-        private String mAuthorName;
+        //private String mAuthorName; // Not yet available
         private int mSize;
         private LinkedList<MusicItem> mTracks; 
         private int mUserRating;
@@ -82,7 +82,7 @@ public class Playlist {
         }
         
         public Builder plId(int id) {
-            this.mPLId = id;
+            this.mGSPLId = id;
             return this;
         }
         
@@ -96,8 +96,28 @@ public class Playlist {
             return this;
         }
         
+        /**
+         * 
+         * @param c datetime in ISO format
+         * @return
+         */
+        public Builder created(String c) {
+//            this.mCreated = //TODO
+            return this;
+        }
+        
         public Builder updated(Calendar c) {
             this.mLastUpdated = c;
+            return this;
+        }
+        
+        /**
+         * 
+         * @param u datetime in ISO format
+         * @return
+         */
+        public Builder updated(String u) {
+//            this.mLastUpdated = //TODO
             return this;
         }
         
@@ -118,8 +138,10 @@ public class Playlist {
         
         public Builder tracks(Track[] t) {
             LinkedList<MusicItem> ll = new LinkedList<MusicItem>();
-            for (int i = 0; i < t.length; i++) {
-                ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title));
+            if (t != null) {
+                for (int i = 0; i < t.length; i++) {
+                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title));
+                }
             }
             this.mTracks = ll;
             return this;
@@ -136,7 +158,7 @@ public class Playlist {
     }
     
     private Playlist(Builder builder) {
-        this.mPLId = builder.mPLId;
+        this.mGSPLId = builder.mGSPLId;
         this.mTitle = builder.mTitle;
         this.mCreated = builder.mCreated;
         this.mLastUpdated = builder.mLastUpdated;
@@ -269,7 +291,7 @@ public class Playlist {
 
 
     public int getPLId() {
-        return mPLId;
+        return mGSPLId;
     }
 
 

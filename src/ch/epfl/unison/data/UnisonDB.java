@@ -447,4 +447,25 @@ public class UnisonDB {
         resetIsChecked(table);
         return json;
     }
+    
+    public void insertToAndroid(Playlist pl) {
+        // Add the playlist to the android dabase
+        
+        // Then set the android id to the pl object and store pl to the app database
+    }
+    
+    private void insert(Playlist pl) {
+        if (pl.getLocalId() == 0) {
+            ContentValues values = new ContentValues();
+            values.put(Const.PLYL_C_GS_ID, pl.getPLId());
+            Cursor cur = getCursorW(Const.PLAYLISTS_TABLE_NAME, new String[] {
+                    Const.PLYL_C_GS_ID,
+                    Const.PLYL_C_CREATED_BY_GS,
+                    Const.PLYL_C_GS_SIZE
+            });
+            
+            
+            closeCursor(cur);
+        }
+    }
 }

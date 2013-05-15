@@ -248,11 +248,11 @@ public class UnisonAPI {
     // PLAYLISTS
     
     public void generatePlaylist(long uid, JSONObject seeds, JSONObject options,
-            Handler<JsonStruct.PlaylistsList> handler) {
+            Handler<JsonStruct.PlaylistJS> handler) {
         Log.i(TAG, "Ready to get!");
         if (seeds != null) {
             URL url = urlFor("/solo/%d/playlist", uid);
-            AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
+            AsyncRequest.of(url, handler, JsonStruct.PlaylistJS.class)
                     .setAuth(mAuth).addParam("seeds", seeds).addParam("options", options).doPOST();
         } else {
             throw new IllegalArgumentException();

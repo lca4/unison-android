@@ -66,12 +66,13 @@ import com.actionbarsherlock.view.MenuItem;
  * @author marc bourqui
  */
 public class SoloPlaylistsActivity extends AbstractFragmentActivity {
-// extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
+    // extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener
+    // {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
 
-    private Playlist mPlaylist;
+    // private Playlist mPlaylist;
     private UnisonDB mDB;
     private ArrayList<Playlist> mPLsLocal;
     private ArrayList<Playlist> mPLsRemote;
@@ -80,15 +81,14 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     private ListView mPlaylistsListLocal;
     private ListView mPlaylistsListRemote;
 
-
     @Override
-	public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         setReloadInterval(RELOAD_INTERVAL);
         setTag(TAG);
 
-        mPlaylist = new Playlist();
+        // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
 
         setContentView(R.layout.solo_playlists);
@@ -119,6 +119,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         if (!cur.isClosed()) {
             cur.close();
         }
+        mPLsRemote = new ArrayList<Playlist>();
 
         mPlaylistsListRemote = (ListView) findViewById(R.id.soloPlaylistsListRemote);
         mPlaylistsListRemote.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
@@ -139,7 +140,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         super.onResume();
         startService(new Intent(LibraryService.ACTION_UPDATE));
     }
-
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -184,7 +184,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                     public void callback(PlaylistsList struct) {
                         try {
                             if (struct.isEmtpy()) {
-                                //TODO display row item to tell no playlist is available
+                                // TODO display row item to tell no playlist is
+                                // available
                                 Toast.makeText(SoloPlaylistsActivity.this,
                                         R.string.solo_playlists_noRemotePL,
                                         Toast.LENGTH_LONG).show();
@@ -246,7 +247,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         data.getAPI().listPlaylists(data.getUid(), playlistsHandler);
         data.getAPI().listTags(data.getUid(), tagsHandler);
     }
-
 
     /** Adapter used to populate the ListView listing the playlists. */
     private class PlaylistsAdapter extends ArrayAdapter<Playlist> {
@@ -323,7 +323,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             // alert.show();
         }
 
-
         /**
          * @author marc
          */
@@ -374,8 +373,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 return builder.create();
             }
         }
-
-       
 
         /**
          * @author marc
@@ -476,12 +473,20 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
                 JSONObject options = new JSONObject();
                 data.getAPI().generatePlaylist(data.getUid(), seeds, options,
-                        new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
+                        new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
                             @Override
-                            public void callback(PlaylistsList struct) {
-                                Log.i(TAG, "Playlist created!");
-                                SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                        .setAdapter(new PlaylistsAdapter(struct.toObject()));
+                            public void callback(JsonStruct.PlaylistJS struct) {
+                                if (struct != null) {
+                                    Log.i(TAG, "Playlist created!");
+                                    mPLsRemote.add(0, struct.toObject());
+                                    SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                            .setAdapter(new PlaylistsAdapter(mPLsRemote));
+                                    // SoloPlaylistsActivity.this.mPlaylistsListRemote
+                                    // .setAdapter(new
+                                    // PlaylistsAdapter(struct.toObject()));
+                                } else {
+                                    Log.i(TAG, "Playlist created, but could not be fetched...");
+                                }
                             }
 
                             @Override
@@ -543,7 +548,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             // });
         }
     }
-    
+
     /**
      * When clicking on a playlist, start MainActivity.
      */
@@ -590,7 +595,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     }
 
     private void savePlaylist(int position) {
-        
+
     }
 
 }

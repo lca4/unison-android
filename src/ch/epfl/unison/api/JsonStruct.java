@@ -137,26 +137,27 @@ public abstract class JsonStruct {
     /** Information about a playlist (used in both directions). */
     public static class PlaylistJS extends JsonStruct {
 
-        public int plid;
-        public String created; // ISO format
-        public String updated; // ISO format
+        public int gsPlaylistId;
+        public String gsCreationTime; // ISO format
+        public String gsUpdateTime; // ISO format
         public String title;
         public String image; // Not used for now
         public Integer authorId;
         public String authorName;
-        public Integer size;
+        public Integer gsSize;
         public Track[] tracks;
-        public Integer listeners;
-        public Double avgRating;
-        public Boolean isShared;
-        public Boolean isSynced;
-        public Integer rating;
-        public String comment;
+        public Integer gsListeners;
+        public Double gsAvgRating;
+        public Boolean gsIsShared;
+        public Boolean gsIsSynced;
+        public Integer gsRating;
+        public String gsComment; // Not used for now
 
         public Playlist toObject() {
             // TODO complete
-            return new Playlist.Builder().plId(plid).title(title).tracks(tracks)
-                    .size(size).listeners(listeners).build();
+            return new Playlist.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
+                    .size(gsSize).authorId(authorId).created(gsCreationTime).updated(gsUpdateTime)
+                    .listeners(gsListeners).build();
         }
 
     }
@@ -167,11 +168,14 @@ public abstract class JsonStruct {
         public PlaylistJS[] playlists;
 
         public ArrayList<Playlist> toObject() {
-            ArrayList<Playlist> al = new ArrayList<Playlist>();
-            for (int i = 0; i < playlists.length; i++) {
-                al.add(playlists[i].toObject());
+            if (playlists != null) {
+                ArrayList<Playlist> al = new ArrayList<Playlist>();
+                for (int i = 0; i < playlists.length; i++) {
+                    al.add(playlists[i].toObject());
+                }
+                return al;
             }
-            return al;
+            return null;
         }
         
         public boolean isEmtpy() {
