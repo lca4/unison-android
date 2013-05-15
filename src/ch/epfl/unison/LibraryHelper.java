@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.UnisonDB;
 
 /**
  * @deprecated use {@link UnisonDB} instead.<br />

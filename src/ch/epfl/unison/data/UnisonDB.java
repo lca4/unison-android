@@ -4,6 +4,7 @@ package ch.epfl.unison.data;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -11,10 +12,16 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.nfc.tech.IsoDep;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 import android.util.Log;
 import ch.epfl.unison.Const.SeedType;
 
@@ -90,8 +97,39 @@ public class UnisonDB {
         close();
     }
 
+    /**
+     * @param itemType
+     * @return
+     * @throws #{@link IllegalArgumentException} if type not supported
+     */
+    public Set<?> getEntries(Class<?> itemType) {
+        if (itemType == MusicItem.class) {
+            return getMusicItems();
+        } else if (itemType == TagItem.class) {
+            return getTagItems();
+        }
+        // Unsupported type
+        throw new IllegalArgumentException();
+    }
+    
+    public boolean isEmpty(Class itemType) {
+        if (itemType == MusicItem.class) {
+            return libeIsEmpty();
+        } else if (itemType == TagItem.class) {
+            return tagIsEmpty();
+        }
+        // Unsupported type
+        throw new IllegalArgumentException();
+    }
+
     /*
      * lib_entry specific methods
+     */
+    /**
+     * @deprecated please use {@link #getEntries(MusicItem.class)} instead
+     * 
+     * @see #getEntries(Object)
+     * @return
      */
     public Set<MusicItem> getMusicItems() {
         Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
@@ -112,6 +150,11 @@ public class UnisonDB {
         return set;
     }
 
+    /**
+     * @deprecated use {@link #isEmpty(MusicItem)} instead
+     * @see #isEmpty(Class)
+     * @return
+     */
     public boolean libeIsEmpty() {
         Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
                 new String[] {
@@ -248,7 +291,7 @@ public class UnisonDB {
     // return null;
     // }
 
-    public Set<TagItem> tagGetItems() {
+    private Set<TagItem> getTagItems() {
         Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
                         Const.TAG_C_ID, Const.TAG_C_NAME
@@ -269,6 +312,11 @@ public class UnisonDB {
         return set;
     }
 
+    /**
+     * @deprecated use {@link #isEmpty(TagItem)} instead
+     * @see #isEmpty(Class)
+     * @return
+     */
     public boolean tagIsEmpty() {
         Cursor cur = getCursor(Const.TAG_TABLE_NAME,
                 new String[] {
@@ -447,13 +495,11 @@ public class UnisonDB {
         resetIsChecked(table);
         return json;
     }
-    
+
     public void insertToAndroid(Playlist pl) {
-        // Add the playlist to the android dabase
-        
-        // Then set the android id to the pl object and store pl to the app database
+        AndroidDB.insertToAndroid(mContext.getContentResolver(), pl);
     }
-    
+
     private void insert(Playlist pl) {
         if (pl.getLocalId() == 0) {
             ContentValues values = new ContentValues();
@@ -463,8 +509,7 @@ public class UnisonDB {
                     Const.PLYL_C_CREATED_BY_GS,
                     Const.PLYL_C_GS_SIZE
             });
-            
-            
+
             closeCursor(cur);
         }
     }
