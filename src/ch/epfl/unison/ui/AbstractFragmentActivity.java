@@ -37,6 +37,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
 	private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
 	private static final int INITIAL_DELAY = 500; // in ms.
+	private static final int DEFAULT_RELOAD_INTERVAL = 30 * 1000; // in ms.
 	private static int smReloadInterval;
 	private boolean mIsForeground = false;
 	private Menu mMenu;
@@ -78,24 +79,24 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unregisterReceiver(getLogoutReceiver());
+		unregisterReceiver(mLogoutReceiver);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setReloadInterval(30 * 1000);
+		setReloadInterval(DEFAULT_RELOAD_INTERVAL);
 
 		// This activity should finish on logout.
-		registerReceiver(getLogoutReceiver(), new IntentFilter(
+		registerReceiver(mLogoutReceiver, new IntentFilter(
 				AbstractMenu.ACTION_LOGOUT));
 
 		// Set up the tabs & stuff.
-		setViewPager(new ViewPager(this));
-		getViewPager().setId(R.id.realtabcontent); // TODO change
-		setContentView(getViewPager());
-		setTabsAdapter(new TabsAdapter(this, getViewPager()));
+		mViewPager = new ViewPager(this);
+		mViewPager.setId(R.id.realtabcontent); // TODO change
+		setContentView(mViewPager);
+		setTabsAdapter(new TabsAdapter(this, mViewPager));
 	}
 
 	@Override
