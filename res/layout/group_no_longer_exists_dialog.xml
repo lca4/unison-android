@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	
+    <TextView
+        android:id="@+id/group_no_longer_exists_body"
+        android:layout_width="match_parent"
+      	android:layout_height="wrap_content"
+      	android:textIsSelectable="false"
+      	android:text="@string/group_no_longer_exists_dialog_body"
+      	android:textSize="18sp"
+        />
+    
+    <Button
+      android:id="@+id/recreateGroupBtn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/group_no_longer_exists_dialog_recreate_group" />
+    
+    <Button
+      android:id="@+id/goBackToGroupsActivityBtn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/group_no_longer_exists_dialog_go_groups_activity" />
+    
+    <Button
+      android:id="@+id/CancelBtn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/generic_cancel" />
+    
+
+</LinearLayout>

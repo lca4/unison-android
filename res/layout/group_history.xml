@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginRight="10dp"
-        android:text="@string/history_delete_label" />
+        android:text="@string/history_delete_label"
+        android:onClick="clearHistory" />
 
   </LinearLayout>
 

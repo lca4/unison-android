@@ -134,10 +134,18 @@ public class UnisonAPI {
                 .setAuth(mAuth).doPUT();
     }
 
-    public void createGroup(String name, double lat, double lon,
+    public void getGroupListAfterCreateGroup(String name, double lat, double lon,
             Handler<JsonStruct.GroupsList> handler) {
         URL url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
+                .addParam("name", name).addParam("lat", lat)
+                .addParam("lon", lon).addParam("list", "True").setAuth(mAuth).doPOST();
+    }
+    
+    public void createGroup(String name, double lat, double lon,
+            Handler<JsonStruct.Group> handler) {
+        URL url = urlFor("/groups");
+        AsyncRequest.of(url, handler, JsonStruct.Group.class)
                 .addParam("name", name).addParam("lat", lat)
                 .addParam("lon", lon).setAuth(mAuth).doPOST();
     }
@@ -329,12 +337,13 @@ public class UnisonAPI {
         }
     }
 
-    /** Corresponds to JSON error codes - synced with back-end. */
+    /** Corresponds to JSON error codes - synced with back-end. (not so much)*/
     public static final class ErrorCodes {
         public static final int MISSING_FIELD = 1;
         public static final int EXISTING_USER = 2;
         public static final int INVALID_EMAIL = 4;
         public static final int INVALID_PASSWORD = 5;
+        public static final int INVALID_GROUP = 6;
     }
 
 }

@@ -1,4 +1,3 @@
-
 package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
@@ -14,6 +13,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,6 +35,7 @@ import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.GroupSuggestion;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
+import ch.epfl.unison.api.JsonStruct.Group;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
@@ -59,6 +60,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
 
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
+    public static final String ACTION_CREATE_AND_JOIN_GROUP =
+            "ch.epfl.unison.action.CREATE_AND_JOIN_GROUP";
 
     private ListView mGroupsList;
     private Menu mMenu;
@@ -110,6 +113,19 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             // knows.
             leaveGroup();
             mDismissedHelp = true;
+        } else if (ACTION_CREATE_AND_JOIN_GROUP.equals(getIntent().getAction())) {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null && extras.containsKey(Const.Strings.GROUP_TO_CREATE_NAME)) {
+                String groupToCreateName =
+                        extras.getCharSequence(Const.Strings.GROUP_TO_CREATE_NAME).toString();
+                if (groupToCreateName != null) {
+                    recreateGroup(groupToCreateName);
+                }
+            } else {
+                Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
+                        Toast.LENGTH_LONG).show();
+            }
+            
         } else if (AppData.getInstance(this).showHelpDialog()) {
             showHelpDialog();
         } else {
@@ -125,7 +141,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     @Override
     public void onResume() {
         super.onResume();
-        // mDismissedHelp = true;
+//        mDismissedHelp = true;
         mIsForeground = true;
         startService(new Intent(LibraryService.ACTION_UPDATE));
         mHandler.postDelayed(mUpdater, INITIAL_DELAY);
@@ -157,7 +173,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     @Override
     public void onRefresh() {
         repaintRefresh(true);
-        UnisonAPI.Handler<JsonStruct.GroupsList> handler = new UnisonAPI.Handler<JsonStruct.GroupsList>() {
+        UnisonAPI.Handler<JsonStruct.GroupsList> handler
+                = new UnisonAPI.Handler<JsonStruct.GroupsList>() {          
             @Override
             public void callback(GroupsList struct) {
                 try {
@@ -186,7 +203,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         if (currentLoc != null) {
             double lat = currentLoc.getLatitude();
             double lon = currentLoc.getLongitude();
-            data.getAPI().listGroups(lat, lon, handler);
+            data.getAPI().listGroups(lat, lon, handler);            
         } else {
             data.getAPI().listGroups(handler);
         }
@@ -290,10 +307,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         userView.setAdapter(userAdapter);
         userView.setSelector(android.R.color.transparent);
         // this is a bit too much, the user cannot scroll the list anymore
-      //userView.setEnabled(false); //this is a bit too much, the user cannot scroll the list 
-      //anymore
-
-        mSuggestionClick =
+        //userView.setEnabled(false);
+        
+        mSuggestionClick = 
                 new DialogInterface.OnClickListener() {
 
                     @Override
@@ -503,18 +519,12 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         R.string.error_creating_group_empty_name, Toast.LENGTH_LONG).show();
             } else {
                 AppData data = AppData.getInstance(GroupsActivity.this);
-                double lat, lon;
-                Location currentLoc = data.getLocation();
-                if (currentLoc != null) {
-                    lat = currentLoc.getLatitude();
-                    lon = currentLoc.getLongitude();
-                } else {
-                    lat = DEFAULT_LATITUDE;
-                    lon = DEFAULT_LONGITUDE;
-                    Log.i(TAG, "location was null, using default values");
-                }
+                Pair<Double, Double> p = getLocation();
+                double lat = p.first;
+                double lon = p.second;
+                
 
-                data.getAPI().createGroup(name, lat, lon,
+                data.getAPI().getGroupListAfterCreateGroup(name, lat, lon,
                         new UnisonAPI.Handler<JsonStruct.GroupsList>() {
                     @Override
                     public void callback(GroupsList struct) {
@@ -634,6 +644,50 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     
             dialog.show();
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
+        }
+    }
+    
+    private Pair<Double, Double> getLocation() {
+        AppData data = AppData.getInstance(GroupsActivity.this);
+        double lat, lon;
+        Location currentLoc = data.getLocation();
+        if (currentLoc != null) {
+            lat = currentLoc.getLatitude();
+            lon = currentLoc.getLongitude();
+        } else {
+            lat = DEFAULT_LATITUDE;
+            lon = DEFAULT_LONGITUDE;
+            Log.i(TAG, "location was null, using default values");
+        }
+        return new Pair<Double, Double>(lat, lon);
+    }
+    
+    private void recreateGroup(String name) {
+        if (name == null || name.equals("")) {
+            Toast.makeText(GroupsActivity.this,
+                    R.string.error_creating_group_empty_name, Toast.LENGTH_LONG).show();
+        } else {
+            AppData data = AppData.getInstance(GroupsActivity.this);
+            Pair<Double, Double> p = getLocation();
+            double lat = p.first;
+            double lon = p.second;
+            
+
+            data.getAPI().createGroup(name, lat, lon,
+                    new UnisonAPI.Handler<JsonStruct.Group>() {
+                @Override
+                public void callback(Group struct) {
+                    joinGroup(struct, null);
+                }
+                @Override
+                public void onError(Error error) {
+                    Log.d(TAG, error.toString());
+                    if (GroupsActivity.this != null) {
+                        Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
         }
     }
 }

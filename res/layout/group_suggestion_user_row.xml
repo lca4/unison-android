@@ -11,7 +11,7 @@
       android:id="@+id/group_suggestion_username"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:textIsSelectable="true"
+      android:textIsSelectable="false"
       android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>
