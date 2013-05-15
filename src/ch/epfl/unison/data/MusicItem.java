@@ -11,11 +11,13 @@ public class MusicItem implements Comparable<MusicItem> {
     public final int localId;
     public final String artist;
     public final String title;
+    public final int playOrder;
 
     public MusicItem(int id, String a, String t) {
         localId = id;
         artist = a;
         title = t;
+        playOrder = -1;
     }
 
     @Override

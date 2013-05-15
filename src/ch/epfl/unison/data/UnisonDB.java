@@ -4,7 +4,6 @@ package ch.epfl.unison.data;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,22 +11,24 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.nfc.tech.IsoDep;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Audio.Media;
 import android.util.Log;
 import ch.epfl.unison.Const.SeedType;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
  * about the one *that GroupStreamer owns*, i.e. on the phone
+ * 
+ * <br />
+ * <br />
+ * Ideas of improvements:
+ * <ul>
+ *  <li>1 private inner class for each table</li>
+ *  <li>interface implemented by every such inner classes</li>
+ * </ul>
  * 
  * @author marc
  */
@@ -111,12 +112,22 @@ public class UnisonDB {
         // Unsupported type
         throw new IllegalArgumentException();
     }
-    
-    public boolean isEmpty(Class itemType) {
+
+    public boolean isEmpty(Class<?> itemType) {
         if (itemType == MusicItem.class) {
             return libeIsEmpty();
         } else if (itemType == TagItem.class) {
             return tagIsEmpty();
+        }
+        // Unsupported type
+        throw new IllegalArgumentException();
+    }
+
+    public void truncate(Class<?> itemType) {
+        if (itemType == MusicItem.class) {
+            libeTruncate();
+        } else if (itemType == TagItem.class) {
+            tagTruncate();
         }
         // Unsupported type
         throw new IllegalArgumentException();
@@ -127,7 +138,6 @@ public class UnisonDB {
      */
     /**
      * @deprecated please use {@link #getEntries(MusicItem.class)} instead
-     * 
      * @see #getEntries(Object)
      * @return
      */
@@ -327,6 +337,12 @@ public class UnisonDB {
         return isEmpty;
     }
 
+    private void tagTruncate() {
+        openW();
+        mDB.delete(Const.TAG_TABLE_NAME, null, null);
+        close();
+    }
+
     /**
      * Inserts the item only if it still does not exists.
      * 
@@ -497,7 +513,11 @@ public class UnisonDB {
     }
 
     public void insertToAndroid(Playlist pl) {
+        // First store to android DB
         AndroidDB.insertToAndroid(mContext.getContentResolver(), pl);
+        
+        // Then insert a record to the device-local GS database
+        insert(pl);
     }
 
     private void insert(Playlist pl) {

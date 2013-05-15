@@ -264,6 +264,9 @@ public class Playlist {
         return mIsShared;
     }
 
+    public void setLocalId(int localId) {
+        this.mLocalId = localId;
+    }
 
     public void setIsShared(boolean isShared) {
         this.mIsShared = isShared;
