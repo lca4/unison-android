@@ -18,6 +18,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
+      android:onClick="errorDialogCreateGroupPressed"
       android:text="@string/group_no_longer_exists_dialog_recreate_group" />
     
     <Button
@@ -25,6 +26,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
+      android:onClick="errorDialogGoGroupsActivityPressed"
       android:text="@string/group_no_longer_exists_dialog_go_groups_activity" />
     
     <Button
@@ -32,6 +34,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
+      android:onClick="errorDialogCancelPressed"
       android:text="@string/generic_cancel" />
     
 

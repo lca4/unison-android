@@ -34,7 +34,6 @@ import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.Group;
 import ch.epfl.unison.api.JsonStruct.GroupSuggestion;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
 import ch.epfl.unison.api.JsonStruct.Success;
@@ -230,7 +229,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         } else {
             data.getAPI().listGroups(handler);
         }
-        switchSuggestionButtonState(data.showGroupSuggestion());
+//        switchSuggestionButtonState(data.showGroupSuggestion());
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
         }
@@ -580,8 +579,11 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     }
     
     private void joinGroup(final JsonStruct.Group group, String password) {
-        UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
-        long uid = AppData.getInstance(GroupsActivity.this).getUid();
+        Log.d(TAG, "Calling joinGroup with groupID = " + group.gid);
+        
+        AppData data = AppData.getInstance(GroupsActivity.this);
+        UnisonAPI api = data.getAPI();
+        long uid = data.getUid();
         
         UnisonAPI.Handler<JsonStruct.Success> handler = 
                 new UnisonAPI.Handler<JsonStruct.Success>() {
@@ -604,10 +606,12 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             }
 
         };
-        if (group.password && password != null) {
-            api.joinProtectedGroup(uid, group.gid, password, handler);
-        } else {
-            api.joinGroup(uid, group.gid, handler);
+        if (group != null) {
+            if (group.password && password != null) {
+                api.joinProtectedGroup(uid, group.gid, password, handler);
+            } else {
+                api.joinGroup(uid, group.gid, handler);
+            }
         }
     }
     
@@ -693,8 +697,13 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             data.getAPI().createGroup(name, lat, lon,
                     new UnisonAPI.Handler<JsonStruct.Group>() {
                 @Override
-                public void callback(Group struct) {
-                    joinGroup(struct, null);
+                public void callback(JsonStruct.Group struct) {
+                    if ((struct == null || struct.gid == null) && GroupsActivity.this != null) {
+                        Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        joinGroup(struct, null);
+                    }
                 }
                 @Override
                 public void onError(Error error) {

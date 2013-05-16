@@ -2,7 +2,6 @@ package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,12 +14,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -222,8 +219,8 @@ public class GroupsHistoryActivity extends SherlockActivity {
         // FIXME This is a duplicate of the listener in GroupsActivity.
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            UnisonAPI api = AppData.getInstance(GroupsHistoryActivity.this).getAPI();
-            long uid = AppData.getInstance(GroupsHistoryActivity.this).getUid();
+//            UnisonAPI api = AppData.getInstance(GroupsHistoryActivity.this).getAPI();
+//            long uid = AppData.getInstance(GroupsHistoryActivity.this).getUid();
             mGroupClicked = (JsonStruct.Group) view.getTag();
 
 //            UnisonAPI.Handler<JsonStruct.Success> enterGroup =
@@ -361,12 +358,13 @@ public class GroupsHistoryActivity extends SherlockActivity {
     public void errorDialogCreateGroupPressed(View view) {
         startActivity(new Intent(this, GroupsActivity.class).setAction(
                 GroupsActivity.ACTION_CREATE_AND_JOIN_GROUP).addFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(Const.Strings.GROUP_TO_CREATE_NAME, mGroupClicked.name));
+                Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(Const.Strings.GROUP_TO_CREATE_NAME, mGroupClicked.name));
         
         mGroupNoLongerExistsDialog.dismiss();
     }
     public void errorDialogGoGroupsActivityPressed(View view) {
-        if(mAlreadyInGroup) {
+        if (mAlreadyInGroup) {
             startActivity(new Intent(this, GroupsActivity.class).setAction(
                     GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
                     Intent.FLAG_ACTIVITY_CLEAR_TOP));
