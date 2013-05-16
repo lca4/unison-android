@@ -16,26 +16,26 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     private static final String TAG = "ch.epfl.unison.UnisonDBHelper";
 
     private static final String LIBE_SCHEMA = "CREATE TABLE IF NOT EXISTS "
-            + Const.LIBE_TABLE_NAME + " ("
-            + Const.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
-            + Const.LIBE_C_LOCAL_ID + " int UNIQUE, "
-            + Const.LIBE_C_ARTIST + " text, "
-            + Const.LIBE_C_TITLE + " text, "
-            + Const.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
+            + ConstDB.LIBE_TABLE_NAME + " ("
+            + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
+            + ConstDB.LIBE_C_LOCAL_ID + " int UNIQUE, "
+            + ConstDB.LIBE_C_ARTIST + " text, "
+            + ConstDB.LIBE_C_TITLE + " text, "
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
     		+ ")";
 
     private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
-            + Const.TAG_TABLE_NAME + " ("
-            + Const.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
-            + Const.TAG_C_NAME + " text UNIQUE NOT NULL, "
-            + Const.TAG_C_REMOTE_ID + " bigint UNIQUE, "
-            + Const.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
+            + ConstDB.TAG_TABLE_NAME + " ("
+            + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
+            + ConstDB.TAG_C_NAME + " text UNIQUE NOT NULL, "
+            + ConstDB.TAG_C_REMOTE_ID + " bigint UNIQUE, "
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
             + "); "
-            + "CREATE INDEX IF NOT EXISTS " + Const.TAG_INDEX_NAME + " ON " + Const.TAG_TABLE_NAME
-            + " (" + Const.TAG_C_NAME + ");";
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.TAG_INDEX_NAME + " ON " + ConstDB.TAG_TABLE_NAME
+            + " (" + ConstDB.TAG_C_NAME + ");";
 
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
-        super(context, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);
+        super(context, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
         // TODO Auto-generated method stub
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + Const.TAG_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ConstDB.TAG_TABLE_NAME);
         onCreate(db);
     }
 }

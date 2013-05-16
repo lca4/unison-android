@@ -34,8 +34,6 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 		super.onCreate(savedInstanceState);
 		handleExtras(getIntent().getExtras());
 
-		setTag(TAG);
-
 		// Set up Action Bar
 		mSupportActionBar = getSupportActionBar();
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);

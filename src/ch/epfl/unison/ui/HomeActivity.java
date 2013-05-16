@@ -39,7 +39,6 @@ public class HomeActivity extends AbstractFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         
-        setTag(TAG);
         setReloadInterval(RELOAD_INTERVAL);
 
         final ListView listview = (ListView) findViewById(R.id.home_activities_list);

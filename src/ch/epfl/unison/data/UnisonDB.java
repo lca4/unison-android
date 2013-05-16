@@ -40,21 +40,21 @@ public class UnisonDB {
     private final Context mContext;
     private final UnisonDBHelper mDbHelper;
 
-    private static final String LIBE_WHERE_ALL = Const.LIBE_C_LOCAL_ID + " = ? AND "
-            + Const.LIBE_C_ARTIST + " = ? AND " + Const.LIBE_C_TITLE + " = ?";
-    private static final String TAGS_WHERE_ALL = Const.TAG_C_ID + " = ? AND "
-            + Const.TAG_C_NAME + " = ? AND "
-            + Const.TAG_C_IS_CHECKED + " = ?";
+    private static final String LIBE_WHERE_ALL = ConstDB.LIBE_C_LOCAL_ID + " = ? AND "
+            + ConstDB.LIBE_C_ARTIST + " = ? AND " + ConstDB.LIBE_C_TITLE + " = ?";
+    private static final String TAGS_WHERE_ALL = ConstDB.TAG_C_ID + " = ? AND "
+            + ConstDB.TAG_C_NAME + " = ? AND "
+            + ConstDB.TAG_C_IS_CHECKED + " = ?";
     // private static final String TAGS_WHERE_REMOTE_ID = Const.TAG_C_REMOTE_ID
     // + " = ?";
-    private static final String TAG_WHERE_NAME = Const.TAG_C_NAME + " LIKE ? ";
+    private static final String TAG_WHERE_NAME = ConstDB.TAG_C_NAME + " LIKE ? ";
 
     // private static final String TAGS_WHERE_C_ID = Const.TAGS_C_ID + " = ?";
 
     public UnisonDB(Context c) {
         mContext = c;
-        mContext.deleteDatabase(Const.DATABASE_NAME);
-        mDbHelper = new UnisonDBHelper(mContext, Const.DATABASE_NAME, null, Const.DATABASE_VERSION);
+        mContext.deleteDatabase(ConstDB.DATABASE_NAME);
+        mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
     }
 
     private void open() {
@@ -93,7 +93,7 @@ public class UnisonDB {
     private void resetIsChecked(String table) {
         openW();
         ContentValues values = new ContentValues();
-        values.put(Const.C_IS_CHECKED, Const.FALSE);
+        values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
         mDB.update(table, values, null, null);
         close();
     }
@@ -142,15 +142,15 @@ public class UnisonDB {
      * @return
      */
     public Set<MusicItem> getMusicItems() {
-        Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
+        Cursor cur = getCursor(ConstDB.LIBE_TABLE_NAME,
                 new String[] {
-                        Const.LIBE_C_LOCAL_ID, Const.LIBE_C_ARTIST, Const.LIBE_C_TITLE
+                        ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
                 });
         Set<MusicItem> set = new HashSet<MusicItem>();
         if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(Const.LIBE_C_LOCAL_ID);
-            int colArtist = cur.getColumnIndex(Const.LIBE_C_ARTIST);
-            int colTitle = cur.getColumnIndex(Const.LIBE_C_TITLE);
+            int colId = cur.getColumnIndex(ConstDB.LIBE_C_LOCAL_ID);
+            int colArtist = cur.getColumnIndex(ConstDB.LIBE_C_ARTIST);
+            int colTitle = cur.getColumnIndex(ConstDB.LIBE_C_TITLE);
             do {
                 set.add(new MusicItem(cur.getInt(colId),
                         cur.getString(colArtist), cur.getString(colTitle)));
@@ -166,9 +166,9 @@ public class UnisonDB {
      * @return
      */
     public boolean libeIsEmpty() {
-        Cursor cur = getCursor(Const.LIBE_TABLE_NAME,
+        Cursor cur = getCursor(ConstDB.LIBE_TABLE_NAME,
                 new String[] {
-                        Const.LIBE_C_LOCAL_ID, Const.LIBE_C_ARTIST, Const.LIBE_C_TITLE
+                        ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
                 });
         boolean isEmpty = !cur.moveToFirst();
         closeCursor(cur);
@@ -177,18 +177,18 @@ public class UnisonDB {
 
     public void insert(MusicItem item) {
         ContentValues values = new ContentValues();
-        values.put(Const.LIBE_C_LOCAL_ID, item.localId);
-        values.put(Const.LIBE_C_ARTIST, item.artist);
-        values.put(Const.LIBE_C_TITLE, item.title);
+        values.put(ConstDB.LIBE_C_LOCAL_ID, item.localId);
+        values.put(ConstDB.LIBE_C_ARTIST, item.artist);
+        values.put(ConstDB.LIBE_C_TITLE, item.title);
 
         openW();
-        mDB.insert(Const.LIBE_TABLE_NAME, null, values);
+        mDB.insert(ConstDB.LIBE_TABLE_NAME, null, values);
         close();
     }
 
     public void delete(MusicItem item) {
         openW();
-        mDB.delete(Const.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
+        mDB.delete(ConstDB.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.artist, item.title
                 });
@@ -197,9 +197,9 @@ public class UnisonDB {
 
     public boolean exists(MusicItem item) {
         open();
-        Cursor cur = mDB.query(Const.LIBE_TABLE_NAME,
+        Cursor cur = mDB.query(ConstDB.LIBE_TABLE_NAME,
                 new String[] {
-                    Const.LIBE_C_LOCAL_ID
+                    ConstDB.LIBE_C_LOCAL_ID
                 },
                 LIBE_WHERE_ALL,
                 new String[] {
@@ -213,21 +213,21 @@ public class UnisonDB {
 
     public void libeTruncate() {
         openW();
-        mDB.delete(Const.LIBE_TABLE_NAME, null, null);
+        mDB.delete(ConstDB.LIBE_TABLE_NAME, null, null);
         close();
     }
 
     public LinkedHashMap<String, Integer> getLibEntries() {
-        Cursor cursor = getCursor(Const.LIBE_TABLE_NAME, new String[] {
-                Const.TAG_C_ID, Const.LIBE_C_TITLE, Const.LIBE_C_ARTIST
+        Cursor cursor = getCursor(ConstDB.LIBE_TABLE_NAME, new String[] {
+                ConstDB.TAG_C_ID, ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
         });
         LinkedHashMap<String, Integer> tags = null;
         // List<CharSequence> tags = null;
         if (cursor != null && cursor.moveToFirst()) {
             tags = new LinkedHashMap<String, Integer>();
-            int colId = cursor.getColumnIndex(Const.C_ID);
-            int colTitle = cursor.getColumnIndex(Const.LIBE_C_TITLE);
-            int colArtist = cursor.getColumnIndex(Const.LIBE_C_ARTIST);
+            int colId = cursor.getColumnIndex(ConstDB.C_ID);
+            int colTitle = cursor.getColumnIndex(ConstDB.LIBE_C_TITLE);
+            int colArtist = cursor.getColumnIndex(ConstDB.LIBE_C_ARTIST);
             do {
                 tags.put(cursor.getString(colTitle) + " - " + cursor.getString(colArtist),
                         cursor.getInt(colId));
@@ -247,8 +247,8 @@ public class UnisonDB {
      * @return
      */
     public Cursor tagGetItemsCursor() {
-        Cursor cursor = getCursor(Const.TAG_TABLE_NAME, new String[] {
-                Const.TAG_C_ID, Const.TAG_C_NAME, Const.C_IS_CHECKED
+        Cursor cursor = getCursor(ConstDB.TAG_TABLE_NAME, new String[] {
+                ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME, ConstDB.C_IS_CHECKED
         });
         return cursor;
     }
@@ -257,26 +257,26 @@ public class UnisonDB {
         openW();
         ContentValues values = new ContentValues();
         if (isChecked) {
-            values.put(Const.C_IS_CHECKED, Const.TRUE);
+            values.put(ConstDB.C_IS_CHECKED, ConstDB.TRUE);
         } else {
-            values.put(Const.C_IS_CHECKED, Const.FALSE);
+            values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
         }
-        mDB.update(Const.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
+        mDB.update(ConstDB.TAG_TABLE_NAME, values, "_id = ? ", new String[] {
                 String.valueOf(tagId)
         });
         close();
     }
 
     public LinkedHashMap<String, Integer> getTags() {
-        Cursor cursor = getCursor(Const.TAG_TABLE_NAME, new String[] {
-                Const.TAG_C_ID, Const.TAG_C_NAME
+        Cursor cursor = getCursor(ConstDB.TAG_TABLE_NAME, new String[] {
+                ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
         });
         LinkedHashMap<String, Integer> tags = null;
         // List<CharSequence> tags = null;
         if (cursor != null && cursor.moveToFirst()) {
             tags = new LinkedHashMap<String, Integer>();
-            int colId = cursor.getColumnIndex(Const.C_ID);
-            int colName = cursor.getColumnIndex(Const.TAG_C_NAME);
+            int colId = cursor.getColumnIndex(ConstDB.C_ID);
+            int colName = cursor.getColumnIndex(ConstDB.TAG_C_NAME);
             do {
                 tags.put(cursor.getString(colName), cursor.getInt(colId));
             } while (cursor.moveToNext());
@@ -302,16 +302,16 @@ public class UnisonDB {
     // }
 
     private Set<TagItem> getTagItems() {
-        Cursor cur = getCursor(Const.TAG_TABLE_NAME,
+        Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
                 new String[] {
-                        Const.TAG_C_ID, Const.TAG_C_NAME
+                        ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
                 });
         Set<TagItem> set = new HashSet<TagItem>();
         if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(Const.TAG_C_ID);
-            int colName = cur.getColumnIndex(Const.TAG_C_NAME);
-            int colIsChecked = cur.getColumnIndex(Const.TAG_C_IS_CHECKED);
-            int colRemoteId = cur.getColumnIndex(Const.TAG_C_REMOTE_ID);
+            int colId = cur.getColumnIndex(ConstDB.TAG_C_ID);
+            int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
+            int colIsChecked = cur.getColumnIndex(ConstDB.TAG_C_IS_CHECKED);
+            int colRemoteId = cur.getColumnIndex(ConstDB.TAG_C_REMOTE_ID);
             do {
                 set.add(new TagItem(cur.getInt(colId),
                         cur.getString(colName), cur.getInt(colIsChecked),
@@ -328,9 +328,9 @@ public class UnisonDB {
      * @return
      */
     public boolean tagIsEmpty() {
-        Cursor cur = getCursor(Const.TAG_TABLE_NAME,
+        Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
                 new String[] {
-                        Const.TAG_C_ID, Const.TAG_C_NAME
+                        ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
                 });
         boolean isEmpty = !cur.moveToFirst();
         closeCursor(cur);
@@ -339,7 +339,7 @@ public class UnisonDB {
 
     private void tagTruncate() {
         openW();
-        mDB.delete(Const.TAG_TABLE_NAME, null, null);
+        mDB.delete(ConstDB.TAG_TABLE_NAME, null, null);
         close();
     }
 
@@ -351,19 +351,19 @@ public class UnisonDB {
     public void insert(TagItem item) {
         ContentValues values = new ContentValues();
         // values.put(Const.TAGS_C_ID, item.localId);
-        values.put(Const.TAG_C_NAME, item.name);
+        values.put(ConstDB.TAG_C_NAME, item.name);
         // values.put(Const.TAG_C_REMOTE_ID, item.remoteId);
 
         if (!exists(item)) {
             openW();
-            mDB.insert(Const.TAG_TABLE_NAME, null, values);
+            mDB.insert(ConstDB.TAG_TABLE_NAME, null, values);
             close();
         }
     }
 
     public void delete(TagItem item) {
         openW();
-        mDB.delete(Const.TAG_TABLE_NAME, TAGS_WHERE_ALL,
+        mDB.delete(ConstDB.TAG_TABLE_NAME, TAGS_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.name
                 });
@@ -378,9 +378,9 @@ public class UnisonDB {
      */
     public boolean exists(TagItem item) {
         open();
-        Cursor cur = mDB.query(Const.TAG_TABLE_NAME,
+        Cursor cur = mDB.query(ConstDB.TAG_TABLE_NAME,
                 new String[] {
-                    Const.TAG_C_NAME
+                    ConstDB.TAG_C_NAME
                 },
                 TAG_WHERE_NAME,
                 new String[] {
@@ -393,20 +393,20 @@ public class UnisonDB {
     }
 
     public String getColumnLabelRowId() {
-        return Const.C_ID;
+        return ConstDB.C_ID;
     }
 
     public String tagGetColumnLabelIsChecked() {
-        return Const.C_IS_CHECKED;
+        return ConstDB.C_IS_CHECKED;
     }
 
     public String tagGetColumnLabelName() {
-        return Const.TAG_C_NAME;
+        return ConstDB.TAG_C_NAME;
     }
 
     public void tagEmpty() {
         openW();
-        mDB.delete(Const.TAG_TABLE_NAME, null, null);
+        mDB.delete(ConstDB.TAG_TABLE_NAME, null, null);
         close();
     }
 
@@ -425,10 +425,10 @@ public class UnisonDB {
         String table = null;
         switch (type) {
             case TAGS:
-                table = Const.TAG_TABLE_NAME;
+                table = ConstDB.TAG_TABLE_NAME;
                 break;
             case TRACKS:
-                table = Const.LIBE_TABLE_NAME;
+                table = ConstDB.LIBE_TABLE_NAME;
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -438,13 +438,13 @@ public class UnisonDB {
         int index = 0;
         while (it.hasNext()) {
             if (checked[index]) {
-                values.put(Const.C_IS_CHECKED, Const.TRUE);
+                values.put(ConstDB.C_IS_CHECKED, ConstDB.TRUE);
             } else {
-                values.put(Const.C_IS_CHECKED, Const.FALSE);
+                values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
             }
             Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>) it.next();
             int tagId = pair.getValue();
-            mDB.update(table, values, Const.C_ID + " = ? ", new String[] {
+            mDB.update(table, values, ConstDB.C_ID + " = ? ", new String[] {
                     String.valueOf(tagId)
             });
             index++;
@@ -457,22 +457,22 @@ public class UnisonDB {
         String[] columns = null;
         switch (key) {
             case TAGS:
-                table = Const.TAG_TABLE_NAME;
+                table = ConstDB.TAG_TABLE_NAME;
                 columns = new String[] {
-                        Const.TAG_C_NAME
+                        ConstDB.TAG_C_NAME
                 };
                 break;
             case TRACKS:
-                table = Const.LIBE_TABLE_NAME;
+                table = ConstDB.LIBE_TABLE_NAME;
                 columns = new String[] {
-                        Const.LIBE_C_TITLE, Const.LIBE_C_ARTIST
+                        ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
                 };
                 break;
             default:
                 throw new IllegalArgumentException();
         }
-        Cursor cur = getCursor(table, columns, Const.C_IS_CHECKED + " = ? ", new String[] {
-                String.valueOf(Const.TRUE)
+        Cursor cur = getCursor(table, columns, ConstDB.C_IS_CHECKED + " = ? ", new String[] {
+                String.valueOf(ConstDB.TRUE)
         });
 
         JSONObject json = null;
@@ -480,7 +480,7 @@ public class UnisonDB {
             json = new JSONObject();
             switch (key) {
                 case TAGS:
-                    int colName = cur.getColumnIndex(Const.TAG_C_NAME);
+                    int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
                     do {
                         try {
                             json.accumulate(key.getLabel(), cur.getString(colName));
@@ -490,8 +490,8 @@ public class UnisonDB {
                     } while (cur.moveToNext());
                     break;
                 case TRACKS:
-                    int colTitle = cur.getColumnIndex(Const.LIBE_C_TITLE);
-                    int colArtist = cur.getColumnIndex(Const.LIBE_C_ARTIST);
+                    int colTitle = cur.getColumnIndex(ConstDB.LIBE_C_TITLE);
+                    int colArtist = cur.getColumnIndex(ConstDB.LIBE_C_ARTIST);
                     JSONObject track = new JSONObject();
                     do {
                         try {
@@ -520,16 +520,20 @@ public class UnisonDB {
         insert(pl);
     }
 
+    /**
+     * WORK IN PROGRESS.
+     * @param pl
+     */
     private void insert(Playlist pl) {
         if (pl.getLocalId() == 0) {
             ContentValues values = new ContentValues();
-            values.put(Const.PLYL_C_GS_ID, pl.getPLId());
-            Cursor cur = getCursorW(Const.PLAYLISTS_TABLE_NAME, new String[] {
-                    Const.PLYL_C_GS_ID,
-                    Const.PLYL_C_CREATED_BY_GS,
-                    Const.PLYL_C_GS_SIZE
+            values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
+            Cursor cur = getCursorW(ConstDB.PLAYLISTS_TABLE_NAME, new String[] {
+                    ConstDB.PLYL_C_GS_ID,
+                    ConstDB.PLYL_C_CREATED_BY_GS,
+                    ConstDB.PLYL_C_GS_SIZE
             });
-
+            //TODO
             closeCursor(cur);
         }
     }

@@ -55,7 +55,6 @@ public class SoloMainActivity extends AbstractMainActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setReloadInterval(RELOAD_INTERVAL);
-        setTag(TAG);
         getTabsAdapter().addTab(getSupportActBar().newTab().setText(R.string.solo_player_fragment_title),
                 SoloPlayerFragment.class, null);
         getTabsAdapter().addTab(getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),

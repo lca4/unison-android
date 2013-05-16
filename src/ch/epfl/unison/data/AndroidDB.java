@@ -5,11 +5,11 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.location.Address;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Audio.Playlists;
 import android.util.Log;
+
+import ch.epfl.unison.Const;
 
 import java.util.Iterator;
 
@@ -82,7 +82,7 @@ final class AndroidDB {
             uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
             c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
             if (c != null) {
-                addSongsInCursorToPlaylist(cr, pl);
+                addTracksToPlaylist(cr, pl);
                 c.close();
             }
         }
@@ -90,51 +90,36 @@ final class AndroidDB {
     }
 
     /**
-     * WORK IN PROGRESS. To be adapted to our playlists.
+     * WORK IN PROGRESS.<br />
+     * Creates a new playlist, doesn't check if another playlist with same title exists.
      * 
      * @param resolver
      * @param playlistId
      * @param c
      */
-    private static void addSongsInCursorToPlaylist(ContentResolver resolver, Playlist pl) {
-        int mIdCol;
-        int mCount;
-        int mPercent = 0;
+    private static void addTracksToPlaylist(ContentResolver resolver, Playlist pl) {
         ContentResolver mCR = resolver;
         ContentProviderClient mCRC = null;
         try {
-//            mCount = c.getCount();
-//            mIdCol = c.getColumnIndex(MediaStore.Audio.Media._ID);
-            ContentValues[] mInsertList = new ContentValues[1];
-//            mInsertList[0] = new ContentValues();
             int mPlaylistId = pl.getLocalId();
             Uri mUri = MediaStore.Audio.Playlists.Members.getContentUri("external", mPlaylistId);
-            Cursor c2 = mCR.query(mUri,
-                    PROJECTION_PLAYLISTMEMBERS_PLAYORDER, null, null,
-                    MediaStore.Audio.Playlists.Members.PLAY_ORDER + " DESC ");
-            int mPlayOrder = 1;
-            if (c2 != null) {
-                if (c2.moveToFirst()) {
-                    mPlayOrder = (c2.getInt(c2
-                            .getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER))) + 1;
-                }
-                c2.close();
-            }
+
             mCRC = mCR.acquireContentProviderClient(mUri);
-
-            Log.d(TAG, "addSongsInCursorToPlaylist -Content Uri: " + mUri.toString()
-                    + "  PlaylistID: " + mPlaylistId + " mPlayOrder: " + mPlayOrder);
-
             ContentValues candidate = new ContentValues();
+            int tracks = pl.getTracks().size();
+            int percent = 0;
+            int i = 0;
+            // TODO improve: bulk insertion instead of sequential insertion
             Iterator<MusicItem> it = pl.getTracks().iterator();
             if (it.hasNext()) {
                 // Don't pollute with progress messages..has to be at least
                 // 1% increments
-//                    int mTemp = (i * 100) / (mCount);
-//                    if (mTemp > mPercent) {
-//                        mPercent = mTemp;
-//                        // publishProgress(mPercent);
-//                    }
+                    int temp = (i * Const.Integers.HUNDRED) / (tracks);
+                    if (temp > percent) {
+                        percent = temp;
+                        // publishProgress(mPercent);
+                    }
+                    i++;
                 candidate.clear();
                 MusicItem mi = it.next();
                 candidate.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, mi.localId);

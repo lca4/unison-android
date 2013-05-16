@@ -86,7 +86,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         super.onCreate(savedInstanceState);
 
         setReloadInterval(RELOAD_INTERVAL);
-        setTag(TAG);
 
         // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);

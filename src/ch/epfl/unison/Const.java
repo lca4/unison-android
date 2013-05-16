@@ -38,6 +38,14 @@ public final class Const {
         private Strings() {
         } // Non-instantiable.
     }
+    
+    /**  Various integer values.   */
+    public final class Integers {
+        public static final int HUNDRED = 100;
+        
+        private Integers() {
+        } // Non-instantiable.
+    }
 
     private Const() {
     } // Non-instantiable.

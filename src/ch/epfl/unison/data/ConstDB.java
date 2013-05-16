@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
  * 
  * @author marc
  */
-final class Const {
+final class ConstDB {
 
     // Global definitions
     static final String DATABASE_NAME = "unison.db";
@@ -76,7 +76,7 @@ final class Const {
     
 
     // Const class can't be instanciated
-    private Const() {
+    private ConstDB() {
         // TODO Auto-generated constructor stub
     }
 }

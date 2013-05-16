@@ -85,6 +85,8 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		smTag = this.getClass().getName();
 
 		setReloadInterval(DEFAULT_RELOAD_INTERVAL);
 
@@ -187,6 +189,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 		return mUpdater;
 	}
 
+	@Deprecated
 	protected static void setTag(String tag) {
 		smTag = tag;
 	}
@@ -197,6 +200,10 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
 	protected TabsAdapter getTabsAdapter() {
 		return mTabsAdapter;
+	}
+	
+	protected String getTag() {
+	    return smTag;
 	}
 
 	private void setTabsAdapter(TabsAdapter ta) {
