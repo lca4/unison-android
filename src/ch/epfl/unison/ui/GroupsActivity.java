@@ -27,15 +27,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.JsonStruct.Group;
 import ch.epfl.unison.api.JsonStruct.GroupSuggestion;
 import ch.epfl.unison.api.JsonStruct.GroupsList;
-import ch.epfl.unison.api.JsonStruct.Group;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
@@ -103,6 +104,28 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
         ((Button) findViewById(R.id.createGroupBtn))
                 .setOnClickListener(new OnCreateGroupListener());
+        
+        Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion);
+
+        reDisplaySuggestion.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Clicked on suggestionBtn, v instanceof Button: "
+                        + (v instanceof Button)
+                        + " text: " + ((Button) v).getText().toString());
+                if (v instanceof Button && ((Button) v).getText()
+                        .toString().equals(getString(R.string.groups_suggestion_goto_settings))) {
+                    startActivityForResult(
+                            new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+                            0);
+                } else {
+                    showSuggestionDialog();
+                }
+            }
+        });
+        
+        switchSuggestionButtonState(false);
 
         mGroupsList = (ListView) findViewById(R.id.groupsList);
         mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
@@ -353,15 +376,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         builder.setNegativeButton(getString(R.string.groups_suggestion_noBtn),
                 mSuggestionClick);
         
-        Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion);
         
-        reDisplaySuggestion.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                showSuggestionDialog();
-            }
-        });
         
         switchSuggestionButtonState(true);
         
@@ -436,6 +451,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             api.getSuggestion(lat, lon, mSuggestionHandler);
         } else {
             mSuggestionIsForeground = false;
+            ((Button) findViewById(R.id.displaySuggestion)).setText(R.string.groups_suggestion_goto_settings);
+            ((Button) findViewById(R.id.displaySuggestion)).setEnabled(true);
         }
     }
 
