@@ -196,7 +196,7 @@ You can also just cancel this action and stay in groups history.</string> -->
     <string name="error_sending_track">Unable to send play notification to the server.</string>
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
-    <string name="error_group_to_recreate">Sorry an error occured while trying to recreate the group. Please do it manually.</string>
+    <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
 
 </resources>

@@ -1,8 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -16,15 +13,20 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.JsonStruct.Success;
+import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
@@ -174,34 +176,39 @@ public class GroupsMainActivity extends AbstractMainActivity {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             if (which == Dialog.BUTTON_POSITIVE) {
-                AppData data = AppData.getInstance(GroupsMainActivity.this);
-                UnisonAPI api = data.getAPI();
                 String password = ((EditText) ((Dialog) dialog).findViewById(R.id.groupPassword))
                         .getText().toString();
-                api.setGroupPassword(mGroup.gid, password, 
-                        new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                    @Override
-                    public void callback(Success struct) {
-                        if (GroupsMainActivity.this != null) {
-                            Toast.makeText(GroupsMainActivity.this, 
-                                    R.string.main_success_setting_password,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        if (GroupsMainActivity.this != null) {
-                            Toast.makeText(GroupsMainActivity.this, 
-                                    R.string.error_setting_password,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });   
+                sendPassword(password);
             }
         }
     };
+    
+    private void sendPassword(String pw) {
+        AppData data = AppData.getInstance(GroupsMainActivity.this);
+        UnisonAPI api = data.getAPI();
+        
+        api.setGroupPassword(mGroup.gid, pw, 
+                new UnisonAPI.Handler<JsonStruct.Success>() {
+
+            @Override
+            public void callback(Success struct) {
+                if (GroupsMainActivity.this != null) {
+                    Toast.makeText(GroupsMainActivity.this, 
+                            R.string.main_success_setting_password,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Error error) {
+                if (GroupsMainActivity.this != null) {
+                    Toast.makeText(GroupsMainActivity.this, 
+                            R.string.error_setting_password,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
     
 	
 	public void displayPasswordDialog() {
@@ -214,10 +221,22 @@ public class GroupsMainActivity extends AbstractMainActivity {
 	           builder.setView(dialogView);
 	           EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
 	           
+	           
+	           
 	           builder.setPositiveButton(getString(R.string.main_password_ok), mPasswordClick);
 	           builder.setNegativeButton(getString(R.string.main_password_cancel), mPasswordClick);
 
 	           final AlertDialog dialog = builder.create();
+	           
+	           ((Button) dialogView.findViewById(R.id.rstPassword))
+	               .setOnClickListener(new View.OnClickListener() {
+	                
+	                @Override
+	                public void onClick(View v) {
+	                    sendPassword("");
+	                    dialog.dismiss();
+	                }
+	            });
 	                
 	           password.addTextChangedListener(new TextWatcher() {
 	            
