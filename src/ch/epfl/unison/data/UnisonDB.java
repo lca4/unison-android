@@ -20,14 +20,12 @@ import ch.epfl.unison.Const.SeedType;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
- * about the one *that GroupStreamer owns*, i.e. on the phone
- * 
- * <br />
+ * about the one *that GroupStreamer owns*, i.e. on the phone <br />
  * <br />
  * Ideas of improvements:
  * <ul>
- *  <li>1 private inner class for each table</li>
- *  <li>interface implemented by every such inner classes</li>
+ * <li>1 private inner class for each table</li>
+ * <li>interface implemented by every such inner classes</li>
  * </ul>
  * 
  * @author marc
@@ -42,9 +40,9 @@ public class UnisonDB {
 
     private static final String LIBE_WHERE_ALL = ConstDB.LIBE_C_LOCAL_ID + " = ? AND "
             + ConstDB.LIBE_C_ARTIST + " = ? AND " + ConstDB.LIBE_C_TITLE + " = ?";
-    private static final String TAGS_WHERE_ALL = ConstDB.TAG_C_ID + " = ? AND "
+    private static final String TAGS_WHERE_ALL = ConstDB.C_ID + " = ? AND "
             + ConstDB.TAG_C_NAME + " = ? AND "
-            + ConstDB.TAG_C_IS_CHECKED + " = ?";
+            + ConstDB.C_IS_CHECKED + " = ?";
     // private static final String TAGS_WHERE_REMOTE_ID = Const.TAG_C_REMOTE_ID
     // + " = ?";
     private static final String TAG_WHERE_NAME = ConstDB.TAG_C_NAME + " LIKE ? ";
@@ -54,7 +52,8 @@ public class UnisonDB {
     public UnisonDB(Context c) {
         mContext = c;
         mContext.deleteDatabase(ConstDB.DATABASE_NAME);
-        mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
+        mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
+                ConstDB.DATABASE_VERSION);
     }
 
     private void open() {
@@ -219,7 +218,7 @@ public class UnisonDB {
 
     public LinkedHashMap<String, Integer> getLibEntries() {
         Cursor cursor = getCursor(ConstDB.LIBE_TABLE_NAME, new String[] {
-                ConstDB.TAG_C_ID, ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
+                ConstDB.C_ID, ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
         });
         LinkedHashMap<String, Integer> tags = null;
         // List<CharSequence> tags = null;
@@ -248,7 +247,7 @@ public class UnisonDB {
      */
     public Cursor tagGetItemsCursor() {
         Cursor cursor = getCursor(ConstDB.TAG_TABLE_NAME, new String[] {
-                ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME, ConstDB.C_IS_CHECKED
+                ConstDB.C_ID, ConstDB.TAG_C_NAME, ConstDB.C_IS_CHECKED
         });
         return cursor;
     }
@@ -269,7 +268,7 @@ public class UnisonDB {
 
     public LinkedHashMap<String, Integer> getTags() {
         Cursor cursor = getCursor(ConstDB.TAG_TABLE_NAME, new String[] {
-                ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
+                ConstDB.C_ID, ConstDB.TAG_C_NAME
         });
         LinkedHashMap<String, Integer> tags = null;
         // List<CharSequence> tags = null;
@@ -304,13 +303,13 @@ public class UnisonDB {
     private Set<TagItem> getTagItems() {
         Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
                 new String[] {
-                        ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
+                        ConstDB.C_ID, ConstDB.TAG_C_NAME
                 });
         Set<TagItem> set = new HashSet<TagItem>();
         if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(ConstDB.TAG_C_ID);
+            int colId = cur.getColumnIndex(ConstDB.C_ID);
             int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
-            int colIsChecked = cur.getColumnIndex(ConstDB.TAG_C_IS_CHECKED);
+            int colIsChecked = cur.getColumnIndex(ConstDB.C_IS_CHECKED);
             int colRemoteId = cur.getColumnIndex(ConstDB.TAG_C_REMOTE_ID);
             do {
                 set.add(new TagItem(cur.getInt(colId),
@@ -330,7 +329,7 @@ public class UnisonDB {
     public boolean tagIsEmpty() {
         Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
                 new String[] {
-                        ConstDB.TAG_C_ID, ConstDB.TAG_C_NAME
+                        ConstDB.C_ID, ConstDB.TAG_C_NAME
                 });
         boolean isEmpty = !cur.moveToFirst();
         closeCursor(cur);
@@ -420,7 +419,7 @@ public class UnisonDB {
      * @param checked
      */
     public void setChecked(SeedType type, LinkedHashMap<String, Integer> items,
-            boolean[] checked) throws IllegalArgumentException {
+            boolean[] checked) {
         openW();
         String table = null;
         switch (type) {
@@ -515,26 +514,38 @@ public class UnisonDB {
     public void insertToAndroid(Playlist pl) {
         // First store to android DB
         AndroidDB.insertToAndroid(mContext.getContentResolver(), pl);
-        
+
         // Then insert a record to the device-local GS database
         insert(pl);
     }
 
     /**
      * WORK IN PROGRESS.
+     * 
      * @param pl
      */
     private void insert(Playlist pl) {
         if (pl.getLocalId() == 0) {
             ContentValues values = new ContentValues();
+            values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
+            values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
+            values.put(ConstDB.PLYL_C_CREATED_BY_GS, true);
             values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
-            Cursor cur = getCursorW(ConstDB.PLAYLISTS_TABLE_NAME, new String[] {
-                    ConstDB.PLYL_C_GS_ID,
-                    ConstDB.PLYL_C_CREATED_BY_GS,
-                    ConstDB.PLYL_C_GS_SIZE
-            });
-            //TODO
-            closeCursor(cur);
+            values.put(ConstDB.PLYL_C_GS_CREATION_TIME, pl.getCreationTime());
+            values.put(ConstDB.PLYL_C_GS_UPDATE_TIME, pl.getLastUpdated());
+            values.put(ConstDB.PLYL_C_GS_AVG_RATING, pl.getAvgRating());
+            values.put(ConstDB.PLYL_C_GS_IS_SHARED, pl.isIsShared());
+            values.put(ConstDB.PLYL_C_GS_IS_SYNCED, pl.isIsSynced());
+            // Cursor cur = getCursorW(ConstDB.PLAYLISTS_TABLE_NAME, new
+            // String[] {
+            // ConstDB.PLYL_C_GS_ID,
+            // ConstDB.PLYL_C_CREATED_BY_GS,
+            // ConstDB.PLYL_C_GS_SIZE
+            // });
+            // //TODO
+            // closeCursor(cur);
+            openW();
+
         }
     }
 }

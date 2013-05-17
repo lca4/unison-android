@@ -25,7 +25,7 @@ final class ConstDB {
     
     static final String LIBE_TABLE_NAME = "lib_entry"; // Prefix: LIBE_
     // lib_entry table fields here
-    static final String LIBE_C_ID = C_ID;
+//    static final String LIBE_C_ID = C_ID;
     static final String LIBE_C_LOCAL_ID = "local_id";
     static final String LIBE_C_ARTIST = "artist";
     static final String LIBE_C_TITLE = "title";
@@ -33,10 +33,10 @@ final class ConstDB {
     
     static final String TAG_TABLE_NAME = "tag"; // Prefix: TAG_
     // tags table fields here
-    static final String TAG_C_ID = C_ID;
+//    static final String TAG_C_ID = C_ID;
     static final String TAG_C_NAME = "name";
     static final String TAG_C_REMOTE_ID = "gs_tag_id"; // may be useless
-    static final String TAG_C_IS_CHECKED = "is_checked";
+//    static final String TAG_C_IS_CHECKED = "is_checked";
     // index
     static final String TAG_INDEX_NAME = "tag_name_idx";
 
@@ -61,7 +61,7 @@ final class ConstDB {
      * shared android playlists database!
      */
     static final String PLAYLISTS_TABLE_NAME = "playlists"; // Prefix: PLYL_
-    static final String PLYL_C_ID = C_ID;
+//    static final String PLYL_C_ID = C_ID;
     static final String PLYL_C_LOCAL_ID = "local_id";
     static final String PLYL_C_GS_SIZE = "gs_size";
     //static final String PLYL_C_LOCAL_UPDATE_TIME = "update_time"; // =PlaylistsColumns.DATE_MODIFIED
@@ -73,6 +73,14 @@ final class ConstDB {
     static final String PLYL_C_GS_AVG_RATING = "gs_avg_rating";
     static final String PLYL_C_GS_IS_SHARED = "gs_is_shared";
     static final String PLYL_C_GS_IS_SYNCED = "gs_is_synced";
+    static final String PLYL_C_GS_USER_RATING = "gs_user_rating";
+    static final String PLYL_C_GS_USER_COMMENT = "gs_user_comment";
+    
+    // Indexes
+    static final String PLYL_INDEX_GS_ID = "plyl_gs_playlist_id_idx";
+    static final String PLYL_INDEX_GS_SIZE = "plyl_gs_size_idx";
+    static final String PLYL_INDEX_GS_AVG_RATING = "plyl_gs_avg_rating_idx";
+    static final String PLYL_INDEX_GS_USER_RATING = "plyl_gs_user_rating_idx";
     
 
     // Const class can't be instanciated

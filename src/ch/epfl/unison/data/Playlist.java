@@ -230,8 +230,8 @@ public class Playlist {
     }
 
 
-    public Calendar getLastUpdated() {
-        return mLastUpdated;
+    public String getLastUpdated() {
+        return mLastUpdated.toString();
     }
 
 
@@ -298,8 +298,8 @@ public class Playlist {
     }
 
 
-    public Calendar getCreated() {
-        return mCreated;
+    public String getCreationTime() {
+        return mCreated.toString();
     }
 
 

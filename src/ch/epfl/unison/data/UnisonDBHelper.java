@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import ch.epfl.unison.Const;
+
 /**
  * @author marc
  */
@@ -21,22 +23,45 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.LIBE_C_LOCAL_ID + " int UNIQUE, "
             + ConstDB.LIBE_C_ARTIST + " text, "
             + ConstDB.LIBE_C_TITLE + " text, "
-            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
-    		+ ")";
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean
+                                                          // value
+            + ")";
 
     private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + ConstDB.TAG_TABLE_NAME + " ("
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + ConstDB.TAG_C_NAME + " text UNIQUE NOT NULL, "
             + ConstDB.TAG_C_REMOTE_ID + " bigint UNIQUE, "
-            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean value
+            + ConstDB.C_IS_CHECKED
+            + " tinyint DEFAULT 0" // used a boolean value
             + "); "
-            + "CREATE INDEX IF NOT EXISTS " + ConstDB.TAG_INDEX_NAME + " ON " + ConstDB.TAG_TABLE_NAME
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.TAG_INDEX_NAME + " ON "
+            + ConstDB.TAG_TABLE_NAME
             + " (" + ConstDB.TAG_C_NAME + ");";
 
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
     }
+
+    private static final String PLYL_SCHEMA = "CREATE TABLE IF NOT EXISTS "
+            + ConstDB.PLAYLISTS_TABLE_NAME + " ("
+            + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
+            + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
+            + ConstDB.PLYL_C_GS_SIZE + " int, "
+            + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT 0, "
+            + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check
+                                                              // type!
+            + ConstDB.PLYL_C_GS_UPDATE_TIME + " datetime, " // TODO check type!
+            + ConstDB.PLYL_C_GS_AVG_RATING + " double, "
+            + ConstDB.PLYL_C_GS_IS_SHARED + " tinyint DEFAULT 0, "
+            + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1"
+            + "); "
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
