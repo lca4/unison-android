@@ -117,17 +117,19 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         .toString().equals(getString(R.string.groups_suggestion_goto_settings))) {
                     startActivityForResult(
                             new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
-                            0);
+                            1);
                 } else {
                     showSuggestionDialog();
                 }
             }
         });
         
-        switchSuggestionButtonState(false);
+        updateSuggestionButton();
 
         mGroupsList = (ListView) findViewById(R.id.groupsList);
         mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
+        
+        AppData data = AppData.getInstance(GroupsActivity.this);
 
         // Actions that should be taken whe activity is started.
         if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
@@ -148,16 +150,25 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         Toast.LENGTH_LONG).show();
             }
             
-        } else if (AppData.getInstance(this).showHelpDialog()) {
+        } else if (data.showHelpDialog()) {
             showHelpDialog();
         } else {
             mDismissedHelp = true;
         }
 
-        if (AppData.getInstance(this).showGroupSuggestion() && mDismissedHelp) {
+        if (data.showGroupSuggestion() && mDismissedHelp) {
             fetchGroupSuggestion();
         }
 
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        Log.d(TAG, "Called onActivityResult with result code = " + resultCode);
+        
+        updateSuggestionButton();
     }
 
     @Override
@@ -304,6 +315,31 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         alert.show();
     }
 
+    private void updateSuggestionButton() {
+        Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion);
+        AppData data = AppData.getInstance(GroupsActivity.this);
+        Location currentLoc = data.getLocation();
+        
+        if (!data.showGroupSuggestion()) {
+            reDisplaySuggestion.setText(R.string.groups_suggestion_no_suggest);
+            reDisplaySuggestion.setEnabled(false);
+            return;
+        }
+        
+        if (currentLoc == null) {
+            reDisplaySuggestion.setText(R.string.groups_suggestion_goto_settings);
+            reDisplaySuggestion.setEnabled(true);
+            return;
+        }
+        
+        if (mSuggestion == null) {
+            switchSuggestionButtonState(false);
+        } else {
+            switchSuggestionButtonState(true);
+        }
+        
+    }
+    
     private void switchSuggestionButtonState(boolean enabled) {
         Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion); 
         reDisplaySuggestion.setEnabled(enabled);
@@ -337,16 +373,19 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mSuggestionIsForeground = false;
-                mDismissedHelp = true;
+                        mDismissedHelp = true;
 
                         if (cbox.isChecked()) {
                             AppData.getInstance(GroupsActivity.this).setShowGroupSuggestion(false);
                         }
                         if (DialogInterface.BUTTON_POSITIVE == which) {
-//                    UnisonAPI api = AppData.getInstance(GroupsActivity.this).getAPI();
-//                    long uid = AppData.getInstance(GroupsActivity.this).getUid();
-//                    api.joinGroup(uid, mSuggestion.group.gid, mAcceptSuggestionHandler);
-                      joinGroup(mSuggestion.group, null);
+                            // UnisonAPI api =
+                            // AppData.getInstance(GroupsActivity.this).getAPI();
+                            // long uid =
+                            // AppData.getInstance(GroupsActivity.this).getUid();
+                            // api.joinGroup(uid, mSuggestion.group.gid,
+                            // mAcceptSuggestionHandler);
+                            joinGroup(mSuggestion.group, null);
                         }
                     }
                 };
@@ -377,7 +416,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         
         
         
-        switchSuggestionButtonState(true);
+        updateSuggestionButton();
         
 //        mSuggestionIsForeground = true;
         final Dialog dialog = builder.create();
@@ -412,7 +451,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 mSuggestion = null;
                 mSuggestionIsForeground = false;
                 
-                switchSuggestionButtonState(false);
+                updateSuggestionButton();
                 return;
             }
             showSuggestionDialog();
@@ -422,7 +461,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         public void onError(Error error) {
             mSuggestionIsForeground = false;
             
-            switchSuggestionButtonState(false);
+            updateSuggestionButton();
             //Do nothing, errors silently happen in the background.
         }
     };
@@ -442,6 +481,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         UnisonAPI api = data.getAPI();
 
         Location currentLoc = data.getLocation();
+        
+        updateSuggestionButton();
 
         // Only do suggestions based on location for now.
         if (currentLoc != null) {
@@ -450,8 +491,6 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             api.getSuggestion(lat, lon, mSuggestionHandler);
         } else {
             mSuggestionIsForeground = false;
-            ((Button) findViewById(R.id.displaySuggestion)).setText(R.string.groups_suggestion_goto_settings);
-            ((Button) findViewById(R.id.displaySuggestion)).setEnabled(true);
         }
     }
 
