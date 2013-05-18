@@ -47,7 +47,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		setTag(TAG);
+//		setTag(TAG);
 		setDJSupport(true);
 		return v;
 	}

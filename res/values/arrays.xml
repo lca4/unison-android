@@ -3,14 +3,14 @@
 
     <array name="seedtypes">
         <item>Tags</item>
-        <item>Tracks</item>
+        <!-- <item>Tracks</item> -->
     </array>
 
-    <array name="tags">
+    <!-- <array name="tags">
         <item>Pop</item>
         <item>Rock</item>
         <item>Electro</item>
         <item>Metal</item>
         <item>Classic</item>
-    </array>
+    </array> -->
 </resources>

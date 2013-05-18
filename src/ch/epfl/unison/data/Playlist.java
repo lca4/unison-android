@@ -1,18 +1,13 @@
 
 package ch.epfl.unison.data;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
@@ -22,12 +17,14 @@ import ch.epfl.unison.api.JsonStruct.Track;
  * @author marc
  */
 public class Playlist {
+    
+    private static final String TAG = Playlist.class.getName();
 
     private int mLocalId = 0; // Android sqlite
     private int mGSPLId; // GS database id
     private String mTitle;
-    private Calendar mCreated;
-    private Calendar mLastUpdated;
+    private Date mCreated;
+    private Date mLastUpdated;
     private int mAuthorId;
     private String mAuthorName;
     private int mSize;
@@ -38,6 +35,7 @@ public class Playlist {
     private double mAvgRating;
     private boolean mIsShared;
     private boolean mIsSynced;
+    private static DateFormat smDF = DateFormat.getInstance();
     
     // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
@@ -63,8 +61,8 @@ public class Playlist {
         private int mLocalId; // Android sqlite
         private int mGSPLId; // GS database id
         private String mTitle;
-        private Calendar mCreated;
-        private Calendar mLastUpdated;
+        private Date mCreated;
+        private Date mLastUpdated;
         private int mAuthorId;
         //private String mAuthorName; // Not yet available
         private int mSize;
@@ -91,7 +89,7 @@ public class Playlist {
             return this;
         }
         
-        public Builder created(Calendar c) {
+        public Builder created(Date c) {
             this.mCreated = c;
             return this;
         }
@@ -102,11 +100,17 @@ public class Playlist {
          * @return
          */
         public Builder created(String c) {
-//            this.mCreated = //TODO
+            try {
+                this.mCreated = smDF.parse(c);
+            } catch (ParseException e) {
+                this.mCreated = null;
+                e.printStackTrace();
+            }
             return this;
         }
         
-        public Builder updated(Calendar c) {
+        
+        public Builder updated(Date c) {
             this.mLastUpdated = c;
             return this;
         }
@@ -117,7 +121,12 @@ public class Playlist {
          * @return
          */
         public Builder updated(String u) {
-//            this.mLastUpdated = //TODO
+            try {
+                this.mCreated = smDF.parse(u);
+            } catch (ParseException e) {
+                this.mCreated = null;
+                e.printStackTrace();
+            }
             return this;
         }
         
@@ -157,7 +166,11 @@ public class Playlist {
         }
     }
     
+    /*
+     * Minimalistic builder, should be upgraded to include all fields
+     */
     private Playlist(Builder builder) {
+        this.mLocalId = builder.mLocalId;
         this.mGSPLId = builder.mGSPLId;
         this.mTitle = builder.mTitle;
         this.mCreated = builder.mCreated;
@@ -165,7 +178,12 @@ public class Playlist {
         this.mAuthorId = builder.mAuthorId;
         this.mSize = builder.mSize;
         this.mTracks = builder.mTracks;
+        this.mUserRating = builder.mUserRating;
+        this.mUserComment = builder.mUserComment;
         this.mListeners = builder.mListeners;
+        this.mAvgRating = builder.mAvgRating;
+        this.mIsShared = builder.mIsShared;
+        this.mIsSynced = builder.mIsSynced;
     }
     
 
@@ -185,39 +203,39 @@ public class Playlist {
      * @param indexes
      * @return null in case of failure
      */
-    @SuppressLint("NewApi")
-    public JSONObject export(Resources res) {
-
-        if (mRawTagsId.isEmpty()) {
-            return null;
-        }
-
-        JSONObject json = new JSONObject();
-
-        // Tags
-        JSONArray jsonArray = new JSONArray();
-        for (int i = 0; i < mRawTagsId.size(); i++) {
-//            jsonArray.put(tags.getString(i));
-            jsonArray.put(JSONObject.NULL);
-        }
-
-        // Tracks
-        // TODO
-
-        try {
-            json.put(SeedType.TAGS.getLabel(), jsonArray);
-            // json.put(SeedType.TRACKS.getLabel(), tracksInString);
-            if (!mOptions.isEmpty()) {
-                // TODO
-                String foo = null;
-            }
-            return json;
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    @SuppressLint("NewApi")
+//    public JSONObject export(Resources res) {
+//
+//        if (mRawTagsId.isEmpty()) {
+//            return null;
+//        }
+//
+//        JSONObject json = new JSONObject();
+//
+//        // Tags
+//        JSONArray jsonArray = new JSONArray();
+//        for (int i = 0; i < mRawTagsId.size(); i++) {
+////            jsonArray.put(tags.getString(i));
+//            jsonArray.put(JSONObject.NULL);
+//        }
+//
+//        // Tracks
+//        // TODO
+//
+//        try {
+//            json.put(SeedType.TAGS.getLabel(), jsonArray);
+//            // json.put(SeedType.TRACKS.getLabel(), tracksInString);
+//            if (!mOptions.isEmpty()) {
+//                // TODO convert mOptions in json format
+//                Log.i(TAG, "There are options");
+//            }
+//            return json;
+//        } catch (JSONException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     public String getTitle() {
@@ -235,8 +253,26 @@ public class Playlist {
     }
 
 
-    public void setLastUpdated(Calendar lastUpdated) {
+    public void setLastUpdated(Date lastUpdated) {
         this.mLastUpdated = lastUpdated;
+    }
+    
+    public void setLastUpdated(String lastUpdated) {
+        try {
+            this.mLastUpdated = smDF.parse(lastUpdated);
+        } catch (ParseException e) {
+            this.mLastUpdated = null;
+            e.printStackTrace();
+        }
+    }
+    
+    public void setCreated(String created) {
+        try {
+            this.mCreated = smDF.parse(created);
+        } catch (ParseException e) {
+            this.mCreated = null;
+            e.printStackTrace();
+        }
     }
 
 

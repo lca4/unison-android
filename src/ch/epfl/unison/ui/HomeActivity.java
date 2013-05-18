@@ -59,7 +59,7 @@ public class HomeActivity extends AbstractFragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view,
                     int position, long id) {
-                final String item = (String) parent.getItemAtPosition(position);
+                final String itemem = (String) parent.getItemAtPosition(position);
                 if (position == 0) {
                     startActivity(new Intent(HomeActivity.this, GroupsActivity.class));
                 } else if (position == 1) {

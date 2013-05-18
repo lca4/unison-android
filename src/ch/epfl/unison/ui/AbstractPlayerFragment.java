@@ -60,6 +60,8 @@ import com.actionbarsherlock.app.SherlockFragment;
 public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		OnClickListener {
 
+//    private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
+    
 	/**
 	 * Handles instant ratings (when the user clicks on the rating button in the
 	 * player interface).
@@ -375,6 +377,8 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+	    smTag = this.getClass().getName();
+	    
 		View v = inflater.inflate(R.layout.player, container, false);
 
 		// Default values
@@ -585,9 +589,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		this.mStatus = status;
 	}
 
-	protected void setTag(String tag) {
-		smTag = tag;
-	}
+//	protected void setTag(String tag) {
+//		smTag = tag;
+//	}
 
 	private void setTitleTxt(TextView titleTxt) {
 		this.mTitleTxt = titleTxt;

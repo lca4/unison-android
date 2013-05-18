@@ -16,6 +16,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
 import ch.epfl.unison.Const.SeedType;
 
 /**
@@ -51,7 +52,9 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-        mContext.deleteDatabase(ConstDB.DATABASE_NAME);
+        Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+        mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+                                                        // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
     }
@@ -60,8 +63,9 @@ public class UnisonDB {
         mDB = mDbHelper.getReadableDatabase();
     }
 
-    private void openW() {
+    private SQLiteDatabase openW() {
         mDB = mDbHelper.getWritableDatabase();
+        return mDB;
     }
 
     private void close() {
@@ -113,13 +117,24 @@ public class UnisonDB {
     }
 
     public boolean isEmpty(Class<?> itemType) {
+        String table = null;
         if (itemType == MusicItem.class) {
-            return libeIsEmpty();
+            table = ConstDB.LIBE_TABLE_NAME;
         } else if (itemType == TagItem.class) {
-            return tagIsEmpty();
+            table = ConstDB.TAG_TABLE_NAME;
+        } else if (itemType == Playlist.class) {
+            table = ConstDB.PLAYLISTS_TABLE_NAME;
+        } else {
+            // Unsupported type
+            throw new IllegalArgumentException();
         }
-        // Unsupported type
-        throw new IllegalArgumentException();
+        Cursor cur = getCursor(table,
+                new String[] {
+                    ConstDB.C_ID
+                });
+        boolean isEmpty = !cur.moveToFirst();
+        closeCursor(cur);
+        return isEmpty;
     }
 
     public void truncate(Class<?> itemType) {
@@ -159,20 +174,19 @@ public class UnisonDB {
         return set;
     }
 
-    /**
-     * @deprecated use {@link #isEmpty(MusicItem)} instead
-     * @see #isEmpty(Class)
-     * @return
-     */
-    public boolean libeIsEmpty() {
-        Cursor cur = getCursor(ConstDB.LIBE_TABLE_NAME,
-                new String[] {
-                        ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
-                });
-        boolean isEmpty = !cur.moveToFirst();
-        closeCursor(cur);
-        return isEmpty;
-    }
+    // /**
+    // * @see #isEmpty(Class)
+    // * @return
+    // */
+    // private boolean libeIsEmpty() {
+    // Cursor cur = getCursor(ConstDB.LIBE_TABLE_NAME,
+    // new String[] {
+    // ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
+    // });
+    // boolean isEmpty = !cur.moveToFirst();
+    // closeCursor(cur);
+    // return isEmpty;
+    // }
 
     public void insert(MusicItem item) {
         ContentValues values = new ContentValues();
@@ -271,7 +285,6 @@ public class UnisonDB {
                 ConstDB.C_ID, ConstDB.TAG_C_NAME
         });
         LinkedHashMap<String, Integer> tags = null;
-        // List<CharSequence> tags = null;
         if (cursor != null && cursor.moveToFirst()) {
             tags = new LinkedHashMap<String, Integer>();
             int colId = cursor.getColumnIndex(ConstDB.C_ID);
@@ -281,24 +294,8 @@ public class UnisonDB {
             } while (cursor.moveToNext());
         }
         closeCursor(cursor);
-        // return tags.toArray(new CharSequence[tags.size()]);
         return tags;
     }
-
-    // public TagItem getTagItem(int index) {
-    // open();
-    // Cursor c = mDb.query(Const.TAGS_TABLE_NAME,
-    // new String[] {
-    // Const.TAGS_C_ID, Const.TAGS_C_NAME, Const.TAGS_C_REMOTE_ID
-    // },
-    // TAGS_WHERE_C_ID,
-    // new String[] {
-    // String.valueOf(index)
-    // },
-    // null, null, null, "1");
-    // // TODO some stuff
-    // return null;
-    // }
 
     private Set<TagItem> getTagItems() {
         Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
@@ -321,20 +318,19 @@ public class UnisonDB {
         return set;
     }
 
-    /**
-     * @deprecated use {@link #isEmpty(TagItem)} instead
-     * @see #isEmpty(Class)
-     * @return
-     */
-    public boolean tagIsEmpty() {
-        Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
-                new String[] {
-                        ConstDB.C_ID, ConstDB.TAG_C_NAME
-                });
-        boolean isEmpty = !cur.moveToFirst();
-        closeCursor(cur);
-        return isEmpty;
-    }
+    // /**
+    // * @see #isEmpty(Class)
+    // * @return
+    // */
+    // private boolean tagIsEmpty() {
+    // Cursor cur = getCursor(ConstDB.TAG_TABLE_NAME,
+    // new String[] {
+    // ConstDB.C_ID, ConstDB.TAG_C_NAME
+    // });
+    // boolean isEmpty = !cur.moveToFirst();
+    // closeCursor(cur);
+    // return isEmpty;
+    // }
 
     private void tagTruncate() {
         openW();
@@ -511,20 +507,16 @@ public class UnisonDB {
         return json;
     }
 
-    public void insertToAndroid(Playlist pl) {
+    /**
+     * Adds the playlist to the android sqlite DB and to the GS in-app DB.
+     * 
+     * @param pl
+     */
+    public void insert(Playlist pl) {
         // First store to android DB
         AndroidDB.insertToAndroid(mContext.getContentResolver(), pl);
 
         // Then insert a record to the device-local GS database
-        insert(pl);
-    }
-
-    /**
-     * WORK IN PROGRESS.
-     * 
-     * @param pl
-     */
-    private void insert(Playlist pl) {
         if (pl.getLocalId() == 0) {
             ContentValues values = new ContentValues();
             values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
@@ -536,16 +528,11 @@ public class UnisonDB {
             values.put(ConstDB.PLYL_C_GS_AVG_RATING, pl.getAvgRating());
             values.put(ConstDB.PLYL_C_GS_IS_SHARED, pl.isIsShared());
             values.put(ConstDB.PLYL_C_GS_IS_SYNCED, pl.isIsSynced());
-            // Cursor cur = getCursorW(ConstDB.PLAYLISTS_TABLE_NAME, new
-            // String[] {
-            // ConstDB.PLYL_C_GS_ID,
-            // ConstDB.PLYL_C_CREATED_BY_GS,
-            // ConstDB.PLYL_C_GS_SIZE
-            // });
-            // //TODO
-            // closeCursor(cur);
-            openW();
 
+            long plId = openW().insert(ConstDB.PLAYLISTS_TABLE_NAME, null, values);
+            Log.i(TAG, "Added playlist to GS in-app DB with id=" + plId);
+            close();
         }
     }
+
 }

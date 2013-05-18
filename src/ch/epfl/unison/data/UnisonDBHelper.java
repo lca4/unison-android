@@ -56,6 +56,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_GS_IS_SHARED + " tinyint DEFAULT 0, "
             + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1"
             + "); "
+            // Create some indexes
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
             + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
@@ -68,6 +69,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(LIBE_SCHEMA);
             db.execSQL(TAG_SCHEMA);
+            db.execSQL(PLYL_SCHEMA);
         } catch (SQLiteException e) {
             Log.v(TAG, e.getMessage()); // "Create table exception"
         }
@@ -75,7 +77,9 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
+        /* WARNING : CRITICAL CODE HERE
+         * Erroneous DB updates can lead to irreversible lost of data!
+         */
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + ConstDB.TAG_TABLE_NAME);

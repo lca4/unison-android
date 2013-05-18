@@ -22,7 +22,7 @@ import ch.epfl.unison.api.UnisonAPI;
  */
 public class SoloMainActivity extends AbstractMainActivity {
 
-    /** Simple interface to be notified about group info updates. */
+    /** Simple interface to be notified about playlist info updates. */
     public interface OnPlaylistInfoListener {
         void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
     }

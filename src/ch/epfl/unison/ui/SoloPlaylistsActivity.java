@@ -49,7 +49,6 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.Playlist;
 import ch.epfl.unison.data.UnisonDB;
 
-import com.actionbarsherlock.internal.widget.IcsAdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.view.MenuItem;
 
 /*
@@ -154,14 +153,19 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
     // @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        ListView lv = (ListView) info.targetView.getParent();
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
                 return true;
             case R.id.playlist_context_menu_item_delete:
                 return true;
             case R.id.playlist_context_menu_item_save:
-                savePlaylist(info.position);
+                if (lv == mPlaylistsListRemote) {
+                    Log.i(TAG, "Selected playlist has index : " + info.position);
+                    savePlaylist(mPLsRemote.get(info.position));
+                }
                 return true;
             default:
                 return super.onContextItemSelected((android.view.MenuItem) item);
@@ -593,8 +597,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
-    private void savePlaylist(int position) {
-
+    private void savePlaylist(Playlist pl) {
+        mDB.insert(pl);
+//        onRefresh();
     }
 
 }
