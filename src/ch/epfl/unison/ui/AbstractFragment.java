@@ -9,6 +9,10 @@ import ch.epfl.unison.R;
 import com.actionbarsherlock.app.SherlockFragment;
 
 /**
+ * WORK IN PROGRESS.
+ * 
+ * To be used later in SoloPlaylistsActivity, one fragment per playlist type (local and remote). And
+ * potentially any other activity that requires fragments.
  * 
  * @author marc
  *

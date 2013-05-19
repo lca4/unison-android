@@ -150,8 +150,8 @@ public abstract class JsonStruct {
         public Double gsAvgRating;
         public Boolean gsIsShared;
         public Boolean gsIsSynced;
-        public Integer gsRating;
-        public String gsComment; // Not used for now
+        public Integer gsUserRating;
+        public String gsUserComment; // Not used for now
 
         public Playlist toObject() {
             // TODO complete
