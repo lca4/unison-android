@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
@@ -21,6 +22,7 @@ public class Playlist {
     private static final String TAG = Playlist.class.getName();
 
     private int mLocalId = 0; // Android sqlite
+    private boolean mCreatedByGS;
     private int mGSPLId; // GS database id
     private String mTitle;
     private Date mCreated;
@@ -59,12 +61,13 @@ public class Playlist {
      */
     public static class Builder {
         private int mLocalId; // Android sqlite
-        private int mGSPLId; // GS database id
         private String mTitle;
+        private boolean mCreatedByGS;
+        private int mGSPLId; // GS database id
         private Date mCreated;
         private Date mLastUpdated;
         private int mAuthorId;
-        //private String mAuthorName; // Not yet available
+        private String mAuthorName; // Not yet available
         private int mSize;
         private LinkedList<MusicItem> mTracks; 
         private int mUserRating;
@@ -79,8 +82,18 @@ public class Playlist {
             return this;
         }
         
+        public Builder createdByGS(boolean b) {
+            this.mCreatedByGS = b;
+            return this;
+        }
+        
         public Builder plId(int id) {
             this.mGSPLId = id;
+            return this;
+        }
+        
+        public Builder avgRating(double avgRating) {
+            this.mAvgRating = avgRating;
             return this;
         }
         
@@ -101,7 +114,8 @@ public class Playlist {
          */
         public Builder created(String c) {
             try {
-                this.mCreated = smDF.parse(c);
+//                this.mCreated = smDF.parse(c);
+                this.mCreated = Uutils.stringToDate(c);
             } catch (ParseException e) {
                 this.mCreated = null;
                 e.printStackTrace();
@@ -122,7 +136,7 @@ public class Playlist {
          */
         public Builder updated(String u) {
             try {
-                this.mCreated = smDF.parse(u);
+                this.mLastUpdated = Uutils.stringToDate(u);
             } catch (ParseException e) {
                 this.mCreated = null;
                 e.printStackTrace();
@@ -132,6 +146,11 @@ public class Playlist {
         
         public Builder authorId(int id) {
             this.mAuthorId = id;
+            return this;
+        }
+        
+        public Builder authorName(String name) {
+            this.mAuthorName = name;
             return this;
         }
         
@@ -160,22 +179,41 @@ public class Playlist {
             this.mListeners = i;
             return this;
         }
+        
+        public Builder isShared(boolean isShared) {
+            this.mIsShared = isShared;
+            return this;
+        }
+        
+        public Builder isSynced(boolean isSynced) {
+            this.mIsSynced = isSynced;
+            return this;
+        }
+        
+        public Builder userRating(int userRating) {
+            this.mUserRating = userRating;
+            return this;
+        }
+        
+        public Builder userComment(String userComment) {
+            this.mUserComment = userComment;
+            return this;
+        }
 
         public Playlist build() {
             return new Playlist(this);
         }
     }
     
-    /*
-     * Minimalistic builder, should be upgraded to include all fields
-     */
     private Playlist(Builder builder) {
         this.mLocalId = builder.mLocalId;
+        this.mCreatedByGS = builder.mCreatedByGS;
         this.mGSPLId = builder.mGSPLId;
         this.mTitle = builder.mTitle;
         this.mCreated = builder.mCreated;
         this.mLastUpdated = builder.mLastUpdated;
         this.mAuthorId = builder.mAuthorId;
+        this.mAuthorName = builder.mAuthorName;
         this.mSize = builder.mSize;
         this.mTracks = builder.mTracks;
         this.mUserRating = builder.mUserRating;
@@ -187,10 +225,9 @@ public class Playlist {
     }
     
 
+    @Deprecated
     public void addRawTags(ArrayList<Integer> seeds) {
-//        Log.i("Playlist", "to be added to rawlist: " + seeds + "\n");
         mRawTagsId.addAll(seeds);
-//        Log.i("Playlist", "rawlist: " + mRawTags.toString() + "\n");
     }
 
     /**
@@ -259,7 +296,8 @@ public class Playlist {
     
     public void setLastUpdated(String lastUpdated) {
         try {
-            this.mLastUpdated = smDF.parse(lastUpdated);
+//            this.mLastUpdated = smDF.parse(lastUpdated);
+            this.mLastUpdated = Uutils.stringToDate(lastUpdated);
         } catch (ParseException e) {
             this.mLastUpdated = null;
             e.printStackTrace();
@@ -268,7 +306,8 @@ public class Playlist {
     
     public void setCreated(String created) {
         try {
-            this.mCreated = smDF.parse(created);
+//            this.mCreated = smDF.parse(created);
+            this.mCreated = Uutils.stringToDate(created);
         } catch (ParseException e) {
             this.mCreated = null;
             e.printStackTrace();

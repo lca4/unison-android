@@ -9,6 +9,9 @@ import android.provider.BaseColumns;
  * @author marc
  */
 final class ConstDB {
+    /*
+     * If you make modifications here, don't forget to adjust the schema!
+     */
 
     // Global definitions
     static final String DATABASE_NAME = "unison.db";
@@ -70,6 +73,8 @@ final class ConstDB {
     static final String PLYL_C_GS_CREATION_TIME = "gs_creation_time"; // if created by GS
     // Update the android playlists only if requested, thus track last update
     static final String PLYL_C_GS_UPDATE_TIME = "gs_update_time"; // if created by GS
+    static final String PLYL_C_GS_AUTHOR_ID = "gs_author_id";
+    static final String PLYL_C_GS_AUTHOR_NAME = "gs_author_name";
     static final String PLYL_C_GS_AVG_RATING = "gs_avg_rating";
     static final String PLYL_C_GS_IS_SHARED = "gs_is_shared";
     static final String PLYL_C_GS_IS_SYNCED = "gs_is_synced";
@@ -77,6 +82,7 @@ final class ConstDB {
     static final String PLYL_C_GS_USER_COMMENT = "gs_user_comment";
     
     // Indexes
+    static final String PLYL_INDEX_LOCAL_ID = "plyl_local_id_idx";
     static final String PLYL_INDEX_GS_ID = "plyl_gs_playlist_id_idx";
     static final String PLYL_INDEX_GS_SIZE = "plyl_gs_size_idx";
     static final String PLYL_INDEX_GS_AVG_RATING = "plyl_gs_avg_rating_idx";

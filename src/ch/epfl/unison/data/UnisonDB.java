@@ -111,9 +111,66 @@ public class UnisonDB {
             return getMusicItems();
         } else if (itemType == TagItem.class) {
             return getTagItems();
+        } else if (itemType == Playlist.class) {
+            return getPlylItems();
+        } else {
+            // Unsupported type
+            throw new IllegalArgumentException();
         }
-        // Unsupported type
-        throw new IllegalArgumentException();
+    }
+
+    private Set<Playlist> getPlylItems() {
+        Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
+                new String[] {
+                        ConstDB.C_ID,
+                        ConstDB.PLYL_C_LOCAL_ID,
+                        ConstDB.PLYL_C_GS_SIZE,
+                        ConstDB.PLYL_C_CREATED_BY_GS,
+                        ConstDB.PLYL_C_GS_ID,
+                        ConstDB.PLYL_C_GS_CREATION_TIME,
+                        ConstDB.PLYL_C_GS_UPDATE_TIME,
+                        ConstDB.PLYL_C_GS_AUTHOR_ID,
+                        ConstDB.PLYL_C_GS_AUTHOR_NAME,
+                        ConstDB.PLYL_C_GS_AVG_RATING,
+                        ConstDB.PLYL_C_GS_IS_SHARED,
+                        ConstDB.PLYL_C_GS_IS_SYNCED,
+                        ConstDB.PLYL_C_GS_USER_RATING,
+                        ConstDB.PLYL_C_GS_USER_COMMENT
+                });
+        Set<Playlist> set = new HashSet<Playlist>();
+        if (cur != null && cur.moveToFirst()) {
+            // int colId = cur.getColumnIndex(ConstDB.C_ID);
+            int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
+            int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
+            int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
+            int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
+            int colGSCreationTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
+            int colGSUpdateTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
+            int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
+            int colGSAuthorName = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
+            int colGSAvgRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
+            int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
+            int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
+            int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
+            int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
+            do {
+                set.add(new Playlist.Builder().localId(cur.getInt(colLocalId))
+                        .size(cur.getInt(colGSSize))
+                        .createdByGS(cur.getInt(colCreatedByGS) != 0)
+                        .plId(cur.getInt(colGSId))
+                        .created(cur.getString(colGSCreationTime))
+                        .updated(cur.getString(colGSUpdateTime))
+                        .authorId(cur.getInt(colGSAuthorId))
+                        .authorName(cur.getString(colGSAuthorName))
+                        .avgRating(cur.getDouble(colGSAvgRating))
+                        .isShared(cur.getInt(colGSIsShared) != 0)
+                        .isSynced(cur.getInt(colGSIsSynced) != 0)
+                        .userRating(cur.getInt(colGSUserRating))
+                        .userComment(cur.getString(colGSUserComment))
+                        .build());
+            } while (cur.moveToNext());
+        }
+        return set;
     }
 
     public boolean isEmpty(Class<?> itemType) {
@@ -142,9 +199,93 @@ public class UnisonDB {
             libeTruncate();
         } else if (itemType == TagItem.class) {
             tagTruncate();
+        } else if (itemType == Playlist.class) {
+            plylTruncate();
+        } else {
+            // Unsupported type
+            throw new IllegalArgumentException();
         }
-        // Unsupported type
-        throw new IllegalArgumentException();
+    }
+
+    public void exists(Class<?> item) {
+        // TODO
+    }
+
+    public void delete(Object item) {
+        if (item instanceof MusicItem) {
+            delete((MusicItem) item);
+        } else if (item instanceof TagItem) {
+            delete((TagItem) item);
+        } else if (item instanceof Playlist) {
+            delete((Playlist) item);
+        } else {
+            // Unsupported type
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public Object getItem(Class<?> itemType, int itemId) {
+        String table = null;
+        Cursor cur = null;
+        Object res = null;
+        if (itemType == MusicItem.class) {
+            table = ConstDB.LIBE_TABLE_NAME;
+        } else if (itemType == TagItem.class) {
+            table = ConstDB.TAG_TABLE_NAME;
+        } else if (itemType == Playlist.class) {
+            cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
+                    new String[] {
+                            ConstDB.C_ID,
+                            ConstDB.PLYL_C_LOCAL_ID,
+                            ConstDB.PLYL_C_GS_SIZE,
+                            ConstDB.PLYL_C_CREATED_BY_GS,
+                            ConstDB.PLYL_C_GS_ID,
+                            ConstDB.PLYL_C_GS_CREATION_TIME,
+                            ConstDB.PLYL_C_GS_UPDATE_TIME,
+                            ConstDB.PLYL_C_GS_AUTHOR_ID,
+                            ConstDB.PLYL_C_GS_AUTHOR_NAME,
+                            ConstDB.PLYL_C_GS_AVG_RATING,
+                            ConstDB.PLYL_C_GS_IS_SHARED,
+                            ConstDB.PLYL_C_GS_IS_SYNCED,
+                            ConstDB.PLYL_C_GS_USER_RATING,
+                            ConstDB.PLYL_C_GS_USER_COMMENT
+                    });
+            if (cur != null && cur.moveToFirst()) {
+                // int colId = cur.getColumnIndex(ConstDB.C_ID);
+                int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
+                int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
+                int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
+                int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
+                int colGSCreationTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
+                int colGSUpdateTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
+                int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
+                int colGSAuthorName = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
+                int colGSAvgRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
+                int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
+                int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
+                int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
+                int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
+                res = new Playlist.Builder().localId(cur.getInt(colLocalId))
+                        .size(cur.getInt(colGSSize))
+                        .createdByGS(cur.getInt(colCreatedByGS) != 0)
+                        .plId(cur.getInt(colGSId))
+                        .created(cur.getString(colGSCreationTime))
+                        .updated(cur.getString(colGSUpdateTime))
+                        .authorId(cur.getInt(colGSAuthorId))
+                        .authorName(cur.getString(colGSAuthorName))
+                        .avgRating(cur.getDouble(colGSAvgRating))
+                        .isShared(cur.getInt(colGSIsShared) != 0)
+                        .isSynced(cur.getInt(colGSIsSynced) != 0)
+                        .userRating(cur.getInt(colGSUserRating))
+                        .userComment(cur.getString(colGSUserComment))
+                        .build();
+            }
+        } else {
+            // Unsupported type
+            throw new IllegalArgumentException();
+        }
+        closeCursor(cur);
+        return res;
     }
 
     /*
@@ -337,6 +478,12 @@ public class UnisonDB {
         mDB.delete(ConstDB.TAG_TABLE_NAME, null, null);
         close();
     }
+    
+    private void plylTruncate() {
+        openW();
+        mDB.delete(ConstDB.PLAYLISTS_TABLE_NAME, null, null);
+        close();
+    }
 
     /**
      * Inserts the item only if it still does not exists.
@@ -514,10 +661,10 @@ public class UnisonDB {
      */
     public void insert(Playlist pl) {
         // First store to android DB
-        AndroidDB.insertToAndroid(mContext.getContentResolver(), pl);
+        AndroidDB.insert(mContext.getContentResolver(), pl);
 
         // Then insert a record to the device-local GS database
-        if (pl.getLocalId() == 0) {
+        if (pl.getLocalId() >= 0) {
             ContentValues values = new ContentValues();
             values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
             values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
@@ -525,6 +672,8 @@ public class UnisonDB {
             values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
             values.put(ConstDB.PLYL_C_GS_CREATION_TIME, pl.getCreationTime());
             values.put(ConstDB.PLYL_C_GS_UPDATE_TIME, pl.getLastUpdated());
+            values.put(ConstDB.PLYL_C_GS_AUTHOR_ID, pl.getAuthorId());
+            values.put(ConstDB.PLYL_C_GS_AUTHOR_NAME, pl.getAuthorName());
             values.put(ConstDB.PLYL_C_GS_AVG_RATING, pl.getAvgRating());
             values.put(ConstDB.PLYL_C_GS_IS_SHARED, pl.isIsShared());
             values.put(ConstDB.PLYL_C_GS_IS_SYNCED, pl.isIsSynced());
@@ -533,6 +682,27 @@ public class UnisonDB {
             Log.i(TAG, "Added playlist to GS in-app DB with id=" + plId);
             close();
         }
+    }
+
+    private int delete(Playlist pl) {
+        int res = 0;
+        if (pl.getLocalId() >= 0) {
+            res += openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.C_ID + " = ?",
+                    new String[] {
+                        String.valueOf(pl.getLocalId())
+                    });
+            close();
+            if (res < 1) {
+                Log.i(TAG, "Could not remove playlist from GS DB");
+            }
+
+            int tmp = AndroidDB.delete(mContext.getContentResolver(), pl);
+            if (tmp < 1) {
+                Log.i(TAG, "Could not remove playlist from Android DB");
+            }
+            res += tmp;
+        }
+        return res;
     }
 
 }

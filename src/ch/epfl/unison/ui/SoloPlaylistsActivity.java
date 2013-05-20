@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -73,12 +74,18 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
     // private Playlist mPlaylist;
     private UnisonDB mDB;
-    private ArrayList<Playlist> mPLsLocal;
-    private ArrayList<Playlist> mPLsRemote;
+    private ArrayList<Playlist> mPlaylistsLocal;
+    private ArrayList<Playlist> mPlaylistsRemote;
 
     // GUI specific
-    private ListView mPlaylistsListLocal;
-    private ListView mPlaylistsListRemote;
+    private ListView mPlaylistsLocalListView;
+    private ListView mPlaylistsRemoteListView;
+
+    private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+    private final String[] mPlaylistsIdNameProjection = new String[] {
+            MediaStore.Audio.Playlists._ID,
+            MediaStore.Audio.Playlists.NAME
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,40 +95,25 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
         // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
+        
+//        mDB.truncate(Playlist.class);
 
         setContentView(R.layout.solo_playlists);
         ((Button) findViewById(R.id.createPlaylistBtn))
                 .setOnClickListener(new OnCreatePlaylistListener());
 
-        mPlaylistsListLocal = (ListView) findViewById(R.id.soloPlaylistsListLocal);
-        mPlaylistsListLocal.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsListLocal);
-        // TODO Load local PLs
-        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-        String[] projection = new String[] {
-                MediaStore.Audio.Playlists._ID,
-                MediaStore.Audio.Playlists.NAME
-        };
-        Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(uri, projection,
-                null, null, null);
-        if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
-            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
-            do {
-                mPLsLocal.add(new Playlist.Builder().localId(cur.getInt(colId))
-                        .title(cur.getString(colName)).build());
-            } while (cur.moveToNext());
-        } else {
-            mPLsLocal = new ArrayList<Playlist>();
-        }
-        if (!cur.isClosed()) {
-            cur.close();
-        }
-        mPLsRemote = new ArrayList<Playlist>();
+        mPlaylistsLocalListView = (ListView) findViewById(R.id.soloPlaylistsListLocal);
+        mPlaylistsLocalListView.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
+        registerForContextMenu(mPlaylistsLocalListView);
 
-        mPlaylistsListRemote = (ListView) findViewById(R.id.soloPlaylistsListRemote);
-        mPlaylistsListRemote.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsListRemote);
+        mPlaylistsLocal = new ArrayList<Playlist>();
+        fetchLocalPlaylists();
+        mPlaylistsRemote = new ArrayList<Playlist>();
+
+        mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
+        mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
+        registerForContextMenu(mPlaylistsLocalListView);
+        registerForContextMenu(mPlaylistsRemoteListView);
 
         // // Actions that should be taken when activity is started.
         // if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
@@ -143,28 +135,35 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        android.view.MenuInflater inflater = getMenuInflater();
-        if (v == mPlaylistsListLocal) {
+        MenuInflater inflater = getMenuInflater();
+        if (v == mPlaylistsLocalListView) {
             inflater.inflate(R.menu.playlist_local_context_menu, menu);
         } else {
             inflater.inflate(R.menu.playlist_remote_context_menu, menu);
         }
     }
 
-    // @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
         ListView lv = (ListView) info.targetView.getParent();
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
+                if (lv == mPlaylistsLocalListView) {
+                    // TODO
+                }
                 return true;
             case R.id.playlist_context_menu_item_delete:
+                if (lv == mPlaylistsLocalListView) {
+                    mDB.delete(mPlaylistsLocal.get(info.position));
+                    fetchLocalPlaylists();
+                }
                 return true;
             case R.id.playlist_context_menu_item_save:
-                if (lv == mPlaylistsListRemote) {
-                    Log.i(TAG, "Selected playlist has index : " + info.position);
-                    savePlaylist(mPLsRemote.get(info.position));
+                if (lv == mPlaylistsRemoteListView) {
+                    mDB.insert(mPlaylistsRemote.get(info.position));
+                    fetchLocalPlaylists();
                 }
                 return true;
             default:
@@ -176,8 +175,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     public void onRefresh() {
         repaintRefresh(true);
 
-        SoloPlaylistsActivity.this.mPlaylistsListLocal
-                .setAdapter(new PlaylistsAdapter(mPLsLocal));
+        SoloPlaylistsActivity.this.mPlaylistsLocalListView
+                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
 
         // Update playlists
         UnisonAPI.Handler<JsonStruct.PlaylistsList> playlistsHandler =
@@ -187,15 +186,16 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                     public void callback(PlaylistsList struct) {
                         try {
                             if (struct.isEmtpy()) {
+                                mPlaylistsRemote.clear();
                                 // TODO display row item to tell no playlist is
                                 // available
                                 Toast.makeText(SoloPlaylistsActivity.this,
                                         R.string.solo_playlists_noRemotePL,
                                         Toast.LENGTH_LONG).show();
                             } else {
-                                mPLsRemote = struct.toObject();
-                                SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                        .setAdapter(new PlaylistsAdapter(mPLsRemote));
+                                mPlaylistsRemote = struct.toObject();
+                                SoloPlaylistsActivity.this.mPlaylistsRemoteListView
+                                        .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
                                 SoloPlaylistsActivity.this.repaintRefresh(false);
                             }
                         } catch (NullPointerException e) {
@@ -223,10 +223,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
                     @Override
                     public void callback(TagsList struct) {
-
-                        // TODO remove after tests
-                        // mDB.tagEmpty();
-
                         for (int i = 0; i < struct.tags.length; i++) {
                             mDB.insert(struct.tags[i].getTagItem());
                         }
@@ -297,6 +293,13 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         @Override
         public void onClick(View v) {
 
+            /*
+             * TODO allow user to specify title. In order to achieve this, use a
+             * custom view, like the one found on
+             * http://prativas.wordpress.com/category
+             * /android/expandable-list-view-in-android/
+             */
+
             PickSeedDialogFragment pickSeedDialog = new PickSeedDialogFragment();
             pickSeedDialog.show(getSupportFragmentManager(), "seedTypes");
 
@@ -353,23 +356,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             if (pickItemsDialog != null) {
                                 pickItemsDialog.show(getFragmentManager(), seed);
                             }
-                            // switch (seedType) {
-                            // case TAGS:
-                            // PickTagsDialogFragment pickTagsDialog =
-                            // new PickTagsDialogFragment();
-                            // pickTagsDialog.show(getSupportFragmentManager(),
-                            // "tags");
-                            // break;
-                            // case TRACKS:
-                            // /*
-                            // * TODO Checklist from lib_entries
-                            // */
-                            //
-                            // break;
-                            // default:
-                            // // Should never happen
-                            // break;
-                            // }
                         }
                     }
                 });
@@ -481,9 +467,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             public void callback(JsonStruct.PlaylistJS struct) {
                                 if (struct != null) {
                                     Log.i(TAG, "Playlist created!");
-                                    mPLsRemote.add(0, struct.toObject());
-                                    SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                            .setAdapter(new PlaylistsAdapter(mPLsRemote));
+                                    mPlaylistsRemote.add(0, struct.toObject());
+                                    SoloPlaylistsActivity.this.mPlaylistsRemoteListView
+                                            .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
                                     // SoloPlaylistsActivity.this.mPlaylistsListRemote
                                     // .setAdapter(new
                                     // PlaylistsAdapter(struct.toObject()));
@@ -597,9 +583,25 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
-    private void savePlaylist(Playlist pl) {
-        mDB.insert(pl);
-//        onRefresh();
+    private void fetchLocalPlaylists() {
+        Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
+                mPlaylistsIdNameProjection,
+                null, null, null);
+        mPlaylistsLocal.clear();
+        if (cur != null && cur.moveToFirst()) {
+            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+            do {
+                //TODO update
+                
+                mPlaylistsLocal.add(new Playlist.Builder().localId(cur.getInt(colId))
+                        .title(cur.getString(colName)).build());
+            } while (cur.moveToNext());
+        }
+        if (!cur.isClosed()) {
+            cur.close();
+        }
+        SoloPlaylistsActivity.this.mPlaylistsLocalListView
+        .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }
-
 }

@@ -2,13 +2,18 @@ package ch.epfl.unison;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
@@ -101,5 +106,19 @@ public final class Uutils {
                 mImage.setImageBitmap(result);
             }
         }
+    }
+    
+    public static Date stringToDate(String s) throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(s);
+    }
+    
+    /**
+     * 
+     * @param u Uri used to make the insertion
+     * @return
+     */
+    public static int lastInsert(Uri u) {
+        // Empirically seen that the index is at the end
+        return Integer.parseInt(u.getPathSegments().get(u.getPathSegments().size() - 1));
     }
 }

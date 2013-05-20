@@ -313,4 +313,8 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 		}
 	}
 
+    public boolean onContextItemSelected(android.view.MenuItem item) {
+        return super.onContextItemSelected(item);
+    }
+
 }

@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import ch.epfl.unison.Const;
+import ch.epfl.unison.Uutils;
 
 import java.util.Iterator;
 
@@ -55,7 +56,7 @@ final class AndroidDB {
      * @param pl The playlist to store in android databse
      * @return local playlist id
      */
-    static int insertToAndroid(ContentResolver cr, Playlist pl) {
+    static int insert(ContentResolver cr, Playlist pl) {
         // Add the playlist to the android dabase
         ContentValues mValues = new ContentValues();
         mValues.put(MediaStore.Audio.Playlists.NAME, pl.getTitle());
@@ -68,30 +69,34 @@ final class AndroidDB {
         // mValues.put(MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER, "name");
         // ContentResolver mCR = resolver.getContentResolver();
         Uri uri = cr.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, mValues);
-        int playlistId = -1;
-        if (uri != null) {
-            Cursor c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
-            if (c != null) {
-                // Save the newly created ID so it can be selected.
-                playlistId = c.getInt(c.getColumnIndex(MediaStore.Audio.Playlists._ID));
-                c.close();
-            }
+        int playlistId = Uutils.lastInsert(uri);
+        // int playlistId = -1;
+        pl.setLocalId(playlistId);
+        if (playlistId >= 0) {
+            // Cursor c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
+            // if (c != null) {
+            // // Save the newly created ID so it can be selected.
+            // c.moveToLast();
+            // playlistId =
+            // c.getInt(c.getColumnIndex(MediaStore.Audio.Playlists._ID));
+            // c.close();
+            // }
             Log.d(TAG, "PLAYLIST_ADD - mPlaylistId: " + playlistId + "  mUri: " + uri.toString());
-            pl.setLocalId(playlistId);
             // Add tracks to the new playlist
             uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
-            c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
-            if (c != null) {
-                addTracksToPlaylist(cr, pl);
-                c.close();
-            }
+            // c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
+            // if (c != null) {
+            addTracksToPlaylist(cr, pl);
+            // c.close();
+            // }
         }
         return playlistId;
     }
 
     /**
      * WORK IN PROGRESS.<br />
-     * Creates a new playlist, doesn't check if another playlist with same title exists.
+     * Creates a new playlist, doesn't check if another playlist with same title
+     * exists.
      * 
      * @param resolver
      * @param playlistId
@@ -105,7 +110,7 @@ final class AndroidDB {
             Uri mUri = MediaStore.Audio.Playlists.Members.getContentUri("external", mPlaylistId);
 
             mCRC = mCR.acquireContentProviderClient(mUri);
-            ContentValues candidate = new ContentValues();
+            ContentValues values = new ContentValues();
             int tracks = pl.getTracks().size();
             int percent = 0;
             int i = 0;
@@ -114,26 +119,32 @@ final class AndroidDB {
             if (it.hasNext()) {
                 // Don't pollute with progress messages..has to be at least
                 // 1% increments
-                    int temp = (i * Const.Integers.HUNDRED) / (tracks);
-                    if (temp > percent) {
-                        percent = temp;
-                        // publishProgress(mPercent);
-                    }
-                    i++;
-                candidate.clear();
+                int temp = (i * Const.Integers.HUNDRED) / (tracks);
+                if (temp > percent) {
+                    percent = temp;
+                    // publishProgress(mPercent);
+                }
+                i++;
+                values.clear();
                 MusicItem mi = it.next();
-                candidate.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, mi.localId);
-                candidate.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, mi.playOrder);
-                mCRC.insert(mUri, candidate);
+                values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, mi.localId);
+                values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, mi.playOrder);
+                mCRC.insert(mUri, values);
                 mCRC.release();
                 Log.d(TAG,
                         "addSongsInCursorToPlaylist -Adding AudioID: " + 0
-                        + " to Uri: " + mUri.toString());
+                                + " to Uri: " + mUri.toString());
             }
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
 
+    static int delete(ContentResolver resolver, Playlist pl) {
+        return resolver.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                MediaStore.Audio.Playlists._ID + " = ? ", new String[] {
+                    String.valueOf(pl.getLocalId())
+                });
     }
 
 }

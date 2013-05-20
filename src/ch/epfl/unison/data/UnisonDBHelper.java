@@ -49,20 +49,29 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
             + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT 0, "
+            + ConstDB.PLYL_C_GS_ID + " bigint, "
             + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check
                                                               // type!
             + ConstDB.PLYL_C_GS_UPDATE_TIME + " datetime, " // TODO check type!
+            + ConstDB.PLYL_C_GS_AUTHOR_ID + " bigint, "
+            + ConstDB.PLYL_C_GS_AUTHOR_NAME + " text, "
             + ConstDB.PLYL_C_GS_AVG_RATING + " double, "
             + ConstDB.PLYL_C_GS_IS_SHARED + " tinyint DEFAULT 0, "
-            + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1"
+            + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1, "
+            + ConstDB.PLYL_C_GS_USER_RATING + " tinyint, "
+            + ConstDB.PLYL_C_GS_USER_COMMENT + " text "
             + "); "
             // Create some indexes
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_LOCAL_ID + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_LOCAL_ID + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
             + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_SIZE + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_SIZE + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
-            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
-            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
-            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");";
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_AVG_RATING + ");"
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_USER_RATING + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_USER_RATING + ");";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -77,8 +86,9 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        /* WARNING : CRITICAL CODE HERE
-         * Erroneous DB updates can lead to irreversible lost of data!
+        /*
+         * WARNING : CRITICAL CODE HERE Erroneous DB updates can lead to
+         * irreversible lost of data!
          */
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");

@@ -144,7 +144,6 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-//		setTag(TAG);
 		setHistory(null); // TODO fetch a real playlist
 		return v;
 	}
