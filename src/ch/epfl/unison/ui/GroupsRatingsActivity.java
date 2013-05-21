@@ -1,11 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +21,7 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -36,6 +31,12 @@ import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockActivity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Activity where the user can rate the music on his device (or, more precisely: the

@@ -1,15 +1,15 @@
 
 package ch.epfl.unison.data;
 
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -23,7 +23,7 @@ public class Playlist {
 
     private int mLocalId = 0; // Android sqlite
     private Date mLocalLastUpdated;
-    private boolean mCreatedByGS;
+    private boolean mCreatedByGS; // maybe useless
     private int mGSPLId; // GS database id
     private String mTitle;
     private Date mCreated;

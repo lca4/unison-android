@@ -1,14 +1,6 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,6 +28,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
@@ -50,7 +43,13 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.Playlist;
 import ch.epfl.unison.data.UnisonDB;
 
-import com.actionbarsherlock.view.MenuItem;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /*
  * TODO

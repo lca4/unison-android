@@ -1,7 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.AbstractMenu.OnRefreshListener;
 
@@ -24,6 +23,8 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+
+import java.util.ArrayList;
 
 /**
  * Provides some default behaviors. Not supposed to be instantiated directly,
