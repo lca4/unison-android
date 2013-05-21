@@ -22,6 +22,7 @@ public class Playlist {
     private static final String TAG = Playlist.class.getName();
 
     private int mLocalId = 0; // Android sqlite
+    private Date mLocalLastUpdated;
     private boolean mCreatedByGS;
     private int mGSPLId; // GS database id
     private String mTitle;
@@ -61,6 +62,7 @@ public class Playlist {
      */
     public static class Builder {
         private int mLocalId; // Android sqlite
+        private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
         private int mGSPLId; // GS database id
@@ -79,6 +81,21 @@ public class Playlist {
         
         public Builder localId(int id) {
             this.mLocalId = id;
+            return this;
+        }
+        
+        public Builder locaUpdated(Date d) {
+            this.mLocalLastUpdated = d;
+            return this;
+        }
+        
+        public Builder localUpdated(String s) {
+            try {
+              this.mLocalLastUpdated = Uutils.stringToDate(s);
+          } catch (ParseException e) {
+              this.mLocalLastUpdated = null;
+              e.printStackTrace();
+          }
             return this;
         }
         
@@ -168,7 +185,7 @@ public class Playlist {
             LinkedList<MusicItem> ll = new LinkedList<MusicItem>();
             if (t != null) {
                 for (int i = 0; i < t.length; i++) {
-                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title));
+                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title, t[i].playOrder));
                 }
             }
             this.mTracks = ll;
@@ -207,6 +224,7 @@ public class Playlist {
     
     private Playlist(Builder builder) {
         this.mLocalId = builder.mLocalId;
+        this.mLocalLastUpdated = builder.mLocalLastUpdated;
         this.mCreatedByGS = builder.mCreatedByGS;
         this.mGSPLId = builder.mGSPLId;
         this.mTitle = builder.mTitle;

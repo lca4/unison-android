@@ -62,33 +62,18 @@ final class AndroidDB {
         mValues.put(MediaStore.Audio.Playlists.NAME, pl.getTitle());
         mValues.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis());
         mValues.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis());
-        // mValues.put(MediaStore.Audio.Playlists.CONTENT_TYPE,
-        // "vnd.android.cursor.dir/playlist");
-        // mValues.put(MediaStore.Audio.Playlists.ENTRY_CONTENT_TYPE,
-        // "vnd.android.cursor.item/playlist" );
-        // mValues.put(MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER, "name");
-        // ContentResolver mCR = resolver.getContentResolver();
+
         Uri uri = cr.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, mValues);
         int playlistId = Uutils.lastInsert(uri);
-        // int playlistId = -1;
         pl.setLocalId(playlistId);
         if (playlistId >= 0) {
-            // Cursor c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
-            // if (c != null) {
-            // // Save the newly created ID so it can be selected.
-            // c.moveToLast();
-            // playlistId =
-            // c.getInt(c.getColumnIndex(MediaStore.Audio.Playlists._ID));
-            // c.close();
-            // }
+
             Log.d(TAG, "PLAYLIST_ADD - mPlaylistId: " + playlistId + "  mUri: " + uri.toString());
             // Add tracks to the new playlist
             uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
-            // c = cr.query(uri, PROJECTION_PLAYLIST, null, null, null);
-            // if (c != null) {
+
             addTracksToPlaylist(cr, pl);
-            // c.close();
-            // }
+
         }
         return playlistId;
     }
@@ -116,9 +101,8 @@ final class AndroidDB {
             int i = 0;
             // TODO improve: bulk insertion instead of sequential insertion
             Iterator<MusicItem> it = pl.getTracks().iterator();
-            if (it.hasNext()) {
-                // Don't pollute with progress messages..has to be at least
-                // 1% increments
+            while (it.hasNext()) {
+                // Don't pollute with progress messages..has to be at least 1% increments
                 int temp = (i * Const.Integers.HUNDRED) / (tracks);
                 if (temp > percent) {
                     percent = temp;
@@ -129,12 +113,14 @@ final class AndroidDB {
                 MusicItem mi = it.next();
                 values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, mi.localId);
                 values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, mi.playOrder);
-                mCRC.insert(mUri, values);
-                mCRC.release();
+                Uri insertUri = mCRC.insert(mUri, values);
                 Log.d(TAG,
-                        "addSongsInCursorToPlaylist -Adding AudioID: " + 0
+                        "addSongsInCursorToPlaylist -Adding AudioID: " 
+                + Uutils.lastInsert(insertUri)
+                + " with Uri : " + insertUri
                                 + " to Uri: " + mUri.toString());
             }
+            mCRC.release();
         } catch (Throwable t) {
             t.printStackTrace();
         }

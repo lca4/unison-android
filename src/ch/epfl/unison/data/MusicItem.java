@@ -20,6 +20,13 @@ public class MusicItem implements Comparable<MusicItem> {
         playOrder = -1;
     }
 
+    public MusicItem(int id, String a, String t, int o) {
+        localId = id;
+        artist = a;
+        title = t;
+        playOrder = o;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

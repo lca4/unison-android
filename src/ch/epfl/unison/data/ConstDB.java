@@ -50,7 +50,7 @@ final class ConstDB {
     static final String MOOD_C_NAME = "name";
 
     
-    static final String MOOD_TAG_TABLE_NAME = "moods_tags"; // Prefix: MOTA_
+    static final String MOOD_TAG_TABLE_NAME = "mood_tag"; // Prefix: MOTA_
     // moods-tags table fields here
     static final String MOTA_C_MOOD_ID = "mood_id";
     static final String MOTA_C_TAG_ID = "tag_id";
@@ -63,9 +63,10 @@ final class ConstDB {
      * Be careful, the playlists can modified outside of GroupStreamer, since they're stored in the 
      * shared android playlists database!
      */
-    static final String PLAYLISTS_TABLE_NAME = "playlists"; // Prefix: PLYL_
+    static final String PLAYLISTS_TABLE_NAME = "playlist"; // Prefix: PLYL_
 //    static final String PLYL_C_ID = C_ID;
     static final String PLYL_C_LOCAL_ID = "local_id";
+    static final String PLYL_C_LOCAL_UPDATE_TIME = "local_update_time";
     static final String PLYL_C_GS_SIZE = "gs_size";
     //static final String PLYL_C_LOCAL_UPDATE_TIME = "update_time"; // =PlaylistsColumns.DATE_MODIFIED
     static final String PLYL_C_CREATED_BY_GS = "created_by_gs"; // was PL created using GS? // Maybe useless, because quiet obvious

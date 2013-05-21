@@ -47,11 +47,11 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLAYLISTS_TABLE_NAME + " ("
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
+            + ConstDB.PLYL_C_LOCAL_UPDATE_TIME + " datetime, "
             + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT 0, "
             + ConstDB.PLYL_C_GS_ID + " bigint, "
-            + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check
-                                                              // type!
+            + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check type!
             + ConstDB.PLYL_C_GS_UPDATE_TIME + " datetime, " // TODO check type!
             + ConstDB.PLYL_C_GS_AUTHOR_ID + " bigint, "
             + ConstDB.PLYL_C_GS_AUTHOR_NAME + " text, "

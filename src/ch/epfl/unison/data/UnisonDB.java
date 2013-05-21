@@ -226,66 +226,71 @@ public class UnisonDB {
 
     public Object getItem(Class<?> itemType, int itemId) {
         String table = null;
-        Cursor cur = null;
         Object res = null;
         if (itemType == MusicItem.class) {
             table = ConstDB.LIBE_TABLE_NAME;
         } else if (itemType == TagItem.class) {
             table = ConstDB.TAG_TABLE_NAME;
         } else if (itemType == Playlist.class) {
-            cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
-                    new String[] {
-                            ConstDB.C_ID,
-                            ConstDB.PLYL_C_LOCAL_ID,
-                            ConstDB.PLYL_C_GS_SIZE,
-                            ConstDB.PLYL_C_CREATED_BY_GS,
-                            ConstDB.PLYL_C_GS_ID,
-                            ConstDB.PLYL_C_GS_CREATION_TIME,
-                            ConstDB.PLYL_C_GS_UPDATE_TIME,
-                            ConstDB.PLYL_C_GS_AUTHOR_ID,
-                            ConstDB.PLYL_C_GS_AUTHOR_NAME,
-                            ConstDB.PLYL_C_GS_AVG_RATING,
-                            ConstDB.PLYL_C_GS_IS_SHARED,
-                            ConstDB.PLYL_C_GS_IS_SYNCED,
-                            ConstDB.PLYL_C_GS_USER_RATING,
-                            ConstDB.PLYL_C_GS_USER_COMMENT
-                    });
-            if (cur != null && cur.moveToFirst()) {
-                // int colId = cur.getColumnIndex(ConstDB.C_ID);
-                int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-                int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
-                int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
-                int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
-                int colGSCreationTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
-                int colGSUpdateTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
-                int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
-                int colGSAuthorName = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
-                int colGSAvgRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
-                int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
-                int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
-                int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
-                int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
-                res = new Playlist.Builder().localId(cur.getInt(colLocalId))
-                        .size(cur.getInt(colGSSize))
-                        .createdByGS(cur.getInt(colCreatedByGS) != 0)
-                        .plId(cur.getInt(colGSId))
-                        .created(cur.getString(colGSCreationTime))
-                        .updated(cur.getString(colGSUpdateTime))
-                        .authorId(cur.getInt(colGSAuthorId))
-                        .authorName(cur.getString(colGSAuthorName))
-                        .avgRating(cur.getDouble(colGSAvgRating))
-                        .isShared(cur.getInt(colGSIsShared) != 0)
-                        .isSynced(cur.getInt(colGSIsSynced) != 0)
-                        .userRating(cur.getInt(colGSUserRating))
-                        .userComment(cur.getString(colGSUserComment))
-                        .build();
-            }
+            res = plylGetItem(itemId);
         } else {
             // Unsupported type
             throw new IllegalArgumentException();
         }
-        closeCursor(cur);
         return res;
+    }
+    
+    private Playlist plylGetItem(int id) {
+        Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
+                new String[] {
+                        ConstDB.C_ID,
+                        ConstDB.PLYL_C_LOCAL_ID,
+                        ConstDB.PLYL_C_GS_SIZE,
+                        ConstDB.PLYL_C_CREATED_BY_GS,
+                        ConstDB.PLYL_C_GS_ID,
+                        ConstDB.PLYL_C_GS_CREATION_TIME,
+                        ConstDB.PLYL_C_GS_UPDATE_TIME,
+                        ConstDB.PLYL_C_GS_AUTHOR_ID,
+                        ConstDB.PLYL_C_GS_AUTHOR_NAME,
+                        ConstDB.PLYL_C_GS_AVG_RATING,
+                        ConstDB.PLYL_C_GS_IS_SHARED,
+                        ConstDB.PLYL_C_GS_IS_SYNCED,
+                        ConstDB.PLYL_C_GS_USER_RATING,
+                        ConstDB.PLYL_C_GS_USER_COMMENT
+                });
+        Playlist pl = null;
+        if (cur != null && cur.moveToFirst()) {
+            // int colId = cur.getColumnIndex(ConstDB.C_ID);
+            int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
+            int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
+            int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
+            int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
+            int colGSCreationTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
+            int colGSUpdateTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
+            int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
+            int colGSAuthorName = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
+            int colGSAvgRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
+            int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
+            int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
+            int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
+            int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
+            pl = new Playlist.Builder().localId(cur.getInt(colLocalId))
+                    .size(cur.getInt(colGSSize))
+                    .createdByGS(cur.getInt(colCreatedByGS) != 0)
+                    .plId(cur.getInt(colGSId))
+                    .created(cur.getString(colGSCreationTime))
+                    .updated(cur.getString(colGSUpdateTime))
+                    .authorId(cur.getInt(colGSAuthorId))
+                    .authorName(cur.getString(colGSAuthorName))
+                    .avgRating(cur.getDouble(colGSAvgRating))
+                    .isShared(cur.getInt(colGSIsShared) != 0)
+                    .isSynced(cur.getInt(colGSIsSynced) != 0)
+                    .userRating(cur.getInt(colGSUserRating))
+                    .userComment(cur.getString(colGSUserComment))
+                    .build();
+            closeCursor(cur);
+        }
+        return pl;
     }
 
     /*
@@ -687,7 +692,7 @@ public class UnisonDB {
     private int delete(Playlist pl) {
         int res = 0;
         if (pl.getLocalId() >= 0) {
-            res += openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.C_ID + " = ?",
+            res += openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.PLYL_C_LOCAL_ID + " = ?",
                     new String[] {
                         String.valueOf(pl.getLocalId())
                     });
