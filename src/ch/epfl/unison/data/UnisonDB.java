@@ -211,13 +211,13 @@ public class UnisonDB {
         // TODO
     }
 
-    public void delete(Object item) {
+    public int delete(Object item) {
         if (item instanceof MusicItem) {
-            delete((MusicItem) item);
+            return delete((MusicItem) item);
         } else if (item instanceof TagItem) {
-            delete((TagItem) item);
+            return delete((TagItem) item);
         } else if (item instanceof Playlist) {
-            delete((Playlist) item);
+            return delete((Playlist) item);
         } else {
             // Unsupported type
             throw new IllegalArgumentException();
@@ -345,13 +345,14 @@ public class UnisonDB {
         close();
     }
 
-    public void delete(MusicItem item) {
+    public int delete(MusicItem item) {
         openW();
-        mDB.delete(ConstDB.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
+        int res = mDB.delete(ConstDB.LIBE_TABLE_NAME, LIBE_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.artist, item.title
                 });
         close();
+        return res;
     }
 
     public boolean exists(MusicItem item) {
@@ -508,13 +509,14 @@ public class UnisonDB {
         }
     }
 
-    public void delete(TagItem item) {
+    public int delete(TagItem item) {
         openW();
-        mDB.delete(ConstDB.TAG_TABLE_NAME, TAGS_WHERE_ALL,
+        int res = mDB.delete(ConstDB.TAG_TABLE_NAME, TAGS_WHERE_ALL,
                 new String[] {
                         String.valueOf(item.localId), item.name
                 });
         close();
+        return res;
     }
 
     /**
@@ -692,20 +694,20 @@ public class UnisonDB {
     private int delete(Playlist pl) {
         int res = 0;
         if (pl.getLocalId() >= 0) {
-            res += openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.PLYL_C_LOCAL_ID + " = ?",
+            res = openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.PLYL_C_LOCAL_ID + " = ?",
                     new String[] {
                         String.valueOf(pl.getLocalId())
                     });
             close();
-            if (res < 1) {
-                Log.i(TAG, "Could not remove playlist from GS DB");
+            if (res > 0) {
+                res = AndroidDB.delete(mContext.getContentResolver(), pl);
+                if (res < 1) {
+                    Log.i(TAG, "Could not remove playlist from Android DB");
+                    //TODO restore playlist entry in GS DB
+                }
+            } else {
+                Log.i(TAG, "Could not remove playlist from GS DB");                
             }
-
-            int tmp = AndroidDB.delete(mContext.getContentResolver(), pl);
-            if (tmp < 1) {
-                Log.i(TAG, "Could not remove playlist from Android DB");
-            }
-            res += tmp;
         }
         return res;
     }

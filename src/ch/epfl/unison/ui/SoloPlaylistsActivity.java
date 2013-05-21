@@ -55,7 +55,6 @@ import java.util.Set;
  * TODO
  * 
  * - retrieve playlists stored in android database
- * - store playlist to android database 
  * 
  */
 
@@ -150,19 +149,21 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
                 if (lv == mPlaylistsLocalListView) {
-                    // TODO
+                    Log.i(TAG, "Not yet implemented...");
                 }
                 return true;
             case R.id.playlist_context_menu_item_delete:
                 if (lv == mPlaylistsLocalListView) {
-                    mDB.delete(mPlaylistsLocal.get(info.position));
-                    fetchLocalPlaylists();
+                    if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
+                        mPlaylistsLocal.remove(info.position);
+                        refreshLocalPlaylists();                        
+                    } // else: deletion faileds
                 }
                 return true;
             case R.id.playlist_context_menu_item_save:
                 if (lv == mPlaylistsRemoteListView) {
                     mDB.insert(mPlaylistsRemote.get(info.position));
-                    fetchLocalPlaylists();
+                    refreshLocalPlaylists();
                 }
                 return true;
             default:
@@ -600,6 +601,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         if (!cur.isClosed()) {
             cur.close();
         }
+        refreshLocalPlaylists();
+    }
+    
+    private void refreshLocalPlaylists() {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
         .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }

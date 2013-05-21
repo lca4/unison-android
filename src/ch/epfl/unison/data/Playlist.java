@@ -4,7 +4,6 @@ package ch.epfl.unison.data;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct.Track;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,12 +37,8 @@ public class Playlist {
     private double mAvgRating;
     private boolean mIsShared;
     private boolean mIsSynced;
-    private static DateFormat smDF = DateFormat.getInstance();
     
-    // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
-    // TODO mRawTracks
-//    private UnisonDB mDB;
     private HashMap<String, Object> mOptions;
     
     private LinkedList<MusicItem> mPlaylist;   
@@ -131,7 +126,6 @@ public class Playlist {
          */
         public Builder created(String c) {
             try {
-//                this.mCreated = smDF.parse(c);
                 this.mCreated = Uutils.stringToDate(c);
             } catch (ParseException e) {
                 this.mCreated = null;
@@ -248,50 +242,6 @@ public class Playlist {
         mRawTagsId.addAll(seeds);
     }
 
-    /**
-     * Helper to convert a TypedArray to a String in JSONObject format. The
-     * TypedArray values are treated as Strings. Only the values with index from
-     * indexes are selected.
-     * 
-     * @param key
-     * @param values
-     * @param indexes
-     * @return null in case of failure
-     */
-//    @SuppressLint("NewApi")
-//    public JSONObject export(Resources res) {
-//
-//        if (mRawTagsId.isEmpty()) {
-//            return null;
-//        }
-//
-//        JSONObject json = new JSONObject();
-//
-//        // Tags
-//        JSONArray jsonArray = new JSONArray();
-//        for (int i = 0; i < mRawTagsId.size(); i++) {
-////            jsonArray.put(tags.getString(i));
-//            jsonArray.put(JSONObject.NULL);
-//        }
-//
-//        // Tracks
-//        // TODO
-//
-//        try {
-//            json.put(SeedType.TAGS.getLabel(), jsonArray);
-//            // json.put(SeedType.TRACKS.getLabel(), tracksInString);
-//            if (!mOptions.isEmpty()) {
-//                // TODO convert mOptions in json format
-//                Log.i(TAG, "There are options");
-//            }
-//            return json;
-//        } catch (JSONException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
 
     public String getTitle() {
         return mTitle;
@@ -314,7 +264,6 @@ public class Playlist {
     
     public void setLastUpdated(String lastUpdated) {
         try {
-//            this.mLastUpdated = smDF.parse(lastUpdated);
             this.mLastUpdated = Uutils.stringToDate(lastUpdated);
         } catch (ParseException e) {
             this.mLastUpdated = null;
@@ -324,7 +273,6 @@ public class Playlist {
     
     public void setCreated(String created) {
         try {
-//            this.mCreated = smDF.parse(created);
             this.mCreated = Uutils.stringToDate(created);
         } catch (ParseException e) {
             this.mCreated = null;
