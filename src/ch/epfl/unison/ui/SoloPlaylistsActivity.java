@@ -583,19 +583,19 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
+    /**
+     * To be used only once, at onCreate time.
+     */
     private void fetchLocalPlaylists() {
         Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
                 mPlaylistsIdNameProjection,
                 null, null, null);
-        mPlaylistsLocal.clear();
         if (cur != null && cur.moveToFirst()) {
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
-                //TODO update
-                
-                mPlaylistsLocal.add(new Playlist.Builder().localId(cur.getInt(colId))
-                        .title(cur.getString(colName)).build());
+                Playlist pl = (Playlist) mDB.getItem(Playlist.class, cur.getInt(colId));
+                pl.setTitle(cur.getString(colName));
             } while (cur.moveToNext());
         }
         if (!cur.isClosed()) {
@@ -604,6 +604,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         refreshLocalPlaylists();
     }
     
+    /**
+     * To be used to refresh the ListView when changes are made to ArraList.
+     */
     private void refreshLocalPlaylists() {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
         .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));

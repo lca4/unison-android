@@ -122,7 +122,6 @@ public class UnisonDB {
     private Set<Playlist> getPlylItems() {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
-                        ConstDB.C_ID,
                         ConstDB.PLYL_C_LOCAL_ID,
                         ConstDB.PLYL_C_GS_SIZE,
                         ConstDB.PLYL_C_CREATED_BY_GS,
@@ -139,7 +138,6 @@ public class UnisonDB {
                 });
         Set<Playlist> set = new HashSet<Playlist>();
         if (cur != null && cur.moveToFirst()) {
-            // int colId = cur.getColumnIndex(ConstDB.C_ID);
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
             int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -243,8 +241,6 @@ public class UnisonDB {
     private Playlist plylGetItem(int id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
-                        ConstDB.C_ID,
-                        ConstDB.PLYL_C_LOCAL_ID,
                         ConstDB.PLYL_C_GS_SIZE,
                         ConstDB.PLYL_C_CREATED_BY_GS,
                         ConstDB.PLYL_C_GS_ID,
@@ -257,7 +253,7 @@ public class UnisonDB {
                         ConstDB.PLYL_C_GS_IS_SYNCED,
                         ConstDB.PLYL_C_GS_USER_RATING,
                         ConstDB.PLYL_C_GS_USER_COMMENT
-                });
+                }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {String.valueOf(id)});
         Playlist pl = null;
         if (cur != null && cur.moveToFirst()) {
             // int colId = cur.getColumnIndex(ConstDB.C_ID);
@@ -289,6 +285,7 @@ public class UnisonDB {
                     .userComment(cur.getString(colGSUserComment))
                     .build();
             closeCursor(cur);
+            //TODO fetch tracks
         }
         return pl;
     }
