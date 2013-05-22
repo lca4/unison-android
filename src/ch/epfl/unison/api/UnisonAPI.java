@@ -277,8 +277,8 @@ public class UnisonAPI {
     // ---------------
     // TAGS
     
-    public void listTags(long uid, Handler<JsonStruct.TagsList> handler) {
-        URL url = urlFor("/solo/tags", uid);
+    public void listTopTags(long uid, Handler<JsonStruct.TagsList> handler) {
+        URL url = urlFor("/solo/tags/top", uid);
         AsyncRequest.of(url, handler, JsonStruct.TagsList.class)
                 .setAuth(mAuth).doGET();
     }

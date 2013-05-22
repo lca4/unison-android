@@ -20,7 +20,7 @@ public class Playlist {
     
     private static final String TAG = Playlist.class.getName();
 
-    private int mLocalId = 0; // Android sqlite
+    private long mLocalId = 0; // Android sqlite
     private Date mLocalLastUpdated;
     private boolean mCreatedByGS; // maybe useless
     private int mGSPLId; // GS database id
@@ -56,7 +56,7 @@ public class Playlist {
      * TODO complete
      */
     public static class Builder {
-        private int mLocalId; // Android sqlite
+        private long mLocalId; // Android sqlite
         private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
@@ -74,7 +74,7 @@ public class Playlist {
         private boolean mIsShared;
         private boolean mIsSynced;
         
-        public Builder localId(int id) {
+        public Builder localId(long id) {
             this.mLocalId = id;
             return this;
         }
@@ -305,7 +305,7 @@ public class Playlist {
         return mIsShared;
     }
 
-    public void setLocalId(int localId) {
+    public void setLocalId(long localId) {
         this.mLocalId = localId;
     }
 
@@ -329,7 +329,7 @@ public class Playlist {
     }
 
 
-    public int getLocalId() {
+    public long getLocalId() {
         return mLocalId;
     }
 

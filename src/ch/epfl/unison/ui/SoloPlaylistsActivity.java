@@ -244,7 +244,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
         AppData data = AppData.getInstance(this);
         data.getAPI().listPlaylists(data.getUid(), playlistsHandler);
-        data.getAPI().listTags(data.getUid(), tagsHandler);
+        data.getAPI().listTopTags(data.getUid(), tagsHandler);
     }
 
     /** Adapter used to populate the ListView listing the playlists. */

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import ch.epfl.unison.Const.SeedType;
@@ -237,7 +238,7 @@ public class UnisonDB {
         }
         return res;
     }
-    
+
     private Playlist plylGetItem(int id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
@@ -253,10 +254,11 @@ public class UnisonDB {
                         ConstDB.PLYL_C_GS_IS_SYNCED,
                         ConstDB.PLYL_C_GS_USER_RATING,
                         ConstDB.PLYL_C_GS_USER_COMMENT
-                }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {String.valueOf(id)});
+                }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
+                    String.valueOf(id)
+                });
         Playlist pl = null;
         if (cur != null && cur.moveToFirst()) {
-            // int colId = cur.getColumnIndex(ConstDB.C_ID);
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
             int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -285,7 +287,7 @@ public class UnisonDB {
                     .userComment(cur.getString(colGSUserComment))
                     .build();
             closeCursor(cur);
-            //TODO fetch tracks
+            AndroidDB.getTracks(mContext.getContentResolver(), pl);
         }
         return pl;
     }
@@ -481,7 +483,7 @@ public class UnisonDB {
         mDB.delete(ConstDB.TAG_TABLE_NAME, null, null);
         close();
     }
-    
+
     private void plylTruncate() {
         openW();
         mDB.delete(ConstDB.PLAYLISTS_TABLE_NAME, null, null);
@@ -662,51 +664,75 @@ public class UnisonDB {
      * Adds the playlist to the android sqlite DB and to the GS in-app DB.
      * 
      * @param pl
+     * @return local id
      */
-    public void insert(Playlist pl) {
-        // First store to android DB
-        AndroidDB.insert(mContext.getContentResolver(), pl);
+    public long insert(Playlist pl) {
+        openW();
+        mDB.beginTransaction();
+        try {
+            // First store to android DB
+            AndroidDB.insert(mContext.getContentResolver(), pl);
 
-        // Then insert a record to the device-local GS database
-        if (pl.getLocalId() >= 0) {
-            ContentValues values = new ContentValues();
-            values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
-            values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
-            values.put(ConstDB.PLYL_C_CREATED_BY_GS, true);
-            values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
-            values.put(ConstDB.PLYL_C_GS_CREATION_TIME, pl.getCreationTime());
-            values.put(ConstDB.PLYL_C_GS_UPDATE_TIME, pl.getLastUpdated());
-            values.put(ConstDB.PLYL_C_GS_AUTHOR_ID, pl.getAuthorId());
-            values.put(ConstDB.PLYL_C_GS_AUTHOR_NAME, pl.getAuthorName());
-            values.put(ConstDB.PLYL_C_GS_AVG_RATING, pl.getAvgRating());
-            values.put(ConstDB.PLYL_C_GS_IS_SHARED, pl.isIsShared());
-            values.put(ConstDB.PLYL_C_GS_IS_SYNCED, pl.isIsSynced());
+            // Then insert a record to the device-local GS database
+            if (pl.getLocalId() >= 0) {
+                ContentValues values = new ContentValues();
+                values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
+                values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
+                values.put(ConstDB.PLYL_C_CREATED_BY_GS, true);
+                values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
+                values.put(ConstDB.PLYL_C_GS_CREATION_TIME, pl.getCreationTime());
+                values.put(ConstDB.PLYL_C_GS_UPDATE_TIME, pl.getLastUpdated());
+                values.put(ConstDB.PLYL_C_GS_AUTHOR_ID, pl.getAuthorId());
+                values.put(ConstDB.PLYL_C_GS_AUTHOR_NAME, pl.getAuthorName());
+                values.put(ConstDB.PLYL_C_GS_AVG_RATING, pl.getAvgRating());
+                values.put(ConstDB.PLYL_C_GS_IS_SHARED, pl.isIsShared());
+                values.put(ConstDB.PLYL_C_GS_IS_SYNCED, pl.isIsSynced());
 
-            long plId = openW().insert(ConstDB.PLAYLISTS_TABLE_NAME, null, values);
-            Log.i(TAG, "Added playlist to GS in-app DB with id=" + plId);
+                long plId = mDB.insert(ConstDB.PLAYLISTS_TABLE_NAME, null, values);
+                Log.i(TAG, "Added playlist to GS in-app DB with id=" + plId + " (localId="
+                        + pl.getLocalId() + ")");
+                if (plId < 0) {
+                    throw new SQLiteException("Playlist " + pl.toString()
+                            + " could not be inserted to " + ConstDB.PLAYLISTS_TABLE_NAME);
+                }
+                mDB.setTransactionSuccessful();
+            }
+        } catch (SQLiteException sqle) {
+            // An error occured, roll back should happen
+            sqle.printStackTrace();
+        } finally {
+            mDB.endTransaction();
             close();
         }
+        return pl.getLocalId();
     }
 
     private int delete(Playlist pl) {
         int res = 0;
         if (pl.getLocalId() >= 0) {
-            res = openW().delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.PLYL_C_LOCAL_ID + " = ?",
-                    new String[] {
-                        String.valueOf(pl.getLocalId())
-                    });
-            close();
-            if (res > 0) {
-                res = AndroidDB.delete(mContext.getContentResolver(), pl);
+            openW();
+            mDB.beginTransaction();
+
+            try {
+                res = mDB.delete(ConstDB.PLAYLISTS_TABLE_NAME, ConstDB.PLYL_C_LOCAL_ID + " = ?",
+                        new String[] {
+                            String.valueOf(pl.getLocalId())
+                        });
                 if (res < 1) {
-                    Log.i(TAG, "Could not remove playlist from Android DB");
-                    //TODO restore playlist entry in GS DB
+                    throw new SQLiteException("Playlist with local_id " + pl.getLocalId()
+                            + " could not be removed from "
+                            + ConstDB.PLAYLISTS_TABLE_NAME);
                 }
-            } else {
-                Log.i(TAG, "Could not remove playlist from GS DB");                
+                res += AndroidDB.delete(mContext.getContentResolver(), pl);
+                mDB.setTransactionSuccessful();
+            } catch (SQLiteException sqle) {
+                // An error occured, roll back should happen
+                sqle.printStackTrace();
+            } finally {
+                mDB.endTransaction();
+                close();
             }
         }
         return res;
     }
-
 }
