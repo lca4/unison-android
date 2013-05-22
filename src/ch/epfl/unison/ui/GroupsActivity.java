@@ -140,12 +140,15 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         } else if (ACTION_CREATE_AND_JOIN_GROUP.equals(getIntent().getAction())) {
             Bundle extras = getIntent().getExtras();
             if (extras != null && extras.containsKey(Const.Strings.GROUP_TO_CREATE_NAME)) {
+//                Log.d(TAG, "trying to recreate a group: we have extras in the intent");
                 String groupToCreateName =
                         extras.getCharSequence(Const.Strings.GROUP_TO_CREATE_NAME).toString();
                 if (groupToCreateName != null) {
+//                    Log.d(TAG, "trying to recreate a group: the group's name was not null: " + groupToCreateName);
                     recreateGroup(groupToCreateName);
                 }
             } else {
+                Log.d(TAG, "Tried to recreate a group but could not extract infos from intent.");
                 Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
                         Toast.LENGTH_LONG).show();
             }
@@ -738,9 +741,13 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 @Override
                 public void callback(JsonStruct.Group struct) {
                     if ((struct == null || struct.gid == null) && GroupsActivity.this != null) {
+//                        Log.d(TAG, "recreateGroup() callback: something went wrong: " +
+//                        		"group is null: " + (struct == null) +  ", and its gid is null: " + (struct.gid == null));
                         Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
                                 Toast.LENGTH_LONG).show();
                     } else {
+//                        Log.d(TAG, "recreateGroup() callback:"
+//                                + " going to join a recreated group, yay!");
                         joinGroup(struct, null);
                     }
                 }
@@ -748,6 +755,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 public void onError(Error error) {
                     Log.d(TAG, error.toString());
                     if (GroupsActivity.this != null) {
+                        Log.d(TAG, "recreateGroup() onError: we got an error from the server");
                         Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
                                 Toast.LENGTH_LONG).show();
                     }

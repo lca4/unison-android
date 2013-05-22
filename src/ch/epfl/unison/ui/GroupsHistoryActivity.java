@@ -315,10 +315,12 @@ public class GroupsHistoryActivity extends SherlockActivity {
                     if (error.hasJsonError()
                             && error.jsonError.error == UnisonAPI.ErrorCodes.INVALID_GROUP) {
                         //here the group no longer exists, the user needs to take an action:
+                        //you may comment this line for testing purpose only!
                         data.removeOneHistoryItem(group.gid);
                         showErrorPopup();
                         
                     } else {
+                        Log.d(TAG, "The error was not due to an invalid group.");
                         Toast.makeText(GroupsHistoryActivity.this, R.string.error_joining_group,
                                 Toast.LENGTH_LONG).show();
                     }
