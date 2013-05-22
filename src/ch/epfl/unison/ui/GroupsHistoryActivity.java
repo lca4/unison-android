@@ -216,7 +216,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
      * MainActivity.
      */
     private class OnGroupSelectedListener implements OnItemClickListener {
-        // FIXME This is a duplicate of the listener in GroupsActivity.
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //            UnisonAPI api = AppData.getInstance(GroupsHistoryActivity.this).getAPI();
@@ -347,7 +346,11 @@ public class GroupsHistoryActivity extends SherlockActivity {
         builder.setTitle(R.string.group_no_longer_exists_dialog_title);
         LayoutInflater layoutInflater = (LayoutInflater) 
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View dialogView = layoutInflater.inflate(R.layout.group_no_longer_exists_dialog, null);
+        int layout = R.layout.group_no_longer_exists_dialog;
+        if (mGroupClicked.automatic) {
+            layout = R.layout.automatic_group_no_longer_exists;
+        } 
+        View dialogView = layoutInflater.inflate(layout, null);
         builder.setView(dialogView);
 
         mGroupNoLongerExistsDialog = builder.create();
@@ -383,13 +386,17 @@ public class GroupsHistoryActivity extends SherlockActivity {
         if (group.password) {
             AlertDialog.Builder builder = new AlertDialog.Builder(GroupsHistoryActivity.this);
             builder.setTitle(R.string.groups_password_dialog_title);
+            
             LayoutInflater layoutInflater = (LayoutInflater) 
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View dialogView = layoutInflater.inflate(R.layout.password_prompt_dialog, null);
+            View dialogView = layoutInflater.inflate(R.layout.password_prompt_dialog, null);           
             builder.setView(dialogView);
+            
             final EditText password = (EditText) 
-                    dialogView.findViewById(R.id.groupPassword);           
+                    dialogView.findViewById(R.id.groupPassword);
+            
             DialogInterface.OnClickListener passwordClick = new DialogInterface.OnClickListener() {
+                
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == Dialog.BUTTON_POSITIVE) {
@@ -397,25 +404,32 @@ public class GroupsHistoryActivity extends SherlockActivity {
                     }
                 }
             };           
+            
             builder.setPositiveButton(getString(R.string.generic_ok), passwordClick);
             builder.setNegativeButton(getString(R.string.generic_cancel), passwordClick);
+            
             final AlertDialog dialog = builder.create();
-            password.addTextChangedListener(new TextWatcher() {            
+            
+            password.addTextChangedListener(new TextWatcher() {        
+                
              @Override
              public void onTextChanged(CharSequence s, int start, int before, int count) {
                  dialog.getButton(DialogInterface.BUTTON_POSITIVE)
                          .setEnabled(s.length() == AppData.getInstance(GroupsHistoryActivity.this)
                                  .getGroupPasswordLength());
-             }            
+             }       
+             
              @Override
              public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
                  //Do nothing
-             }            
+             }       
+             
              @Override
              public void afterTextChanged(Editable arg0) {
                  //Do nothing
              }
-         });           
+         });
+            
             dialog.show();
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
         }
