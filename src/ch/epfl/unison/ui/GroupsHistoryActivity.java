@@ -350,7 +350,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         int layout = R.layout.group_no_longer_exists_dialog;
         if (mGroupClicked.automatic) {
-            layout = R.layout.automatic_group_no_longer_exists;
+            layout = R.layout.automatic_group_no_longer_exists_dialog;
         } 
         View dialogView = layoutInflater.inflate(layout, null);
         builder.setView(dialogView);
@@ -381,6 +381,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
         finish();
     }
     public void errorDialogCancelPressed(View view) {
+//        repaintRefresh(false);
         mGroupNoLongerExistsDialog.dismiss();
     }
     
