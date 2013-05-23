@@ -142,80 +142,88 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
         ListView lv = (ListView) info.targetView.getParent();
+        AppData data = AppData.getInstance(this);
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
                 if (lv == mPlaylistsLocalListView) {
                     Log.i(TAG, "Not yet implemented...");
+                    Toast.makeText(SoloPlaylistsActivity.this,
+                            R.string.error_not_yet_available,
+                            Toast.LENGTH_LONG).show();
                 }
                 return true;
             case R.id.playlist_context_menu_item_delete:
+                long plId;
                 if (lv == mPlaylistsLocalListView) {
-                    long plid = mPlaylistsLocal.get(info.position).getPLId();
-                    if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
-                        mPlaylistsLocal.remove(info.position);
-                        refreshLocalPlaylists();
-                        AppData data = AppData.getInstance(this);
-                        data.getAPI().removePlaylist(data.getUid(), plid,
-                                new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                                    @Override
-                                    public void callback(JsonStruct.Success struct) {
-                                        // TODO update toast
-                                        // Maybe delete local copy only when removed from server
-                                        Toast.makeText(SoloPlaylistsActivity.this,
-                                                R.string.error_updating_rating,
-                                                Toast.LENGTH_LONG).show();
-                                    }
-
-                                    @Override
-                                    public void onError(Error error) {
-                                        Log.d(TAG, error.toString());
-                                     // TODO update toast
-                                        Toast.makeText(SoloPlaylistsActivity.this,
-                                                R.string.error_updating_rating,
-                                                Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    } // else: deletion failed
+                    plId = mPlaylistsLocal.get(info.position).getPLId();
+                } else {
+                    plId = mPlaylistsRemote.get(info.position).getPLId();
                 }
+                // First remove from server
+                data.getAPI().removePlaylist(data.getUid(), plId,
+                        new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                            @Override
+                            public void callback(JsonStruct.Success struct) {
+                                // Then from local databases
+                                if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
+                                    mPlaylistsLocal.remove(info.position);
+                                    refreshLocalPlaylists();
+                                } else {
+                                    // TODO update toast
+                                    Toast.makeText(SoloPlaylistsActivity.this,
+                                            R.string.error_solo_remove_playlist_from_local_dbs,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Error error) {
+                                Log.d(TAG, error.toString());
+                                // TODO update toast
+                                Toast.makeText(SoloPlaylistsActivity.this,
+                                        R.string.error_solo_remove_playlist_from_gs_server,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+
                 return true;
             case R.id.playlist_context_menu_item_save:
                 if (lv == mPlaylistsRemoteListView) {
                     Playlist pl = mPlaylistsRemote.get(info.position);
+                    // Adds PL to local databases
                     long localId = mDB.insert(pl);
-                    JSONObject json = new JSONObject();
-                    try {
-                        json.put("local_id", localId);
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                    if (localId >= 0) {
+                        try {
+                            // Updates the local_id on server
+                            JSONObject json = new JSONObject();
+                            json.put("local_id", localId);
+                            data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
+                                    new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
+
+                                        @Override
+                                        public void callback(JsonStruct.PlaylistJS struct) {
+                                            // TODO some verifications? (local_id)
+                                        }
+
+                                        @Override
+                                        public void onError(Error error) {
+                                            Log.d(TAG, error.toString());
+                                        }
+                                    });
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        refreshLocalPlaylists();
+                    } else {
+                        Toast.makeText(SoloPlaylistsActivity.this,
+                                R.string.error_solo_save_playlist,
+                                Toast.LENGTH_LONG).show();
                     }
-                    AppData data = AppData.getInstance(this);
-                    data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
-                            new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
-
-                                @Override
-                                public void callback(JsonStruct.PlaylistJS struct) {
-                                    // TODO update toast
-                                    // Maybe delete local copy only when removed from server
-                                    Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_updating_rating,
-                                            Toast.LENGTH_LONG).show();
-                                }
-
-                                @Override
-                                public void onError(Error error) {
-                                    Log.d(TAG, error.toString());
-                                 // TODO update toast
-                                    Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_updating_rating,
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
-                    refreshLocalPlaylists();
                 }
                 return true;
             default:

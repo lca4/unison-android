@@ -661,7 +661,10 @@ public class UnisonDB {
     }
 
     /**
-     * Adds the playlist to the android sqlite DB and to the GS in-app DB.
+     * Adds the playlist to the android sqlite DB and to the GS in-app DB.<br />
+     * The insertions in the databases are made in an atomic way. If a failure occurs when trying 
+     * to insert the playlist in either the Android or GS in-app database, changes done until 
+     * failure are rolled back as if nothing happened. 
      * 
      * @param pl
      * @return local id
