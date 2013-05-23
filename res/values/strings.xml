@@ -193,11 +193,11 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_sending_track">Unable to send play notification to the server.</string>
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
-    <string name="error_group_to_recreate">Sorry an error occured while trying to recreate the group. Please do it manually.</string>
+    <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
     <string name="error_solo_save_playlist">Unable to save the playlist to your device.</string>
     <string name="error_solo_remove_playlist_from_local_dbs">Unable to remove the playlist from your device.</string>
     <string name="error_solo_remove_playlist_from_gs_server">Unable to remove the playlist from the server.</string>
-    <string name="error_not_yet_available">Sorry, this is not yet available...</string>
+    <string name="error_not_yet_available">Sorry, this is not yet available&#8230;</string>
 
 </resources>

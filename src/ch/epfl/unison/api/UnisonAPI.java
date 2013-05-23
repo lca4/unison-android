@@ -272,7 +272,7 @@ public class UnisonAPI {
             Handler<JsonStruct.PlaylistJS> handler) {
         URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistJS.class)
-        .setAuth(mAuth).addParam("fields", fields).doPUT();
+        .setAuth(mAuth).addParam("fields", fields).doPOST();
     }
 
     public void listUserPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
@@ -284,7 +284,7 @@ public class UnisonAPI {
     public void listSharedPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/playlists/shared");
         //TODO
-        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class).setAuth(mAuth);
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class).setAuth(mAuth).doGET();
     }
     
     public void removePlaylist(long uid, long plid, Handler<JsonStruct.Success> handler) {

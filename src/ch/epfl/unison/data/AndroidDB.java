@@ -14,7 +14,6 @@ import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
