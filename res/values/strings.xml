@@ -21,6 +21,8 @@
     <string name="activity_title_history">Group History</string>
     <string name="activity_title_manage">Set Password</string>
     <string name="activity_title_home">GroupStreamer</string>
+    <string name="title_activity_nfcrecieve_group">Join Group Using NFC</string>
+    <string name="title_activity_nfcsend_group">Share Group Using NFC</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
@@ -176,6 +178,12 @@ You can also just cancel this action and stay in groups history.</string>
 
     <!-- History -->
     <string name="history_delete_label">Delete History</string>
+    
+    <!-- NFC -->
+    <string name="NFC_reciever_wait">Wainting for an NFC transmission</string>
+    <string name="NFC_send_button">Share group!</string>
+    
+    
 
     <!-- Errors. -->
     <string name="error_setting_password">Unable to set password</string>
@@ -198,10 +206,10 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
     <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
+    <string name="error_NFC_not_present">Sorry, your phone doesn\'t have NFC :\'(</string>
+    <string name="error_NFC_not_active">Please turn on the NFC feature.</string>
+    
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
-
-    <string name="title_activity_nfcsend_group">Share Group Using NFC</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_nfcrecieve_group">Join Group Using NFC</string>
 
 </resources>

@@ -1,26 +1,107 @@
 
 package ch.epfl.unison.ui;
 
-import ch.epfl.unison.R;
-import ch.epfl.unison.R.layout;
-import ch.epfl.unison.R.menu;
+import android.content.Context;
+import android.content.Intent;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.os.Bundle;
-import android.app.Activity;
-import android.view.Menu;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+import ch.epfl.unison.R;
 
-public class NFCSendGroupActivity extends Activity {
+import com.actionbarsherlock.app.SherlockActivity;
 
+public class NFCSendGroupActivity extends SherlockActivity {
+
+    private static final String TAG = "ch.epfl.unison.NFCSendGroupActivity";
+    private NfcAdapter mAdapter = null;
+    private boolean mNFCStatusChecked = false;
+    private NdefMessage mMessage = null;
+    private int mDebugGroupID = 123;
+    private String mDebugRecord = "123";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc_send_group);
+        
+        setupNFC();
+    }
+    
+    
+    
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        if(mNFCStatusChecked) {
+            mAdapter.disableForegroundNdefPush(this);
+        }
     }
 
+
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.nfcsend_group, menu);
-        return true;
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        
+        if(mNFCStatusChecked) {
+            mAdapter.enableForegroundNdefPush(this, mMessage);
+        }
+    }
+
+
+
+    private void setupNFC() {
+        
+        NfcManager manager = (NfcManager) getApplicationContext().getSystemService(Context.NFC_SERVICE);
+        mAdapter = manager.getDefaultAdapter();
+        if (mAdapter == null) {
+           Toast.makeText(NFCSendGroupActivity.this, R.string.error_NFC_not_present,
+                    Toast.LENGTH_LONG).show();
+           finish();
+           return;
+        }
+        
+        
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(NFCSendGroupActivity.this, R.string.error_NFC_not_active,
+                    Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        } else {
+            Log.d(TAG, "NFC is enabled!");
+            mNFCStatusChecked = true;
+            
+            
+        }
+        
+    }
+    
+    private void setMessage(int groupID) throws FormatException {
+        NdefRecord[] records = new NdefRecord[1];
+        records[0] = new NdefRecord(mDebugRecord.getBytes());
+        mMessage = new  NdefMessage(records);
+    }
+    
+    public void buttonClicked(View v) {
+        sendNFCMessage();
+    }
+
+    private void sendNFCMessage() {
+        try {
+            setMessage(mDebugGroupID);
+            mAdapter.enableForegroundNdefPush(this, mMessage);
+        } catch (FormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

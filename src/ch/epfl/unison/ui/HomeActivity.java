@@ -43,7 +43,7 @@ public class HomeActivity extends AbstractFragmentActivity {
 
         final ListView listview = (ListView) findViewById(R.id.home_activities_list);
         String[] values = new String[] {
-                "Groups", "Solo"
+                "Groups", "Solo", "NFC send", "NFC recieve"
         };
 
         final ArrayList<String> list = new ArrayList<String>();
@@ -64,6 +64,10 @@ public class HomeActivity extends AbstractFragmentActivity {
                     startActivity(new Intent(HomeActivity.this, GroupsActivity.class));
                 } else if (position == 1) {
                     startActivity(new Intent(HomeActivity.this, SoloPlaylistsActivity.class));
+                } else if (position == 2) {
+                    startActivity(new Intent(HomeActivity.this, NFCSendGroupActivity.class));
+                } else if (position == 3) {
+                    startActivity(new Intent(HomeActivity.this, NFCRecieveGroupActivity.class));
                 }
             }
 
