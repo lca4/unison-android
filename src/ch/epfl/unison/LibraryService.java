@@ -124,7 +124,7 @@ public class LibraryService extends Service {
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
             }
-            if (cur != null & !cur.isClosed()) {
+            if (cur != null && !cur.isClosed()) {
                 cur.close();
             }
 
