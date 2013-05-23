@@ -43,6 +43,7 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.Playlist;
 import ch.epfl.unison.data.UnisonDB;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -93,8 +94,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
         // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
-        
-//        mDB.truncate(Playlist.class);
 
         setContentView(R.layout.solo_playlists);
         ((Button) findViewById(R.id.createPlaylistBtn))
@@ -105,7 +104,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         registerForContextMenu(mPlaylistsLocalListView);
 
         mPlaylistsLocal = new ArrayList<Playlist>();
-        fetchLocalPlaylists();
+        initLocalPlaylists();
         mPlaylistsRemote = new ArrayList<Playlist>();
 
         mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
@@ -154,15 +153,68 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 return true;
             case R.id.playlist_context_menu_item_delete:
                 if (lv == mPlaylistsLocalListView) {
+                    long plid = mPlaylistsLocal.get(info.position).getPLId();
                     if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
                         mPlaylistsLocal.remove(info.position);
-                        refreshLocalPlaylists();                        
-                    } // else: deletion faileds
+                        refreshLocalPlaylists();
+                        AppData data = AppData.getInstance(this);
+                        data.getAPI().removePlaylist(data.getUid(), plid,
+                                new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                                    @Override
+                                    public void callback(JsonStruct.Success struct) {
+                                        // TODO update toast
+                                        // Maybe delete local copy only when removed from server
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_updating_rating,
+                                                Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onError(Error error) {
+                                        Log.d(TAG, error.toString());
+                                     // TODO update toast
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_updating_rating,
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    } // else: deletion failed
                 }
                 return true;
             case R.id.playlist_context_menu_item_save:
                 if (lv == mPlaylistsRemoteListView) {
-                    mDB.insert(mPlaylistsRemote.get(info.position));
+                    Playlist pl = mPlaylistsRemote.get(info.position);
+                    long localId = mDB.insert(pl);
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put("local_id", localId);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    AppData data = AppData.getInstance(this);
+                    data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
+                            new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
+
+                                @Override
+                                public void callback(JsonStruct.PlaylistJS struct) {
+                                    // TODO update toast
+                                    // Maybe delete local copy only when removed from server
+                                    Toast.makeText(SoloPlaylistsActivity.this,
+                                            R.string.error_updating_rating,
+                                            Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onError(Error error) {
+                                    Log.d(TAG, error.toString());
+                                 // TODO update toast
+                                    Toast.makeText(SoloPlaylistsActivity.this,
+                                            R.string.error_updating_rating,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
                     refreshLocalPlaylists();
                 }
                 return true;
@@ -178,7 +230,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
 
-        // Update playlists
+        // Update remote playlists
         UnisonAPI.Handler<JsonStruct.PlaylistsList> playlistsHandler =
                 new UnisonAPI.Handler<JsonStruct.PlaylistsList>() {
 
@@ -243,7 +295,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 };
 
         AppData data = AppData.getInstance(this);
-        data.getAPI().listPlaylists(data.getUid(), playlistsHandler);
+        data.getAPI().listUserPlaylists(data.getUid(), playlistsHandler);
         data.getAPI().listTopTags(data.getUid(), tagsHandler);
     }
 
@@ -586,7 +638,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     /**
      * To be used only once, at onCreate time.
      */
-    private void fetchLocalPlaylists() {
+    private void initLocalPlaylists() {
         Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
                 mPlaylistsIdNameProjection,
                 null, null, null);
@@ -603,12 +655,12 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
         refreshLocalPlaylists();
     }
-    
+
     /**
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshLocalPlaylists() {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
-        .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }
 }

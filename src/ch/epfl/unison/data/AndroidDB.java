@@ -146,15 +146,24 @@ final class AndroidDB {
         return res;
     }
 
+    /**
+     * Inspiration found on
+     * <a href=http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from-android-playlist>http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from-android-playlist</a>.
+     * 
+     * @param resolver
+     * @param pl
+     */
     static void getTracks(ContentResolver resolver, Playlist pl) {
         String[] projection = new String[] {
-//                MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
+                // MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.TITLE,
                 // MediaStore.Audio.Media.DATA,
                 // MediaStore.Audio.Media.ALBUM,
-//                MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                // MediaStore.Audio.Playlists.Members.AUDIO_ID,
                 MediaStore.Audio.Playlists.Members.PLAY_ORDER
         };
         Uri contentUri = MediaStore.Audio.Playlists.Members

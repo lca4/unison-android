@@ -23,7 +23,7 @@ public class Playlist {
     private long mLocalId = 0; // Android sqlite
     private Date mLocalLastUpdated;
     private boolean mCreatedByGS; // maybe useless
-    private int mGSPLId; // GS database id
+    private long mGSPLId; // GS database id
     private String mTitle;
     private Date mCreated;
     private Date mLastUpdated;
@@ -60,7 +60,7 @@ public class Playlist {
         private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
-        private int mGSPLId; // GS database id
+        private long mGSPLId; // GS database id
         private Date mCreated;
         private Date mLastUpdated;
         private int mAuthorId;
@@ -334,7 +334,7 @@ public class Playlist {
     }
 
 
-    public int getPLId() {
+    public long getPLId() {
         return mGSPLId;
     }
 
