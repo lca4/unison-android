@@ -5,21 +5,13 @@
     android:orientation="vertical" >
 	
     <TextView
-        android:id="@+id/group_no_longer_exists_body"
+        android:id="@+id/automatic_group_no_longer_exists_body"
         android:layout_width="match_parent"
       	android:layout_height="wrap_content"
       	android:textIsSelectable="false"
-      	android:text="@string/group_no_longer_exists_dialog_body"
+      	android:text="@string/automatic_group_no_longer_exists_body"
       	android:textSize="18sp"
         />
-    
-    <Button
-      android:id="@+id/recreateGroupBtn"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:onClick="errorDialogCreateGroupPressed"
-      android:text="@string/group_no_longer_exists_dialog_recreate_group" />
     
     <Button
       android:id="@+id/goBackToGroupsActivityBtn"

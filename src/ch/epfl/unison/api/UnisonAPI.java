@@ -1,17 +1,17 @@
 
 package ch.epfl.unison.api;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.json.JSONObject;
-
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Java interface to the Unison RESTful HTTP API.
@@ -139,7 +139,7 @@ public class UnisonAPI {
         URL url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .addParam("name", name).addParam("lat", lat)
-                .addParam("lon", lon).addParam("list", "True").setAuth(mAuth).doPOST();
+                .addParam("lon", lon).addParam("list", true).setAuth(mAuth).doPOST();
     }
     
     public void createGroup(String name, double lat, double lon,

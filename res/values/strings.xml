@@ -71,6 +71,8 @@
     <string name="groups_suggestion_yesBtn">Yes</string>
     <string name="groups_suggestion_noBtn">No, thanks</string>
     <string name="groups_suggestion_cBx">Do not ask me again</string>
+    <string name="groups_suggestion_goto_settings">Activate GPS</string>
+    <string name="groups_suggestion_no_suggest">Suggestions disabled</string>
     <string name="groups_display_suggestion_enabled">Join users near me</string>
     <string name="groups_display_suggestion_disabled">No users near me</string>
     <string name="groups_alert_newgroup_title">New Group</string>
@@ -81,9 +83,11 @@
     <string name="groups_chooseGrp">or select one below :</string>
     <string name="groups_password_dialog_title">Enter group password</string>
     <string name="group_no_longer_exists_dialog_title">Ooops&#8230; this group no longer exists!</string>
-    <string name="group_no_longer_exists_dialog_body">You may want to recreate this group, or if someone else already did it, go back to the list of groups and join this new group as you usually do.
+    <!-- <string name="group_no_longer_exists_dialog_body">You may want to recreate this group, or if someone else already did it, go back to the list of groups and join this new group as you usually do.
 
-You can also just cancel this action and stay in groups history.</string>
+You can also just cancel this action and stay in groups history.</string> -->
+	<string name="group_no_longer_exists_dialog_body">You can either create one with the same name.\nOr Jump back to the list of groups</string>
+    <string name="automatic_group_no_longer_exists_body">You can go back to the groups list or continue browsing your history.</string>
     <string name="group_no_longer_exists_dialog_recreate_group">Recreate group</string>
     <string name="group_no_longer_exists_dialog_go_groups_activity">Go back to groups list</string>
     
@@ -193,7 +197,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_sending_track">Unable to send play notification to the server.</string>
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
-    <string name="error_group_to_recreate">Sorry an error occured while trying to recreate the group. Please do it manually.</string>
+    <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
 
 </resources>
