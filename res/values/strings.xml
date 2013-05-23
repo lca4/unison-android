@@ -202,5 +202,6 @@ You can also just cancel this action and stay in groups history.</string>
 
     <string name="title_activity_nfcsend_group">Share Group Using NFC</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_nfcrecieve_group">Join Group Using NFC</string>
 
 </resources>

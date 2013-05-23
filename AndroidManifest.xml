@@ -111,8 +111,12 @@
         </service>
 
         <activity
-            android:name="ch.epfl.unison.NFCSendGroupActivity"
+            android:name="ch.epfl.unison.ui.NFCSendGroupActivity"
             android:label="@string/title_activity_nfcsend_group" >
+        </activity>
+        <activity
+            android:name="ch.epfl.unison.ui.NFCRecieveGroupActivity"
+            android:label="@string/title_activity_nfcrecieve_group" >
         </activity>
     </application>
 
