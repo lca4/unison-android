@@ -44,7 +44,6 @@ public class NFCSendGroupActivity extends SherlockActivity {
     
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
         if (mNFCStatusChecked) {
             mAdapter.disableForegroundNdefPush(this);
@@ -55,7 +54,6 @@ public class NFCSendGroupActivity extends SherlockActivity {
 
     @Override
     protected void onResume() {
-        // TODO Auto-generated method stub
         super.onResume();
         
         if (mNFCStatusChecked) {

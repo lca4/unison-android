@@ -4,13 +4,11 @@ package ch.epfl.unison.ui;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.location.GpsStatus.NmeaListener;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
-import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,6 +16,12 @@ import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
+/**
+ * 
+ * @author vincent
+ * source: http://stackoverflow.com/questions/14222831/
+ *              how-to-display-ndef-message-after-ndef-discovered-activity-launched
+ */
 public class NFCRecieveGroupActivity extends SherlockActivity {
 
 
@@ -45,7 +49,7 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
         // TODO Auto-generated method stub
         super.onResume();
         
-        if(mNFCStatusChecked ) {
+        if (mNFCStatusChecked ) {
             mAdapter.enableForegroundDispatch(this, mPe, null, null);
         }
     }
@@ -54,7 +58,7 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
     protected void onPause() {
         // TODO Auto-generated method stub
         super.onPause();
-        if(mNFCStatusChecked) {
+        if (mNFCStatusChecked) {
             mAdapter.disableForegroundDispatch(this);
         }
     }
@@ -64,23 +68,73 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
         // TODO Auto-generated method stub
         super.onNewIntent(intent);
         
-        
-        mMessage  = intent.getParcelableExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        
-        if (mMessage == null) {
-            Log.d(TAG, "could not retrieve message from intent.");
-            return;
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            NdefMessage[] messages = null;
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            if (rawMsgs != null) {
+                messages = new NdefMessage[rawMsgs.length];
+                for (int i = 0; i < rawMsgs.length; i++) {
+                    messages[i] = (NdefMessage) rawMsgs[i];
+                }
+            } else if (rawMsgs == null) {
+                    Toast.makeText(getApplicationContext(), "No NDEF Message Read",
+                            Toast.LENGTH_LONG).show();
+                }
+            if (messages[0] != null) {
+                String result = "";
+                byte[] payload = messages[0].getRecords()[0].getPayload();
+                for (int b = 0; b < payload.length; b++) {
+                    result += (char) payload[b];
+                }
+                Toast.makeText(getApplicationContext(), "Read: " + result,
+                        Toast.LENGTH_SHORT).show();
+                
+                long groupID = Long.valueOf(result);
+                
+                
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Intent Error...",
+                Toast.LENGTH_LONG).show();
         }
+        
+        
+        /*Log.d(TAG, "Recieved intent : " + intent.toString());
+        
+        Bundle extras = intent.getExtras();
+        Log.d(TAG, "Containing the extras : " + extras.toString());
+        
+        for (String key : extras.keySet()) {
+            Log.d(TAG, key);
+            
+        }
+        NdefMessage[] messages = extras.getParcelableArray(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        Log.d(TAG, "we got " + messages.length + " messages.");
+        
+        if (intent.getAction() == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+            
+        } else {
+            Log.d(TAG, "ignoring intent because not related to NFC");
+        }*/
+        
+        
+        //CRAP:
+//        mMessage  = intent.getParcelableExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);    
+        
+//        if (mMessage == null) {
+//            Log.d(TAG, "could not retrieve message from intent.");
+//            return;
+//        }
         /*StringBuilder sb = new StringBuilder();
         for(int i = 0; i < tag.getId().length; i++){
             sb.append(new Integer(tag.getId()[i]) + " ");
         }*/
 //        info.setText("TagID: " + bytesToHex(tag.getId()));
         
-        NdefRecord[] records = mMessage.getRecords();
-        NdefRecord record = records[0];
-        String payload = new String(record.getPayload());
-        Log.d(TAG, "We recieved this payload: " + payload);
+//        NdefRecord[] records = mMessage.getRecords();
+//        NdefRecord record = records[0];
+//        String payload = new String(record.getPayload());
+//        Log.d(TAG, "We recieved this payload: " + payload);
         
     }
 
