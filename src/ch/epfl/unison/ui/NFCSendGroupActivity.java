@@ -17,11 +17,17 @@ import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
+/**
+ * 
+ * @author vincent
+ *
+ */
 public class NFCSendGroupActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.NFCSendGroupActivity";
     private NfcAdapter mAdapter = null;
     private boolean mNFCStatusChecked = false;
+    private byte[] mDummyByte = {new Integer(1).byteValue()};
     private NdefMessage mMessage = null;
     private int mDebugGroupID = 123;
     private String mDebugRecord = "123";
@@ -40,7 +46,7 @@ public class NFCSendGroupActivity extends SherlockActivity {
     protected void onPause() {
         // TODO Auto-generated method stub
         super.onPause();
-        if(mNFCStatusChecked) {
+        if (mNFCStatusChecked) {
             mAdapter.disableForegroundNdefPush(this);
         }
     }
@@ -52,8 +58,17 @@ public class NFCSendGroupActivity extends SherlockActivity {
         // TODO Auto-generated method stub
         super.onResume();
         
-        if(mNFCStatusChecked) {
-            mAdapter.enableForegroundNdefPush(this, mMessage);
+        if (mNFCStatusChecked) {
+            if (mAdapter == null) {
+                Log.d(TAG, "adapter was NULL !!!");
+            }
+            try {
+                mMessage = new NdefMessage(mDummyByte);
+                mAdapter.enableForegroundNdefPush(this, mMessage);
+            } catch (FormatException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -61,7 +76,8 @@ public class NFCSendGroupActivity extends SherlockActivity {
 
     private void setupNFC() {
         
-        NfcManager manager = (NfcManager) getApplicationContext().getSystemService(Context.NFC_SERVICE);
+        NfcManager manager = (NfcManager) getApplicationContext()
+                .getSystemService(Context.NFC_SERVICE);
         mAdapter = manager.getDefaultAdapter();
         if (mAdapter == null) {
            Toast.makeText(NFCSendGroupActivity.this, R.string.error_NFC_not_present,
@@ -86,7 +102,9 @@ public class NFCSendGroupActivity extends SherlockActivity {
     
     private void setMessage(int groupID) throws FormatException {
         NdefRecord[] records = new NdefRecord[1];
-        records[0] = new NdefRecord(mDebugRecord.getBytes());
+//        records[0] = new NdefRecord(mDebugRecord.getBytes());
+        records[0] = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,
+                NdefRecord.RTD_TEXT, new byte[] {}, mDebugRecord.getBytes());
         mMessage = new  NdefMessage(records);
     }
     

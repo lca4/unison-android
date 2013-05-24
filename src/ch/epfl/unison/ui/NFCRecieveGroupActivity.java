@@ -88,7 +88,8 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
 
     private void setupNFC() {
         
-        NfcManager manager = (NfcManager) getApplicationContext().getSystemService(Context.NFC_SERVICE);
+        NfcManager manager = (NfcManager) getApplicationContext()
+                .getSystemService(Context.NFC_SERVICE);
         mAdapter = manager.getDefaultAdapter();
         if (mAdapter == null) {
            Toast.makeText(NFCRecieveGroupActivity.this, R.string.error_NFC_not_present,
