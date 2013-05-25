@@ -116,7 +116,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			startActivity(new Intent(this, GroupsActivity.class).setAction(
+			startActivity(new Intent(this, HomeActivity.class).setAction(
 					GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
 					Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			finish();

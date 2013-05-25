@@ -3,12 +3,11 @@ package ch.epfl.unison.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
-import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.UnisonAPI;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +17,6 @@ import java.util.Set;
  * player and information about the group (through fragments).
  * 
  * @see AbstractMainActivity
- * 
  * @author lum
  */
 public class SoloMainActivity extends AbstractMainActivity {
@@ -27,7 +25,6 @@ public class SoloMainActivity extends AbstractMainActivity {
     public interface OnPlaylistInfoListener {
         void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
     }
-
 
     private static final String TAG = "ch.epfl.unison.SoloMainActivity";
 
@@ -55,20 +52,33 @@ public class SoloMainActivity extends AbstractMainActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setReloadInterval(RELOAD_INTERVAL);
-        getTabsAdapter().addTab(getSupportActBar().newTab().setText(R.string.solo_player_fragment_title),
+        // setReloadInterval(RELOAD_INTERVAL);
+        getTabsAdapter().addTab(
+                getSupportActBar().newTab().setText(R.string.solo_player_fragment_title),
                 SoloPlayerFragment.class, null);
-        getTabsAdapter().addTab(getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),
+        getTabsAdapter().addTab(
+                getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),
                 SoloTracksFragment.class, null);
     }
 
     @Override
     public void onRefresh() {
         super.onRefresh();
-        UnisonAPI api = AppData.getInstance(this).getAPI();
+//        UnisonAPI api = AppData.getInstance(this).getAPI();
 
-        //TODO
-        
+        // TODO
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            startActivity(new Intent(this, SoloPlaylistsActivity.class).addFlags(
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     public void registerPlaylistInfoListener(OnPlaylistInfoListener listener) {
