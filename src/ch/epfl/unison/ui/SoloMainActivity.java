@@ -70,17 +70,6 @@ public class SoloMainActivity extends AbstractMainActivity {
 
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            startActivity(new Intent(this, SoloPlaylistsActivity.class).addFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     public void registerPlaylistInfoListener(OnPlaylistInfoListener listener) {
         mListeners.add(listener);
     }

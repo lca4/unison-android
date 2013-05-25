@@ -250,18 +250,6 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             fetchGroupSuggestion();
         }
     }
-    
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            startActivity(new Intent(this, HomeActivity.class).setAction(
-                    GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 
     public void repaintRefresh(boolean isRefreshing) {
         if (mMenu == null) {
