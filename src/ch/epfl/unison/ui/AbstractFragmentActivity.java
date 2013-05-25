@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 		implements OnRefreshListener {
 
-	private static String smTag = "ch.epfl.unison.UnisonFragmentActivity";
+	private String mTag = "ch.epfl.unison.UnisonFragmentActivity";
 	private static final int INITIAL_DELAY = 500; // in ms.
 	private static final int DEFAULT_RELOAD_INTERVAL = 30 * 1000; // in ms.
 	private static int smReloadInterval;
@@ -87,7 +86,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		smTag = this.getClass().getName();
+		mTag = this.getClass().getName();
 
 		setReloadInterval(DEFAULT_RELOAD_INTERVAL);
 
@@ -115,7 +114,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
 	public void repaintRefresh(boolean isRefreshing) {
 		if (mMenu == null) {
-			Log.d(smTag, "repaintRefresh: mMenu is null");
+			Log.d(mTag, "repaintRefresh: mMenu is null");
 			return;
 		}
 
@@ -132,7 +131,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 				refreshItem.setActionView(null);
 			}
 		} else {
-			Log.d(smTag, "repaintRefresh: menu_item_refresh not found");
+			Log.d(mTag, "repaintRefresh: menu_item_refresh not found");
 		}
 	}
 
@@ -178,11 +177,6 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 		return mUpdater;
 	}
 
-	@Deprecated
-	protected static void setTag(String tag) {
-		smTag = tag;
-	}
-
 	protected Menu getMenu() {
 		return mMenu;
 	}
@@ -192,7 +186,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 	}
 	
 	protected String getTag() {
-	    return smTag;
+	    return mTag;
 	}
 
 	private void setTabsAdapter(TabsAdapter ta) {

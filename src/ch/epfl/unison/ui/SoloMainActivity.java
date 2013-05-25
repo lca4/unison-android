@@ -3,7 +3,6 @@ package ch.epfl.unison.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;

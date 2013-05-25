@@ -689,8 +689,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                     pl.setTitle(cur.getString(colName));
                 }
             } while (cur.moveToNext());
-        }
-        if (!cur.isClosed()) {
             cur.close();
         }
         refreshLocalPlaylists();

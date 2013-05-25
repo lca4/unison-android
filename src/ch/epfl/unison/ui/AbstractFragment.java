@@ -21,7 +21,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  */
 public class AbstractFragment extends SherlockFragment {
     
-    private static String smClassTag = "ch.epfl.unison.ui.AbstractFragment";
+    private String mClassTag = "ch.epfl.unison.ui.AbstractFragment";
 
     private AbstractMainActivity mActivity;
 
@@ -29,7 +29,7 @@ public class AbstractFragment extends SherlockFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         
-        smClassTag = this.getClass().getName();
+        mClassTag = this.getClass().getName();
         
         View v = inflater.inflate(R.layout.list, container, false);
 
@@ -49,7 +49,7 @@ public class AbstractFragment extends SherlockFragment {
     }
     
     protected String getCName() {
-        return smClassTag;
+        return mClassTag;
     }
 
 }

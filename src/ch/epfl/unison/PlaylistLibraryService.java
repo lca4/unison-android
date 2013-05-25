@@ -14,6 +14,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.Playlist;
 import ch.epfl.unison.data.UnisonDB;
 
 import java.util.ArrayList;
@@ -58,10 +59,7 @@ public class PlaylistLibraryService extends AbstractService {
     private void truncate() {
         Log.d(TAG, "truncating the user playlist library");
         UnisonDB mDB = new UnisonDB(this);
-        //TODO work in progress
-        LibraryHelper helper = new LibraryHelper(this);
-        helper.truncate();
-        helper.close();
+        mDB.truncate(Playlist.class);
     }
 
     private void update() {
@@ -124,11 +122,8 @@ public class PlaylistLibraryService extends AbstractService {
                     set.add(new MusicItem(cur.getInt(colId),
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
-            }
-            if (!cur.isClosed()) {
                 cur.close();
             }
-
             return set;
         }
     }

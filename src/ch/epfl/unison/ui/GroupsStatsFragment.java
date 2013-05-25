@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -20,10 +21,11 @@ import com.actionbarsherlock.app.SherlockFragment;
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
  * information about the members of the group: nickname, rating of current song,
  * etc.
- *
+ * 
  * @author lum
  */
-public class GroupsStatsFragment extends SherlockFragment implements GroupsMainActivity.OnGroupInfoListener {
+public class GroupsStatsFragment extends SherlockFragment implements
+        GroupsMainActivity.OnGroupInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
@@ -69,7 +71,10 @@ public class GroupsStatsFragment extends SherlockFragment implements GroupsMainA
         mActivity.unregisterGroupInfoListener(this);
     }
 
-    /** ArrayAdapter that displays the stats associated with each user in the group. */
+    /**
+     * ArrayAdapter that displays the stats associated with each user in the
+     * group.
+     */
     private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
 
         public static final int ROW_LAYOUT = R.layout.stats_row;

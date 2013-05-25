@@ -105,7 +105,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		}
 
 		private void sendRating(MusicItem item, int rating) {
-			Log.d(smTag, String.format("artist: %s, title: %s, rating: %d",
+			Log.d(mTag, String.format("artist: %s, title: %s, rating: %d",
 					item.artist, item.title, rating));
 
 			UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
@@ -118,7 +118,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 						@Override
 						public void onError(Error error) {
-							Log.d(smTag, error.toString());
+							Log.d(mTag, error.toString());
 							if (getActivity() != null) {
 								Toast.makeText(getActivity(),
 										R.string.error_sending_rating,
@@ -143,13 +143,13 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			AbstractPlayerFragment.this.setStatus(Status.Stopped);
-			Log.i(smTag, "track has completed, send the next one.");
+			Log.i(mTag, "track has completed, send the next one.");
 			AbstractPlayerFragment.this.next();
 		}
 
 	}
 
-	private static String smTag = "ch.epfl.unison.UnisonPlayerFragment";
+	private String mTag = "ch.epfl.unison.UnisonPlayerFragment";
 
 	private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
 
@@ -370,7 +370,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		} else if (v == getPrevBtn()) {
 			prev();
 		} else if (mDJSupport && v == mDjBtn) {
-			Log.d(smTag, "Clicked DJ button");
+			Log.d(mTag, "Clicked DJ button");
 			setIsDJ(!mIsDJ);
 		}
 	}
@@ -378,7 +378,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-	    smTag = this.getClass().getName();
+	    mTag = this.getClass().getName();
 	    
 		View v = inflater.inflate(R.layout.player, container, false);
 
@@ -452,7 +452,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	}
 
 	protected void play(MusicItem item) {
-		Log.i(smTag, String.format("playing %s - %s", item.artist, item.title));
+		Log.i(mTag, String.format("playing %s - %s", item.artist, item.title));
 		// Send the song to the music player service.
 		Uri uri = ContentUris.withAppendedId(
 				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);

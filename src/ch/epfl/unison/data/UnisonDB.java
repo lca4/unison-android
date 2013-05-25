@@ -314,8 +314,8 @@ public class UnisonDB {
                 set.add(new MusicItem(cur.getInt(colId),
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
+            closeCursor(cur);
         }
-        closeCursor(cur);
         return set;
     }
 
@@ -391,8 +391,8 @@ public class UnisonDB {
                 tags.put(cursor.getString(colTitle) + " - " + cursor.getString(colArtist),
                         cursor.getInt(colId));
             } while (cursor.moveToNext());
+            closeCursor(cursor);
         }
-        closeCursor(cursor);
         return tags;
     }
 
@@ -438,8 +438,8 @@ public class UnisonDB {
             do {
                 tags.put(cursor.getString(colName), cursor.getInt(colId));
             } while (cursor.moveToNext());
+            closeCursor(cursor);
         }
-        closeCursor(cursor);
         return tags;
     }
 
@@ -459,8 +459,8 @@ public class UnisonDB {
                         cur.getString(colName), cur.getInt(colIsChecked),
                         cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
+            closeCursor(cur);
         }
-        closeCursor(cur);
         return set;
     }
 
@@ -654,8 +654,8 @@ public class UnisonDB {
                 default:
                     throw new IllegalArgumentException();
             }
+            closeCursor(cur);
         }
-        closeCursor(cur);
         resetIsChecked(table);
         return json;
     }
