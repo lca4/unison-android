@@ -123,6 +123,13 @@
         <activity
             android:name="ch.epfl.unison.ui.NfcManagementActivity"
             android:label="@string/title_activity_nfc_management" >
+            <intent-filter >
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="vnd.android.nfc"
+                    android:host="ext"
+                    android:pathPrefix="/ch.epfl.unison:text/plain" />
+            </intent-filter>
         </activity>
     </application>
 

@@ -135,8 +135,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
     }
     
     private NdefMessage getNdefFromGID(Long gid) {
-    	NdefRecord[] records = {new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
-    			NdefRecord.RTD_TEXT, new byte[1], gid.toString().getBytes())};
+    	NdefRecord[] records = {new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, 
+    			Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString().getBytes())};
     	
     	return new NdefMessage(records);
     }

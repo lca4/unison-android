@@ -34,6 +34,8 @@ public final class Const {
         public static final String CALLER = "caller";
         public static final String SONG_ARTIST_TITLE = "songat";
         public static final String GROUP_TO_CREATE_NAME = "gtcn";
+        
+        public static final String UNISON_NFC_MIME_TYPE = "ch.epfl.unison:text/plain";
 
         private Strings() {
         } // Non-instantiable.
