@@ -76,8 +76,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private boolean mSuggestionIsForeground = false;
     private DialogInterface.OnClickListener mSuggestionClick;
     
-    private NfcAdapter mNfcAdapter = null;
-    private PendingIntent mNfcIntent = null;
+//    private NfcAdapter mNfcAdapter = null;
+//    private PendingIntent mNfcIntent = null;
 
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -98,29 +98,29 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         }
     };
     
-    private void setupNFC() {
-    	NfcManager manager = (NfcManager) GroupsActivity
-    			.this.getSystemService(Context.NFC_SERVICE);
-    	
-    	mNfcAdapter = manager.getDefaultAdapter();
-    	
-    	if (mNfcAdapter == null) {
-    		//FIXME
-    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
-    		return;
-    	}
-    	
-    	if (!mNfcAdapter.isEnabled()) {
-    		//FIXME
-    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
-    	} else {
-    		mNfcIntent = PendingIntent.getActivity(GroupsActivity.this, 0, 
-    				new Intent(GroupsActivity.this, GroupsActivity.class)
-    					.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-    	}
-    	
-    	Log.d(TAG, "NFC is enabled");
-    }
+//    private void setupNFC() {
+//    	NfcManager manager = (NfcManager) GroupsActivity
+//    			.this.getSystemService(Context.NFC_SERVICE);
+//    	
+//    	mNfcAdapter = manager.getDefaultAdapter();
+//    	
+//    	if (mNfcAdapter == null) {
+//    		//FIXME
+//    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+//    		return;
+//    	}
+//    	
+//    	if (!mNfcAdapter.isEnabled()) {
+//    		//FIXME
+//    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+//    	} else {
+//    		mNfcIntent = PendingIntent.getActivity(GroupsActivity.this, 0, 
+//    				new Intent(GroupsActivity.this, GroupsActivity.class)
+//    					.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+//    	}
+//    	
+//    	Log.d(TAG, "NFC is enabled");
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +194,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             fetchGroupSuggestion();
         }
 
-        setupNFC();
+//        setupNFC();
     }
     
     @Override
@@ -206,46 +206,46 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         updateSuggestionButton();
     }
     
-    @Override
-    protected void onNewIntent(Intent intent) {
-    	super.onNewIntent(intent);
-    	
-    	if (mNfcAdapter == null) {
-    		return;
-    	}
-    	
-//    	NdefMessage[] messages;
-    	
-    	if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-    		NdefMessage[] messages = (NdefMessage[]) intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-    		if (messages == null) {
-    			//FIXME
-    			Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
-    			
-    		} else {
-    			StringBuilder sb = new StringBuilder();    			
-    			
-    			for (NdefMessage msg: messages) {
-					NdefRecord[] records = msg.getRecords();
-					if (records != null) {
-						for (NdefRecord rec : records) {
-							if (rec != null) {
-								byte[] pl = rec.getPayload();
-								if (pl != null) {
-									sb.append(new String(pl));
-								}
-							}
-						}
-					}
-    			}
-    			
-    			String result = sb.toString();
-    			
-    			//FIXME
-    			Toast.makeText(GroupsActivity.this, "Read " + result, Toast.LENGTH_LONG).show();
-    		}
-    	}
-    }
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//    	super.onNewIntent(intent);
+//    	
+//    	if (mNfcAdapter == null) {
+//    		return;
+//    	}
+//    	
+////    	NdefMessage[] messages;
+//    	
+//    	if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+//    		NdefMessage[] messages = (NdefMessage[]) intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+//    		if (messages == null) {
+//    			//FIXME
+//    			Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+//    			
+//    		} else {
+//    			StringBuilder sb = new StringBuilder();    			
+//    			
+//    			for (NdefMessage msg: messages) {
+//					NdefRecord[] records = msg.getRecords();
+//					if (records != null) {
+//						for (NdefRecord rec : records) {
+//							if (rec != null) {
+//								byte[] pl = rec.getPayload();
+//								if (pl != null) {
+//									sb.append(new String(pl));
+//								}
+//							}
+//						}
+//					}
+//    			}
+//    			
+//    			String result = sb.toString();
+//    			
+//    			//FIXME
+//    			Toast.makeText(GroupsActivity.this, "Read " + result, Toast.LENGTH_LONG).show();
+//    		}
+//    	}
+//    }
 
     @Override
     protected void onResume() {
@@ -255,10 +255,10 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         startService(new Intent(LibraryService.ACTION_UPDATE));
         mHandler.postDelayed(mUpdater, INITIAL_DELAY);
         
-        if (mNfcAdapter != null && mNfcIntent != null) {
-        	mNfcAdapter.enableForegroundDispatch(GroupsActivity.this,
-        			mNfcIntent, null, null);
-        }
+//        if (mNfcAdapter != null && mNfcIntent != null) {
+//        	mNfcAdapter.enableForegroundDispatch(GroupsActivity.this,
+//        			mNfcIntent, null, null);
+//        }
     }
 
     @Override
@@ -266,9 +266,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         super.onPause();
         mIsForeground = false;
         
-        if (mNfcAdapter != null) {
-        	mNfcAdapter.disableForegroundDispatch(GroupsActivity.this);
-        }
+//        if (mNfcAdapter != null) {
+//        	mNfcAdapter.disableForegroundDispatch(GroupsActivity.this);
+//        }
     }
 
     @Override
@@ -367,6 +367,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             public void onError(Error error) {
                 if (error != null) {                    
                     Log.d(TAG, error.toString());
+                } else {
+                    Log.d(TAG, "error on leaveGroup() and the error was null!");
                 }
             }
         });
