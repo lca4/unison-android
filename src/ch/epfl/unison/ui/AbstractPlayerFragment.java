@@ -118,7 +118,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 						@Override
 						public void onError(Error error) {
-							Log.d(smTag, error.toString());
+						    if (error != null) {
+						        Log.d(smTag, error.toString());
+						    }
 							if (getActivity() != null) {
 								Toast.makeText(getActivity(),
 										R.string.error_sending_rating,

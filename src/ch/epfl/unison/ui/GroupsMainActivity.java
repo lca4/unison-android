@@ -206,7 +206,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
 
 					@Override
 					public void onError(UnisonAPI.Error error) {
-						Log.d(TAG, error.toString());
+					    if (error != null) {                    
+		                    Log.d(TAG, error.toString());
+		                }
 						if (GroupsMainActivity.this != null) {
 							Toast.makeText(GroupsMainActivity.this,
 									R.string.error_loading_info,
