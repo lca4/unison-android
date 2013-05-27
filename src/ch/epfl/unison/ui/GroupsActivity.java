@@ -2,14 +2,20 @@ package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,7 +34,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
@@ -73,6 +78,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private boolean mDismissedHelp = false;
     private boolean mSuggestionIsForeground = false;
     private DialogInterface.OnClickListener mSuggestionClick;
+    
+    private NfcAdapter mNfcAdapter = null;
+    private PendingIntent mNfcIntent = null;
 
     private boolean mIsForeground = false;
     private Handler mHandler = new Handler();
@@ -92,6 +100,30 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             finish();
         }
     };
+    
+    private void setupNFC() {
+    	NfcManager manager = (NfcManager) GroupsActivity
+    			.this.getSystemService(Context.NFC_SERVICE);
+    	
+    	mNfcAdapter = manager.getDefaultAdapter();
+    	
+    	if (mNfcAdapter == null) {
+    		//FIXME
+    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    		return;
+    	}
+    	
+    	if (!mNfcAdapter.isEnabled()) {
+    		//FIXME
+    		Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    	} else {
+    		mNfcIntent = PendingIntent.getActivity(GroupsActivity.this, 0, 
+    				new Intent(GroupsActivity.this, GroupsActivity.class)
+    					.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+    	}
+    	
+    	Log.d(TAG, "NFC is enabled");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +197,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             fetchGroupSuggestion();
         }
 
+        setupNFC();
     }
     
     @Override
@@ -175,20 +208,71 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         
         updateSuggestionButton();
     }
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+    	super.onNewIntent(intent);
+    	
+    	if (mNfcAdapter == null) {
+    		return;
+    	}
+    	
+//    	NdefMessage[] messages;
+    	
+    	if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+    		NdefMessage[] messages = (NdefMessage[]) intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+    		if (messages == null) {
+    			//FIXME
+    			Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    			
+    		} else {
+    			StringBuilder sb = new StringBuilder();
+    			
+    			
+    			for (NdefMessage msg: messages) {
+					NdefRecord[] records = msg.getRecords();
+					if (records != null) {
+						for (NdefRecord rec : records) {
+							if (rec != null) {
+								byte[] pl = rec.getPayload();
+								if (pl != null) {
+									sb.append(new String(pl));
+								}
+							}
+						}
+					}
+    			}
+    			
+    			String result = sb.toString();
+    			
+    			//FIXME
+    			Toast.makeText(GroupsActivity.this, "Read " + result, Toast.LENGTH_LONG).show();
+    		}
+    	}
+    }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
 //        mDismissedHelp = true;
         mIsForeground = true;
         startService(new Intent(LibraryService.ACTION_UPDATE));
         mHandler.postDelayed(mUpdater, INITIAL_DELAY);
+        
+        if (mNfcAdapter != null && mNfcIntent != null) {
+        	mNfcAdapter.enableForegroundDispatch(GroupsActivity.this,
+        			mNfcIntent, null, null);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mIsForeground = false;
+        
+        if (mNfcAdapter != null) {
+        	mNfcAdapter.disableForegroundDispatch(GroupsActivity.this);
+        }
     }
 
     @Override

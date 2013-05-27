@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,6 +51,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
 	private static final double MAX_DISTANCE = 2000;
 
 	private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
+	
+	private NfcAdapter mNfcAdapter = null;
 
 	private JsonStruct.Group mGroup;
 
@@ -107,6 +113,55 @@ public class GroupsMainActivity extends AbstractMainActivity {
 //        setIntent(intent); //optional
 //        handleExtras(intent.getExtras());
     }
+    
+    private void setupNFC() {
+    	NfcManager manager = (NfcManager) GroupsMainActivity
+    			.this.getSystemService(Context.NFC_SERVICE);
+    	
+    	mNfcAdapter = manager.getDefaultAdapter();
+    	
+    	if (mNfcAdapter == null) {
+    		//FIXME
+    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    		return;
+    	}
+    	
+    	if (!mNfcAdapter.isEnabled()) {
+    		//FIXME
+    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    	}
+    	
+    	Log.d(TAG, "NFC is enabled");
+    }
+    
+    private NdefMessage getNdefFromGID(Long gid) {
+    	NdefRecord[] records = {new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
+    			NdefRecord.RTD_TEXT, new byte[1], gid.toString().getBytes())};
+    	
+    	return new NdefMessage(records);
+    }
+    
+    private void sendGIDOverNFC() {
+    	if (mNfcAdapter != null && mGroup != null && mGroup.gid != null) {
+    		mNfcAdapter.enableForegroundNdefPush(GroupsMainActivity.this, getNdefFromGID(mGroup.gid));
+    	}
+    }
+    
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	
+    	if (mNfcAdapter != null) {
+    		mNfcAdapter.disableForegroundDispatch(GroupsMainActivity.this);
+    	}
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	
+    	sendGIDOverNFC();
+    }
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -120,6 +175,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
 				getSupportActBar().newTab().setText(
 						R.string.fragment_title_stats),
 				GroupsStatsFragment.class, null);
+		
+		setupNFC();
 	}
 
 	private void onGroupInfo(JsonStruct.Group group) {
@@ -272,5 +329,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
 	           dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
 	       }
 	    }
+	
+	
 
 }

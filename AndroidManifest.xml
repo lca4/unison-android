@@ -6,47 +6,49 @@
 
     <!-- Requirements. -->
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="8" /> <!-- previously: 14 (https://developer.android.com/tools/extras/support-library.html#SettingUp) -->
+        android:minSdkVersion="10"
+        android:targetSdkVersion="10" /> <!-- previously: 14 (https://developer.android.com/tools/extras/support-library.html#SettingUp) -->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Added by Vincent -->
+    <uses-permission android:name="android.permission.NFC" />
 
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock"
-        android:allowBackup="true" > <!-- FIX lint warning -->
+        android:theme="@style/Theme.Sherlock" > <!-- FIX lint warning -->
+
 
         <!-- Activities. -->
         <activity
-            android:name=".ui.PrefsActivity"
+            android:name="ch.epfl.unison.ui.PrefsActivity"
             android:label="@string/activity_title_prefs" />
         <activity
-            android:name=".ui.GroupsRatingsActivity"
+            android:name="ch.epfl.unison.ui.GroupsRatingsActivity"
             android:label="@string/activity_title_ratings" />
         <activity
-            android:name=".ui.HelpActivity"
+            android:name="ch.epfl.unison.ui.HelpActivity"
             android:label="@string/activity_title_help" />
         <activity
-            android:name=".ui.GroupsActivity"
+            android:name="ch.epfl.unison.ui.GroupsActivity"
             android:label="@string/activity_title_groups" />
         <activity
-            android:name=".ui.GroupsHistoryActivity"
+            android:name="ch.epfl.unison.ui.GroupsHistoryActivity"
             android:label="@string/activity_title_history" />
         <activity
-            android:name=".ui.SoloMainActivity"
+            android:name="ch.epfl.unison.ui.SoloMainActivity"
             android:label="@string/activity_title_solo_main" />
         <activity
-            android:name=".ui.SoloPlaylistsActivity"
+            android:name="ch.epfl.unison.ui.SoloPlaylistsActivity"
             android:label="@string/activity_title_solo_playlists" />
         <activity
-            android:name=".ui.HomeActivity"
+            android:name="ch.epfl.unison.ui.HomeActivity"
             android:label="@string/activity_title_home" />
-        
         <activity
-            android:name=".ui.LoginActivity"
+            android:name="ch.epfl.unison.ui.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Sherlock.NoActionBar" >
@@ -63,24 +65,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SignupActivity"
+            android:name="ch.epfl.unison.ui.SignupActivity"
             android:label="@string/activity_title_signup"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.GroupsMainActivity"
+            android:name="ch.epfl.unison.ui.GroupsMainActivity"
             android:label="@string/activity_title_main"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
-        <!-- See doc on singleTask:
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <!--
+        See doc on singleTask:
         http://developer.android.com/guide/components/tasks-and-back-stack.html 
         One could alternatively use the intent flag:
         FLAG_ACTIVITY_REORDER_TO_FRONT
-        when creating the pending intent in MusicService for the notification -->
-        
+        when creating the pending intent in MusicService for the notification
+        -->
+
 
         <!-- Services. -->
         <service
-            android:name=".music.MusicService"
+            android:name="ch.epfl.unison.music.MusicService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="ch.epfl.unison.music.action.TOGGLE_PLAYBACK" />
@@ -98,7 +102,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".LibraryService"
+            android:name="ch.epfl.unison.LibraryService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="ch.epfl.unison.action.UPDATE" />
@@ -106,7 +110,14 @@
             </intent-filter>
         </service>
 
-        
+        <activity
+            android:name="ch.epfl.unison.ui.NFCSendGroupActivity"
+            android:label="@string/title_activity_nfcsend_group" >
+        </activity>
+        <activity
+            android:name="ch.epfl.unison.ui.NFCRecieveGroupActivity"
+            android:label="@string/title_activity_nfcrecieve_group" >
+        </activity>
     </application>
 
 </manifest>

@@ -458,4 +458,5 @@ public class GroupsHistoryActivity extends SherlockActivity {
             repaintRefresh(false);
         }
     }
+    
 }
