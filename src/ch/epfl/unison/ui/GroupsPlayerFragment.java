@@ -114,7 +114,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 					@Override
 					public void onError(Error error) {
-						Log.d(TAG, error.toString());
+						if (error != null) {
+							Log.d(TAG, error.toString());
+						}
 						if (getActivity() != null) {
 							Toast.makeText(getActivity(),
 									R.string.error_sending_track,
@@ -135,7 +137,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 					@Override
 					public void onError(Error error) {
-						Log.d(TAG, error.toString());
+						if (error != null) {
+							Log.d(TAG, error.toString());
+						}
 					}
 				});
 	}
@@ -171,7 +175,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 					@Override
 					public void onError(Error error) {
-						Log.d(TAG, error.toString());
+						if (error != null) {
+							Log.d(TAG, error.toString());
+						}
 						if (getActivity() != null) {
 							Toast.makeText(getActivity(),
 									R.string.error_becoming_dj,
@@ -208,7 +214,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 					@Override
 					public void onError(Error error) {
-						Log.d(TAG, error.toString());
+						if (error != null) {
+							Log.d(TAG, error.toString());
+						}
 					}
 				});
 	}
@@ -244,7 +252,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 						@Override
 						public void onError(Error error) {
-							Log.d(TAG, error.toString());
+							if (error != null) {
+								Log.d(TAG, error.toString());
+							}
 							if (getActivity() != null) {
 								Toast.makeText(getActivity(),
 										R.string.error_sending_rating,

@@ -94,24 +94,26 @@ public class SignupActivity extends SherlockActivity {
     }
 
     public void handleError(UnisonAPI.Error error) {
-        Log.d(TAG, error.toString());
-        if (error.hasJsonError()) {
-            if (UnisonAPI.ErrorCodes.MISSING_FIELD == error.jsonError.error) {
-                showError(getString(R.string.signup_form_missing_fields));
+		if (error != null) {
+			Log.d(TAG, error.toString());
+			if (error.hasJsonError()) {
+				if (UnisonAPI.ErrorCodes.MISSING_FIELD == error.jsonError.error) {
+					showError(getString(R.string.signup_form_missing_fields));
 
-            } else if (UnisonAPI.ErrorCodes.EXISTING_USER == error.jsonError.error) {
-                showError(getString(R.string.signup_form_email_in_use));
+				} else if (UnisonAPI.ErrorCodes.EXISTING_USER == error.jsonError.error) {
+					showError(getString(R.string.signup_form_email_in_use));
 
-            } else if (UnisonAPI.ErrorCodes.INVALID_EMAIL == error.jsonError.error) {
-                showError(getString(R.string.signup_form_email_invalid));
+				} else if (UnisonAPI.ErrorCodes.INVALID_EMAIL == error.jsonError.error) {
+					showError(getString(R.string.signup_form_email_invalid));
 
-            } else if (UnisonAPI.ErrorCodes.INVALID_PASSWORD == error.jsonError.error) {
-                showError(getString(R.string.signup_form_password_invalid));
-            }
-            return;
-        }
-        // Last resort.
-        showError(getString(R.string.signup_form_unable_to_create));
+				} else if (UnisonAPI.ErrorCodes.INVALID_PASSWORD == error.jsonError.error) {
+					showError(getString(R.string.signup_form_password_invalid));
+				}
+				return;
+			}
+		}
+		// Last resort.
+		showError(getString(R.string.signup_form_unable_to_create));
     }
 
     /** Validates the data before submitting it to the back-end. */

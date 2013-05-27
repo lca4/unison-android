@@ -210,8 +210,10 @@ public class LoginActivity extends SherlockActivity {
 
             @Override
             public void onError(Error error) {
-                Log.d(TAG, error.toString());
-                if (error.statusCode == Error.STATUS_FORBIDDEN) {
+            	if (error != null) {
+            		Log.d(TAG, error.toString());
+            	}
+                if (error != null && error.statusCode == Error.STATUS_FORBIDDEN) {
                     Toast.makeText(LoginActivity.this, R.string.error_unauthorized,
                             Toast.LENGTH_LONG).show();
                 } else {
