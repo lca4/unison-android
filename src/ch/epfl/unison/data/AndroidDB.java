@@ -5,6 +5,7 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -13,6 +14,7 @@ import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Utility to handle interactions with Original code from MarkG on <a
@@ -72,8 +74,11 @@ final class AndroidDB {
             // Add tracks to the new playlist
             uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
 
-            addTracksToPlaylist(cr, pl);
+            insertTracks(cr, pl);
 
+        } else {
+            throw new SQLiteException("Playlists " + pl.toString() + " could not be inserted to "
+                    + MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI);
         }
         return playlistId;
     }
@@ -87,11 +92,11 @@ final class AndroidDB {
      * @param playlistId
      * @param c
      */
-    private static void addTracksToPlaylist(ContentResolver resolver, Playlist pl) {
+    private static void insertTracks(ContentResolver resolver, Playlist pl) {
         ContentResolver mCR = resolver;
         ContentProviderClient mCRC = null;
         try {
-            int mPlaylistId = pl.getLocalId();
+            long mPlaylistId = pl.getLocalId();
             Uri mUri = MediaStore.Audio.Playlists.Members.getContentUri("external", mPlaylistId);
 
             mCRC = mCR.acquireContentProviderClient(mUri);
@@ -102,7 +107,8 @@ final class AndroidDB {
             // TODO improve: bulk insertion instead of sequential insertion
             Iterator<MusicItem> it = pl.getTracks().iterator();
             while (it.hasNext()) {
-                // Don't pollute with progress messages..has to be at least 1% increments
+                // Don't pollute with progress messages..has to be at least 1%
+                // increments
                 int temp = (i * Const.Integers.HUNDRED) / (tracks);
                 if (temp > percent) {
                     percent = temp;
@@ -115,9 +121,9 @@ final class AndroidDB {
                 values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, mi.playOrder);
                 Uri insertUri = mCRC.insert(mUri, values);
                 Log.d(TAG,
-                        "addSongsInCursorToPlaylist -Adding AudioID: " 
-                + Uutils.lastInsert(insertUri)
-                + " with Uri : " + insertUri
+                        "addSongsInCursorToPlaylist -Adding AudioID: "
+                                + Uutils.lastInsert(insertUri)
+                                + " with Uri : " + insertUri
                                 + " to Uri: " + mUri.toString());
             }
             mCRC.release();
@@ -127,10 +133,54 @@ final class AndroidDB {
     }
 
     static int delete(ContentResolver resolver, Playlist pl) {
-        return resolver.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+        int res = resolver.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 MediaStore.Audio.Playlists._ID + " = ? ", new String[] {
                     String.valueOf(pl.getLocalId())
                 });
+        if (res < 1) {
+            throw new SQLiteException("Playlist with _ID " + pl.getLocalId()
+                    + " could not be removed from "
+                    + MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI);
+        }
+        return res;
+    }
+
+    /**
+     * Inspiration found on
+     * <a href=http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from-android-playlist>http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from-android-playlist</a>.
+     * 
+     * @param resolver
+     * @param pl
+     */
+    static void getTracks(ContentResolver resolver, Playlist pl) {
+        String[] projection = new String[] {
+                // MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                // MediaStore.Audio.Media.DATA,
+                // MediaStore.Audio.Media.ALBUM,
+                // MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER
+        };
+        Uri contentUri = MediaStore.Audio.Playlists.Members
+                .getContentUri("external", pl.getLocalId()).buildUpon().build();
+        Cursor cur = resolver.query(contentUri,
+                projection,
+                null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+        if (cur != null) {
+            LinkedList<MusicItem> mTracks = new LinkedList<MusicItem>();
+            int colId = cur.getColumnIndex(MediaStore.Audio.Media._ID);
+            int colTitle = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int colArtist = cur.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int colPlayOrder = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+            do {
+                mTracks.add(new MusicItem(cur.getInt(colId), cur.getString(colArtist),
+                        cur.getString(colTitle), cur.getInt(colPlayOrder)));
+            } while (cur.moveToNext());
+        }
     }
 
 }

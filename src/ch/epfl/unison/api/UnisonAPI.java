@@ -93,14 +93,14 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("gid", gid).setAuth(mAuth).doPUT();
     }
-    
+
     public void joinProtectedGroup(long uid, long gid,
             String password, Handler<JsonStruct.Success> handler) {
         Log.d(TAG, "joining group protected and using password: " + password);
         URL url = urlFor("/users/%d/group", uid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
-        .addParam("gid", gid)
-        .addParam("password", password).setAuth(mAuth).doPUT();
+                .addParam("gid", gid)
+                .addParam("password", password).setAuth(mAuth).doPUT();
     }
 
     public void leaveGroup(long uid, Handler<JsonStruct.Success> handler) {
@@ -114,11 +114,11 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(mAuth).doGET();
     }
-    
+
     public void getSuggestion(double lat, double lon,
             Handler<JsonStruct.GroupSuggestion> handler) {
         URL url = urlFor(String.format("/groups/suggestion?lat=%f&lon=%f", lat, lon));
-        AsyncRequest.of(url, handler, JsonStruct.GroupSuggestion.class).setAuth(mAuth).doGET();   
+        AsyncRequest.of(url, handler, JsonStruct.GroupSuggestion.class).setAuth(mAuth).doGET();
     }
 
     public void listGroups(double lat, double lon, Handler<JsonStruct.GroupsList> handler) {
@@ -126,7 +126,7 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.GroupsList.class)
                 .setAuth(mAuth).doGET();
     }
-    
+
     public void setGroupPassword(long gid, String password, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/groups/%d", gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
@@ -141,7 +141,7 @@ public class UnisonAPI {
                 .addParam("name", name).addParam("lat", lat)
                 .addParam("lon", lon).addParam("list", true).setAuth(mAuth).doPOST();
     }
-    
+
     public void createGroup(String name, double lat, double lon,
             Handler<JsonStruct.Group> handler) {
         URL url = urlFor("/groups");
@@ -254,7 +254,7 @@ public class UnisonAPI {
 
     // ---------------
     // PLAYLISTS
-    
+
     public void generatePlaylist(long uid, JSONObject seeds, JSONObject options,
             Handler<JsonStruct.PlaylistJS> handler) {
         Log.i(TAG, "Ready to get!");
@@ -265,20 +265,40 @@ public class UnisonAPI {
         } else {
             throw new IllegalArgumentException();
         }
-            
+
     }
 
-    public void listPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
+    public void updatePlaylist(long uid, long plid, JSONObject fields,
+            Handler<JsonStruct.PlaylistJS> handler) {
+        URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistJS.class)
+        .setAuth(mAuth).addParam("fields", fields).doPOST();
+    }
+
+    public void listUserPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/%d/playlists", uid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
                 .setAuth(mAuth).doGET();
     }
+    
+    public void listSharedPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
+        URL url = urlFor("/solo/playlists/shared");
+        //TODO
+        AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class).setAuth(mAuth).doGET();
+    }
+    
+    public void removePlaylist(long uid, long plid, Handler<JsonStruct.Success> handler) {
+        URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
+        .setAuth(mAuth).doDELETE();
+    }
+    
 
     // ---------------
     // TAGS
-    
-    public void listTags(long uid, Handler<JsonStruct.TagsList> handler) {
-        URL url = urlFor("/solo/tags", uid);
+
+    public void listTopTags(long uid, Handler<JsonStruct.TagsList> handler) {
+        URL url = urlFor("/solo/tags/top", uid);
         AsyncRequest.of(url, handler, JsonStruct.TagsList.class)
                 .setAuth(mAuth).doGET();
     }
@@ -337,7 +357,7 @@ public class UnisonAPI {
         }
     }
 
-    /** Corresponds to JSON error codes - synced with back-end. (not so much)*/
+    /** Corresponds to JSON error codes - synced with back-end. (not so much) */
     public static final class ErrorCodes {
         public static final int MISSING_FIELD = 1;
         public static final int EXISTING_USER = 2;

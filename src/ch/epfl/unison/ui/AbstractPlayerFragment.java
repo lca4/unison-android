@@ -1,8 +1,5 @@
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -30,6 +27,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -42,6 +40,9 @@ import ch.epfl.unison.music.MusicService;
 import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 
 import com.actionbarsherlock.app.SherlockFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fragment that is displayed inside {@link AbstractMainActivity} (one of the

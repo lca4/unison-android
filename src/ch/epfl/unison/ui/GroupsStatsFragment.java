@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 

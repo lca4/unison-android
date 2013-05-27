@@ -1,8 +1,8 @@
 package ch.epfl.unison.api;
 
-import java.net.URL;
-
 import android.os.AsyncTask;
+
+import java.net.URL;
 
 /**
  * Wraps a Request in an AsyncTask to allow non-blocking requests.

@@ -36,8 +36,8 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
 		// Set up Action Bar
 		mSupportActionBar = getSupportActionBar();
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mSupportActionBar.setDisplayHomeAsUpEnabled(true);
+		mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 	}
 	

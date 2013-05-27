@@ -8,8 +8,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import ch.epfl.unison.Const;
-
 /**
  * @author marc
  */
@@ -23,8 +21,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.LIBE_C_LOCAL_ID + " int UNIQUE, "
             + ConstDB.LIBE_C_ARTIST + " text, "
             + ConstDB.LIBE_C_TITLE + " text, "
-            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0" // used a boolean
-                                                          // value
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0"
             + ")";
 
     private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
@@ -32,8 +29,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + ConstDB.TAG_C_NAME + " text UNIQUE NOT NULL, "
             + ConstDB.TAG_C_REMOTE_ID + " bigint UNIQUE, "
-            + ConstDB.C_IS_CHECKED
-            + " tinyint DEFAULT 0" // used a boolean value
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0"
             + "); "
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.TAG_INDEX_NAME + " ON "
             + ConstDB.TAG_TABLE_NAME
@@ -60,6 +56,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1, "
             + ConstDB.PLYL_C_GS_USER_RATING + " tinyint, "
             + ConstDB.PLYL_C_GS_USER_COMMENT + " text "
+            + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0"
             + "); "
             // Create some indexes
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_LOCAL_ID + " ON "

@@ -39,7 +39,7 @@ public class NFCReceiveGroupActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nfc_receive_group);
+//        setContentView(R.layout.activity_nfc_receive_group);
         setupNFC();
     }
 

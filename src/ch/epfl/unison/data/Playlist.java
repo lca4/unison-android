@@ -1,15 +1,14 @@
 
 package ch.epfl.unison.data;
 
-import java.text.DateFormat;
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -21,10 +20,10 @@ public class Playlist {
     
     private static final String TAG = Playlist.class.getName();
 
-    private int mLocalId = 0; // Android sqlite
+    private long mLocalId = 0; // Android sqlite
     private Date mLocalLastUpdated;
-    private boolean mCreatedByGS;
-    private int mGSPLId; // GS database id
+    private boolean mCreatedByGS; // maybe useless
+    private long mGSPLId; // GS database id
     private String mTitle;
     private Date mCreated;
     private Date mLastUpdated;
@@ -38,12 +37,8 @@ public class Playlist {
     private double mAvgRating;
     private boolean mIsShared;
     private boolean mIsSynced;
-    private static DateFormat smDF = DateFormat.getInstance();
     
-    // private HashMap<SeedType, LinkedList<Long>> mRaw;
     private ArrayList<Integer> mRawTagsId;
-    // TODO mRawTracks
-//    private UnisonDB mDB;
     private HashMap<String, Object> mOptions;
     
     private LinkedList<MusicItem> mPlaylist;   
@@ -61,11 +56,11 @@ public class Playlist {
      * TODO complete
      */
     public static class Builder {
-        private int mLocalId; // Android sqlite
+        private long mLocalId; // Android sqlite
         private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
-        private int mGSPLId; // GS database id
+        private long mGSPLId; // GS database id
         private Date mCreated;
         private Date mLastUpdated;
         private int mAuthorId;
@@ -79,7 +74,7 @@ public class Playlist {
         private boolean mIsShared;
         private boolean mIsSynced;
         
-        public Builder localId(int id) {
+        public Builder localId(long id) {
             this.mLocalId = id;
             return this;
         }
@@ -131,7 +126,6 @@ public class Playlist {
          */
         public Builder created(String c) {
             try {
-//                this.mCreated = smDF.parse(c);
                 this.mCreated = Uutils.stringToDate(c);
             } catch (ParseException e) {
                 this.mCreated = null;
@@ -248,50 +242,6 @@ public class Playlist {
         mRawTagsId.addAll(seeds);
     }
 
-    /**
-     * Helper to convert a TypedArray to a String in JSONObject format. The
-     * TypedArray values are treated as Strings. Only the values with index from
-     * indexes are selected.
-     * 
-     * @param key
-     * @param values
-     * @param indexes
-     * @return null in case of failure
-     */
-//    @SuppressLint("NewApi")
-//    public JSONObject export(Resources res) {
-//
-//        if (mRawTagsId.isEmpty()) {
-//            return null;
-//        }
-//
-//        JSONObject json = new JSONObject();
-//
-//        // Tags
-//        JSONArray jsonArray = new JSONArray();
-//        for (int i = 0; i < mRawTagsId.size(); i++) {
-////            jsonArray.put(tags.getString(i));
-//            jsonArray.put(JSONObject.NULL);
-//        }
-//
-//        // Tracks
-//        // TODO
-//
-//        try {
-//            json.put(SeedType.TAGS.getLabel(), jsonArray);
-//            // json.put(SeedType.TRACKS.getLabel(), tracksInString);
-//            if (!mOptions.isEmpty()) {
-//                // TODO convert mOptions in json format
-//                Log.i(TAG, "There are options");
-//            }
-//            return json;
-//        } catch (JSONException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
 
     public String getTitle() {
         return mTitle;
@@ -314,7 +264,6 @@ public class Playlist {
     
     public void setLastUpdated(String lastUpdated) {
         try {
-//            this.mLastUpdated = smDF.parse(lastUpdated);
             this.mLastUpdated = Uutils.stringToDate(lastUpdated);
         } catch (ParseException e) {
             this.mLastUpdated = null;
@@ -324,7 +273,6 @@ public class Playlist {
     
     public void setCreated(String created) {
         try {
-//            this.mCreated = smDF.parse(created);
             this.mCreated = Uutils.stringToDate(created);
         } catch (ParseException e) {
             this.mCreated = null;
@@ -357,7 +305,7 @@ public class Playlist {
         return mIsShared;
     }
 
-    public void setLocalId(int localId) {
+    public void setLocalId(long localId) {
         this.mLocalId = localId;
     }
 
@@ -381,12 +329,12 @@ public class Playlist {
     }
 
 
-    public int getLocalId() {
+    public long getLocalId() {
         return mLocalId;
     }
 
 
-    public int getPLId() {
+    public long getPLId() {
         return mGSPLId;
     }
 
