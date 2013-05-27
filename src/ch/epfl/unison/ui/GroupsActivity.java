@@ -221,7 +221,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     		NdefMessage[] messages = (NdefMessage[]) intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
     		if (messages == null) {
     			//FIXME
-    			Toast.makeText(GroupsActivity.this, "fixne", Toast.LENGTH_LONG).show();
+    			Toast.makeText(GroupsActivity.this, "fixme", Toast.LENGTH_LONG).show();
     			
     		} else {
     			StringBuilder sb = new StringBuilder();
