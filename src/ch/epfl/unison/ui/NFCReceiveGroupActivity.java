@@ -22,7 +22,7 @@ import com.actionbarsherlock.app.SherlockActivity;
  * source: http://stackoverflow.com/questions/14222831/
  *              how-to-display-ndef-message-after-ndef-discovered-activity-launched
  */
-public class NFCRecieveGroupActivity extends SherlockActivity {
+public class NFCReceiveGroupActivity extends SherlockActivity {
 
 
 
@@ -39,7 +39,7 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nfc_recieve_group);
+        setContentView(R.layout.activity_nfc_receive_group);
         setupNFC();
     }
 
@@ -146,7 +146,7 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
                 .getSystemService(Context.NFC_SERVICE);
         mAdapter = manager.getDefaultAdapter();
         if (mAdapter == null) {
-           Toast.makeText(NFCRecieveGroupActivity.this, R.string.error_NFC_not_present,
+           Toast.makeText(NFCReceiveGroupActivity.this, R.string.error_NFC_not_present,
                     Toast.LENGTH_LONG).show();
            finish();
            return;
@@ -154,14 +154,14 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
         
         
         if (!mAdapter.isEnabled()) {
-            Toast.makeText(NFCRecieveGroupActivity.this, R.string.error_NFC_not_active,
+            Toast.makeText(NFCReceiveGroupActivity.this, R.string.error_NFC_not_active,
                     Toast.LENGTH_LONG).show();
 //            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
         } else {
             Log.d(TAG, "NFC is enabled!");
             mPe = PendingIntent.getActivity(
                     getApplicationContext(), 3, new Intent(this,
-                            NFCRecieveGroupActivity.class)
+                            NFCReceiveGroupActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             
             

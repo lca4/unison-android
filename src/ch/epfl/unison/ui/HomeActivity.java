@@ -67,7 +67,7 @@ public class HomeActivity extends AbstractFragmentActivity {
                 } else if (position == 2) {
                     startActivity(new Intent(HomeActivity.this, NFCSendGroupActivity.class));
                 } else if (position == 3) {
-                    startActivity(new Intent(HomeActivity.this, NFCRecieveGroupActivity.class));
+                    startActivity(new Intent(HomeActivity.this, NFCReceiveGroupActivity.class));
                 }
             }
 
