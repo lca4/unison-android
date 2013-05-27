@@ -308,7 +308,9 @@ public class GroupsHistoryActivity extends SherlockActivity {
            
             @Override
             public void onError(Error error) {
-                Log.d(TAG, error.toString());
+                if (error != null) {                    
+                    Log.d(TAG, error.toString());
+                }
                 if (GroupsHistoryActivity.this != null) {
                     
                     if (error.hasJsonError()

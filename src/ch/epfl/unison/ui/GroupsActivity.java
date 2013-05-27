@@ -367,7 +367,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             @Override
             public void onError(Error error) {
-                Log.d(TAG, error.toString());
+                if (error != null) {                    
+                    Log.d(TAG, error.toString());
+                }
             }
         });
     }
@@ -674,7 +676,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                     }
                     @Override
                     public void onError(Error error) {
-                        Log.d(TAG, error.toString());
+                        if (error != null) {                    
+                            Log.d(TAG, error.toString());
+                        }
                         if (GroupsActivity.this != null) {
                             Toast.makeText(GroupsActivity.this, R.string.error_creating_group,
                                     Toast.LENGTH_LONG).show();
@@ -724,7 +728,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             @Override
             public void onError(Error error) {
-                Log.d(TAG, error.toString());
+                if (error != null) {                    
+                    Log.d(TAG, error.toString());
+                }
                 if (GroupsActivity.this != null) {
                     Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
                             Toast.LENGTH_LONG).show();
@@ -837,7 +843,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 }
                 @Override
                 public void onError(Error error) {
-                    Log.d(TAG, error.toString());
+                    if (error != null) {                    
+                        Log.d(TAG, error.toString());
+                    }
                     if (GroupsActivity.this != null) {
                         Log.d(TAG, "recreateGroup() onError: we got an error from the server");
                         Toast.makeText(GroupsActivity.this, R.string.error_group_to_recreate,
