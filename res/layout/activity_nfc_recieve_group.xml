@@ -7,13 +7,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".NFCSendGroupActivity" >
+    tools:context=".NFCRecieveGroupActivity" >
 
-    <Button
-        android:gravity="center"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/NFC_send_button"
-        android:onClick="buttonClicked" />
+        android:text="@string/NFC_reciever_wait" />
 
 </LinearLayout>
