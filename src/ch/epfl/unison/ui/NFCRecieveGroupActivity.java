@@ -156,7 +156,7 @@ public class NFCRecieveGroupActivity extends SherlockActivity {
         if (!mAdapter.isEnabled()) {
             Toast.makeText(NFCRecieveGroupActivity.this, R.string.error_NFC_not_active,
                     Toast.LENGTH_LONG).show();
-            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+//            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
         } else {
             Log.d(TAG, "NFC is enabled!");
             mPe = PendingIntent.getActivity(

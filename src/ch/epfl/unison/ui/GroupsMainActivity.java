@@ -141,7 +141,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     	return new NdefMessage(records);
     }
     
-    private void sendGIDOverNFC() {
+    private void enableGIDOverNFC() {
     	if (mNfcAdapter != null && mGroup != null && mGroup.gid != null) {
     		mNfcAdapter.enableForegroundNdefPush(GroupsMainActivity.this, getNdefFromGID(mGroup.gid));
     	}
@@ -152,7 +152,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     	super.onPause();
     	
     	if (mNfcAdapter != null) {
-    		mNfcAdapter.disableForegroundDispatch(GroupsMainActivity.this);
+    		mNfcAdapter.disableForegroundNdefPush(GroupsMainActivity.this);
     	}
     }
     
@@ -160,7 +160,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     protected void onResume() {
     	super.onResume();
     	
-    	sendGIDOverNFC();
+    	enableGIDOverNFC();
     }
 	
 	@Override

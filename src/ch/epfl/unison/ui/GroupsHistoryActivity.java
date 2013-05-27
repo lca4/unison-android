@@ -316,6 +316,13 @@ public class GroupsHistoryActivity extends SherlockActivity {
                         //here the group no longer exists, the user needs to take an action:
                         //you may comment this line for testing purpose only!
                         data.removeOneHistoryItem(group.gid);
+                        
+                        mGroupsHistory.remove(group);
+                        
+                        mGroupsList.setAdapter(new GroupsAdapter());
+                        
+                        repaintRefresh(false);
+                        
                         showErrorPopup();
                         
                     } else {
