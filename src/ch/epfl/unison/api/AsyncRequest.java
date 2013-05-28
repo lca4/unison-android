@@ -33,6 +33,7 @@ public final class AsyncRequest<T extends JsonStruct>
     private AsyncRequest(URL url, UnisonAPI.Handler<T> handler, Class<T> classOfT) {
         mRequest = Request.of(url, classOfT);
         mHandler = handler;
+        mPostponeDelays = new HashMap<AsyncRequest.Method, Integer>();
     }
 
     public static <S extends JsonStruct> AsyncRequest<S> of(
