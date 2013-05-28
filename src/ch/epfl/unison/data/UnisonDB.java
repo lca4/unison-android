@@ -56,8 +56,8 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-        Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-        mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+//        Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+//        mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
                                                         // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
@@ -251,6 +251,7 @@ public class UnisonDB {
     private Playlist plylGetItem(int id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
+                        ConstDB.PLYL_C_LOCAL_ID,
                         ConstDB.PLYL_C_GS_SIZE,
                         ConstDB.PLYL_C_CREATED_BY_GS,
                         ConstDB.PLYL_C_GS_ID,

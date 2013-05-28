@@ -177,8 +177,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                                     .remove(info.position));
                                             Log.w(TAG, "Successfully removed playlist with id "
                                                     + struct.gsPlaylistId + " from user library");
-                                            refreshLocalPlaylists();
-                                            refreshRemotePlaylists();
+                                            refreshPlaylistsLocal();
+                                            refreshPlaylistsRemote();
                                         } else {
                                             Toast.makeText(
                                                     SoloPlaylistsActivity.this,
@@ -210,7 +210,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                 @Override
                                 public void callback(JsonStruct.Success struct) {
                                     mPlaylistsRemote.remove(info.position);
-                                    refreshRemotePlaylists();
+                                    refreshPlaylistsRemote();
                                 }
 
                                 @Override
@@ -253,8 +253,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             e.printStackTrace();
                         }
                         mPlaylistsLocal.add(mPlaylistsRemote.remove(info.position));
-                        refreshLocalPlaylists();
-                        refreshRemotePlaylists();
+                        refreshPlaylistsLocal();
+                        refreshPlaylistsRemote();
                     } else {
                         Toast.makeText(SoloPlaylistsActivity.this,
                                 R.string.error_solo_save_playlist,
@@ -694,24 +694,23 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 if (pl != null) {
                     pl.setTitle(cur.getString(colName));
                     mPlaylistsLocal.add(pl);
-                } else {
-                    // Put here non-GS playlists
                 }
+                // Non-GS playlists not shown
             } while (cur.moveToNext());
             cur.close();
         }
-        refreshLocalPlaylists();
+        refreshPlaylistsLocal();
     }
 
     /**
      * To be used to refresh the ListView when changes are made to ArraList.
      */
-    private void refreshLocalPlaylists() {
+    private void refreshPlaylistsLocal() {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }
 
-    private void refreshRemotePlaylists() {
+    private void refreshPlaylistsRemote() {
         SoloPlaylistsActivity.this.mPlaylistsRemoteListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
     }

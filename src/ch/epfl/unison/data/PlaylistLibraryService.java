@@ -24,12 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Android service that helps maintaining the back-end DB in sync with the actual
- * music on the device. It does so by keeping a local "copy" (as a SQLite DB) that
- * mirrors what's on the back-end DB. Whenever it sees that the local copy is out
- * of sync with the music on the device it sends updates to the server.
- *
- * @author lum
+ * 
+ * @author marc
  */
 public class PlaylistLibraryService extends AbstractService {
 
@@ -63,6 +59,9 @@ public class PlaylistLibraryService extends AbstractService {
         mDB.truncate(Playlist.class);
     }
 
+    /*
+     * Don't do it now.
+     */
     private void update() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // How many seconds elapsed since the last successful update ?

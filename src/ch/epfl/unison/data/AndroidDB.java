@@ -173,7 +173,7 @@ final class AndroidDB {
         Cursor cur = resolver.query(contentUri,
                 projection,
                 null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
-        if (cur != null) {
+        if (cur != null & cur.moveToFirst()) {
             LinkedList<MusicItem> mTracks = new LinkedList<MusicItem>();
             int colId = cur.getColumnIndex(MediaStore.Audio.Media._ID);
             int colTitle = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
