@@ -61,7 +61,7 @@ final class AndroidDB {
      * @param pl The playlist to store in android databse
      * @return local playlist id
      */
-    static int insert(ContentResolver cr, Playlist pl) {
+    static int insert(ContentResolver cr, PlaylistItem pl) {
         // Add the playlist to the android dabase
         ContentValues mValues = new ContentValues();
         mValues.put(MediaStore.Audio.Playlists.NAME, pl.getTitle());
@@ -95,7 +95,7 @@ final class AndroidDB {
      * @param playlistId
      * @param c
      */
-    private static void insertTracks(ContentResolver resolver, Playlist pl) {
+    private static void insertTracks(ContentResolver resolver, PlaylistItem pl) {
         ContentResolver mCR = resolver;
         ContentProviderClient mCRC = null;
         try {
@@ -135,7 +135,7 @@ final class AndroidDB {
         }
     }
 
-    static int delete(ContentResolver resolver, Playlist pl) {
+    static int delete(ContentResolver resolver, PlaylistItem pl) {
         int res = resolver.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 MediaStore.Audio.Playlists._ID + " = ? ", new String[] {
                     String.valueOf(pl.getLocalId())
@@ -157,7 +157,7 @@ final class AndroidDB {
      * @param resolver
      * @param pl
      */
-    static void getTracks(ContentResolver resolver, Playlist pl) {
+    static void getTracks(ContentResolver resolver, PlaylistItem pl) {
         String[] projection = new String[] {
                 // MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
                 MediaStore.Audio.Media._ID,
@@ -186,8 +186,8 @@ final class AndroidDB {
         }
     }
     
-    static Set<Playlist> getPlaylists(ContentResolver resolver) {
-        Set<Playlist> set = new HashSet<Playlist>();
+    static Set<PlaylistItem> getPlaylists(ContentResolver resolver) {
+        Set<PlaylistItem> set = new HashSet<PlaylistItem>();
         String[] columns = {
                 MediaStore.Audio.Playlists._ID,
                 MediaStore.Audio.Playlists.NAME,
@@ -204,7 +204,7 @@ final class AndroidDB {
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
             do {
-                Playlist pl = new Playlist.Builder().plId(cur.getLong(colId))
+                PlaylistItem pl = new PlaylistItem.Builder().plId(cur.getLong(colId))
                         .title(cur.getString(colName)).build();
                         
                 getTracks(resolver, pl);

@@ -8,8 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import ch.epfl.unison.Const.SeedType;
 
 import org.json.JSONArray;
@@ -115,7 +113,7 @@ public class UnisonDB {
             return getMusicItems();
         } else if (itemType == TagItem.class) {
             return getTagItems();
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             return getPlylItems();
         } else {
             // Unsupported type
@@ -123,7 +121,7 @@ public class UnisonDB {
         }
     }
 
-    private Set<Playlist> getPlylItems() {
+    private Set<PlaylistItem> getPlylItems() {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
                         ConstDB.PLYL_C_LOCAL_ID,
@@ -140,7 +138,7 @@ public class UnisonDB {
                         ConstDB.PLYL_C_GS_USER_RATING,
                         ConstDB.PLYL_C_GS_USER_COMMENT
                 });
-        Set<Playlist> set = new HashSet<Playlist>();
+        Set<PlaylistItem> set = new HashSet<PlaylistItem>();
         if (cur != null && cur.moveToFirst()) {
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
@@ -156,7 +154,7 @@ public class UnisonDB {
             int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
             int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
             do {
-                set.add(new Playlist.Builder().localId(cur.getInt(colLocalId))
+                set.add(new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
                         .size(cur.getInt(colGSSize))
                         .createdByGS(cur.getInt(colCreatedByGS) != 0)
                         .plId(cur.getInt(colGSId))
@@ -181,7 +179,7 @@ public class UnisonDB {
             table = ConstDB.LIBE_TABLE_NAME;
         } else if (itemType == TagItem.class) {
             table = ConstDB.TAG_TABLE_NAME;
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             table = ConstDB.PLAYLISTS_TABLE_NAME;
         } else {
             // Unsupported type
@@ -201,7 +199,7 @@ public class UnisonDB {
             libeTruncate();
         } else if (itemType == TagItem.class) {
             tagTruncate();
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             plylTruncate();
         } else {
             // Unsupported type
@@ -218,8 +216,8 @@ public class UnisonDB {
             return delete((MusicItem) item);
         } else if (item instanceof TagItem) {
             return delete((TagItem) item);
-        } else if (item instanceof Playlist) {
-            return delete((Playlist) item);
+        } else if (item instanceof PlaylistItem) {
+            return delete((PlaylistItem) item);
         } else {
             // Unsupported type
             throw new IllegalArgumentException();
@@ -231,7 +229,7 @@ public class UnisonDB {
      * @param itemId
      * @return if found, the object in type itemType; null else.
      */
-    public AbstractItem getItem(Class<?> itemType, int itemId) {
+    public AbstractItem getItem(Class<?> itemType, long itemId) {
         AbstractItem res = null;
         if (itemType == MusicItem.class) {
             // Not yet implemented
@@ -239,7 +237,7 @@ public class UnisonDB {
         } else if (itemType == TagItem.class) {
             // Not yet implemented
             res = null;
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             res = plylGetItem(itemId);
         } else {
             // Unsupported type
@@ -248,7 +246,7 @@ public class UnisonDB {
         return res;
     }
 
-    private Playlist plylGetItem(int id) {
+    private PlaylistItem plylGetItem(long id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
                         ConstDB.PLYL_C_LOCAL_ID,
@@ -267,7 +265,7 @@ public class UnisonDB {
                 }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
                     String.valueOf(id)
                 });
-        Playlist pl = null;
+        PlaylistItem pl = null;
         if (cur != null && cur.moveToFirst()) {
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
@@ -282,7 +280,7 @@ public class UnisonDB {
             int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
             int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
             int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
-            pl = new Playlist.Builder().localId(cur.getInt(colLocalId))
+            pl = new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
                     .size(cur.getInt(colGSSize))
                     .createdByGS(cur.getInt(colCreatedByGS) != 0)
                     .plId(cur.getInt(colGSId))
@@ -694,7 +692,7 @@ public class UnisonDB {
      * @param pl
      * @return local id
      */
-    public long insert(Playlist pl) {
+    public long insert(PlaylistItem pl) {
         openW();
         mDB.beginTransaction();
         try {
@@ -735,7 +733,7 @@ public class UnisonDB {
         return pl.getLocalId();
     }
 
-    private int delete(Playlist pl) {
+    private int delete(PlaylistItem pl) {
         int res = 0;
         if (pl.getLocalId() >= 0) {
             openW();

@@ -1,7 +1,7 @@
 
 package ch.epfl.unison.api;
 
-import ch.epfl.unison.data.Playlist;
+import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.TagItem;
 
 import java.io.Serializable;
@@ -153,9 +153,9 @@ public abstract class JsonStruct {
         public Integer gsUserRating;
         public String gsUserComment; // Not used for now
 
-        public Playlist toObject() {
+        public PlaylistItem toObject() {
             // TODO complete
-            return new Playlist.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
+            return new PlaylistItem.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
                     .size(gsSize).authorId(authorId).created(gsCreationTime).gsUpdated(gsUpdateTime)
                     .listeners(gsListeners).build();
         }
@@ -167,9 +167,9 @@ public abstract class JsonStruct {
 
         public PlaylistJS[] playlists;
 
-        public ArrayList<Playlist> toObject() {
+        public ArrayList<PlaylistItem> toObject() {
             if (playlists != null) {
-                ArrayList<Playlist> al = new ArrayList<Playlist>();
+                ArrayList<PlaylistItem> al = new ArrayList<PlaylistItem>();
                 for (int i = 0; i < playlists.length; i++) {
                     al.add(playlists[i].toObject());
                 }

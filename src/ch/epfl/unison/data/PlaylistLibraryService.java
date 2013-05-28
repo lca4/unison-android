@@ -56,7 +56,7 @@ public class PlaylistLibraryService extends AbstractService {
     private void truncate() {
         Log.d(TAG, "truncating the user playlist library");
         UnisonDB mDB = new UnisonDB(this);
-        mDB.truncate(Playlist.class);
+        mDB.truncate(PlaylistItem.class);
     }
 
     /*
@@ -71,7 +71,7 @@ public class PlaylistLibraryService extends AbstractService {
         if (!isUpdating() && interval > MIN_UPDATE_INTERVAL) {
             setIsUpdating(true);
             UnisonDB mDB = new UnisonDB(this);
-            if (mDB.isEmpty(Playlist.class)) {
+            if (mDB.isEmpty(PlaylistItem.class)) {
                 // If the DB is empty, just PUT all the tracks.
                 Log.d(TAG, "uploading all the playlists");
                 new Uploader().execute();
@@ -138,19 +138,19 @@ public class PlaylistLibraryService extends AbstractService {
 
         private List<JsonStruct.Delta> getDeltas(UnisonDB uDB) {
             // Setting up the expectations.
-            Set<Playlist> expectation = (Set<Playlist>) uDB.getEntries(Playlist.class);
+            Set<PlaylistItem> expectation = (Set<PlaylistItem>) uDB.getEntries(PlaylistItem.class);
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
 //            Set<Playlist> reality = getRealPlaylists();
-            Set<Playlist> reality = AndroidDB.getPlaylists(getContentResolver());
+            Set<PlaylistItem> reality = AndroidDB.getPlaylists(getContentResolver());
             Log.d(TAG, "number of TRUE music entries: " + reality.size());
 
             
             
             // Trying to reconcile everyone.
             List<JsonStruct.Delta> deltas = new ArrayList<JsonStruct.Delta>();
-            for (Playlist item : reality) {
+            for (PlaylistItem item : reality) {
                 if (!expectation.contains(item)) {
                     Log.d(TAG, "Adding playlist: " + item.getTitle());
 //                    deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,

@@ -34,6 +34,7 @@ public final class Const {
         public static final String CALLER = "caller";
         public static final String SONG_ARTIST_TITLE = "songat";
         public static final String GROUP_TO_CREATE_NAME = "gtcn";
+        public static final String URI = "uri";
 
         private Strings() {
         } // Non-instantiable.
