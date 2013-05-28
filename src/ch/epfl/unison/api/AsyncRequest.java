@@ -63,6 +63,12 @@ public final class AsyncRequest<T extends JsonStruct>
 
     @Override
     protected Request.Result<T> doInBackground(Method... method) {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         switch(method[0]) {
         case GET:
             return mRequest.doGET();

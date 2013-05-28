@@ -23,6 +23,7 @@
     <string name="activity_title_home">GroupStreamer</string>
     <string name="title_activity_nfcrecieve_group">Join Group Using NFC</string>
     <string name="title_activity_nfcsend_group">Share Group Using NFC</string>
+    <string name="title_activity_nfc_management">NfcManagementActivity</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
@@ -218,6 +219,6 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_solo_remove_playlist_from_gs_server">Unable to remove the playlist from the server.</string>
     <string name="error_not_yet_available">Sorry, this is not yet available&#8230;</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_nfc_management">NfcManagementActivity</string>
+    <string name="error_creating_suggestion_popup">There was an error while trying to suggest a group.</string>
 
 </resources>
