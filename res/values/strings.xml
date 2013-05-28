@@ -59,6 +59,12 @@
     <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
     <string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
     <string name="login_menu_signup">Sign Up</string>
+    
+    <!-- Home -->
+    <string name="home_button_groups">Groups</string>
+    <string name="home_button_groups_desc">Enter the groups mode</string>
+    <string name="home_button_solo">Single-user mode</string>
+    <string name="home_button_solo_desc">Enter the single-user mode</string>
 
 
     <!-- Groups -->
