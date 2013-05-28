@@ -1,8 +1,10 @@
 package ch.epfl.unison.api;
 
 import android.os.AsyncTask;
+import android.widget.SlidingDrawer;
 
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Wraps a Request in an AsyncTask to allow non-blocking requests.
@@ -15,6 +17,9 @@ public final class AsyncRequest<T extends JsonStruct>
 
     private Request<T> mRequest;
     private UnisonAPI.Handler<T> mHandler;
+    
+    private final int POSTPONE_DELAY = 3000;
+    private HashMap<Method, Integer> mPostponeDelays;
 
     /** Types of HTTP requests. */
     public static enum Method {
@@ -60,6 +65,11 @@ public final class AsyncRequest<T extends JsonStruct>
     public void doDELETE() {
         execute(Method.DELETE);
     }
+    
+    public void doDELETE(boolean postpone) {
+        mPostponeDelays.put(Method.DELETE, POSTPONE_DELAY);
+        doDELETE();
+    }
 
     @Override
     protected Request.Result<T> doInBackground(Method... method) {
@@ -71,6 +81,13 @@ public final class AsyncRequest<T extends JsonStruct>
         case PUT:
             return mRequest.doPUT();
         case DELETE:
+            if (mPostponeDelays.containsKey(Method.DELETE)) {
+                try {
+                    wait(mPostponeDelays.get(Method.DELETE));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             return mRequest.doDELETE();
         default:
             return null;  // Should never happen.
