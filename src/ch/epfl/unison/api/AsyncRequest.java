@@ -1,7 +1,6 @@
 package ch.epfl.unison.api;
 
 import android.os.AsyncTask;
-import android.widget.SlidingDrawer;
 
 import java.net.URL;
 import java.util.HashMap;

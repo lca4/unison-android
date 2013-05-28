@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
-import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
@@ -15,34 +14,37 @@ import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
- * player and information about the group (through fragments).
+ * player and information about the playlist (through fragments).
  * 
  * @see AbstractMainActivity
- * @author lum
+ * @author mbourqui
  */
 public class SoloMainActivity extends AbstractMainActivity {
 
     /** Simple interface to be notified about playlist info updates. */
     public interface OnPlaylistInfoListener {
-        void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+//        void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+
+        void onPlaylistInfo(PlaylistItem playlistInfo);
     }
 
     private static final String TAG = "ch.epfl.unison.SoloMainActivity";
 
     private UnisonDB mDB;
-    private PlaylistItem playlist;
+    private PlaylistItem mPlaylist;
 //    private List<MusicItem> mHistory;
 
     private Set<OnPlaylistInfoListener> mListeners = new HashSet<OnPlaylistInfoListener>();
 
-    public void dispatchPlaylistInfo(JsonStruct.PlaylistJS playlistInfo) {
+    public void dispatchPlaylistInfo(PlaylistItem playlistInfo) {
         for (OnPlaylistInfoListener listener : mListeners) {
+//            listener.onPlaylistInfo(playlistInfo);
             listener.onPlaylistInfo(playlistInfo);
         }
     }
 
     protected void handleExtras(Bundle extras) {
-        if (extras == null || !extras.containsKey(Const.Strings.PLID)) {
+        if (extras == null || !extras.containsKey(Const.Strings.LOCAL_ID)) {
             // Should never happen. If it does, redirect the user to the
             // playlists list.
             startActivity(new Intent(this, SoloPlaylistsActivity.class));
@@ -51,8 +53,8 @@ public class SoloMainActivity extends AbstractMainActivity {
             if (extras.containsKey(Const.Strings.TITLE)) {
                 setTitle(extras.getString(Const.Strings.TITLE));
             }
-            playlist = (PlaylistItem) mDB.getItem(PlaylistItem.class,
-                    extras.getLong(Const.Strings.PLID));
+            mPlaylist = (PlaylistItem) mDB.getItem(PlaylistItem.class,
+                    extras.getLong(Const.Strings.LOCAL_ID));
         }
     }
 
@@ -67,6 +69,7 @@ public class SoloMainActivity extends AbstractMainActivity {
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),
                 SoloTracksFragment.class, null);
+        
     }
 
     @Override
@@ -84,6 +87,10 @@ public class SoloMainActivity extends AbstractMainActivity {
 
     public void unregisterPlaylistInfoListener(OnPlaylistInfoListener listener) {
         mListeners.remove(listener);
+    }
+    
+    protected PlaylistItem getPlaylist() {
+        return mPlaylist;
     }
 
 }

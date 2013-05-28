@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -17,8 +18,13 @@ import java.util.LinkedList;
  * @author marc
  */
 public class PlaylistItem extends AbstractItem {
-    
+
     private static final String TAG = PlaylistItem.class.getName();
+
+    /** How is the playlist played. */
+    private enum Mode {
+        Linear, Circular, LoopOnTrack, Shuffle
+    }
 
     private long mLocalId = 0; // Android sqlite
     private Date mLocalLastUpdated;
@@ -32,35 +38,35 @@ public class PlaylistItem extends AbstractItem {
     private int mAuthorId;
     private String mAuthorName;
     private int mGSSize;
-    private LinkedList<MusicItem> mTracks; 
+    private LinkedList<MusicItem> mTracks;
     private int mUserRating;
     private String mUserComment;
     private int mListeners;
     private double mAvgRating;
     private boolean mIsShared;
     private boolean mIsSynced;
-    
+
     private ArrayList<Integer> mRawTagsId;
     private HashMap<String, Object> mOptions;
-    
-    private LinkedList<MusicItem> mPlaylist;   
+
+    // private LinkedList<MusicItem> mPlaylist;
+    private int mCurrent = 0;
+    private Mode mMode = Mode.Linear;
+    private HashSet<Integer> mShuffled; // To store played tracks (avoid duplicates)
 
     public PlaylistItem() {
         mRawTagsId = new ArrayList<Integer>();
         mTracks = new LinkedList<MusicItem>();
         mOptions = new HashMap<String, Object>();
     }
-    
+
     public PlaylistItem(long localId, String name) {
         mLocalId = localId;
         mTitle = name;
     }
-    
+
     /**
-     * 
-     * @author marc
-     *
-     * TODO complete
+     * @author marc TODO complete
      */
     public static class Builder {
         private long mLocalId; // Android sqlite
@@ -74,61 +80,60 @@ public class PlaylistItem extends AbstractItem {
         private int mAuthorId;
         private String mAuthorName; // Not yet available
         private int mSize;
-        private LinkedList<MusicItem> mTracks; 
+        private LinkedList<MusicItem> mTracks;
         private int mUserRating;
         private String mUserComment;
         private int mListeners;
         private double mAvgRating;
         private boolean mIsShared;
         private boolean mIsSynced;
-        
+
         public Builder localId(long id) {
             this.mLocalId = id;
             return this;
         }
-        
+
         public Builder locaUpdated(Date d) {
             this.mLocalLastUpdated = d;
             return this;
         }
-        
+
         public Builder localUpdated(String s) {
             try {
-              this.mLocalLastUpdated = Uutils.stringToDate(s);
-          } catch (ParseException e) {
-              this.mLocalLastUpdated = null;
-              e.printStackTrace();
-          }
+                this.mLocalLastUpdated = Uutils.stringToDate(s);
+            } catch (ParseException e) {
+                this.mLocalLastUpdated = null;
+                e.printStackTrace();
+            }
             return this;
         }
-        
+
         public Builder createdByGS(boolean b) {
             this.mCreatedByGS = b;
             return this;
         }
-        
+
         public Builder plId(long id) {
             this.mGSPLId = id;
             return this;
         }
-        
+
         public Builder avgRating(double avgRating) {
             this.mAvgRating = avgRating;
             return this;
         }
-        
+
         public Builder title(String t) {
             this.mTitle = t;
             return this;
         }
-        
+
         public Builder created(Date c) {
             this.mGSCreated = c;
             return this;
         }
-        
+
         /**
-         * 
          * @param c datetime in ISO format
          * @return
          */
@@ -141,15 +146,13 @@ public class PlaylistItem extends AbstractItem {
             }
             return this;
         }
-        
-        
+
         public Builder updated(Date c) {
             this.mGSUpdated = c;
             return this;
         }
-        
+
         /**
-         * 
          * @param u datetime in ISO format
          * @return
          */
@@ -162,12 +165,12 @@ public class PlaylistItem extends AbstractItem {
             }
             return this;
         }
-        
+
         public Builder modBuilder(Date d) {
             this.mDateModified = d;
             return this;
         }
-        
+
         public Builder modified(String u) {
             try {
                 this.mDateModified = Uutils.stringToDate(u);
@@ -177,27 +180,27 @@ public class PlaylistItem extends AbstractItem {
             }
             return this;
         }
-        
+
         public Builder authorId(int id) {
             this.mAuthorId = id;
             return this;
         }
-        
+
         public Builder authorName(String name) {
             this.mAuthorName = name;
             return this;
         }
-        
+
         public Builder size(int i) {
             this.mSize = i;
             return this;
         }
-        
+
         public Builder tracks(LinkedList<MusicItem> ll) {
             this.mTracks = ll;
             return this;
         }
-        
+
         public Builder tracks(Track[] t) {
             LinkedList<MusicItem> ll = new LinkedList<MusicItem>();
             if (t != null) {
@@ -208,27 +211,27 @@ public class PlaylistItem extends AbstractItem {
             this.mTracks = ll;
             return this;
         }
-        
+
         public Builder listeners(int i) {
             this.mListeners = i;
             return this;
         }
-        
+
         public Builder isShared(boolean isShared) {
             this.mIsShared = isShared;
             return this;
         }
-        
+
         public Builder isSynced(boolean isSynced) {
             this.mIsSynced = isSynced;
             return this;
         }
-        
+
         public Builder userRating(int userRating) {
             this.mUserRating = userRating;
             return this;
         }
-        
+
         public Builder userComment(String userComment) {
             this.mUserComment = userComment;
             return this;
@@ -238,7 +241,7 @@ public class PlaylistItem extends AbstractItem {
             return new PlaylistItem(this);
         }
     }
-    
+
     private PlaylistItem(Builder builder) {
         this.mLocalId = builder.mLocalId;
         this.mLocalLastUpdated = builder.mLocalLastUpdated;
@@ -258,33 +261,86 @@ public class PlaylistItem extends AbstractItem {
         this.mIsShared = builder.mIsShared;
         this.mIsSynced = builder.mIsSynced;
     }
-    
+
+    public boolean hasNext() {
+        if (mCurrent < mTracks.size() - 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public MusicItem next() {
+        // TODO Add shuffle support
+        if (mMode != Mode.LoopOnTrack) {
+            if (hasNext()) {
+                mCurrent++;
+            } else {
+                if (mMode == Mode.Circular) {
+                    mCurrent = 0;
+                } else {
+                    throw new IndexOutOfBoundsException();
+                }
+            }
+        }
+        return mTracks.get(mCurrent);
+    }
+
+    public MusicItem current() {
+        if (mCurrent >= 0 && mTracks.size() > 0) {
+            return mTracks.get(mCurrent);
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    public boolean hasPrevious() {
+        if (mCurrent >= 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public MusicItem previous() {
+        // TODO Add shuffle support
+        if (mMode != Mode.LoopOnTrack) {
+            if (hasPrevious()) {
+                mCurrent--;
+            } else {
+                if (mMode == Mode.Circular) {
+                    mCurrent = mTracks.size();
+                } else {
+                    throw new IndexOutOfBoundsException();
+                }
+            }
+        }
+        return mTracks.get(mCurrent);
+    }
 
     @Deprecated
     public void addRawTags(ArrayList<Integer> seeds) {
         mRawTagsId.addAll(seeds);
     }
 
-
     public String getTitle() {
         return mTitle;
     }
-
 
     public void setTitle(String title) {
         this.mTitle = title;
     }
 
+    public void setTracks(LinkedList<MusicItem> tracks) {
+        this.mTracks = tracks;
+    }
 
     public String getLastUpdated() {
         return mGSLastUpdated.toString();
     }
 
-
     public void setLastUpdated(Date lastUpdated) {
         this.mGSLastUpdated = lastUpdated;
     }
-    
+
     public void setLastUpdated(String lastUpdated) {
         try {
             this.mGSLastUpdated = Uutils.stringToDate(lastUpdated);
@@ -293,7 +349,7 @@ public class PlaylistItem extends AbstractItem {
             e.printStackTrace();
         }
     }
-    
+
     public void setCreated(String created) {
         try {
             this.mGSCreated = Uutils.stringToDate(created);
@@ -303,26 +359,21 @@ public class PlaylistItem extends AbstractItem {
         }
     }
 
-
     public int getUserRating() {
         return mUserRating;
     }
-
 
     public void setUserRating(int userRating) {
         this.mUserRating = userRating;
     }
 
-
     public String getUserComment() {
         return mUserComment;
     }
 
-
     public void setUserComment(String userComment) {
         this.mUserComment = userComment;
     }
-
 
     public boolean isIsShared() {
         return mIsShared;
@@ -336,76 +387,61 @@ public class PlaylistItem extends AbstractItem {
         this.mIsShared = isShared;
     }
 
-
     public boolean isIsSynced() {
         return mIsSynced;
     }
-
 
     public void setIsSynced(boolean isSynced) {
         this.mIsSynced = isSynced;
     }
 
-
     public void setRawTagsId(ArrayList<Integer> rawTagsId) {
         this.mRawTagsId = rawTagsId;
     }
-
 
     public long getLocalId() {
         return mLocalId;
     }
 
-
     public long getPLId() {
         return mGSPLId;
     }
-
 
     public String getCreationTime() {
         return mGSCreated.toString();
     }
 
-
     public int getAuthorId() {
         return mAuthorId;
     }
-
 
     public String getAuthorName() {
         return mAuthorName;
     }
 
-
     public int getSize() {
         return mGSSize;
     }
-
 
     public LinkedList<MusicItem> getTracks() {
         return mTracks;
     }
 
-
     public int getListeners() {
         return mListeners;
     }
-
 
     public double getAvgRating() {
         return mAvgRating;
     }
 
-
     public HashMap<String, Object> getOptions() {
         return mOptions;
     }
 
-
     public LinkedList<MusicItem> getPlaylist() {
-        return mPlaylist;
+        return mTracks;
     }
-
 
     @Override
     public int compareTo(AbstractItem another) {

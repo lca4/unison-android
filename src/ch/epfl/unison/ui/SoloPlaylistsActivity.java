@@ -596,11 +596,14 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            SoloPlaylistsActivity.this.startActivity(
-                    new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
-                        .putExtra(Const.Strings.PLID, ((PlaylistItem) view.getTag()).getPLId())
-                        .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle())
-                        );
+            //TODO on click, display list of tracks
+//            SoloPlaylistsActivity.this.startActivity(
+//                    new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
+//                            .putExtra(Const.Strings.LOCAL_ID,
+//                                    ((PlaylistItem) view.getTag()).getLocalId())
+//                            .putExtra(Const.Strings.TITLE,
+//                                    ((PlaylistItem) view.getTag()).getTitle())
+//                    );
             // .putExtra(Const.Strings.PLID,
             // view.getTag());
             // UnisonAPI api =
@@ -645,9 +648,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
             // Give tracks to player here
             SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
-                    SoloMainActivity.class).putExtra(Const.Strings.PLID,
-                    ((PlaylistItem) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
-                    ((PlaylistItem) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
+                    SoloMainActivity.class)
+                    .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
+                    .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
+            // .putExtra(Const.Strings.PLID,
             // view.getTag());
             // UnisonAPI api =
             // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();

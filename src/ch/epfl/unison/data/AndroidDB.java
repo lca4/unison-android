@@ -1,7 +1,6 @@
 
 package ch.epfl.unison.data;
 
-import android.R.menu;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -170,6 +169,7 @@ final class AndroidDB {
         };
         Uri contentUri = MediaStore.Audio.Playlists.Members
                 .getContentUri("external", pl.getLocalId()).buildUpon().build();
+        // Sort the tracks by play_order
         Cursor cur = resolver.query(contentUri,
                 projection,
                 null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
@@ -183,6 +183,8 @@ final class AndroidDB {
                 mTracks.add(new MusicItem(cur.getInt(colId), cur.getString(colArtist),
                         cur.getString(colTitle), cur.getInt(colPlayOrder)));
             } while (cur.moveToNext());
+            pl.setTracks(mTracks);
+            cur.close();
         }
     }
     

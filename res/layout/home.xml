@@ -4,6 +4,8 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <!-- Alignment of buttons: http://stackoverflow.com/questions/2614936/how-to-center-buttons-on-screen-horizontally-and-vertically-plus-equidistant-apa -->
+    
     <ImageButton
         android:id="@+id/home_button_groups"
         android:contentDescription="@string/home_button_groups_desc"

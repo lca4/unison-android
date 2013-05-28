@@ -24,6 +24,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.PlaylistItem;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -222,7 +223,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     
 	
 	public void displayPasswordDialog() {
-	       if (getDJ()) {
+	       if (isDJ()) {
 	           AlertDialog.Builder builder = new AlertDialog.Builder(GroupsMainActivity.this);
 	           builder.setTitle(R.string.main_set_password_title);
 	           LayoutInflater layoutInflater = (LayoutInflater) 
@@ -272,5 +273,10 @@ public class GroupsMainActivity extends AbstractMainActivity {
 	           dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
 	       }
 	    }
+
+    @Override
+    protected PlaylistItem getPlaylist() {
+        return null;
+    }
 
 }

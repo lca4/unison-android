@@ -2,24 +2,18 @@ package ch.epfl.unison.data;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
-import ch.epfl.unison.LibraryHelper;
-import ch.epfl.unison.Const.PrefKeys;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

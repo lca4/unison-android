@@ -71,7 +71,7 @@ public abstract class AbstractMenu {
                 break;
             case R.id.menu_item_manage_group:
                 if (activity instanceof GroupsMainActivity
-                        && ((GroupsMainActivity) activity).getDJ()) {
+                        && ((GroupsMainActivity) activity).isDJ()) {
                     // TODO is it a problem if we call this here?
                     ((GroupsMainActivity) activity).displayPasswordDialog();
                 }

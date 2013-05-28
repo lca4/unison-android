@@ -14,9 +14,9 @@ import android.widget.RatingBar;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
-import ch.epfl.unison.api.JsonStruct.PlaylistJS;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.PlaylistItem;
 
 /**
  * Specialized Fragment for {@link SoloMainFragment}.
@@ -156,7 +156,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
 	}
 
 	@Override
-	public void onPlaylistInfo(PlaylistJS playlistInfo) {
+	public void onPlaylistInfo(PlaylistItem playlistInfo) {
 		// TODO Auto-generated method stub
 	}
 
