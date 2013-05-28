@@ -272,7 +272,7 @@ public class UnisonAPI {
             Handler<JsonStruct.PlaylistJS> handler) {
         URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
         AsyncRequest.of(url, handler, JsonStruct.PlaylistJS.class)
-        .setAuth(mAuth).addParam("fields", fields).doPOST();
+                .setAuth(mAuth).addParam("fields", fields).doPOST();
     }
 
     public void listUserPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
@@ -280,19 +280,18 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class)
                 .setAuth(mAuth).doGET();
     }
-    
+
     public void listSharedPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/playlists/shared");
-        //TODO
+        // TODO
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class).setAuth(mAuth).doGET();
     }
-    
+
     public void removePlaylist(long uid, long plid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
-        .setAuth(mAuth).doDELETE();
+                .setAuth(mAuth).doDELETE();
     }
-    
 
     // ---------------
     // TAGS
@@ -364,6 +363,18 @@ public class UnisonAPI {
         public static final int INVALID_EMAIL = 4;
         public static final int INVALID_PASSWORD = 5;
         public static final int INVALID_GROUP = 6;
+        public static final int INVALID_TRACK = 0x07;
+        public static final int INVALID_LIBENTRY = 0x08;
+        public static final int INVALID_DELTA = 0x09;
+        public static final int UNAUTHORIZED = 0x0a;
+        public static final int TRACKS_DEPLETED = 0x0b;
+        public static final int MASTER_TAKEN = 0x0c;
+        public static final int NO_CURRENT_TRACK = 0x0d;
+        // Added by Vincent:
+        public static final int MISSING_CLUSTER = 0x0e;
+        public static final int FORBIDDEN = 0x0f;
+        // Added by Marc:
+        public static final int IS_EMPTY = 32;
     }
 
 }

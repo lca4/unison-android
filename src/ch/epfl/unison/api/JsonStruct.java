@@ -156,7 +156,7 @@ public abstract class JsonStruct {
         public Playlist toObject() {
             // TODO complete
             return new Playlist.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
-                    .size(gsSize).authorId(authorId).created(gsCreationTime).updated(gsUpdateTime)
+                    .size(gsSize).authorId(authorId).created(gsCreationTime).gsUpdated(gsUpdateTime)
                     .listeners(gsListeners).build();
         }
 

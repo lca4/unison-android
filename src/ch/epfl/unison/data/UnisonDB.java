@@ -8,8 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import ch.epfl.unison.Const.SeedType;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -158,7 +161,7 @@ public class UnisonDB {
                         .createdByGS(cur.getInt(colCreatedByGS) != 0)
                         .plId(cur.getInt(colGSId))
                         .created(cur.getString(colGSCreationTime))
-                        .updated(cur.getString(colGSUpdateTime))
+                        .gsUpdated(cur.getString(colGSUpdateTime))
                         .authorId(cur.getInt(colGSAuthorId))
                         .authorName(cur.getString(colGSAuthorName))
                         .avgRating(cur.getDouble(colGSAvgRating))
@@ -223,13 +226,19 @@ public class UnisonDB {
         }
     }
 
-    public Object getItem(Class<?> itemType, int itemId) {
-        String table = null;
-        Object res = null;
+    /**
+     * @param itemType
+     * @param itemId
+     * @return if found, the object in type itemType; null else.
+     */
+    public AbstractItem getItem(Class<?> itemType, int itemId) {
+        AbstractItem res = null;
         if (itemType == MusicItem.class) {
-            table = ConstDB.LIBE_TABLE_NAME;
+            // Not yet implemented
+            res = null;
         } else if (itemType == TagItem.class) {
-            table = ConstDB.TAG_TABLE_NAME;
+            // Not yet implemented
+            res = null;
         } else if (itemType == Playlist.class) {
             res = plylGetItem(itemId);
         } else {
@@ -277,7 +286,7 @@ public class UnisonDB {
                     .createdByGS(cur.getInt(colCreatedByGS) != 0)
                     .plId(cur.getInt(colGSId))
                     .created(cur.getString(colGSCreationTime))
-                    .updated(cur.getString(colGSUpdateTime))
+                    .gsUpdated(cur.getString(colGSUpdateTime))
                     .authorId(cur.getInt(colGSAuthorId))
                     .authorName(cur.getString(colGSAuthorName))
                     .avgRating(cur.getDouble(colGSAvgRating))
@@ -631,7 +640,14 @@ public class UnisonDB {
                     int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
                     do {
                         try {
-                            json.accumulate(key.getLabel(), cur.getString(colName));
+                            // Ugly trick to get around missing json.append in
+                            // android API
+                            if (json.has(key.getLabel())) {
+                                json.accumulate(key.getLabel(), cur.getString(colName));
+                            } else {
+                                json.put(key.getLabel(),
+                                        new JSONArray().put(cur.getString(colName)));
+                            }
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }
@@ -645,7 +661,14 @@ public class UnisonDB {
                         try {
                             track.put("title", cur.getString(colTitle));
                             track.put("artist", cur.getString(colArtist));
-                            json.accumulate(key.getLabel(), track.toString());
+                            // Ugly trick to get around missing json.append in
+                            // android API
+                            if (json.has(key.getLabel())) {
+                                json.accumulate(key.getLabel(), track.toString());
+                            } else {
+                                json.put(key.getLabel(),
+                                        new JSONArray().put(track.toString()));
+                            }
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }
@@ -662,9 +685,10 @@ public class UnisonDB {
 
     /**
      * Adds the playlist to the android sqlite DB and to the GS in-app DB.<br />
-     * The insertions in the databases are made in an atomic way. If a failure occurs when trying 
-     * to insert the playlist in either the Android or GS in-app database, changes done until 
-     * failure are rolled back as if nothing happened. 
+     * The insertions in the databases are made in an atomic way. If a failure
+     * occurs when trying to insert the playlist in either the Android or GS
+     * in-app database, changes done until failure are rolled back as if nothing
+     * happened.
      * 
      * @param pl
      * @return local id

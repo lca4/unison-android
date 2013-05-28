@@ -191,6 +191,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                     @Override
                                     public void onError(UnisonAPI.Error error) {
                                         Log.d(TAG, error.toString());
+                                        Toast.makeText(
+                                                SoloPlaylistsActivity.this,
+                                                R.string
+                                                .error_solo_remove_playlist_from_local_dbs,
+                                                Toast.LENGTH_LONG).show();
                                     }
                                 });
                     } catch (JSONException e) {
@@ -636,6 +641,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            // Give tracks to player here
             SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
                     SoloMainActivity.class).putExtra(Const.Strings.PLID,
                     ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
@@ -687,6 +693,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                 Playlist pl = (Playlist) mDB.getItem(Playlist.class, cur.getInt(colId));
                 if (pl != null) {
                     pl.setTitle(cur.getString(colName));
+                    mPlaylistsLocal.add(pl);
+                } else {
+                    // Put here non-GS playlists
                 }
             } while (cur.moveToNext());
             cur.close();

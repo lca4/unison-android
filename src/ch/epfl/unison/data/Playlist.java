@@ -16,7 +16,7 @@ import java.util.LinkedList;
  * 
  * @author marc
  */
-public class Playlist {
+public class Playlist extends AbstractItem {
     
     private static final String TAG = Playlist.class.getName();
 
@@ -25,11 +25,13 @@ public class Playlist {
     private boolean mCreatedByGS; // maybe useless
     private long mGSPLId; // GS database id
     private String mTitle;
-    private Date mCreated;
-    private Date mLastUpdated;
+    private Date mGSCreated;
+    private Date mGSLastUpdated;
+    private Date mDateCreated; // unused for now
+    private Date mDateModified; // from android
     private int mAuthorId;
     private String mAuthorName;
-    private int mSize;
+    private int mGSSize;
     private LinkedList<MusicItem> mTracks; 
     private int mUserRating;
     private String mUserComment;
@@ -49,6 +51,11 @@ public class Playlist {
         mOptions = new HashMap<String, Object>();
     }
     
+    public Playlist(long localId, String name) {
+        mLocalId = localId;
+        mTitle = name;
+    }
+    
     /**
      * 
      * @author marc
@@ -61,8 +68,9 @@ public class Playlist {
         private String mTitle;
         private boolean mCreatedByGS;
         private long mGSPLId; // GS database id
-        private Date mCreated;
-        private Date mLastUpdated;
+        private Date mGSCreated;
+        private Date mGSUpdated;
+        private Date mDateModified;
         private int mAuthorId;
         private String mAuthorName; // Not yet available
         private int mSize;
@@ -99,7 +107,7 @@ public class Playlist {
             return this;
         }
         
-        public Builder plId(int id) {
+        public Builder plId(long id) {
             this.mGSPLId = id;
             return this;
         }
@@ -115,7 +123,7 @@ public class Playlist {
         }
         
         public Builder created(Date c) {
-            this.mCreated = c;
+            this.mGSCreated = c;
             return this;
         }
         
@@ -126,9 +134,9 @@ public class Playlist {
          */
         public Builder created(String c) {
             try {
-                this.mCreated = Uutils.stringToDate(c);
+                this.mGSCreated = Uutils.stringToDate(c);
             } catch (ParseException e) {
-                this.mCreated = null;
+                this.mGSCreated = null;
                 e.printStackTrace();
             }
             return this;
@@ -136,7 +144,7 @@ public class Playlist {
         
         
         public Builder updated(Date c) {
-            this.mLastUpdated = c;
+            this.mGSUpdated = c;
             return this;
         }
         
@@ -145,11 +153,26 @@ public class Playlist {
          * @param u datetime in ISO format
          * @return
          */
-        public Builder updated(String u) {
+        public Builder gsUpdated(String u) {
             try {
-                this.mLastUpdated = Uutils.stringToDate(u);
+                this.mGSUpdated = Uutils.stringToDate(u);
             } catch (ParseException e) {
-                this.mCreated = null;
+                this.mGSCreated = null;
+                e.printStackTrace();
+            }
+            return this;
+        }
+        
+        public Builder modBuilder(Date d) {
+            this.mDateModified = d;
+            return this;
+        }
+        
+        public Builder modified(String u) {
+            try {
+                this.mDateModified = Uutils.stringToDate(u);
+            } catch (ParseException e) {
+                this.mDateModified = null;
                 e.printStackTrace();
             }
             return this;
@@ -222,11 +245,11 @@ public class Playlist {
         this.mCreatedByGS = builder.mCreatedByGS;
         this.mGSPLId = builder.mGSPLId;
         this.mTitle = builder.mTitle;
-        this.mCreated = builder.mCreated;
-        this.mLastUpdated = builder.mLastUpdated;
+        this.mGSCreated = builder.mGSCreated;
+        this.mGSLastUpdated = builder.mGSUpdated;
         this.mAuthorId = builder.mAuthorId;
         this.mAuthorName = builder.mAuthorName;
-        this.mSize = builder.mSize;
+        this.mGSSize = builder.mSize;
         this.mTracks = builder.mTracks;
         this.mUserRating = builder.mUserRating;
         this.mUserComment = builder.mUserComment;
@@ -254,28 +277,28 @@ public class Playlist {
 
 
     public String getLastUpdated() {
-        return mLastUpdated.toString();
+        return mGSLastUpdated.toString();
     }
 
 
     public void setLastUpdated(Date lastUpdated) {
-        this.mLastUpdated = lastUpdated;
+        this.mGSLastUpdated = lastUpdated;
     }
     
     public void setLastUpdated(String lastUpdated) {
         try {
-            this.mLastUpdated = Uutils.stringToDate(lastUpdated);
+            this.mGSLastUpdated = Uutils.stringToDate(lastUpdated);
         } catch (ParseException e) {
-            this.mLastUpdated = null;
+            this.mGSLastUpdated = null;
             e.printStackTrace();
         }
     }
     
     public void setCreated(String created) {
         try {
-            this.mCreated = Uutils.stringToDate(created);
+            this.mGSCreated = Uutils.stringToDate(created);
         } catch (ParseException e) {
-            this.mCreated = null;
+            this.mGSCreated = null;
             e.printStackTrace();
         }
     }
@@ -340,7 +363,7 @@ public class Playlist {
 
 
     public String getCreationTime() {
-        return mCreated.toString();
+        return mGSCreated.toString();
     }
 
 
@@ -355,7 +378,7 @@ public class Playlist {
 
 
     public int getSize() {
-        return mSize;
+        return mGSSize;
     }
 
 
@@ -381,6 +404,13 @@ public class Playlist {
 
     public LinkedList<MusicItem> getPlaylist() {
         return mPlaylist;
+    }
+
+
+    @Override
+    public int compareTo(AbstractItem another) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

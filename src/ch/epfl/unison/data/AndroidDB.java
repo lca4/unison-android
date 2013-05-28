@@ -1,6 +1,7 @@
 
 package ch.epfl.unison.data;
 
+import android.R.menu;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -13,8 +14,10 @@ import android.util.Log;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Utility to handle interactions with Original code from MarkG on <a
@@ -181,6 +184,35 @@ final class AndroidDB {
                         cur.getString(colTitle), cur.getInt(colPlayOrder)));
             } while (cur.moveToNext());
         }
+    }
+    
+    static Set<Playlist> getPlaylists(ContentResolver resolver) {
+        Set<Playlist> set = new HashSet<Playlist>();
+        String[] columns = {
+                MediaStore.Audio.Playlists._ID,
+                MediaStore.Audio.Playlists.NAME,
+                MediaStore.Audio.Playlists.DATE_MODIFIED
+        };
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Cursor cur = resolver.query(uri, columns,
+//                MediaStore.Audio.Playlists.CONTENT_TYPE + " = vnd.android.cursor.dir/playlist",
+                null,
+                null, null);
+
+        if (cur != null && cur.moveToFirst()) {
+            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+            int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
+            do {
+                Playlist pl = new Playlist.Builder().plId(cur.getLong(colId))
+                        .title(cur.getString(colName)).build();
+                        
+                getTracks(resolver, pl);
+                set.add(pl);
+            } while (cur.moveToNext());
+            cur.close();
+        }
+        return set;
     }
 
 }

@@ -6,7 +6,7 @@ package ch.epfl.unison.data;
  *
  * @author lum
  */
-public class MusicItem implements Comparable<MusicItem> {
+public class MusicItem extends AbstractItem {
 
     public final int localId;
     public final String artist;
@@ -76,21 +76,26 @@ public class MusicItem implements Comparable<MusicItem> {
     }
 
     @Override
-    public int compareTo(MusicItem another) {
-        int artistComp = artist.compareTo(another.artist);
-        if (artistComp != 0) {
-            return artistComp;
+    public int compareTo(AbstractItem another) {
+        if (another instanceof TagItem) {
+            MusicItem musicItem = (MusicItem) another;
+            int artistComp = artist.compareTo(musicItem.artist);
+            if (artistComp != 0) {
+                return artistComp;
+            }
+            int titleComp = title.compareTo(musicItem.title);
+            if (titleComp != 0) {
+                return titleComp;
+            }
+            if (localId < musicItem.localId) {
+                return -1;
+            } else if (localId > musicItem.localId) {
+                return 1;
+            }
+            return 0;
+        } else {
+            throw new IllegalArgumentException();
         }
-        int titleComp = title.compareTo(another.title);
-        if (titleComp != 0) {
-            return titleComp;
-        }
-        if (localId < another.localId) {
-            return -1;
-        } else if (localId > another.localId) {
-            return 1;
-        }
-        return 0;
     }
 
 }

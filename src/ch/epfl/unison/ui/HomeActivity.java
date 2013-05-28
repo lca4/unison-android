@@ -29,7 +29,9 @@ import java.util.List;
  * @author marc bourqui
  */
 public class HomeActivity extends AbstractFragmentActivity {
-//extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener {
+/*
+ * TODO remove ListView and replace with buttons
+ */
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
