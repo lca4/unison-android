@@ -122,13 +122,14 @@ public class GroupsMainActivity extends AbstractMainActivity {
     	
     	if (mNfcAdapter == null) {
     		//FIXME
-    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+//    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
     		return;
     	}
     	
     	if (!mNfcAdapter.isEnabled()) {
     		//FIXME
-    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+//    		Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+    		return;
     	}
     	
     	Log.d(TAG, "NFC is enabled");
@@ -252,8 +253,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     };
     
-    private void sendPassword(String pw) {
-        AppData data = AppData.getInstance(GroupsMainActivity.this);
+    private void sendPassword(final String pw) {
+        final AppData data = AppData.getInstance(GroupsMainActivity.this);
         UnisonAPI api = data.getAPI();
         
         api.setGroupPassword(mGroup.gid, pw, 
@@ -266,6 +267,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
                             R.string.main_success_setting_password,
                             Toast.LENGTH_LONG).show();
                 }
+
+                mGroup.password = !pw.equals(""); 
+                data.addToHistory(mGroup);
             }
 
             @Override

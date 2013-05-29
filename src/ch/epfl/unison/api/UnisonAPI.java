@@ -364,6 +364,8 @@ public class UnisonAPI {
         public static final int INVALID_EMAIL = 4;
         public static final int INVALID_PASSWORD = 5;
         public static final int INVALID_GROUP = 6;
+        public static final int GROUP_JOIN_FORBIDDEN = 15;
+        public static final int PASSWORD_EXPECTED = 16;
     }
 
 }
