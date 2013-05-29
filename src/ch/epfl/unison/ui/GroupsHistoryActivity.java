@@ -53,12 +53,12 @@ import java.util.Map;
 public class GroupsHistoryActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.GroupHistoryActivity";
-    private Menu mMenu;
+//    private Menu mMenu;
     private List<JsonStruct.Group> mGroupsHistory = null;
     private ListView mGroupsList;
     private JsonStruct.Group mGroupClicked = null;
     private boolean mAlreadyInGroup = false;
-    private AlertDialog mGroupNoLongerExistsDialog;
+//    private AlertDialog mGroupNoLongerExistsDialog;
 
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
@@ -101,7 +101,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
         try {
             mGroupsList.setAdapter(new GroupsAdapter());
-            repaintRefresh(false);
         } catch (NullPointerException e) {
             Log.w(TAG, "group or activity is null?", e);
         }
@@ -186,31 +185,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
         }
     }
 
-//	@Override
-//	public void onRefresh() {
-//		repaintRefresh(true);
-//		//No server comm for now.
-//	}
-	
-	 public void repaintRefresh(boolean isRefreshing) {
-	        if (mMenu == null) {
-	            return;
-	        }
-
-        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-        if (refreshItem != null) {
-            if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(
-                        R.layout.actionbar_indeterminate_progress, null);
-                refreshItem.setActionView(refreshView);
-            } else {
-                refreshItem.setActionView(null);
-            }
-        }
-    }
-
     /**
      * When clicking on a group, send a request to the server and start
      * MainActivity.
@@ -250,11 +224,20 @@ public class GroupsHistoryActivity extends SherlockActivity {
 //                        }
 //                    };
 
-            if (mGroupClicked.password) {
+            /*if (mGroupClicked.password) {
                 promptForPassword(mGroupClicked);
             } else {
                 joinGroup(mGroupClicked, null);
+            }*/
+            Intent intent = new Intent(GroupsHistoryActivity.this, GroupsActivity.class)
+                .putExtra(Const.Strings.GROUP, mGroupClicked)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            if (mAlreadyInGroup) {
+                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY_LEAVE_GROUP);
+            } else {
+                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY);
             }
+            startActivity(intent);
         }
     }
 
@@ -286,7 +269,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
 //        });
 //    }
     
-    private void joinGroup(final JsonStruct.Group group, String password) {
+    /*private void joinGroup(final JsonStruct.Group group, String password) {
         final AppData data = AppData.getInstance(GroupsHistoryActivity.this);
         UnisonAPI api = data.getAPI();
         long uid = data.getUid();
@@ -322,9 +305,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
                         mGroupsHistory.remove(group);
                         
                         mGroupsList.setAdapter(new GroupsAdapter());
-                        
-                        repaintRefresh(false);
-                        
+                                                
                         showErrorPopup();
                         
                     } else {
@@ -349,10 +330,10 @@ public class GroupsHistoryActivity extends SherlockActivity {
             api.joinGroup(uid, group.gid, handler);
 //            }
         }
-    }
+    }*/
     
     
-    private void showErrorPopup() {
+    /*private void showErrorPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(GroupsHistoryActivity.this);
         builder.setTitle(R.string.group_no_longer_exists_dialog_title);
         LayoutInflater layoutInflater = (LayoutInflater) 
@@ -390,11 +371,10 @@ public class GroupsHistoryActivity extends SherlockActivity {
         finish();
     }
     public void errorDialogCancelPressed(View view) {
-//        repaintRefresh(false);
         mGroupNoLongerExistsDialog.dismiss();
-    }
+    }*/
     
-    private void promptForPassword(final JsonStruct.Group group) {
+    /*private void promptForPassword(final JsonStruct.Group group) {
         if (group.password) {
             AlertDialog.Builder builder = new AlertDialog.Builder(GroupsHistoryActivity.this);
             builder.setTitle(R.string.groups_password_dialog_title);
@@ -445,7 +425,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
             dialog.show();
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
         }
-    }
+    }*/
     
     public void clearHistory(View view) {
         AppData data = AppData.getInstance(GroupsHistoryActivity.this);
@@ -464,7 +444,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
             
             mGroupsList.setAdapter(new GroupsAdapter());
             
-            repaintRefresh(false);
         }
     }
     
