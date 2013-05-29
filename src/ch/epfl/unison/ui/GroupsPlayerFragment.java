@@ -13,7 +13,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
