@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.data;
 
 import java.util.ArrayList;
@@ -17,14 +18,14 @@ import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 
 /**
- * 
  * @author marc
  */
 public class PlaylistLibraryService extends AbstractService {
 
     private static final String TAG = "ch.epfl.unison.PlaylistLibraryService";
-    private static final int MIN_UPDATE_INTERVAL = 60 * 60 * 10;  // In seconds.
-    private static final long MILLIS_IN_S = 1000L;  // Number of milliseconds in a second.
+    private static final int MIN_UPDATE_INTERVAL = 60 * 60 * 10; // In seconds.
+    private static final long MILLIS_IN_S = 1000L; // Number of milliseconds in
+                                                   // a second.
 
     public static final String ACTION_UPDATE = "ch.epfl.unison.action.UPDATE";
     public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
@@ -78,8 +79,8 @@ public class PlaylistLibraryService extends AbstractService {
     }
 
     /**
-     * Abstract base class for synchronization tasks (either "truncate and upload"
-     * or "update some deltas").
+     * Abstract base class for synchronization tasks (either
+     * "truncate and upload" or "update some deltas").
      */
     private abstract class LibraryTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -96,36 +97,39 @@ public class PlaylistLibraryService extends AbstractService {
             }
         }
 
-//        public Set<Playlist> getRealPlaylists() {
-//            Set<Playlist> set = new HashSet<Playlist>();
-//            String[] columns = {
-//                    MediaStore.Audio.Playlists._ID,
-//                    MediaStore.Audio.Playlists.NAME
-//            };
-//            Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-//            Cursor cur = PlaylistLibraryService.this.getContentResolver().query(uri, columns,
-////                    MediaStore.Audio.Playlists.CONTENT_TYPE + " = vnd.android.cursor.dir/playlist",
-//                    null,
-//                    null, null);
-//
-//            if (cur != null && cur.moveToFirst()) {
-//                int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
-//                int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
-//                do {
-//                    Playlist pl = new Playlist(cur.getInt(colId),
-//                            cur.getString(colName));
-//                    AndroidDB.getTracks(getContentResolver(), pl);
-//                    set.add(pl);
-//                } while (cur.moveToNext());
-//                cur.close();
-//            }
-//            return set;
-//        }
+        // public Set<Playlist> getRealPlaylists() {
+        // Set<Playlist> set = new HashSet<Playlist>();
+        // String[] columns = {
+        // MediaStore.Audio.Playlists._ID,
+        // MediaStore.Audio.Playlists.NAME
+        // };
+        // Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        // Cursor cur =
+        // PlaylistLibraryService.this.getContentResolver().query(uri, columns,
+        // // MediaStore.Audio.Playlists.CONTENT_TYPE +
+        // " = vnd.android.cursor.dir/playlist",
+        // null,
+        // null, null);
+        //
+        // if (cur != null && cur.moveToFirst()) {
+        // int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+        // int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+        // do {
+        // Playlist pl = new Playlist(cur.getInt(colId),
+        // cur.getString(colName));
+        // AndroidDB.getTracks(getContentResolver(), pl);
+        // set.add(pl);
+        // } while (cur.moveToNext());
+        // cur.close();
+        // }
+        // return set;
+        // }
     }
 
     /**
-     * If the local DB is already populated, we only send deltas to the server (i.e.
-     * a list of tracks that were added and a list of tracks that were removed).
+     * If the local DB is already populated, we only send deltas to the server
+     * (i.e. a list of tracks that were added and a list of tracks that were
+     * removed).
      */
     private class Updater extends LibraryTask {
 
@@ -135,28 +139,27 @@ public class PlaylistLibraryService extends AbstractService {
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
-//            Set<Playlist> reality = getRealPlaylists();
+            // Set<Playlist> reality = getRealPlaylists();
             Set<PlaylistItem> reality = AndroidDB.getPlaylists(getContentResolver());
             Log.d(TAG, "number of TRUE music entries: " + reality.size());
 
-            
-            
             // Trying to reconcile everyone.
             List<JsonStruct.Delta> deltas = new ArrayList<JsonStruct.Delta>();
             for (PlaylistItem item : reality) {
                 if (!expectation.contains(item)) {
                     Log.d(TAG, "Adding playlist: " + item.getTitle());
-//                    deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,
-//                            item.localId, item.artist, item.title));  // Add item.
+                    // deltas.add(new
+                    // JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,
+                    // item.localId, item.artist, item.title)); // Add item.
                 }
             }
-//            for (MusicItem item : expectation) {
-//                if (!reality.contains(item)) {
-//                    Log.d(TAG, "Removing track: " + item.title);
-//                    deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_DELETE,
-//                            item.localId, item.artist, item.title));  // Delete item.
-//                }
-//            }
+            // for (MusicItem item : expectation) {
+            // if (!reality.contains(item)) {
+            // Log.d(TAG, "Removing track: " + item.title);
+            // deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_DELETE,
+            // item.localId, item.artist, item.title)); // Delete item.
+            // }
+            // }
             Log.d(TAG, "number of deltas: " + deltas.size());
             return deltas;
         }
@@ -180,36 +183,37 @@ public class PlaylistLibraryService extends AbstractService {
                 return false;
             }
 
-//            // "Commiting" the changes locally.
-//            for (JsonStruct.Delta delta : deltas) {
-//                MusicItem item = new MusicItem(
-//                        delta.entry.localId, delta.entry.artist, delta.entry.title);
-//                if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
-//                    helper.insert(item);
-//                } else {  // TYPE_DELETE.
-//                    helper.delete(item);
-//                }
-//            }
+            // // "Commiting" the changes locally.
+            // for (JsonStruct.Delta delta : deltas) {
+            // MusicItem item = new MusicItem(
+            // delta.entry.localId, delta.entry.artist, delta.entry.title);
+            // if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
+            // helper.insert(item);
+            // } else { // TYPE_DELETE.
+            // helper.delete(item);
+            // }
+            // }
 
             return true;
         }
     }
 
     /**
-     * If it's the first time that the application is used (i.e. the local DB doesn't exist
-     * yet) we simply "upload" all the music on the server (which will then invalidate any
-     * library entries previously valid for the user).
+     * If it's the first time that the application is used (i.e. the local DB
+     * doesn't exist yet) we simply "upload" all the music on the server (which
+     * will then invalidate any library entries previously valid for the user).
      */
     private class Uploader extends LibraryTask {
 
         @Override
         protected Boolean doInBackground(Void... params) {
             List<JsonStruct.Track> tracks = new ArrayList<JsonStruct.Track>();
-//            Iterable<Playlist> playlist = getRealPlaylists();
+            // Iterable<Playlist> playlist = getRealPlaylists();
 
-//            for (Playlist item : playlist) {
-////                tracks.add(new JsonStruct.Track(item.localId, item.artist, item.title));
-//            }
+            // for (Playlist item : playlist) {
+            // // tracks.add(new JsonStruct.Track(item.localId, item.artist,
+            // item.title));
+            // }
 
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
@@ -225,11 +229,12 @@ public class PlaylistLibraryService extends AbstractService {
                 return false;
             }
 
-//            // Store the music in the library.
-//            LibraryHelper helper = new LibraryHelper(PlaylistLibraryService.this);
-//            for (MusicItem item : music) {
-//                helper.insert(item);
-//            }
+            // // Store the music in the library.
+            // LibraryHelper helper = new
+            // LibraryHelper(PlaylistLibraryService.this);
+            // for (MusicItem item : music) {
+            // helper.insert(item);
+            // }
 
             return true;
         }

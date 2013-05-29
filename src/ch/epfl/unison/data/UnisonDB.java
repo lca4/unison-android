@@ -53,9 +53,9 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-//        Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-//        mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
-                                                        // production app!
+        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+        // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
     }

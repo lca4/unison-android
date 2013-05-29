@@ -47,7 +47,8 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT 0, "
             + ConstDB.PLYL_C_GS_ID + " bigint, "
-            + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check type!
+            + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check
+                                                              // type!
             + ConstDB.PLYL_C_GS_UPDATE_TIME + " datetime, " // TODO check type!
             + ConstDB.PLYL_C_GS_AUTHOR_ID + " bigint, "
             + ConstDB.PLYL_C_GS_AUTHOR_NAME + " text, "

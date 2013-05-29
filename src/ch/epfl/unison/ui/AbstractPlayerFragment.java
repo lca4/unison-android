@@ -525,9 +525,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                     // Internal error occured
                     Log.i(getTag(), "prev: internal error : playlist is null.");
                 } catch (IndexOutOfBoundsException ioobe) {
-                    //TODO Else, display error message
-                    Log.i(getTag(), "prev: no track found to play.");                    
-                }  
+                    // TODO Else, display error message
+                    Log.i(getTag(), "prev: no track found to play.");
+                }
                 break;
             default:
                 break;

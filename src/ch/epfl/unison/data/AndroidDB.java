@@ -147,10 +147,11 @@ final class AndroidDB {
     }
 
     /**
-     * Inspiration found on
-     * <a href=http://stackoverflow.com/questions/7774384/get-next-previous
-     * -song-from-android-playlist>http://stackoverflow.com/questions/7774384/get-next-previous
-     * -song-from-android-playlist</a>.
+     * Inspiration found on <a
+     * href=http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from
+     * -android-playlist>http://stackoverflow.com/questions/7774384/get
+     * -next-previous -song-from-android-playlist</a>.
      * 
      * @param resolver
      * @param pl
@@ -186,7 +187,7 @@ final class AndroidDB {
             cur.close();
         }
     }
-    
+
     static Set<PlaylistItem> getPlaylists(ContentResolver resolver) {
         Set<PlaylistItem> set = new HashSet<PlaylistItem>();
         String[] columns = {
@@ -196,7 +197,8 @@ final class AndroidDB {
         };
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         Cursor cur = resolver.query(uri, columns,
-//                MediaStore.Audio.Playlists.CONTENT_TYPE + " = vnd.android.cursor.dir/playlist",
+                // MediaStore.Audio.Playlists.CONTENT_TYPE +
+                // " = vnd.android.cursor.dir/playlist",
                 null,
                 null, null);
 
@@ -207,7 +209,7 @@ final class AndroidDB {
             do {
                 PlaylistItem pl = new PlaylistItem.Builder().plId(cur.getLong(colId))
                         .title(cur.getString(colName)).build();
-                        
+
                 getTracks(resolver, pl);
                 set.add(pl);
             } while (cur.moveToNext());

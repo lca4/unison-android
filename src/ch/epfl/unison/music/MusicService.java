@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.music;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import ch.epfl.unison.ui.GroupsMainActivity;
  * Music player service. Inspired by the Android SDK's sample application,
  * RandomMusicPlayer. We're taking some shortcuts with respect to the sample
  * application, for example, we don't handle remote controls, etc.
- *
+ * 
  * @author lum
  */
 public class MusicService extends Service
@@ -54,24 +55,27 @@ public class MusicService extends Service
 
     /** State of the the audio player. */
     private enum State {
-        Stopped,   // Media player is stopped.
+        Stopped, // Media player is stopped.
         Preparing, // Media player is preparing
-        Playing,   // Currently playing.
-        Paused,    // Paused by user.
+        Playing, // Currently playing.
+        Paused, // Paused by user.
     }
+
     private State mState = State.Stopped;
 
     /** State of the audio focus. */
     private enum AudioFocus {
-        NoFocusNoDuck,  // We don't have the focus and can't duck.
+        NoFocusNoDuck, // We don't have the focus and can't duck.
         NoFocusCanDuck, // We don't have the focus but can duck.
-        Focused,        // We have the focus. Yay!
+        Focused, // We have the focus. Yay!
     }
+
     private AudioFocus mFocus = AudioFocus.NoFocusNoDuck;
 
-    private String mTrackBeingPlayed = "Group Streamer"; //should always be updated before displayed
+    private String mTrackBeingPlayed = "Group Streamer"; // should always be
+                                                         // updated before
+                                                         // displayed
 
-    
     @Override
     public void onCreate() {
         mFocusHelper = new AudioFocusHelper(getApplicationContext(), this);
@@ -92,9 +96,9 @@ public class MusicService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) {
         CharSequence cs = intent.getCharSequenceExtra(Const.Strings.SONG_ARTIST_TITLE);
         if (cs != null) {
-           mTrackBeingPlayed = cs.toString(); 
+            mTrackBeingPlayed = cs.toString();
         }
-        
+
         String action = intent.getAction();
         if (action.equals(ACTION_TOGGLE_PLAYBACK)) {
             toggle();
@@ -137,8 +141,8 @@ public class MusicService extends Service
             // Calls OnPreparedListener when ready.
             mMediaPlayer.prepareAsync();
 
-            //setUpAsForeground("Unison"); // TODO Change notification text.
-            setUpAsForeground(mTrackBeingPlayed); 
+            // setUpAsForeground("Unison"); // TODO Change notification text.
+            setUpAsForeground(mTrackBeingPlayed);
         } catch (IOException ioe) {
             Log.e(TAG, "Couldn't load resource.");
         }
@@ -147,7 +151,7 @@ public class MusicService extends Service
     private void play() {
         if (mState == State.Paused) {
             tryToGetAudioFocus();
-//            setUpAsForeground("Unison"); // TODO Change notification text
+            // setUpAsForeground("Unison"); // TODO Change notification text
             setUpAsForeground(mTrackBeingPlayed);
             mState = State.Playing;
             configAndStartMediaPlayer();
@@ -184,7 +188,8 @@ public class MusicService extends Service
             return;
         }
         mMediaPlayer = new MediaPlayer();
-        // This means that the screen can go off, but the CPU has to stay running.
+        // This means that the screen can go off, but the CPU has to stay
+        // running.
         mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         // Various events we need to handle.
         mMediaPlayer.setOnPreparedListener(this);
@@ -193,7 +198,8 @@ public class MusicService extends Service
     }
 
     /**
-     * Reconfigures MediaPlayer according to audio focus settings and starts/restarts it.
+     * Reconfigures MediaPlayer according to audio focus settings and
+     * starts/restarts it.
      */
     void configAndStartMediaPlayer() {
         Log.d(TAG, "duration = " + mMediaPlayer.getDuration());
@@ -224,16 +230,16 @@ public class MusicService extends Service
         mNotification.tickerText = text;
         mNotification.icon = R.drawable.ic_media_play;
         mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
-        mNotification.setLatestEventInfo(context,  context.getString(R.string.app_name),
+        mNotification.setLatestEventInfo(context, context.getString(R.string.app_name),
                 text, pi);
         startForeground(NOTIFICATION_ID, mNotification);
     }
 
     /**
      * Releases resources used by the service for playback.
-     *
-     * @param releaseMediaPlayer Indicates whether the Media Player should
-     *     also be released or not.
+     * 
+     * @param releaseMediaPlayer Indicates whether the Media Player should also
+     *            be released or not.
      */
     void relaxResources(boolean releaseMediaPlayer) {
         stopForeground(true);
@@ -304,7 +310,7 @@ public class MusicService extends Service
     public class MusicServiceBinder extends Binder {
         public int getCurrentPosition() {
             if (mMediaPlayer != null) {
-                return  mMediaPlayer.getCurrentPosition();
+                return mMediaPlayer.getCurrentPosition();
             }
             return -1;
         }
@@ -315,6 +321,7 @@ public class MusicService extends Service
                 mMediaPlayer.seekTo(newPos);
             }
         }
+
         public int getDuration() {
             if (mMediaPlayer != null) {
                 return mMediaPlayer.getDuration();

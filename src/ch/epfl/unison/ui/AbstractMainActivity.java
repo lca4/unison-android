@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.os.Bundle;
@@ -7,49 +8,46 @@ import ch.epfl.unison.data.PlaylistItem;
 import com.actionbarsherlock.app.ActionBar;
 
 /**
- * To be used when using a player fragment.
- * Provides some default behaviors.
+ * To be used when using a player fragment. Provides some default behaviors.
  * 
  * @see AbstractFragmentActivity
- * 
  * @author marc
- * 
  */
 public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
-	private static final String TAG = "ch.epfl.unison.UnisonMainActivity";
+    private static final String TAG = "ch.epfl.unison.UnisonMainActivity";
 
-	private ActionBar mSupportActionBar;
-	
-	private boolean mIsDj = false;
+    private ActionBar mSupportActionBar;
 
-	protected ActionBar getSupportActBar() {
-		return mSupportActionBar;
-	}
+    private boolean mIsDj = false;
 
-	protected abstract void handleExtras(Bundle extras);
-	
-	protected abstract PlaylistItem getPlaylist();
+    protected ActionBar getSupportActBar() {
+        return mSupportActionBar;
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		handleExtras(getIntent().getExtras());
+    protected abstract void handleExtras(Bundle extras);
 
-		// Set up Action Bar
-		mSupportActionBar = getSupportActionBar();
-		mSupportActionBar.setDisplayHomeAsUpEnabled(true);
-		mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    protected abstract PlaylistItem getPlaylist();
 
-	}
-	
-	public void setDJ(boolean dj) {
-		mIsDj = dj;
-		getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj);
-	}
-	
-	public boolean isDJ() {
-		return mIsDj;
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        handleExtras(getIntent().getExtras());
+
+        // Set up Action Bar
+        mSupportActionBar = getSupportActionBar();
+        mSupportActionBar.setDisplayHomeAsUpEnabled(true);
+        mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+    }
+
+    public void setDJ(boolean dj) {
+        mIsDj = dj;
+        getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj);
+    }
+
+    public boolean isDJ() {
+        return mIsDj;
+    }
 
 }

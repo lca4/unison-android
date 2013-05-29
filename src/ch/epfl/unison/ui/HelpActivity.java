@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.os.Bundle;
@@ -8,7 +9,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 
 /**
  * Simple activity consisting of a WebView displaying the help.
- *
+ * 
  * @author lum
  */
 public class HelpActivity extends SherlockActivity {

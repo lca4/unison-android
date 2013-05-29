@@ -1,9 +1,10 @@
+
 package ch.epfl.unison.data;
 
 /**
- * Simple POJO used to store, compare and process a track. It is represented
- * by a local ID that allows to play the file, an artist and a title.
- *
+ * Simple POJO used to store, compare and process a track. It is represented by
+ * a local ID that allows to play the file, an artist and a title.
+ * 
  * @author lum
  */
 public class MusicItem extends AbstractItem {

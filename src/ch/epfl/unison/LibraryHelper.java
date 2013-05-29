@@ -1,3 +1,4 @@
+
 package ch.epfl.unison;
 
 import java.util.HashSet;
@@ -14,11 +15,9 @@ import ch.epfl.unison.data.UnisonDB;
 
 /**
  * @deprecated use {@link UnisonDB} instead.<br />
- * 
- * Helper class for accessing / managing the music library. Note: we are talking
- * about the one *that GroupStreamer owns*, not the Android content provider which
- * gives access to the music files.
- *
+ *             Helper class for accessing / managing the music library. Note: we
+ *             are talking about the one *that GroupStreamer owns*, not the
+ *             Android content provider which gives access to the music files.
  * @author lum
  */
 public class LibraryHelper {
@@ -47,7 +46,9 @@ public class LibraryHelper {
     public Set<MusicItem> getEntries() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(TABLE_NAME,
-                new String[] { C_LOCAL_ID, C_ARTIST, C_TITLE },
+                new String[] {
+                        C_LOCAL_ID, C_ARTIST, C_TITLE
+                },
                 null, null, null, null, null);
         Set<MusicItem> set = new HashSet<MusicItem>();
         if (cur != null && cur.moveToFirst()) {
@@ -67,7 +68,9 @@ public class LibraryHelper {
     public boolean isEmpty() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(TABLE_NAME,
-                new String[] { C_LOCAL_ID, C_ARTIST, C_TITLE },
+                new String[] {
+                        C_LOCAL_ID, C_ARTIST, C_TITLE
+                },
                 null, null, null, null, null);
         boolean isEmpty = !cur.moveToFirst();
         cur.close();
@@ -89,17 +92,23 @@ public class LibraryHelper {
     public void delete(MusicItem item) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, WHERE_ALL,
-                new String[] { String.valueOf(item.localId), item.artist, item.title});
+                new String[] {
+                        String.valueOf(item.localId), item.artist, item.title
+                });
         db.close();
     }
 
     public boolean exists(MusicItem item) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME,
-                new String[] { C_LOCAL_ID },
+                new String[] {
+                    C_LOCAL_ID
+                },
                 WHERE_ALL,
-                new String[] { String.valueOf(item.localId), item.artist, item.title},
-                null, null, null, "1");  // LIMIT 1
+                new String[] {
+                        String.valueOf(item.localId), item.artist, item.title
+                },
+                null, null, null, "1"); // LIMIT 1
         boolean exists = c.moveToFirst();
         c.close();
         db.close();
@@ -117,9 +126,9 @@ public class LibraryHelper {
     }
 
     /**
-     * Simple SQLiteOpenHelper implementation that takes care of initializing the
-     * database on installation and app updates.
-     *
+     * Simple SQLiteOpenHelper implementation that takes care of initializing
+     * the database on installation and app updates.
+     * 
      * @author lum
      */
     private static class OpenHelper extends SQLiteOpenHelper {

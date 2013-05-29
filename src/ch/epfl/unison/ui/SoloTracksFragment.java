@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -15,11 +16,11 @@ import ch.epfl.unison.data.PlaylistItem;
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
  * the list of the tracks of the playlist.
- *
+ * 
  * @author mbourqui
  */
-public class SoloTracksFragment extends AbstractListFragment 
-    implements SoloMainActivity.OnPlaylistInfoListener {
+public class SoloTracksFragment extends AbstractListFragment
+        implements SoloMainActivity.OnPlaylistInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
@@ -68,11 +69,11 @@ public class SoloTracksFragment extends AbstractListFragment
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
             ((TextView) view.findViewById(R.id.trackTitle)).setText(getItem(position).title);
-//            int rating = 0;
-//            if (getItem(position).rating != null) {
-//                rating = getItem(position).rating;
-//            }
-//            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+            // int rating = 0;
+            // if (getItem(position).rating != null) {
+            // rating = getItem(position).rating;
+            // }
+            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
 
             return view;
         }

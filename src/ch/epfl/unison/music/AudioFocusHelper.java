@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.music;
 
 import android.content.Context;
@@ -6,9 +7,8 @@ import android.media.AudioManager;
 /**
  * Small helper class that deals with audio focus. Inspired by the Android SDK's
  * sample application, RandomMusicPlayer.
- *
+ * 
  * @author lum
- *
  */
 public class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener {
 
@@ -38,18 +38,18 @@ public class AudioFocusHelper implements AudioManager.OnAudioFocusChangeListener
         }
 
         switch (focusChange) {
-        case AudioManager.AUDIOFOCUS_GAIN:
-            mMusicService.onGainedAudioFocus();
-            break;
-        case AudioManager.AUDIOFOCUS_LOSS:
-        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-            mMusicService.onLostAudioFocus(false);
-            break;
-        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-            mMusicService.onLostAudioFocus(true);
-            break;
-        default:  // Should never happen.
-            break;
+            case AudioManager.AUDIOFOCUS_GAIN:
+                mMusicService.onGainedAudioFocus();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                mMusicService.onLostAudioFocus(false);
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                mMusicService.onLostAudioFocus(true);
+                break;
+            default: // Should never happen.
+                break;
         }
 
     }

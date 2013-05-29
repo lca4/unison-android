@@ -25,25 +25,24 @@ public class HomeActivity extends AbstractFragmentActivity {
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
 
     @Override
-	public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
-        
+
         setReloadInterval(RELOAD_INTERVAL);
     }
-    
+
     @Override
     public void onRefresh() {
-    	// Do nothing
+        // Do nothing
     }
-    
+
     public void onButtonClickGroups(View view) {
         startActivity(new Intent(HomeActivity.this, GroupsActivity.class));
     }
-    
+
     public void onButtonClickSolo(View view) {
         startActivity(new Intent(HomeActivity.this, SoloPlaylistsActivity.class));
     }
-
 
 }
