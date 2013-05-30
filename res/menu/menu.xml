@@ -30,7 +30,8 @@
     <item
         android:id="@+id/menu_item_history"
         android:icon="@drawable/ic_menu_help"
-        android:title="@string/activity_title_history"/>
+        android:title="@string/activity_title_history"
+        android:visible="false"/>
     <!--
     <item
         android:id="@+id/menu_item_solo"

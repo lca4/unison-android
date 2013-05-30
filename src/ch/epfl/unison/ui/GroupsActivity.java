@@ -167,6 +167,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         }
 
     }
+    
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -201,7 +202,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
-        return AbstractMenu.onCreateOptionsMenu(this, menu);
+        boolean res = AbstractMenu.onCreateOptionsMenu(this, menu);
+        mMenu.findItem(R.id.menu_item_history).setVisible(true);
+        return res;
     }
 
     @Override

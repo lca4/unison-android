@@ -20,6 +20,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -121,6 +124,13 @@ public class GroupsMainActivity extends AbstractMainActivity {
                 getSupportActBar().newTab().setText(
                         R.string.fragment_title_stats),
                 GroupsStatsFragment.class, null);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean res = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_history).setVisible(true);
+        return res;
     }
 
     private void onGroupInfo(JsonStruct.Group group) {
