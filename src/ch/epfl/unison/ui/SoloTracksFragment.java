@@ -22,13 +22,13 @@ import ch.epfl.unison.data.PlaylistItem;
 public class SoloTracksFragment extends AbstractListFragment
         implements SoloMainActivity.OnPlaylistInfoListener {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = "ch.epfl.unison.StatsActivity";
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        SoloTracksFragment.this.getList()
+        .setAdapter(new TracksAdapter(getMainActivity().getPlaylist()));
+        return v;
     }
 
     @Override
@@ -54,19 +54,19 @@ public class SoloTracksFragment extends AbstractListFragment
     /** ArrayAdapter that displays the tracks of the playlist. */
     private class TracksAdapter extends ArrayAdapter<MusicItem> {
 
-        public static final int ROW_LAYOUT = R.layout.track_row;
+        public static final int TRACK_ROW_LAYOUT = R.layout.track_row;
 
         public TracksAdapter(PlaylistItem playlist) {
             super(SoloTracksFragment.this.getActivity(), 0, playlist.getTracks());
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
+        public View getView(int position, View view, ViewGroup parent) {
+            MusicItem track = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloTracksFragment.this.getActivity()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(ROW_LAYOUT, parent, false);
+                view = inflater.inflate(TRACK_ROW_LAYOUT, parent, false);
             }
             ((TextView) view.findViewById(R.id.trackTitle)).setText(getItem(position).title);
             // int rating = 0;
@@ -74,7 +74,7 @@ public class SoloTracksFragment extends AbstractListFragment
             // rating = getItem(position).rating;
             // }
             // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
-
+            view.setTag(track);
             return view;
         }
     }

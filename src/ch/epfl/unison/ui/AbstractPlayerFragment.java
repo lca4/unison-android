@@ -372,7 +372,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        setMainActivity((AbstractMainActivity) activity);
+        mMainActivity = (AbstractMainActivity) activity;
         getMainActivity().registerReceiver(mCompletedReceiver,
                 new IntentFilter(MusicService.ACTION_COMPLETED));
     }

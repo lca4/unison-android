@@ -101,11 +101,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         mPlaylistsLocalListView = (ListView) findViewById(R.id.soloPlaylistsListLocal);
         mPlaylistsLocalListView.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
         registerForContextMenu(mPlaylistsLocalListView);
-
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
         initLocalPlaylists();
+        
         mPlaylistsRemote = new ArrayList<PlaylistItem>();
-
         mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
         mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
         registerForContextMenu(mPlaylistsLocalListView);
