@@ -70,7 +70,7 @@
             android:name=".ui.GroupsMainActivity"
             android:label="@string/activity_title_main"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTop" />
         <!-- See doc on singleTask:
         http://developer.android.com/guide/components/tasks-and-back-stack.html 
         One could alternatively use the intent flag:
