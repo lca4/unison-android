@@ -3,7 +3,6 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
@@ -71,21 +70,30 @@ public abstract class AbstractMenu {
                 break;
             case R.id.menu_item_manage_group:
                 if (activity instanceof GroupsMainActivity
-                        && ((GroupsMainActivity) activity).getDJ()) {
+                        && ((GroupsMainActivity) activity).isDJ()) {
                     // TODO is it a problem if we call this here?
                     ((GroupsMainActivity) activity).displayPasswordDialog();
                 }
                 break;
             case android.R.id.home: // if using home button from menu: R.id.home
                 // app icon in Action Bar clicked; go home
-                activity.startActivity(new Intent(activity, HomeActivity.class));
+                // activity.startActivity(new Intent(activity,
+                // HomeActivity.class));
                 // activity.startActivity(new Intent(activity,
                 // GroupsActivity.class)
                 // .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                 // .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                // Make sure the activity is finished, even if it was at the
-                // bottom of the stack.
-                activity.finish();
+                
+                if (!(activity instanceof HomeActivity)) {
+                    if (activity instanceof GroupsMainActivity) {
+                        activity.startActivity(new Intent(activity, GroupsActivity.class).setAction(
+                                GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    }
+                    // Make sure the activity is finished, even if it was at the
+                    // bottom of the stack.
+                    activity.finish();                    
+                }
                 break;
             default:
                 break; // Should never happen.

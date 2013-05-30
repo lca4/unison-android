@@ -5,16 +5,18 @@
     android:orientation="vertical">
 
     <RelativeLayout
+      android:id="@+id/listHeader"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:padding="10dp"
-      android:background="#3FFF">
+      android:background="#3FFF"
+      android:visibility="gone">
     <TextView
         android:id="@+id/listTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/stats_not_playing"
+        android:text="@string/defaul_title"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
     <TextView
@@ -23,8 +25,9 @@
         android:layout_below="@id/listTitle"
         android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="@string/stats_taste" />
+        android:text="@string/default_subtitle" />
   </RelativeLayout>
+  
 
 
 

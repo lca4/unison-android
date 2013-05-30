@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.ProgressDialog;
@@ -13,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
@@ -29,13 +29,13 @@ import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Log into the application (checks username / password against the back-end).
- *
+ * 
  * @author lum
  */
 public class LoginActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.LoginActivity";
-    
+
     private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
@@ -48,7 +48,7 @@ public class LoginActivity extends SherlockActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        
+
         Log.d(TAG, "Calling LoginActivity.onCreate");
 
         mEmail = (EditText) findViewById(R.id.email);
@@ -77,14 +77,14 @@ public class LoginActivity extends SherlockActivity {
         // Initialize the AppData instance.
         AppData.getInstance(this);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = LoginActivity.this.getSupportMenuInflater();
-        inflater.inflate(R.menu.login_menu, menu);  
+        inflater.inflate(R.menu.login_menu, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -113,8 +113,8 @@ public class LoginActivity extends SherlockActivity {
     }
 
     /**
-     * Called when starting the Activity after signing up. Sets the preferences (email,
-     * password) according to the parameters.
+     * Called when starting the Activity after signing up. Sets the preferences
+     * (email, password) according to the parameters.
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
@@ -186,11 +186,11 @@ public class LoginActivity extends SherlockActivity {
                     .putExtra(Const.Strings.GID, user.gid));
         } else {
             // Display list of groups.
-//            startActivity(new Intent(this, GroupsActivity.class));
+            // startActivity(new Intent(this, GroupsActivity.class));
             startActivity(new Intent(this, HomeActivity.class));
         }
         // Close this activity.
-        
+
         Log.d(TAG, "Going to finish LoginActiviy");
         finish();
     }

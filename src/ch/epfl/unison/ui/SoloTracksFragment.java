@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -7,88 +8,73 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.TextView;
-
 import ch.epfl.unison.R;
-import ch.epfl.unison.api.JsonStruct;
-
-import com.actionbarsherlock.app.SherlockFragment;
+import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.PlaylistItem;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
  * the list of the tracks of the playlist.
- *
- * @author lum
+ * 
+ * @author mbourqui
  */
-public class SoloTracksFragment extends SherlockFragment 
-    implements SoloMainActivity.OnPlaylistInfoListener {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = "ch.epfl.unison.StatsActivity";
-
-    private ListView mTracksList;
-    private TextView mTrackTitle;
-
-    private SoloMainActivity mActivity;
+public class SoloTracksFragment extends AbstractListFragment
+        implements SoloMainActivity.OnPlaylistInfoListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list, container, false);
-
-        mTracksList = (ListView) v.findViewById(R.id.listList);
-        mTrackTitle = (TextView) v.findViewById(R.id.listTitle);
-
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        SoloTracksFragment.this.getList()
+        .setAdapter(new TracksAdapter(getMainActivity().getPlaylist()));
         return v;
     }
 
     @Override
-    public void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo) {
-        if (playlistInfo.title != null) {
-            mTrackTitle.setText(playlistInfo.title);
+    public void onPlaylistInfo(PlaylistItem playlistInfo) {
+        if (playlistInfo.getTitle() != null) {
+            getTitle().setText(playlistInfo.getTitle());
         }
-        mTracksList.setAdapter(new TracksAdapter(playlistInfo));
+        getList().setAdapter(new TracksAdapter(playlistInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (SoloMainActivity) activity;
-        mActivity.registerPlaylistInfoListener(this);
+        ((SoloMainActivity) getMainActivity()).registerPlaylistInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mActivity.unregisterPlaylistInfoListener(this);
+        ((SoloMainActivity) getMainActivity()).unregisterPlaylistInfoListener(this);
     }
 
-    /** ArrayAdapter that displays the stats associated with each user in the group. */
-    private class TracksAdapter extends ArrayAdapter<JsonStruct.Track> {
+    /** ArrayAdapter that displays the tracks of the playlist. */
+    private class TracksAdapter extends ArrayAdapter<MusicItem> {
 
-        public static final int ROW_LAYOUT = R.layout.track_row;
+        public static final int TRACK_ROW_LAYOUT = R.layout.track_row;
 
-        public TracksAdapter(JsonStruct.PlaylistJS playlist) {
-            super(SoloTracksFragment.this.getActivity(), 0, playlist.tracks);
+        public TracksAdapter(PlaylistItem playlist) {
+            super(SoloTracksFragment.this.getActivity(), 0, playlist.getTracks());
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
+        public View getView(int position, View view, ViewGroup parent) {
+            MusicItem track = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloTracksFragment.this.getActivity()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(ROW_LAYOUT, parent, false);
+                view = inflater.inflate(TRACK_ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.username)).setText(getItem(position).title);
-            int rating = 0;
-            if (getItem(position).rating != null) {
-                rating = getItem(position).rating;
-            }
-            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
-
+            ((TextView) view.findViewById(R.id.trackTitle)).setText(getItem(position).title);
+            // int rating = 0;
+            // if (getItem(position).rating != null) {
+            // rating = getItem(position).rating;
+            // }
+            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+            view.setTag(track);
             return view;
         }
     }

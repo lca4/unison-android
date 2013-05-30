@@ -37,7 +37,7 @@
       android:isIndicator="true"
       style="?android:attr/ratingBarStyleSmall"
       android:numStars="5"
-      android:id="@+id/trRating"
+      android:id="@+id/trackRating"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
 

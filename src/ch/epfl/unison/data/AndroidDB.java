@@ -1,6 +1,11 @@
 
 package ch.epfl.unison.data;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -9,12 +14,8 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
-
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Utility to handle interactions with Original code from MarkG on <a
@@ -58,7 +59,7 @@ final class AndroidDB {
      * @param pl The playlist to store in android databse
      * @return local playlist id
      */
-    static int insert(ContentResolver cr, Playlist pl) {
+    static int insert(ContentResolver cr, PlaylistItem pl) {
         // Add the playlist to the android dabase
         ContentValues mValues = new ContentValues();
         mValues.put(MediaStore.Audio.Playlists.NAME, pl.getTitle());
@@ -92,7 +93,7 @@ final class AndroidDB {
      * @param playlistId
      * @param c
      */
-    private static void insertTracks(ContentResolver resolver, Playlist pl) {
+    private static void insertTracks(ContentResolver resolver, PlaylistItem pl) {
         ContentResolver mCR = resolver;
         ContentProviderClient mCRC = null;
         try {
@@ -132,7 +133,7 @@ final class AndroidDB {
         }
     }
 
-    static int delete(ContentResolver resolver, Playlist pl) {
+    static int delete(ContentResolver resolver, PlaylistItem pl) {
         int res = resolver.delete(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 MediaStore.Audio.Playlists._ID + " = ? ", new String[] {
                     String.valueOf(pl.getLocalId())
@@ -146,15 +147,16 @@ final class AndroidDB {
     }
 
     /**
-     * Inspiration found on
-     * <a href=http://stackoverflow.com/questions/7774384/get-next-previous
-     * -song-from-android-playlist>http://stackoverflow.com/questions/7774384/get-next-previous
-     * -song-from-android-playlist</a>.
+     * Inspiration found on <a
+     * href=http://stackoverflow.com/questions/7774384/get-next-previous
+     * -song-from
+     * -android-playlist>http://stackoverflow.com/questions/7774384/get
+     * -next-previous -song-from-android-playlist</a>.
      * 
      * @param resolver
      * @param pl
      */
-    static void getTracks(ContentResolver resolver, Playlist pl) {
+    static void getTracks(ContentResolver resolver, PlaylistItem pl) {
         String[] projection = new String[] {
                 // MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
                 MediaStore.Audio.Media._ID,
@@ -167,10 +169,11 @@ final class AndroidDB {
         };
         Uri contentUri = MediaStore.Audio.Playlists.Members
                 .getContentUri("external", pl.getLocalId()).buildUpon().build();
+        // Sort the tracks by play_order
         Cursor cur = resolver.query(contentUri,
                 projection,
                 null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
-        if (cur != null) {
+        if (cur != null & cur.moveToFirst()) {
             LinkedList<MusicItem> mTracks = new LinkedList<MusicItem>();
             int colId = cur.getColumnIndex(MediaStore.Audio.Media._ID);
             int colTitle = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -180,7 +183,39 @@ final class AndroidDB {
                 mTracks.add(new MusicItem(cur.getInt(colId), cur.getString(colArtist),
                         cur.getString(colTitle), cur.getInt(colPlayOrder)));
             } while (cur.moveToNext());
+            pl.setTracks(mTracks);
+            cur.close();
         }
+    }
+
+    static Set<PlaylistItem> getPlaylists(ContentResolver resolver) {
+        Set<PlaylistItem> set = new HashSet<PlaylistItem>();
+        String[] columns = {
+                MediaStore.Audio.Playlists._ID,
+                MediaStore.Audio.Playlists.NAME,
+                MediaStore.Audio.Playlists.DATE_MODIFIED
+        };
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Cursor cur = resolver.query(uri, columns,
+                // MediaStore.Audio.Playlists.CONTENT_TYPE +
+                // " = vnd.android.cursor.dir/playlist",
+                null,
+                null, null);
+
+        if (cur != null && cur.moveToFirst()) {
+            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+            int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
+            do {
+                PlaylistItem pl = new PlaylistItem.Builder().plId(cur.getLong(colId))
+                        .title(cur.getString(colName)).build();
+
+                getTracks(resolver, pl);
+                set.add(pl);
+            } while (cur.moveToNext());
+            cur.close();
+        }
+        return set;
     }
 
 }

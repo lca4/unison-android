@@ -58,7 +58,8 @@ final class ConstDB {
      */
     static final String PLAYLISTS_TABLE_NAME = "playlist"; // Prefix: PLYL_
     static final String PLYL_C_LOCAL_ID = "local_id";
-    // =PlaylistsColumns.DATE_MODIFIED, needed to see if playlist modified outside GS
+    // =PlaylistsColumns.DATE_MODIFIED, needed to see if playlist modified
+    // outside GS
     static final String PLYL_C_LOCAL_UPDATE_TIME = "local_update_time";
     static final String PLYL_C_GS_SIZE = "gs_size";
     // Maybe useless, because quiet obvious

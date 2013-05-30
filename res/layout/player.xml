@@ -87,6 +87,8 @@
       android:layout_height="56dp"
       android:layout_above="@id/musicSeekBarContainer"
       android:background="@drawable/media_bg">
+      	
+      <!-- TODO add loop/loopOnce/shuffle buttons -->
 
     <!-- Play / pause button -->
     <Button android:id="@+id/musicToggleBtn"

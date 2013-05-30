@@ -1,4 +1,7 @@
+
 package ch.epfl.unison.api;
+
+import java.net.URI;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,11 +17,9 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
-import java.net.URI;
-
 /**
  * TODO(louismagarshack) Write the javadoc for this class.
- *
+ * 
  * @author louismagarshack
  */
 public final class HttpClientFactory {
@@ -43,7 +44,8 @@ public final class HttpClientFactory {
     private static HttpClient sHttpClient;
 
     /** Hide the Constructor. */
-    private HttpClientFactory() { };
+    private HttpClientFactory() {
+    };
 
     public static synchronized HttpClient getInstance() {
         if (sHttpClient == null) {
@@ -67,7 +69,7 @@ public final class HttpClientFactory {
         return result;
     }
 
-    //For tests since Mockito cannot mock AbstractHttpClient.
+    // For tests since Mockito cannot mock AbstractHttpClient.
     public static void setInstance(HttpClient instance) {
         sHttpClient = instance;
     }

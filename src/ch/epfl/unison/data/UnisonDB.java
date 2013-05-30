@@ -1,24 +1,24 @@
 
 package ch.epfl.unison.data;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.util.Log;
-
-import ch.epfl.unison.Const.SeedType;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.util.Log;
+import ch.epfl.unison.Const.SeedType;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
@@ -53,9 +53,9 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-        Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-        mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
-                                                        // production app!
+        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+        // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
     }
@@ -112,7 +112,7 @@ public class UnisonDB {
             return getMusicItems();
         } else if (itemType == TagItem.class) {
             return getTagItems();
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             return getPlylItems();
         } else {
             // Unsupported type
@@ -120,7 +120,7 @@ public class UnisonDB {
         }
     }
 
-    private Set<Playlist> getPlylItems() {
+    private Set<PlaylistItem> getPlylItems() {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
                         ConstDB.PLYL_C_LOCAL_ID,
@@ -137,7 +137,7 @@ public class UnisonDB {
                         ConstDB.PLYL_C_GS_USER_RATING,
                         ConstDB.PLYL_C_GS_USER_COMMENT
                 });
-        Set<Playlist> set = new HashSet<Playlist>();
+        Set<PlaylistItem> set = new HashSet<PlaylistItem>();
         if (cur != null && cur.moveToFirst()) {
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
@@ -153,12 +153,12 @@ public class UnisonDB {
             int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
             int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
             do {
-                set.add(new Playlist.Builder().localId(cur.getInt(colLocalId))
+                set.add(new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
                         .size(cur.getInt(colGSSize))
                         .createdByGS(cur.getInt(colCreatedByGS) != 0)
                         .plId(cur.getInt(colGSId))
                         .created(cur.getString(colGSCreationTime))
-                        .updated(cur.getString(colGSUpdateTime))
+                        .gsUpdated(cur.getString(colGSUpdateTime))
                         .authorId(cur.getInt(colGSAuthorId))
                         .authorName(cur.getString(colGSAuthorName))
                         .avgRating(cur.getDouble(colGSAvgRating))
@@ -178,7 +178,7 @@ public class UnisonDB {
             table = ConstDB.LIBE_TABLE_NAME;
         } else if (itemType == TagItem.class) {
             table = ConstDB.TAG_TABLE_NAME;
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             table = ConstDB.PLAYLISTS_TABLE_NAME;
         } else {
             // Unsupported type
@@ -198,7 +198,7 @@ public class UnisonDB {
             libeTruncate();
         } else if (itemType == TagItem.class) {
             tagTruncate();
-        } else if (itemType == Playlist.class) {
+        } else if (itemType == PlaylistItem.class) {
             plylTruncate();
         } else {
             // Unsupported type
@@ -215,22 +215,28 @@ public class UnisonDB {
             return delete((MusicItem) item);
         } else if (item instanceof TagItem) {
             return delete((TagItem) item);
-        } else if (item instanceof Playlist) {
-            return delete((Playlist) item);
+        } else if (item instanceof PlaylistItem) {
+            return delete((PlaylistItem) item);
         } else {
             // Unsupported type
             throw new IllegalArgumentException();
         }
     }
 
-    public Object getItem(Class<?> itemType, int itemId) {
-        String table = null;
-        Object res = null;
+    /**
+     * @param itemType
+     * @param itemId
+     * @return if found, the object in type itemType; null else.
+     */
+    public AbstractItem getItem(Class<?> itemType, long itemId) {
+        AbstractItem res = null;
         if (itemType == MusicItem.class) {
-            table = ConstDB.LIBE_TABLE_NAME;
+            // Not yet implemented
+            res = null;
         } else if (itemType == TagItem.class) {
-            table = ConstDB.TAG_TABLE_NAME;
-        } else if (itemType == Playlist.class) {
+            // Not yet implemented
+            res = null;
+        } else if (itemType == PlaylistItem.class) {
             res = plylGetItem(itemId);
         } else {
             // Unsupported type
@@ -239,9 +245,10 @@ public class UnisonDB {
         return res;
     }
 
-    private Playlist plylGetItem(int id) {
+    private PlaylistItem plylGetItem(long id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
+                        ConstDB.PLYL_C_LOCAL_ID,
                         ConstDB.PLYL_C_GS_SIZE,
                         ConstDB.PLYL_C_CREATED_BY_GS,
                         ConstDB.PLYL_C_GS_ID,
@@ -257,7 +264,7 @@ public class UnisonDB {
                 }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
                     String.valueOf(id)
                 });
-        Playlist pl = null;
+        PlaylistItem pl = null;
         if (cur != null && cur.moveToFirst()) {
             int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
             int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
@@ -272,12 +279,12 @@ public class UnisonDB {
             int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
             int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
             int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
-            pl = new Playlist.Builder().localId(cur.getInt(colLocalId))
+            pl = new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
                     .size(cur.getInt(colGSSize))
                     .createdByGS(cur.getInt(colCreatedByGS) != 0)
                     .plId(cur.getInt(colGSId))
                     .created(cur.getString(colGSCreationTime))
-                    .updated(cur.getString(colGSUpdateTime))
+                    .gsUpdated(cur.getString(colGSUpdateTime))
                     .authorId(cur.getInt(colGSAuthorId))
                     .authorName(cur.getString(colGSAuthorName))
                     .avgRating(cur.getDouble(colGSAvgRating))
@@ -314,8 +321,8 @@ public class UnisonDB {
                 set.add(new MusicItem(cur.getInt(colId),
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
+            closeCursor(cur);
         }
-        closeCursor(cur);
         return set;
     }
 
@@ -391,8 +398,8 @@ public class UnisonDB {
                 tags.put(cursor.getString(colTitle) + " - " + cursor.getString(colArtist),
                         cursor.getInt(colId));
             } while (cursor.moveToNext());
+            closeCursor(cursor);
         }
-        closeCursor(cursor);
         return tags;
     }
 
@@ -438,8 +445,8 @@ public class UnisonDB {
             do {
                 tags.put(cursor.getString(colName), cursor.getInt(colId));
             } while (cursor.moveToNext());
+            closeCursor(cursor);
         }
-        closeCursor(cursor);
         return tags;
     }
 
@@ -459,8 +466,8 @@ public class UnisonDB {
                         cur.getString(colName), cur.getInt(colIsChecked),
                         cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
+            closeCursor(cur);
         }
-        closeCursor(cur);
         return set;
     }
 
@@ -631,7 +638,14 @@ public class UnisonDB {
                     int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
                     do {
                         try {
-                            json.accumulate(key.getLabel(), cur.getString(colName));
+                            // Ugly trick to get around missing json.append in
+                            // android API
+                            if (json.has(key.getLabel())) {
+                                json.accumulate(key.getLabel(), cur.getString(colName));
+                            } else {
+                                json.put(key.getLabel(),
+                                        new JSONArray().put(cur.getString(colName)));
+                            }
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }
@@ -645,7 +659,14 @@ public class UnisonDB {
                         try {
                             track.put("title", cur.getString(colTitle));
                             track.put("artist", cur.getString(colArtist));
-                            json.accumulate(key.getLabel(), track.toString());
+                            // Ugly trick to get around missing json.append in
+                            // android API
+                            if (json.has(key.getLabel())) {
+                                json.accumulate(key.getLabel(), track.toString());
+                            } else {
+                                json.put(key.getLabel(),
+                                        new JSONArray().put(track.toString()));
+                            }
                         } catch (JSONException e) {
                             Log.i(TAG, e.getMessage());
                         }
@@ -654,22 +675,23 @@ public class UnisonDB {
                 default:
                     throw new IllegalArgumentException();
             }
+            closeCursor(cur);
         }
-        closeCursor(cur);
         resetIsChecked(table);
         return json;
     }
 
     /**
      * Adds the playlist to the android sqlite DB and to the GS in-app DB.<br />
-     * The insertions in the databases are made in an atomic way. If a failure occurs when trying 
-     * to insert the playlist in either the Android or GS in-app database, changes done until 
-     * failure are rolled back as if nothing happened. 
+     * The insertions in the databases are made in an atomic way. If a failure
+     * occurs when trying to insert the playlist in either the Android or GS
+     * in-app database, changes done until failure are rolled back as if nothing
+     * happened.
      * 
      * @param pl
      * @return local id
      */
-    public long insert(Playlist pl) {
+    public long insert(PlaylistItem pl) {
         openW();
         mDB.beginTransaction();
         try {
@@ -710,7 +732,7 @@ public class UnisonDB {
         return pl.getLocalId();
     }
 
-    private int delete(Playlist pl) {
+    private int delete(PlaylistItem pl) {
         int res = 0;
         if (pl.getLocalId() >= 0) {
             openW();

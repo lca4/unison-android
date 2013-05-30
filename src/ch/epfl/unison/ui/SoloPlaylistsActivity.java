@@ -1,6 +1,15 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -28,7 +37,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
@@ -40,17 +48,8 @@ import ch.epfl.unison.api.JsonStruct.PlaylistsList;
 import ch.epfl.unison.api.JsonStruct.TagsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.Playlist;
+import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 
 /*
  * TODO
@@ -73,8 +72,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
     // private Playlist mPlaylist;
     private UnisonDB mDB;
-    private ArrayList<Playlist> mPlaylistsLocal;
-    private ArrayList<Playlist> mPlaylistsRemote;
+    private ArrayList<PlaylistItem> mPlaylistsLocal;
+    private ArrayList<PlaylistItem> mPlaylistsRemote;
 
     // GUI specific
     private ListView mPlaylistsLocalListView;
@@ -102,11 +101,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         mPlaylistsLocalListView = (ListView) findViewById(R.id.soloPlaylistsListLocal);
         mPlaylistsLocalListView.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
         registerForContextMenu(mPlaylistsLocalListView);
-
-        mPlaylistsLocal = new ArrayList<Playlist>();
+        mPlaylistsLocal = new ArrayList<PlaylistItem>();
         initLocalPlaylists();
-        mPlaylistsRemote = new ArrayList<Playlist>();
-
+        
+        mPlaylistsRemote = new ArrayList<PlaylistItem>();
         mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
         mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
         registerForContextMenu(mPlaylistsLocalListView);
@@ -177,8 +175,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                                     .remove(info.position));
                                             Log.w(TAG, "Successfully removed playlist with id "
                                                     + struct.gsPlaylistId + " from user library");
-                                            refreshLocalPlaylists();
-                                            refreshRemotePlaylists();
+                                            refreshPlaylistsLocal();
+                                            refreshPlaylistsRemote();
                                         } else {
                                             Toast.makeText(
                                                     SoloPlaylistsActivity.this,
@@ -191,6 +189,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                     @Override
                                     public void onError(UnisonAPI.Error error) {
                                         Log.d(TAG, error.toString());
+                                        Toast.makeText(
+                                                SoloPlaylistsActivity.this,
+                                                R.string
+                                                .error_solo_remove_playlist_from_local_dbs,
+                                                Toast.LENGTH_LONG).show();
                                     }
                                 });
                     } catch (JSONException e) {
@@ -205,7 +208,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                 @Override
                                 public void callback(JsonStruct.Success struct) {
                                     mPlaylistsRemote.remove(info.position);
-                                    refreshRemotePlaylists();
+                                    refreshPlaylistsRemote();
                                 }
 
                                 @Override
@@ -221,7 +224,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
             case R.id.playlist_context_menu_item_save:
                 if (lv == mPlaylistsRemoteListView) {
-                    Playlist pl = mPlaylistsRemote.get(info.position);
+                    PlaylistItem pl = mPlaylistsRemote.get(info.position);
                     // Adds PL to local databases
                     long localId = mDB.insert(pl);
                     if (localId >= 0) {
@@ -248,8 +251,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             e.printStackTrace();
                         }
                         mPlaylistsLocal.add(mPlaylistsRemote.remove(info.position));
-                        refreshLocalPlaylists();
-                        refreshRemotePlaylists();
+                        refreshPlaylistsLocal();
+                        refreshPlaylistsRemote();
                     } else {
                         Toast.makeText(SoloPlaylistsActivity.this,
                                 R.string.error_solo_save_playlist,
@@ -338,17 +341,17 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     }
 
     /** Adapter used to populate the ListView listing the playlists. */
-    private class PlaylistsAdapter extends ArrayAdapter<Playlist> {
+    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
 
         public static final int ROW_LAYOUT = R.layout.list_row;
 
-        public PlaylistsAdapter(ArrayList<Playlist> list) {
+        public PlaylistsAdapter(ArrayList<PlaylistItem> list) {
             super(SoloPlaylistsActivity.this, 0, list);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            Playlist playlist = getItem(position);
+            PlaylistItem playlist = getItem(position);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
                         .getSystemService(
@@ -591,10 +594,15 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
-                    SoloMainActivity.class).putExtra(Const.Strings.PLID,
-                    ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
-                    ((Playlist) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
+            // TODO on click, display list of tracks
+            // SoloPlaylistsActivity.this.startActivity(
+            // new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
+            // .putExtra(Const.Strings.LOCAL_ID,
+            // ((PlaylistItem) view.getTag()).getLocalId())
+            // .putExtra(Const.Strings.TITLE,
+            // ((PlaylistItem) view.getTag()).getTitle())
+            // );
+            // .putExtra(Const.Strings.PLID,
             // view.getTag());
             // UnisonAPI api =
             // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
@@ -636,10 +644,12 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+            // Give tracks to player here
             SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
-                    SoloMainActivity.class).putExtra(Const.Strings.PLID,
-                    ((Playlist) view.getTag()).getPLId()).putExtra(Const.Strings.TITLE,
-                    ((Playlist) view.getTag()).getTitle())); // .putExtra(Const.Strings.PLID,
+                    SoloMainActivity.class)
+                    .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
+                    .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
+            // .putExtra(Const.Strings.PLID,
             // view.getTag());
             // UnisonAPI api =
             // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
@@ -684,27 +694,27 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
-                Playlist pl = (Playlist) mDB.getItem(Playlist.class, cur.getInt(colId));
+                PlaylistItem pl = (PlaylistItem) mDB.getItem(PlaylistItem.class, cur.getInt(colId));
                 if (pl != null) {
                     pl.setTitle(cur.getString(colName));
+                    mPlaylistsLocal.add(pl);
                 }
+                // Non-GS playlists not shown
             } while (cur.moveToNext());
-        }
-        if (!cur.isClosed()) {
             cur.close();
         }
-        refreshLocalPlaylists();
+        refreshPlaylistsLocal();
     }
 
     /**
      * To be used to refresh the ListView when changes are made to ArraList.
      */
-    private void refreshLocalPlaylists() {
+    private void refreshPlaylistsLocal() {
         SoloPlaylistsActivity.this.mPlaylistsLocalListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }
 
-    private void refreshRemotePlaylists() {
+    private void refreshPlaylistsRemote() {
         SoloPlaylistsActivity.this.mPlaylistsRemoteListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
     }

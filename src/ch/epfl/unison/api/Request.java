@@ -1,10 +1,15 @@
+
 package ch.epfl.unison.api;
 
-import android.util.Log;
-
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -19,19 +24,15 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import android.util.Log;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Helper class that facilitates HTTP requests returning JSON data.
- *
+ * 
  * @param <T> the type of the response
  * @author lum
  */
@@ -48,8 +49,8 @@ public final class Request<T extends JsonStruct> {
     private static final int SUCCESS_RANGE_START = 200;
     private static final int SUCCESS_RANGE_STOP = 299;
     private static final String ENCODING = "UTF-8";
-    private static final int CONNECT_TIMEOUT = 30 * 1000;  // In ms.
-    private static final int READ_TIMEOUT = 30 * 1000;  // In ms.
+    private static final int CONNECT_TIMEOUT = 30 * 1000; // In ms.
+    private static final int READ_TIMEOUT = 30 * 1000; // In ms.
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
@@ -103,15 +104,16 @@ public final class Request<T extends JsonStruct> {
     public Result<T> doDELETE() {
         return this.execute(new HttpDelete());
     }
-    
-    private HttpRequestBase prepareRequest(HttpRequestBase request) 
+
+    private HttpRequestBase prepareRequest(HttpRequestBase request)
             throws UnsupportedEncodingException {
         try {
             request.setURI(this.mUrl.toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        // Configure some sensible defaults. Timeout setting could also be done in client,
+        // Configure some sensible defaults. Timeout setting could also be done
+        // in client,
         // we choose to keep it here for better readability.
         request.getParams().setParameter(
                 "http.connection.timeout", Integer.valueOf(CONNECT_TIMEOUT));
@@ -119,25 +121,26 @@ public final class Request<T extends JsonStruct> {
                 "http.socket.timeout", Integer.valueOf(READ_TIMEOUT));
 
         if (mAuth != null) {
-            // Set a raw HTTP Basic Auth header (java.net.Authenticator has issues).
+            // Set a raw HTTP Basic Auth header (java.net.Authenticator has
+            // issues).
             request.addHeader("Authorization", "Basic " + mAuth);
         }
-        
+
         if (mData != null && request instanceof HttpEntityEnclosingRequestBase) {
             // Write out the request body (i.e. the form data).
             ((HttpEntityEnclosingRequestBase) request).setEntity(
                     new UrlEncodedFormEntity(generateQueryNVP(this.mData), ENCODING));
         }
-        
+
         return request;
     }
 
-    private Result<T> execute(HttpRequestBase request) {       
+    private Result<T> execute(HttpRequestBase request) {
         String responseContent = null;
         HttpResponse response = null;
         StatusLine responseStatusLine = null;
 
-        try {           
+        try {
             request = prepareRequest(request);
             Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
             try {
@@ -154,7 +157,8 @@ public final class Request<T extends JsonStruct> {
 
             int status = responseStatusLine.getStatusCode();
             if (status < SUCCESS_RANGE_START || status > SUCCESS_RANGE_STOP) {
-                // We didn't receive a 2xx status code - we treat it as an error.
+                // We didn't receive a 2xx status code - we treat it as an
+                // error.
                 JsonStruct.Error jsonError = GSON.fromJson(responseContent, JsonStruct.Error.class);
                 return new Result<T>(new UnisonAPI.Error(status,
                         responseStatusLine.toString(), responseContent, jsonError));
@@ -167,8 +171,10 @@ public final class Request<T extends JsonStruct> {
         } catch (Exception e) {
             // Under this catch-all, we mean:
             // - IOException, thrown by most HttpURLConnection methods,
-            // - NullPointerException. if there's not InputStream nor ErrorStream,
-            // - JsonSyntaxException, if we fail to decode the server's response.
+            // - NullPointerException. if there's not InputStream nor
+            // ErrorStream,
+            // - JsonSyntaxException, if we fail to decode the server's
+            // response.
             Log.e(TAG, "caught exception while handling request", e);
             int statusCode = 0;
             String statusMessage = "";

@@ -1,4 +1,10 @@
+
 package ch.epfl.unison;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import android.app.Service;
 import android.content.Intent;
@@ -10,30 +16,26 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
- * Android service that helps maintaining the back-end DB in sync with the actual
- * music on the device. It does so by keeping a local "copy" (as a SQLite DB) that
- * mirrors what's on the back-end DB. Whenever it sees that the local copy is out
- * of sync with the music on the device it sends updates to the server.
- *
+ * Android service that helps maintaining the back-end DB in sync with the
+ * actual music on the device. It does so by keeping a local "copy" (as a SQLite
+ * DB) that mirrors what's on the back-end DB. Whenever it sees that the local
+ * copy is out of sync with the music on the device it sends updates to the
+ * server.
+ * 
  * @author lum
  */
 public class LibraryService extends Service {
 
     private static final String TAG = "ch.epfl.unison.LibraryService";
-    private static final int MIN_UPDATE_INTERVAL = 60 * 60 * 10;  // In seconds.
-    private static final long MILLIS_IN_S = 1000L;  // Number of milliseconds in a second.
+    private static final int MIN_UPDATE_INTERVAL = 60 * 60 * 10; // In seconds.
+    private static final long MILLIS_IN_S = 1000L; // Number of milliseconds in
+                                                   // a second.
 
     public static final String ACTION_UPDATE = "ch.epfl.unison.action.UPDATE";
     public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
@@ -87,8 +89,8 @@ public class LibraryService extends Service {
     }
 
     /**
-     * Abstract base class for synchronization tasks (either "truncate and upload"
-     * or "update some deltas").
+     * Abstract base class for synchronization tasks (either
+     * "truncate and upload" or "update some deltas").
      */
     private abstract class LibraryTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -134,8 +136,9 @@ public class LibraryService extends Service {
     }
 
     /**
-     * If the local DB is already populated, we only send deltas to the server (i.e.
-     * a list of tracks that were added and a list of tracks that were removed).
+     * If the local DB is already populated, we only send deltas to the server
+     * (i.e. a list of tracks that were added and a list of tracks that were
+     * removed).
      */
     private class Updater extends LibraryTask {
 
@@ -154,14 +157,16 @@ public class LibraryService extends Service {
                 if (!expectation.contains(item)) {
                     Log.d(TAG, "Adding track: " + item.title);
                     deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,
-                            item.localId, item.artist, item.title));  // Add item.
+                            item.localId, item.artist, item.title)); // Add
+                                                                     // item.
                 }
             }
             for (MusicItem item : expectation) {
                 if (!reality.contains(item)) {
                     Log.d(TAG, "Removing track: " + item.title);
                     deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_DELETE,
-                            item.localId, item.artist, item.title));  // Delete item.
+                            item.localId, item.artist, item.title)); // Delete
+                                                                     // item.
                 }
             }
             Log.d(TAG, "number of deltas: " + deltas.size());
@@ -193,7 +198,7 @@ public class LibraryService extends Service {
                         delta.entry.localId, delta.entry.artist, delta.entry.title);
                 if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
                     helper.insert(item);
-                } else {  // TYPE_DELETE.
+                } else { // TYPE_DELETE.
                     helper.delete(item);
                 }
             }
@@ -204,9 +209,9 @@ public class LibraryService extends Service {
     }
 
     /**
-     * If it's the first time that the application is used (i.e. the local DB doesn't exist
-     * yet) we simply "upload" all the music on the server (which will then invalidate any
-     * library entries previously valid for the user).
+     * If it's the first time that the application is used (i.e. the local DB
+     * doesn't exist yet) we simply "upload" all the music on the server (which
+     * will then invalidate any library entries previously valid for the user).
      */
     private class Uploader extends LibraryTask {
 

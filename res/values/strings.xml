@@ -7,6 +7,8 @@
     <!-- Generic values -->
     <string name="generic_ok">OK</string>
     <string name="generic_cancel">Cancel</string>
+    <string name="defaul_title">Title</string>
+    <string name="default_subtitle">Subtitle</string>
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>
@@ -61,6 +63,12 @@
     <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
     <string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
     <string name="login_menu_signup">Sign Up</string>
+    
+    <!-- Home -->
+    <string name="home_button_groups">Groups</string>
+    <string name="home_button_groups_desc">Enter the groups mode</string>
+    <string name="home_button_solo">Single-user mode</string>
+    <string name="home_button_solo_desc">Enter the single-user mode</string>
 
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>
@@ -135,7 +143,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="playlist_context_menu_item_save">Save to phone</string>
 
     <!-- Home -->
-    <string name="home_title">What kind of party?</string>
+    <string name="home_title">How many are you?</string>
 
     <!-- Solo player -->
 
@@ -187,6 +195,7 @@ You can also just cancel this action and stay in groups history.</string>
     
 
     <!-- Errors. -->
+    <string name="error_generic_server_response">Server responded:</string>
     <string name="error_setting_password">Unable to set password</string>
     <string name="error_loading_groups">Unable to load the list of groups.</string>
     <string name="error_loading_playlists">Unable to load the list of playlists</string>
@@ -214,6 +223,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_solo_save_playlist">Unable to save the playlist to your device.</string>
     <string name="error_solo_remove_playlist_from_local_dbs">Unable to remove the playlist from your device.</string>
     <string name="error_solo_remove_playlist_from_gs_server">Unable to remove the playlist from the server.</string>
+    <string name="error_solo_generate_playlists">The server was unable to remove the playlist from the server.</string>
     <string name="error_not_yet_available">Sorry, this is not yet available&#8230;</string>
     <!-- <string name="action_settings">Settings</string> -->
 

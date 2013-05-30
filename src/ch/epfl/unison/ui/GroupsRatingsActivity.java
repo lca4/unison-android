@@ -1,4 +1,11 @@
+
 package ch.epfl.unison.ui;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -21,7 +28,6 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -32,16 +38,10 @@ import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Activity where the user can rate the music on his device (or, more precisely: the
- * tracks that are on the local SQLite DB managed by the app).
- *
+ * Activity where the user can rate the music on his device (or, more precisely:
+ * the tracks that are on the local SQLite DB managed by the app).
+ * 
  * @author lum
  */
 public class GroupsRatingsActivity extends SherlockActivity {
@@ -129,10 +129,10 @@ public class GroupsRatingsActivity extends SherlockActivity {
     private void initItems() {
         UnisonDB db = new UnisonDB(this);
         mItems = new ArrayList<MusicItem>(db.getMusicItems());
-//        LibraryHelper helper = new LibraryHelper(this);
-//        mItems = new ArrayList<MusicItem>(helper.getEntries());
+        // LibraryHelper helper = new LibraryHelper(this);
+        // mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);
-//        helper.close();
+        // helper.close();
     }
 
     private void refreshList() {
@@ -219,7 +219,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
         }
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id)  {
+        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
             final MusicItem item = (MusicItem) view.getTag();
             int tempRating = 0;
             if (mRatings.get(item.artist + item.title) != null) {
@@ -248,8 +248,8 @@ public class GroupsRatingsActivity extends SherlockActivity {
                             if (newRating != oldRating) {
                                 sendRating(item, newRating, position);
                             }
-                }
-            });
+                        }
+                    });
 
             alert.setNegativeButton(getString(R.string.ratings_cancel), null);
             alert.show();

@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-  <LinearLayout android:orientation="horizontal"
-      android:layout_width="fill_parent" android:layout_height="wrap_content"
-      android:padding="10dp"
-      android:gravity="center"
-      android:background="#3FFF">
-
-    <TextView
-        android:layout_width="0dp"
+    <!-- Alignment of buttons: http://stackoverflow.com/questions/2614936/how-to-center-buttons-on-screen-horizontally-and-vertically-plus-equidistant-apa -->
+    
+    <ImageButton
+        android:id="@+id/home_button_groups"
+        android:contentDescription="@string/home_button_groups_desc"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/home_title"/>
+        android:src="@drawable/ic_social_group"
+        android:onClick="onButtonClickGroups"
+        android:text="@string/home_button_groups"
+        android:layout_centerInParent="true" />
 
-  </LinearLayout>
+    <ImageButton
+        android:id="@+id/home_button_solo"
+        android:contentDescription="@string/home_button_solo_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_social_person"
+        android:onClick="onButtonClickSolo"
+        android:text="@string/home_button_solo"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/home_button_groups"
+        android:layout_marginTop="30dip" />
 
-  <!-- Text output wrapper -->
-  <ListView
-      android:layout_height="0dp"
-      android:layout_width="match_parent"
-      android:layout_weight="1"
-      android:id="@+id/home_activities_list" />
-
-</LinearLayout>
+</RelativeLayout>
