@@ -1,21 +1,16 @@
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RatingBar;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -127,10 +122,10 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 		}
 		//now everything is set up.
 		if (!isDJ() && groupInfo.master != null
-				&& (new Long(mUid)).equals(groupInfo.master.uid)) {
+				&& Long.valueOf(mUid).equals(groupInfo.master.uid)) {
 			setIsDJ(true, mApi, mUid, mGid, mLatitude, mLongitude);
 		} else if (isDJ()
-				&& (groupInfo.master == null || !(new Long(mUid))
+				&& (groupInfo.master == null || !Long.valueOf(mUid)
 						.equals(groupInfo.master.uid))) {
 		    setIsDJ(false, mApi, mUid, mGid, mLatitude, mLongitude);
 		}
@@ -243,6 +238,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
 					@Override
 					public void onError(Error error) {
+						mIsDJ = false;
 						if (error != null) {
 							Log.d(TAG, error.toString());
 						}
@@ -296,6 +292,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 						if (error != null) {
 							Log.d(TAG, error.toString());
 						}
+						mIsDJ = true;
 					}
 				});
 	}
@@ -310,74 +307,74 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 		mMainActivity.setDJ(wantsToBeDJ);
 	}
 
-	/**
-	 * Handles instant ratings (when the user clicks on the rating button in the
-	 * player interface).
-	 */
-	private class OnRatingClickListener implements OnClickListener {
-
-		private void sendRating(MusicItem item, int rating) {
-			Log.d(TAG, String.format("artist: %s, title: %s, rating: %d",
-					item.artist, item.title, rating));
-
-			UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
-			api.instantRate(
-					((GroupsMainActivity) getMainActivity()).getGroupId(),
-					item.artist, item.title, rating,
-					new UnisonAPI.Handler<JsonStruct.Success>() {
-						@Override
-						public void callback(JsonStruct.Success struct) {
-						}
-
-						@Override
-						public void onError(Error error) {
-							if (error != null) {
-								Log.d(TAG, error.toString());
-							}
-							if (getActivity() != null) {
-								Toast.makeText(getActivity(),
-										R.string.error_sending_rating,
-										Toast.LENGTH_LONG).show();
-							}
-						}
-					});
-		}
-
-		@Override
-		public void onClick(View v) {
-			if (getCurrentTrack() == null) {
-				return;
-			}
-
-			AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-			alert.setTitle(getString(R.string.player_rate));
-			alert.setMessage(getString(R.string.player_like));
-
-			LayoutInflater inflater = (LayoutInflater) getActivity()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View layout = inflater.inflate(R.layout.rating_dialog, null);
-			final RatingBar bar = (RatingBar) layout
-					.findViewById(R.id.ratingBar);
-
-			alert.setView(layout);
-			alert.setPositiveButton(getString(R.string.player_ok),
-					new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-							if (getCurrentTrack() != null) {
-								int newRating = Math.max((int) bar.getRating(),
-										1);
-								sendRating(getCurrentTrack(), newRating);
-							}
-						}
-					});
-
-			alert.setNegativeButton(getString(R.string.player_cancel), null);
-			alert.show();
-		}
-	}
+//	/**
+//	 * Handles instant ratings (when the user clicks on the rating button in the
+//	 * player interface).
+//	 */
+//	private class OnRatingClickListener implements OnClickListener {
+//
+//		private void sendRating(MusicItem item, int rating) {
+//			Log.d(TAG, String.format("artist: %s, title: %s, rating: %d",
+//					item.artist, item.title, rating));
+//
+//			UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
+//			api.instantRate(
+//					((GroupsMainActivity) getMainActivity()).getGroupId(),
+//					item.artist, item.title, rating,
+//					new UnisonAPI.Handler<JsonStruct.Success>() {
+//						@Override
+//						public void callback(JsonStruct.Success struct) {
+//						}
+//
+//						@Override
+//						public void onError(Error error) {
+//							if (error != null) {
+//								Log.d(TAG, error.toString());
+//							}
+//							if (getActivity() != null) {
+//								Toast.makeText(getActivity(),
+//										R.string.error_sending_rating,
+//										Toast.LENGTH_LONG).show();
+//							}
+//						}
+//					});
+//		}
+//
+//		@Override
+//		public void onClick(View v) {
+//			if (getCurrentTrack() == null) {
+//				return;
+//			}
+//
+//			AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+//			alert.setTitle(getString(R.string.player_rate));
+//			alert.setMessage(getString(R.string.player_like));
+//
+//			LayoutInflater inflater = (LayoutInflater) getActivity()
+//					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//			View layout = inflater.inflate(R.layout.rating_dialog, null);
+//			final RatingBar bar = (RatingBar) layout
+//					.findViewById(R.id.ratingBar);
+//
+//			alert.setView(layout);
+//			alert.setPositiveButton(getString(R.string.player_ok),
+//					new DialogInterface.OnClickListener() {
+//
+//						@Override
+//						public void onClick(DialogInterface dialog,
+//								int whichButton) {
+//							if (getCurrentTrack() != null) {
+//								int newRating = Math.max((int) bar.getRating(),
+//										1);
+//								sendRating(getCurrentTrack(), newRating);
+//							}
+//						}
+//					});
+//
+//			alert.setNegativeButton(getString(R.string.player_cancel), null);
+//			alert.show();
+//		}
+//	}
 
 	@Override
 	protected boolean requestTrack() {
