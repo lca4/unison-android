@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
@@ -7,62 +8,47 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.data.PlaylistItem;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
  * the list of the tracks of the playlist.
- *
+ * 
  * @author mbourqui
  */
-public class SoloTracksFragment extends SherlockFragment 
-    implements SoloMainActivity.OnPlaylistInfoListener {
+public class SoloTracksFragment extends AbstractListFragment
+        implements SoloMainActivity.OnPlaylistInfoListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "ch.epfl.unison.StatsActivity";
 
-    private ListView mTracksList;
-    private TextView mTrackTitle;
-
-    private SoloMainActivity mActivity;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list, container, false);
-
-        mTracksList = (ListView) v.findViewById(R.id.listList);
-        mTrackTitle = (TextView) v.findViewById(R.id.listTitle);
-
-        return v;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onPlaylistInfo(PlaylistItem playlistInfo) {
         if (playlistInfo.getTitle() != null) {
-            mTrackTitle.setText(playlistInfo.getTitle());
+            getTitle().setText(playlistInfo.getTitle());
         }
-        mTracksList.setAdapter(new TracksAdapter(playlistInfo));
+        getList().setAdapter(new TracksAdapter(playlistInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (SoloMainActivity) activity;
-        mActivity.registerPlaylistInfoListener(this);
+        ((SoloMainActivity) getMainActivity()).registerPlaylistInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mActivity.unregisterPlaylistInfoListener(this);
+        ((SoloMainActivity) getMainActivity()).unregisterPlaylistInfoListener(this);
     }
 
     /** ArrayAdapter that displays the tracks of the playlist. */
@@ -82,12 +68,12 @@ public class SoloTracksFragment extends SherlockFragment
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.trTrackTitle)).setText(getItem(position).title);
-//            int rating = 0;
-//            if (getItem(position).rating != null) {
-//                rating = getItem(position).rating;
-//            }
-//            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+            ((TextView) view.findViewById(R.id.trackTitle)).setText(getItem(position).title);
+            // int rating = 0;
+            // if (getItem(position).rating != null) {
+            // rating = getItem(position).rating;
+            // }
+            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
 
             return view;
         }

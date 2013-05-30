@@ -11,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 
@@ -42,10 +41,13 @@ public class GroupsStatsFragment extends SherlockFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.stats, container, false);
+        View v = inflater.inflate(R.layout.list, container, false);
+        v.findViewById(R.id.listHeader).setVisibility(View.VISIBLE);
+        ((TextView) v.findViewById(R.id.listTitle)).setText(R.string.stats_not_playing);
+        ((TextView) v.findViewById(R.id.listSubTitle)).setText(R.string.stats_taste);
 
-        mUsersList = (ListView) v.findViewById(R.id.usersList);
-        mTrackTitle = (TextView) v.findViewById(R.id.trackTitle);
+        mUsersList = (ListView) v.findViewById(R.id.listList);
+        mTrackTitle = (TextView) v.findViewById(R.id.listTitle);
 
         return v;
     }
@@ -97,7 +99,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
                 score = getItem(position).score;
             }
             float rating = Math.round(score / TEN) / TWO;
-            ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+            ((RatingBar) view.findViewById(R.id.trackRating)).setRating(rating);
 
             TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
             if (getItem(position).score == null || getItem(position).predicted == null) {

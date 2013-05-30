@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.ProgressDialog;
@@ -11,7 +12,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -23,7 +23,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Activity that allows the user to sign up for the service.
- *
+ * 
  * @author lum
  */
 public class SignupActivity extends SherlockActivity {
@@ -54,7 +54,8 @@ public class SignupActivity extends SherlockActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { // if using home button from menu: R.id.home 
+        if (item.getItemId() == android.R.id.home) { // if using home button
+                                                     // from menu: R.id.home
             // app icon in Action Bar clicked; go home
             startActivity(new Intent(this, LoginActivity.class)
                     .setAction(GroupsActivity.ACTION_LEAVE_GROUP)

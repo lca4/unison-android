@@ -1,24 +1,23 @@
+
 package ch.epfl.unison.data;
 
 /**
- * 
  * @author marc
- *
  */
 public class TagItem extends AbstractItem {
-    
+
     public final int localId;
     public final String name;
     public boolean isChecked;
     public final Long remoteId; // id on GS database, hash in fact
-    
+
     public TagItem(String n, Long rid) {
         this.localId = -1;
         this.name = n;
         this.isChecked = false;
         this.remoteId = rid;
     }
-    
+
     public TagItem(int lid, String n, int checked, Long rid) {
         this.localId = lid;
         this.name = n;
@@ -48,11 +47,10 @@ public class TagItem extends AbstractItem {
             } else if (localId > tagItem.localId) {
                 return 1;
             }
-            return 0;            
+            return 0;
         } else {
             throw new IllegalArgumentException();
         }
     }
-
 
 }

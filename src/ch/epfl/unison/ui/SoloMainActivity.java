@@ -1,16 +1,15 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.Intent;
 import android.os.Bundle;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
@@ -23,7 +22,7 @@ public class SoloMainActivity extends AbstractMainActivity {
 
     /** Simple interface to be notified about playlist info updates. */
     public interface OnPlaylistInfoListener {
-//        void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
 
         void onPlaylistInfo(PlaylistItem playlistInfo);
     }
@@ -32,13 +31,13 @@ public class SoloMainActivity extends AbstractMainActivity {
 
     private UnisonDB mDB;
     private PlaylistItem mPlaylist;
-//    private List<MusicItem> mHistory;
+    // private List<MusicItem> mHistory;
 
     private Set<OnPlaylistInfoListener> mListeners = new HashSet<OnPlaylistInfoListener>();
 
     public void dispatchPlaylistInfo(PlaylistItem playlistInfo) {
         for (OnPlaylistInfoListener listener : mListeners) {
-//            listener.onPlaylistInfo(playlistInfo);
+            // listener.onPlaylistInfo(playlistInfo);
             listener.onPlaylistInfo(playlistInfo);
         }
     }
@@ -69,7 +68,7 @@ public class SoloMainActivity extends AbstractMainActivity {
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),
                 SoloTracksFragment.class, null);
-        
+
     }
 
     @Override
@@ -88,7 +87,7 @@ public class SoloMainActivity extends AbstractMainActivity {
     public void unregisterPlaylistInfoListener(OnPlaylistInfoListener listener) {
         mListeners.remove(listener);
     }
-    
+
     protected PlaylistItem getPlaylist() {
         return mPlaylist;
     }

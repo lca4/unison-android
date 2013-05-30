@@ -1,15 +1,17 @@
 
 package ch.epfl.unison.data;
 
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
-
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -26,7 +28,7 @@ public class PlaylistItem extends AbstractItem {
         Linear, Circular, LoopOnTrack, Shuffle
     }
 
-    private long mLocalId = 0; // Android sqlite
+    private long mLocalId = -1; // Android sqlite
     private Date mLocalLastUpdated;
     private boolean mCreatedByGS; // maybe useless
     private long mGSPLId; // GS database id
@@ -38,7 +40,7 @@ public class PlaylistItem extends AbstractItem {
     private int mAuthorId;
     private String mAuthorName;
     private int mGSSize;
-    private LinkedList<MusicItem> mTracks;
+    private List<MusicItem> mTracks;
     private int mUserRating;
     private String mUserComment;
     private int mListeners;
@@ -46,17 +48,17 @@ public class PlaylistItem extends AbstractItem {
     private boolean mIsShared;
     private boolean mIsSynced;
 
-    private ArrayList<Integer> mRawTagsId;
     private HashMap<String, Object> mOptions;
 
     // private LinkedList<MusicItem> mPlaylist;
     private int mCurrent = 0;
     private Mode mMode = Mode.Linear;
-    private HashSet<Integer> mShuffled; // To store played tracks (avoid duplicates)
+    private LinkedList<Integer> mShuffled = new LinkedList<Integer>();
+
+    private Random mRandom = new Random();
 
     public PlaylistItem() {
-        mRawTagsId = new ArrayList<Integer>();
-        mTracks = new LinkedList<MusicItem>();
+        mTracks = Collections.synchronizedList(new LinkedList<MusicItem>());
         mOptions = new HashMap<String, Object>();
     }
 
@@ -66,7 +68,7 @@ public class PlaylistItem extends AbstractItem {
     }
 
     /**
-     * @author marc TODO complete
+     * @author marc
      */
     public static class Builder {
         private long mLocalId; // Android sqlite
@@ -205,7 +207,8 @@ public class PlaylistItem extends AbstractItem {
             LinkedList<MusicItem> ll = new LinkedList<MusicItem>();
             if (t != null) {
                 for (int i = 0; i < t.length; i++) {
-                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title, t[i].playOrder));
+                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title,
+                            t[i].playOrder));
                 }
             }
             this.mTracks = ll;
@@ -262,38 +265,46 @@ public class PlaylistItem extends AbstractItem {
         this.mIsSynced = builder.mIsSynced;
     }
 
-    public boolean hasNext() {
-        if (mCurrent < mTracks.size() - 1) {
-            return true;
+    /*
+     * Player specific interaction
+     */
+
+    private boolean hasNext() {
+        synchronized (mTracks) {
+            if (mCurrent < mTracks.size() - 1) {
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     public MusicItem next() {
-        // TODO Add shuffle support
-        if (mMode != Mode.LoopOnTrack) {
+        synchronized (mTracks) {
             if (hasNext()) {
                 mCurrent++;
-            } else {
-                if (mMode == Mode.Circular) {
-                    mCurrent = 0;
-                } else {
-                    throw new IndexOutOfBoundsException();
+                if (mMode == Mode.Shuffle) {
+                    return mTracks.get(mShuffled.get(mCurrent));
                 }
+            } else if (mMode == Mode.Circular) {
+                mCurrent = 0;
+            } else {
+                throw new IndexOutOfBoundsException("No more tracks to play");
             }
+            return mTracks.get(mCurrent);
         }
-        return mTracks.get(mCurrent);
     }
 
     public MusicItem current() {
-        if (mCurrent >= 0 && mTracks.size() > 0) {
-            return mTracks.get(mCurrent);
-        } else {
-            throw new IndexOutOfBoundsException();
+        synchronized (mTracks) {
+            if (mCurrent >= 0 && mTracks.size() > 0 && mCurrent < mTracks.size()) {
+                return mTracks.get(mCurrent);
+            } else {
+                throw new IndexOutOfBoundsException();
+            }
         }
     }
 
-    public boolean hasPrevious() {
+    private boolean hasPrevious() {
         if (mCurrent >= 1) {
             return true;
         }
@@ -301,25 +312,24 @@ public class PlaylistItem extends AbstractItem {
     }
 
     public MusicItem previous() {
-        // TODO Add shuffle support
-        if (mMode != Mode.LoopOnTrack) {
+        synchronized (mTracks) {
             if (hasPrevious()) {
                 mCurrent--;
-            } else {
-                if (mMode == Mode.Circular) {
-                    mCurrent = mTracks.size();
-                } else {
-                    throw new IndexOutOfBoundsException();
+                if (mMode == Mode.Shuffle) {
+                    return mTracks.get(mShuffled.get(mCurrent));
                 }
+            } else if (mMode == Mode.Circular) {
+                mCurrent = mTracks.size() - 1;
+            } else {
+                throw new IndexOutOfBoundsException("No more tracks to play");
             }
+            return mTracks.get(mCurrent);
         }
-        return mTracks.get(mCurrent);
     }
 
-    @Deprecated
-    public void addRawTags(ArrayList<Integer> seeds) {
-        mRawTagsId.addAll(seeds);
-    }
+    /*
+     * Getters and setters
+     */
 
     public String getTitle() {
         return mTitle;
@@ -395,10 +405,6 @@ public class PlaylistItem extends AbstractItem {
         this.mIsSynced = isSynced;
     }
 
-    public void setRawTagsId(ArrayList<Integer> rawTagsId) {
-        this.mRawTagsId = rawTagsId;
-    }
-
     public long getLocalId() {
         return mLocalId;
     }
@@ -423,7 +429,7 @@ public class PlaylistItem extends AbstractItem {
         return mGSSize;
     }
 
-    public LinkedList<MusicItem> getTracks() {
+    public List<MusicItem> getTracks() {
         return mTracks;
     }
 
@@ -439,7 +445,7 @@ public class PlaylistItem extends AbstractItem {
         return mOptions;
     }
 
-    public LinkedList<MusicItem> getPlaylist() {
+    public List<MusicItem> getPlaylist() {
         return mTracks;
     }
 
@@ -447,6 +453,25 @@ public class PlaylistItem extends AbstractItem {
     public int compareTo(AbstractItem another) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    public void setMode(Mode mode) {
+        switch (mode) {
+            case Shuffle:
+                mShuffled.clear();
+                LinkedList<Integer> temp = new LinkedList<Integer>();
+                Iterator<MusicItem> it = mTracks.iterator();
+                while (it.hasNext()) {
+                    temp.add(it.next().playOrder);
+                }
+                while (mShuffled.size() < mTracks.size()) {
+                    mShuffled.add(temp.remove(mRandom.nextInt(temp.size())));
+                }
+                break;
+            default:
+                mMode = mode;
+                break;
+        }
     }
 
 }
