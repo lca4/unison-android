@@ -1,5 +1,8 @@
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -10,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +31,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -40,9 +43,6 @@ import ch.epfl.unison.music.MusicService;
 import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 
 import com.actionbarsherlock.app.SherlockFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fragment that is displayed inside {@link AbstractMainActivity} (one of the
@@ -152,6 +152,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	}
 
 	private static String smTag = "ch.epfl.unison.UnisonPlayerFragment";
+	
 
 	private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
 
@@ -164,13 +165,13 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		return SEEK_BAR_MAX;
 	}
 
-	private AbstractMainActivity mMainActivity;
+	protected AbstractMainActivity mMainActivity;
 
 	private Button mNextBtn;
 	private Button mPrevBtn;
 	private Button mToggleBtn;
 	private Button mRatingBtn;
-	private Button mDjBtn;
+	protected Button mDjBtn;
 
 	private SeekBar mSeekBar;
 	private Handler mHandler = new Handler();
@@ -185,8 +186,8 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 	private int mHistPointer;
 
-	private boolean mDJSupport;
-	private boolean mIsDJ;
+//	private boolean mDJSupport;
+//	private boolean mIsDJ;
 	private Status mStatus = Status.Stopped;
 	private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
 
@@ -247,10 +248,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
 	MusicItem getCurrentTrack() {
 		return mCurrentTrack;
-	}
-
-	Button getDJBtn() {
-		return mDjBtn;
 	}
 
 	private Handler getHandler() {
@@ -323,10 +320,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		return mIsBound;
 	}
 
-	protected boolean isDJ() {
-		return mIsDJ;
-	}
-
 	protected void next() {
 		if (!mHistory.isEmpty()
 				&& mHistPointer == 0
@@ -371,10 +364,31 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 			next();
 		} else if (v == getPrevBtn()) {
 			prev();
-		} else if (mDJSupport && v == mDjBtn) {
-			Log.d(smTag, "Clicked DJ button");
-			setIsDJ(!mIsDJ);
 		}
+//		else if (mDJSupport && v == mDjBtn) {
+//			Log.d(smTag, "Clicked DJ button");
+//			//Here we are (almost) sure that the main activity is still not null, so we collect usefull
+//			//information for latter servercomm:
+//			Activity activity = getActivity();
+//			if (activity == null) {
+//			    //this should never happen
+//			    Log.d(smTag,
+//			            "Trying to get or release DJ seat while the activity was null! Aborting.");
+//			}
+//			AppData data = AppData.getInstance(activity);
+//			Location loc = data.getLocation();
+//			double lat, lon;
+//			if (loc != null) {
+//			    lat = loc.getLatitude();
+//			    lon = loc.getLongitude();
+//			} else {
+//			    lat = DEFAULT_LATITUDE;
+//			    lon = DEFAULT_LONGITUDE;
+//			    Log.i(smTag, "location was null, using default values");
+//			}
+//			
+////			setIsDJ(!mIsDJ, data.getAPI(), data.getUid(), activity.getG);
+//		}
 	}
 
 	@Override
@@ -384,9 +398,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	    
 		View v = inflater.inflate(R.layout.player, container, false);
 
-		// Default values
-		mDJSupport = false;
-		mIsDJ = false;
+//		// Default values
+//		mDJSupport = false;
+//		mIsDJ = false;
 
 		mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
 		mToggleBtn.setOnClickListener(this);
@@ -394,9 +408,11 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		mNextBtn.setOnClickListener(this);
 		setPrevBtn((Button) v.findViewById(R.id.musicPrevBtn));
 		mPrevBtn.setOnClickListener(this);
+		
 		mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
 		mDjBtn.setOnClickListener(this);
 		mDjBtn.setVisibility(View.INVISIBLE);
+		
 		mRatingBtn = (Button) v.findViewById(R.id.ratingBtn);
 		mRatingBtn.setOnClickListener(new OnRatingClickListener());
 
@@ -432,14 +448,14 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 	public void onStart() {
 		super.onStart();
 		getSeekBar().setEnabled(true);
-		if (mDJSupport && !mIsDJ) {
-			// Just to make sure, when the activity is recreated.
-			getButtons().setVisibility(View.INVISIBLE);
-			mDjBtn.setText(getString(R.string.player_become_dj));
-			getSeekBar().setVisibility(View.INVISIBLE);
-		} else {
-			getSeekBar().setVisibility(View.VISIBLE);
-		}
+//		if (mDJSupport && !mIsDJ) {
+//			// Just to make sure, when the activity is recreated.
+//			getButtons().setVisibility(View.INVISIBLE);
+//			mDjBtn.setText(getString(R.string.player_become_dj));
+//			getSeekBar().setVisibility(View.INVISIBLE);
+//		} else {
+		getSeekBar().setVisibility(View.VISIBLE);
+//		}
 		getMainActivity().bindService(
 				new Intent(getMainActivity(), MusicService.class),
 				getConnection(), Context.BIND_AUTO_CREATE);
@@ -529,19 +545,19 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		this.mCurrentTrack = currentTrack;
 	}
 
-	/**
-	 * Also makes the DJ toggle visible.
-	 * 
-	 * @param djSupport
-	 */
-	protected void setDJSupport(boolean djSupport) {
-		mDJSupport = djSupport;
-		if (mDJSupport) {
-			mDjBtn.setVisibility(View.VISIBLE);
-		} else {
-			mDjBtn.setVisibility(View.INVISIBLE);
-		}
-	}
+//	/**
+//	 * Also makes the DJ toggle visible.
+//	 * 
+//	 * @param djSupport
+//	 */
+//	protected void setDJSupport(boolean djSupport) {
+//		mDJSupport = djSupport;
+//		if (mDJSupport) {
+//			mDjBtn.setVisibility(View.VISIBLE);
+//		} else {
+//			mDjBtn.setVisibility(View.INVISIBLE);
+//		}
+//	}
 
 	/**
 	 * Initialize the history, for example when giving a playlist from the
@@ -553,20 +569,20 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 		mHistory = history;
 	}
 
-	/**
-	 * Be sure you asked for DJ support first. If the DJ is not supported,
-	 * throws an UnsupportedOperationException.
-	 * 
-	 * @param wantsToBeDJ
-	 */
-	protected void setIsDJ(boolean wantsToBeDJ) {
-		if (mDJSupport) {
-			mIsDJ = wantsToBeDJ;
-			mMainActivity.setDJ(wantsToBeDJ);
-		} else {
-			throw new UnsupportedOperationException();
-		}
-	}
+//	/**
+//	 * Be sure you asked for DJ support first. If the DJ is not supported,
+//	 * throws an UnsupportedOperationException.
+//	 * 
+//	 * @param wantsToBeDJ
+//	 */
+//	protected void setIsDJ(boolean wantsToBeDJ) {
+//		if (mDJSupport) {
+//			mIsDJ = wantsToBeDJ;
+//			mMainActivity.setDJ(wantsToBeDJ);
+//		} else {
+//			throw new UnsupportedOperationException();
+//		}
+//	}
 
 	private void setMainActivity(AbstractMainActivity mActivity) {
 		this.mMainActivity = mActivity;

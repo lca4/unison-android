@@ -170,8 +170,8 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
 		return false;
 	}
 
-	@Override
-	protected void setIsDJ(boolean wantsToBeDJ) {
-		// Unused, since there is no DJ
-	}
+//	@Override
+//	protected void setIsDJ(boolean wantsToBeDJ) {
+//		// Unused, since there is no DJ
+//	}
 }

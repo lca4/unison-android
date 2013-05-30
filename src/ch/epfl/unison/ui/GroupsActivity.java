@@ -378,6 +378,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             data.getAPI().listGroups(handler);
         }
 //        switchSuggestionButtonState(data.showGroupSuggestion());
+        
+        updateSuggestionButton(!mProcessingAutoAction);
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
         }
@@ -482,10 +484,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
      */
     private void updateSuggestionButton(boolean mask) {
         
-        if (!mask) {
-            switchSuggestionButtonState(false);
-            return;
-        }
+        
         
         Button reDisplaySuggestion = (Button) findViewById(R.id.displaySuggestion);
         AppData data = AppData.getInstance(GroupsActivity.this);
@@ -499,7 +498,12 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         
         if (currentLoc == null) {
             reDisplaySuggestion.setText(R.string.groups_suggestion_goto_settings);
-            reDisplaySuggestion.setEnabled(true);
+            reDisplaySuggestion.setEnabled(mask); //was previously true
+            return;
+        }
+        
+        if (!mask) {
+            switchSuggestionButtonState(false);
             return;
         }
         
@@ -638,9 +642,11 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 mSuggestion = null;
                 mSuggestionIsForeground = false;
                 
-                updateSuggestionButton(true);
+                
                 return;
             }
+            updateSuggestionButton(!mProcessingAutoAction);
+            
             if (!mProcessingAutoAction) {
             	showSuggestionDialog();
             }
@@ -650,7 +656,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         public void onError(Error error) {
             mSuggestionIsForeground = false;
             
-            updateSuggestionButton(true);
+            updateSuggestionButton(!mProcessingAutoAction);
             //Do nothing, errors silently happen in the background.
         }
     };
@@ -671,7 +677,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
         Location currentLoc = data.getLocation();
         
-        updateSuggestionButton(true);
+        //TODO check if needed
+//        updateSuggestionButton(!mProcessingAutoAction);
 
         // Only do suggestions based on location for now.
         if (currentLoc != null) {
@@ -815,6 +822,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     }
     
     private void joinGroup(final JsonStruct.Group group, String password) {
+        mProcessingAutoAction = true;
+        toggleActivityButtons(false);
+        
         if (group != null) {            
             Log.d(TAG, "Calling joinGroup with groupID = " + group.gid);
             
@@ -886,28 +896,29 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 if (error != null) {                    
                     Log.d(TAG, error.toString());
                 }
-                if (error != null && GroupsActivity.this != null) {
-                    
-                    if (error.hasJsonError()) {
-                    	if (error.jsonError.error == UnisonAPI.ErrorCodes.INVALID_GROUP) {
-                    		//here the group no longer exists, the user needs to take an action:
-                    		//you may comment this line for testing purpose only!
-                    		data.removeOneHistoryItem(group.gid);
-
-                    		showErrorPopup();
-                    	} else if (error.jsonError.error == UnisonAPI.ErrorCodes.PASSWORD_EXPECTED) {
-                    		group.password = true;
-                    		data.addToHistory(group);
-                    		promptForPassword(group);
-                    	}
-                        
-                    } else {
-                        Log.d(TAG, "The error was not due to an invalid group.");
+                
+                Log.d(TAG, "The error was not due to an invalid group.");
                         Toast.makeText(GroupsActivity.this, R.string.error_joining_group,
                                 Toast.LENGTH_LONG).show();
+                        if (error != null && GroupsActivity.this != null) {
+                            if (error.hasJsonError()) {
+                                if (error.jsonError.error == UnisonAPI.ErrorCodes.INVALID_GROUP) {
+                                    // here the group no longer exists, the user
+                                    // needs to take an action:
+                                    // you may comment this line for testing
+                                    // purpose only!
+                                    data.removeOneHistoryItem(group.gid);
+
+                                    showErrorPopup();
+                                } else if (error.jsonError.error 
+                                        == UnisonAPI.ErrorCodes.PASSWORD_EXPECTED) {
+                                    group.password = true;
+                                    data.addToHistory(group);
+                                    promptForPassword(group);
+                                }
+                            }
+                        }
                     }
-                }             
-            }
 
         };
         
