@@ -462,7 +462,7 @@ public class PlaylistItem extends AbstractItem {
                 LinkedList<Integer> temp = new LinkedList<Integer>();
                 Iterator<MusicItem> it = mTracks.iterator();
                 while (it.hasNext()) {
-                    temp.add(it.next().playOrder);
+                    temp.add((int) it.next().playOrder);
                 }
                 while (mShuffled.size() < mTracks.size()) {
                     mShuffled.add(temp.remove(mRandom.nextInt(temp.size())));

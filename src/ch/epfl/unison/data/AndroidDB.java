@@ -159,9 +159,9 @@ final class AndroidDB {
     static void getTracks(ContentResolver resolver, PlaylistItem pl) {
         String[] projection = new String[] {
                 // MediaStore.Audio.Playlists.Members.PLAYLIST_ID,
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                MediaStore.Audio.Playlists.Members.ARTIST,
+                MediaStore.Audio.Playlists.Members.TITLE,
                 // MediaStore.Audio.Media.DATA,
                 // MediaStore.Audio.Media.ALBUM,
                 // MediaStore.Audio.Playlists.Members.AUDIO_ID,
@@ -172,15 +172,17 @@ final class AndroidDB {
         // Sort the tracks by play_order
         Cursor cur = resolver.query(contentUri,
                 projection,
-                null, null, MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+                null,
+                null,
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER);
         if (cur != null & cur.moveToFirst()) {
             LinkedList<MusicItem> mTracks = new LinkedList<MusicItem>();
-            int colId = cur.getColumnIndex(MediaStore.Audio.Media._ID);
-            int colTitle = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int colArtist = cur.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID);
+            int colTitle = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.TITLE);
+            int colArtist = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.ARTIST);
             int colPlayOrder = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER);
             do {
-                mTracks.add(new MusicItem(cur.getInt(colId), cur.getString(colArtist),
+                mTracks.add(new MusicItem(cur.getLong(colId), cur.getString(colArtist),
                         cur.getString(colTitle), cur.getInt(colPlayOrder)));
             } while (cur.moveToNext());
             pl.setTracks(mTracks);
