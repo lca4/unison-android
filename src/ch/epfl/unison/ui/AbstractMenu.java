@@ -83,9 +83,17 @@ public abstract class AbstractMenu {
                 // GroupsActivity.class)
                 // .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                 // .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                // Make sure the activity is finished, even if it was at the
-                // bottom of the stack.
-                activity.finish();
+                
+                if (!(activity instanceof HomeActivity)) {
+                    if (activity instanceof GroupsMainActivity) {
+                        activity.startActivity(new Intent(activity, GroupsActivity.class).setAction(
+                                GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    }
+                    // Make sure the activity is finished, even if it was at the
+                    // bottom of the stack.
+                    activity.finish();                    
+                }
                 break;
             default:
                 break; // Should never happen.
