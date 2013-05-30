@@ -9,19 +9,19 @@ package ch.epfl.unison.data;
  */
 public class MusicItem extends AbstractItem {
 
-    public final int localId;
+    public final long localId;
     public final String artist;
     public final String title;
-    public final int playOrder;
+    public final long playOrder;
 
-    public MusicItem(int id, String a, String t) {
+    public MusicItem(long id, String a, String t) {
         localId = id;
         artist = a;
         title = t;
         playOrder = -1;
     }
 
-    public MusicItem(int id, String a, String t, int o) {
+    public MusicItem(long id, String a, String t, long o) {
         localId = id;
         artist = a;
         title = t;
@@ -31,7 +31,7 @@ public class MusicItem extends AbstractItem {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
+        long result = 1;
         result = prime * result;
         if (artist != null) {
             result += artist.hashCode();
@@ -41,7 +41,7 @@ public class MusicItem extends AbstractItem {
         if (title != null) {
             result += title.hashCode();
         }
-        return result;
+        return (int) result;
     }
 
     @Override

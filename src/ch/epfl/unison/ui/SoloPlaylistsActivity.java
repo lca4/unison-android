@@ -595,6 +595,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             // TODO on click, display list of tracks
+            
+            
             // SoloPlaylistsActivity.this.startActivity(
             // new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
             // .putExtra(Const.Strings.LOCAL_ID,

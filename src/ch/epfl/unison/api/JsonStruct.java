@@ -67,14 +67,14 @@ public abstract class JsonStruct {
         public String artist;
         public String title;
         public String image;
-        public Integer localId;
+        public Long localId;
         public Integer rating;
         public Integer playOrder;
 
         public Track() {
         }
 
-        public Track(int id, String a, String t) {
+        public Track(long id, String a, String t) {
             localId = id;
             artist = a;
             title = t;
@@ -130,7 +130,7 @@ public abstract class JsonStruct {
         public Delta() {
         }
 
-        public Delta(String t, int localId, String artist, String title) {
+        public Delta(String t, long localId, String artist, String title) {
             this.type = t;
             this.entry = new Track(localId, artist, title);
         }
@@ -156,7 +156,6 @@ public abstract class JsonStruct {
         public String gsUserComment; // Not used for now
 
         public PlaylistItem toObject() {
-            // TODO complete
             return new PlaylistItem.Builder().plId(gsPlaylistId).title(title).tracks(tracks)
                     .size(gsSize).authorId(authorId).created(gsCreationTime)
                     .gsUpdated(gsUpdateTime)
