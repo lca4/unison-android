@@ -34,7 +34,6 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     
 @Override
     public void onStart() {
-        // TODO Auto-generated method stub
         super.onStart();
         if (!mIsDJ) {
             // Just to make sure, when the activity is recreated.
@@ -47,18 +46,25 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     //    private Button mDjBtn;
     private boolean mIsDJ = false;
 
+    //This boolean was added in order to avoid inconsistency in the app state when spamming the DJ btton.
+    private boolean mProcessingDjRequest = false;
+    
  // EPFL Polydome.
     private static final double DEFAULT_LATITUDE = 46.52147800207456;
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
     
 	@Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
         super.onClick(v);
         
         //now we check if the DJ button was clicked:
         if (v == mDjBtn) {
-            Log.d(TAG, "Clicked DJ button");
+        	if (mProcessingDjRequest) {
+        		return;
+        	}      	
+        	mProcessingDjRequest = true;
+        	
+//            Log.d(TAG, "Clicked DJ button, mProcessing is now true");
             //Here we are (almost) sure that the main activity is still not null, so we collect usefull
             //information for latter servercomm:
             if (!setupServerCommBundleForDJ()) {
@@ -86,6 +92,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
+		
+		mProcessingDjRequest = false;
 //		setTag(TAG);
 		// Default values
 //        mDJSupport = false;
@@ -195,45 +203,51 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 	}
 
 	/** Don't call this directly. Call setDJ() instead. */
-	private void grabDJSeat(final UnisonAPI api, final long uid, final long gid,
-	        final double lat, final double lon) {
-	    
-	    /*if (getActivity() == null) {
-            return;
-        }*/
-//		final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
-//		AppData data = AppData.getInstance(getActivity());
-//		double lat, lon;
-		/*if (data.getLocation() != null) {
-			lat = data.getLocation().getLatitude();
-			lon = data.getLocation().getLongitude();
-		} else {
-			lat = DEFAULT_LATITUDE;
-			lon = DEFAULT_LONGITUDE;
-			Log.i(TAG, "location was null, using default values");
-		}*/
-		
-		//update: now we always get a non null location from the "activity" when the DJ button is pressed.
-		//It is set to the default location at this time.
+	private void grabDJSeat(final UnisonAPI api, final long uid,
+			final long gid, final double lat, final double lon) {
 
-//		data.getAPI().becomeMaster(gid, data.getUid(), lat, lon,
+		/*
+		 * if (getActivity() == null) { return; }
+		 */
+		// final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
+		// AppData data = AppData.getInstance(getActivity());
+		// double lat, lon;
+		/*
+		 * if (data.getLocation() != null) { lat =
+		 * data.getLocation().getLatitude(); lon =
+		 * data.getLocation().getLongitude(); } else { lat = DEFAULT_LATITUDE;
+		 * lon = DEFAULT_LONGITUDE; Log.i(TAG,
+		 * "location was null, using default values"); }
+		 */
+
+		// update: now we always get a non null location from the "activity"
+		// when the DJ button is pressed.
+		// It is set to the default location at this time.
+
+		// data.getAPI().becomeMaster(gid, data.getUid(), lat, lon,
 		api.becomeMaster(gid, uid, lat, lon,
 				new UnisonAPI.Handler<JsonStruct.Success>() {
 
 					@Override
 					public void callback(Success structure) {
-					    if (getActivity() == null) {
-					        Log.d(TAG, "Tried to update an Activity that was null!");
-					        return;
-					    } 
-						getDJBtn().setText(getString(R.string.player_leave_dj));
-						getToggleBtn().setBackgroundResource(
-								R.drawable.btn_play);
-						getButtons().setVisibility(View.VISIBLE);
-						getSeekBar().setVisibility(View.VISIBLE);
-						getSeekBar().setEnabled(true);
-						mTrackQueue = new TrackQueue(getActivity(), gid)
-								.start();
+						if (getActivity() == null) {
+							Log.d(TAG,
+									"Tried to update an Activity that was null!");
+							return;
+						}
+						if (mIsDJ) {
+							getDJBtn().setText(
+									getString(R.string.player_leave_dj));
+							getToggleBtn().setBackgroundResource(
+									R.drawable.btn_play);
+							getButtons().setVisibility(View.VISIBLE);
+							getSeekBar().setVisibility(View.VISIBLE);
+							getSeekBar().setEnabled(true);
+							mTrackQueue = new TrackQueue(getActivity(), gid)
+									.start();
+						}
+						mProcessingDjRequest = false;
+//						Log.d(TAG, "mProcessing is now false");
 					}
 
 					@Override
@@ -247,7 +261,10 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 									R.string.error_becoming_dj,
 									Toast.LENGTH_LONG).show();
 						}
-						GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid, lat, lon);
+						GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid,
+								lat, lon);
+						mProcessingDjRequest = false;
+						Log.d(TAG, "mProcessing is now false");
 					}
 				});
 	}
@@ -255,46 +272,50 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 	/** Don't call this directly. Call setDJ() instead. */
 	private void dropDJSeat(UnisonAPI api, long uid, long gid) {
 
-        /*if (getActivity() == null) {
-            return;
-        }   */
-//		final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
-//		AppData data = AppData.getInstance(getActivity());
+		/*
+		 * if (getActivity() == null) { return; }
+		 */
+		// final long gid = ((GroupsMainActivity) getActivity()).getGroupId();
+		// AppData data = AppData.getInstance(getActivity());
 
 		if (mTrackQueue != null) {
 			mTrackQueue.stop();
 		}
-		
-//		data.getAPI().resignMaster(gid, data.getUid(),
-		        api.resignMaster(gid, uid,
-				new UnisonAPI.Handler<JsonStruct.Success>() {
 
-					@Override
-					public void callback(Success structure) {
-					    if (getActivity() == null) {
-	                           Log.d(TAG, "Tried to update an Activity that was null!");
+		// data.getAPI().resignMaster(gid, data.getUid(),
+		api.resignMaster(gid, uid, new UnisonAPI.Handler<JsonStruct.Success>() {
 
-                            return;
-                        } 
-						getDJBtn()
-								.setText(getString(R.string.player_become_dj));
-						getButtons().setVisibility(View.INVISIBLE);
-						getSeekBar().setVisibility(View.INVISIBLE);
-						getSeekBar().setEnabled(false);
+			@Override
+			public void callback(Success structure) {
+				if (getActivity() == null) {
+					Log.d(TAG, "Tried to update an Activity that was null!");
 
-						getActivity().startService(
-								new Intent(MusicService.ACTION_STOP));
-						setStatus(Status.Stopped);
-					}
+					return;
+				}
+				if (!mIsDJ) {
+					getDJBtn().setText(getString(R.string.player_become_dj));
+					getButtons().setVisibility(View.INVISIBLE);
+					getSeekBar().setVisibility(View.INVISIBLE);
+					getSeekBar().setEnabled(false);
 
-					@Override
-					public void onError(Error error) {
-						if (error != null) {
-							Log.d(TAG, error.toString());
-						}
-						mIsDJ = true;
-					}
-				});
+					getActivity().startService(
+							new Intent(MusicService.ACTION_STOP));
+					setStatus(Status.Stopped);
+				}
+				mProcessingDjRequest = false;
+//				Log.d(TAG, "mProcessing is now false");
+			}
+
+			@Override
+			public void onError(Error error) {
+				if (error != null) {
+					Log.d(TAG, error.toString());
+				}
+				mIsDJ = true;
+				mProcessingDjRequest = false;
+//				Log.d(TAG, "mProcessing is now false");
+			}
+		});
 	}
 
 	protected void setIsDJ(boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat, double lon) {
