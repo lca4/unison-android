@@ -7,7 +7,8 @@
     android:padding="10dp">
 
   <ImageView
-      android:id="@+id/lr_image"
+      android:id="@+id/listrow_image"
+      android:contentDescription="@string/solo_playlists_fragment_local_list_row_image_desc"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
@@ -21,17 +22,25 @@
       android:orientation="vertical">
 
   <TextView
-      android:id="@+id/lr_title"
+      android:id="@+id/listrow_title"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
+      android:text="@string/default_title"
       android:textAppearance="?android:attr/textAppearanceMedium" />
+  <TextView
+        android:id="@+id/listrow_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/default_subtitle" />
 
   <!-- Display short infos. For e.g. # tracks -->
-  <TextView
-      android:id="@+id/lr_notifRight"
+  <!-- <TextView
+      android:id="@+id/listrow_notifRight"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall" />
+      android:text="@string/defaul_title"
+      android:textAppearance="?android:attr/textAppearanceSmall" /> -->
   </LinearLayout>
 
 </LinearLayout>

@@ -27,7 +27,11 @@ import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Provides some default behaviors. Not supposed to be instantiated directly,
- * but to be extended.
+ * but to be extended.<br />
+ * <br />
+ * Useful link: <a href=
+ * "https://developer.android.com/guide/components/fragments.html#CommunicatingWithActivity"
+ * >Android Developer Guide</a>
  * 
  * @author marc
  */
@@ -43,6 +47,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
     private TabsAdapter mTabsAdapter;
     private ViewPager mViewPager;
+    private ActionBar mSupportActionBar;
 
     private Handler mHandler = new Handler();
     private Runnable mUpdater = new Runnable() {
@@ -61,6 +66,13 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
             finish();
         }
     };
+
+    // /** Simple interface to be notified about playlist info updates. */
+    // public interface OnContentInfoListener {
+    // // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+    //
+    // void onContentInfo(Object contentInfo);
+    // }
 
     @Override
     protected void onPause() {
@@ -98,6 +110,11 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         mViewPager.setId(R.id.realtabcontent); // TODO change
         setContentView(mViewPager);
         setTabsAdapter(new TabsAdapter(this, mViewPager));
+
+        // Set up Action Bar
+        mSupportActionBar = getSupportActionBar();
+        mSupportActionBar.setDisplayHomeAsUpEnabled(true);
+        mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
     }
 
     @Override
@@ -195,8 +212,12 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         return mViewPager;
     }
 
-    private void setViewPager(ViewPager vp) {
-        this.mViewPager = vp;
+    // private void setViewPager(ViewPager vp) {
+    // this.mViewPager = vp;
+    // }
+
+    protected ActionBar getSupportActBar() {
+        return mSupportActionBar;
     }
 
     /**

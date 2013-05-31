@@ -2,40 +2,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical" >
 
     <RelativeLayout
-      android:id="@+id/listHeader"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:padding="10dp"
-      android:background="#3FFF"
-      android:visibility="gone">
-    <TextView
-        android:id="@+id/listTitle"
+        android:id="@+id/list_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/defaul_title"
-        android:textStyle="bold"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
-    <TextView
-        android:id="@+id/listSubTitle"
-        android:layout_width="match_parent"
-        android:layout_below="@id/listTitle"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="@string/default_subtitle" />
-  </RelativeLayout>
-  
+        android:background="#3FFF"
+        android:padding="10dp"
+        android:visibility="gone" >
 
+        <TextView
+            android:id="@+id/list_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/default_title"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/list_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/list_title"
+            android:gravity="center"
+            android:text="@string/default_subtitle" />
+    </RelativeLayout>
 
     <!-- Text output wrapper -->
-    <ListView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:id="@+id/listList" />
 
+    <ListView
+        android:id="@+id/list_contentlist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/list_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/default_empty" />
 
 </LinearLayout>

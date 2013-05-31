@@ -2,6 +2,7 @@
 package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,13 +52,7 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
-
-/*
- * TODO
- * 
- * - retrieve playlists stored in android database
- * 
- */
+import ch.epfl.unison.ui.SoloMainActivity.OnPlaylistInfoListener;
 
 /**
  * Listing of the groups.
@@ -64,13 +60,10 @@ import ch.epfl.unison.data.UnisonDB;
  * @author marc bourqui
  */
 public class SoloPlaylistsActivity extends AbstractFragmentActivity {
-    // extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener
-    // {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
 
-    // private Playlist mPlaylist;
     private UnisonDB mDB;
     private ArrayList<PlaylistItem> mPlaylistsLocal;
     private ArrayList<PlaylistItem> mPlaylistsRemote;
@@ -78,46 +71,83 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
     // GUI specific
     private ListView mPlaylistsLocalListView;
     private ListView mPlaylistsRemoteListView;
+    // Hosted fragments
+    private Fragment mPlaylistsLocalFragment;
+    private Fragment mPlaylistsRemoteFragment;
+
+    private Set<OnPlaylistsLocalInfoListener> mListenersLocal =
+            new HashSet<OnPlaylistsLocalInfoListener>();
 
     private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-    private final String[] mPlaylistsIdNameProjection = new String[] {
-            MediaStore.Audio.Playlists._ID,
-            MediaStore.Audio.Playlists.NAME
-    };
 
+    // private final String[] mPlaylistsIdNameProjection = new String[] {
+    // MediaStore.Audio.Playlists._ID,
+    // MediaStore.Audio.Playlists.NAME
+    // };
+
+    /** Simple interface to be notified about playlist info updates. */
+    public interface OnPlaylistsLocalInfoListener {
+        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+
+        void onPlaylistsLocalInfo(Object contentInfo);
+    }
+
+    /** Simple interface to be notified about playlist info updates. */
+    public interface OnPlaylistsRemoteInfoListener {
+        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+
+        void onPlaylistsRemoteInfo(Object contentInfo);
+    }
+
+    // /** Simple interface to be notified about playlist info updates. */
+    // public interface OnPlaylistsLocalInfoListener {
+    // // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+    //
+    // void onPlaylistsLocalInfo(Object contentInfo);
+    // }
+
+    @SuppressLint("NewApi")
+    // Concerns fragments' stuff
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getTabsAdapter().addTab(
+                getSupportActBar().newTab().setText(R.string.solo_player_fragment_title)
+                        .setTag(getString(R.string.solo_playlists_fragment_local_tag)),
+                SoloPlayerFragment.class, null);
+        mPlaylistsLocalFragment = getFragmentManager().findFragmentByTag(
+                getString(R.string.solo_playlists_fragment_local_tag));
+        getTabsAdapter().addTab(
+                getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title)
+                        .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
+                SoloTracksFragment.class, null);
+        mPlaylistsRemoteFragment = getFragmentManager().findFragmentByTag(
+                getString(R.string.solo_playlists_fragment_remote_tag));
+
         setReloadInterval(RELOAD_INTERVAL);
 
-        // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
 
         setContentView(R.layout.solo_playlists);
         ((Button) findViewById(R.id.createPlaylistBtn))
                 .setOnClickListener(new OnCreatePlaylistListener());
 
-        mPlaylistsLocalListView = (ListView) findViewById(R.id.soloPlaylistsListLocal);
-        mPlaylistsLocalListView.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsLocalListView);
+        // mPlaylistsLocalListView = (ListView)
+        // findViewById(R.id.soloPlaylistsListLocal);
+        // mPlaylistsLocalListView.setOnItemClickListener(new
+        // OnLocalPlaylistSelectedListener());
+        // registerForContextMenu(mPlaylistsLocalListView);
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
-        initLocalPlaylists();
-        
-        mPlaylistsRemote = new ArrayList<PlaylistItem>();
-        mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
-        mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsLocalListView);
-        registerForContextMenu(mPlaylistsRemoteListView);
+        // initLocalPlaylists();
 
-        // // Actions that should be taken when activity is started.
-        // if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
-        // // We are coming back from a group - let's make sure the back-end
-        // // knows.
-        // leaveGroup();
-        // } else if (AppData.getInstance(this).showHelpDialog()) {
-        // showHelpDialog();
-        // }
+        mPlaylistsRemote = new ArrayList<PlaylistItem>();
+        // mPlaylistsRemoteListView = (ListView)
+        // findViewById(R.id.soloPlaylistsListRemote);
+        // mPlaylistsRemoteListView.setOnItemClickListener(new
+        // OnRemotePlaylistSelectedListener());
+        // registerForContextMenu(mPlaylistsLocalListView);
+        // registerForContextMenu(mPlaylistsRemoteListView);
     }
 
     @Override
@@ -175,7 +205,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                                     .remove(info.position));
                                             Log.w(TAG, "Successfully removed playlist with id "
                                                     + struct.gsPlaylistId + " from user library");
-                                            refreshPlaylistsLocal();
+                                            // refreshPlaylistsLocal();
                                             refreshPlaylistsRemote();
                                         } else {
                                             Toast.makeText(
@@ -251,7 +281,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             e.printStackTrace();
                         }
                         mPlaylistsLocal.add(mPlaylistsRemote.remove(info.position));
-                        refreshPlaylistsLocal();
+                        // refreshPlaylistsLocal();
                         refreshPlaylistsRemote();
                     } else {
                         Toast.makeText(SoloPlaylistsActivity.this,
@@ -358,7 +388,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.lr_title)).setText(playlist.getTitle());
+            ((TextView) view.findViewById(R.id.listrow_title)).setText(playlist.getTitle());
             String subtitle = null;
             if (playlist.getListeners() > 0) {
                 String plural = "s";
@@ -370,7 +400,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             } else {
                 subtitle = String.format("%d tracks", playlist.getSize());
             }
-            ((TextView) view.findViewById(R.id.lr_notifRight)).setText(subtitle);
+            ((TextView) view.findViewById(R.id.listrow_subtitle)).setText(subtitle);
 
             view.setTag(playlist);
             return view;
@@ -595,8 +625,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             // TODO on click, display list of tracks
-            
-            
+
             // SoloPlaylistsActivity.this.startActivity(
             // new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
             // .putExtra(Const.Strings.LOCAL_ID,
@@ -638,86 +667,112 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
-    /**
-     * When clicking on a playlist, start MainActivity.
-     */
-    private class OnLocalPlaylistSelectedListener implements OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            // Give tracks to player here
-            SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
-                    SoloMainActivity.class)
-                    .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
-                    .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
-            // .putExtra(Const.Strings.PLID,
-            // view.getTag());
-            // UnisonAPI api =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-            // long uid =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
-            // view.getTag();
-
-            // api.joinGroup(uid, playlist.plid, new
-            // UnisonAPI.Handler<JsonStruct.Success>() {
-            //
-            // @Override
-            // public void callback(Success struct) {
-            // SoloPlaylistsActivity.this.startActivity(
-            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-            // .putExtra(Const.Strings.GID, playlist.plid)
-            // .putExtra(Const.Strings.NAME, playlist.name));
-            // }
-            //
-            // @Override
-            // public void onError(Error error) {
-            // Log.d(TAG, error.toString());
-            // if (SoloPlaylistsActivity.this != null) {
-            // Toast.makeText(SoloPlaylistsActivity.this,
-            // R.string.error_joining_group,
-            // Toast.LENGTH_LONG).show();
-            // }
-            // }
-            //
-            // });
-        }
-    }
-
-    /**
-     * To be used only once, at onCreate time.
-     */
-    private void initLocalPlaylists() {
-        Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
-                mPlaylistsIdNameProjection,
-                null, null, null);
-        if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
-            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
-            do {
-                PlaylistItem pl = (PlaylistItem) mDB.getItem(PlaylistItem.class, cur.getInt(colId));
-                if (pl != null) {
-                    pl.setTitle(cur.getString(colName));
-                    mPlaylistsLocal.add(pl);
-                }
-                // Non-GS playlists not shown
-            } while (cur.moveToNext());
-            cur.close();
-        }
-        refreshPlaylistsLocal();
-    }
-
-    /**
-     * To be used to refresh the ListView when changes are made to ArraList.
-     */
-    private void refreshPlaylistsLocal() {
-        SoloPlaylistsActivity.this.mPlaylistsLocalListView
-                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
-    }
+    // /**
+    // * When clicking on a playlist, start MainActivity.
+    // */
+    // private class OnLocalPlaylistSelectedListener implements
+    // OnItemClickListener {
+    //
+    // @Override
+    // public void onItemClick(AdapterView<?> parent, View view, int position,
+    // long id) {
+    //
+    // // Give tracks to player here
+    // SoloPlaylistsActivity.this.startActivity(new
+    // Intent(SoloPlaylistsActivity.this,
+    // SoloMainActivity.class)
+    // .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem)
+    // view.getTag()).getLocalId())
+    // .putExtra(Const.Strings.TITLE, ((PlaylistItem)
+    // view.getTag()).getTitle()));
+    // // .putExtra(Const.Strings.PLID,
+    // // view.getTag());
+    // // UnisonAPI api =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
+    // // long uid =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
+    // // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
+    // // view.getTag();
+    //
+    // // api.joinGroup(uid, playlist.plid, new
+    // // UnisonAPI.Handler<JsonStruct.Success>() {
+    // //
+    // // @Override
+    // // public void callback(Success struct) {
+    // // SoloPlaylistsActivity.this.startActivity(
+    // // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
+    // // .putExtra(Const.Strings.GID, playlist.plid)
+    // // .putExtra(Const.Strings.NAME, playlist.name));
+    // // }
+    // //
+    // // @Override
+    // // public void onError(Error error) {
+    // // Log.d(TAG, error.toString());
+    // // if (SoloPlaylistsActivity.this != null) {
+    // // Toast.makeText(SoloPlaylistsActivity.this,
+    // // R.string.error_joining_group,
+    // // Toast.LENGTH_LONG).show();
+    // // }
+    // // }
+    // //
+    // // });
+    // }
+    // }
+    //
+    // /**
+    // * To be used only once, at onCreate time.
+    // */
+    // private void initLocalPlaylists() {
+    // Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
+    // mPlaylistsIdNameProjection,
+    // null, null, null);
+    // if (cur != null && cur.moveToFirst()) {
+    // int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+    // int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+    // do {
+    // PlaylistItem pl = (PlaylistItem) mDB.getItem(PlaylistItem.class,
+    // cur.getInt(colId));
+    // if (pl != null) {
+    // pl.setTitle(cur.getString(colName));
+    // mPlaylistsLocal.add(pl);
+    // }
+    // // Non-GS playlists not shown
+    // } while (cur.moveToNext());
+    // cur.close();
+    // }
+    // refreshPlaylistsLocal();
+    // }
+    //
+    // /**
+    // * To be used to refresh the ListView when changes are made to ArraList.
+    // */
+    // private void refreshPlaylistsLocal() {
+    // SoloPlaylistsActivity.this.mPlaylistsLocalListView
+    // .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+    // }
 
     private void refreshPlaylistsRemote() {
         SoloPlaylistsActivity.this.mPlaylistsRemoteListView
                 .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+    }
+
+    protected ArrayList<PlaylistItem> getPlaylistsLocal() {
+        return mPlaylistsLocal;
+    }
+
+    protected ArrayList<PlaylistItem> getPlaylistsRemote() {
+        return mPlaylistsRemote;
+    }
+
+    protected UnisonDB getDB() {
+        return mDB;
+    }
+
+    public void registerPlaylistsLocalInfoListener(OnPlaylistsLocalInfoListener listener) {
+        mListenersLocal.add(listener);
+    }
+
+    public void unregisterPlaylistsLocalInfoListener(OnPlaylistsLocalInfoListener listener) {
+        mListenersLocal.remove(listener);
     }
 }

@@ -17,28 +17,16 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
     private static final String TAG = "ch.epfl.unison.UnisonMainActivity";
 
-    private ActionBar mSupportActionBar;
-
-    private boolean mIsDj = false;
-
-    protected ActionBar getSupportActBar() {
-        return mSupportActionBar;
-    }
+    private boolean mIsDj = false;  
 
     protected abstract void handleExtras(Bundle extras);
 
-    protected abstract PlaylistItem getPlaylist();
+//    protected abstract PlaylistItem getPlaylist();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleExtras(getIntent().getExtras());
-
-        // Set up Action Bar
-        mSupportActionBar = getSupportActionBar();
-        mSupportActionBar.setDisplayHomeAsUpEnabled(true);
-        mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
     }
 
     public void setDJ(boolean dj) {

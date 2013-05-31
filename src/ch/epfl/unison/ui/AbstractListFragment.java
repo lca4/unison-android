@@ -2,28 +2,33 @@
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.unison.R;
+import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.PlaylistItem;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
 /**
- * WORK IN PROGRESS. Offers a fragment containing a list. A header can be
- * displayed, with a title and/or a subtitle. By default, the header is "gone".
- * 
+ * Offers a fragment containing a list. A header can be
+ * displayed, with a title and/or a subtitle. By default, the header is "gone".<br />
+ * Child classes have implement an ArrayAdapter.
+ * @see {@link ListFragment} What can be done there?
  * @author marc
  */
-public class AbstractListFragment extends SherlockFragment {
+public abstract class AbstractListFragment extends SherlockFragment {
 
     private String mClassTag = "ch.epfl.unison.ui.AbstractFragment";
 
-    private AbstractMainActivity mMainActivity;
+    private AbstractFragmentActivity mHostActivity;
 
     private RelativeLayout mHeader;
     private TextView mTitle;
@@ -31,24 +36,24 @@ public class AbstractListFragment extends SherlockFragment {
     private ListView mList;
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mHostActivity = (AbstractFragmentActivity) activity;
+    }
+    
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
         mClassTag = this.getClass().getName();
 
         View v = inflater.inflate(R.layout.list, container, false);
-        mHeader = (RelativeLayout) v.findViewById(R.id.listHeader);
-        mTitle = (TextView) v.findViewById(R.id.listTitle);
-        mSubtitle = (TextView) v.findViewById(R.id.listSubTitle);
-        mList = (ListView) v.findViewById(R.id.listList);
+        mHeader = (RelativeLayout) v.findViewById(R.id.list_header);
+        mTitle = (TextView) v.findViewById(R.id.list_title);
+        mSubtitle = (TextView) v.findViewById(R.id.list_subtitle);
+        mList = (ListView) v.findViewById(R.id.list_contentlist);
 
         return v;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mMainActivity = (AbstractMainActivity) activity;
     }
 
     @Override
@@ -60,8 +65,8 @@ public class AbstractListFragment extends SherlockFragment {
         return mClassTag;
     }
 
-    protected AbstractMainActivity getMainActivity() {
-        return mMainActivity;
+    protected AbstractFragmentActivity getHostActivity() {
+        return mHostActivity;
     }
 
     protected RelativeLayout getHeader() {

@@ -61,7 +61,7 @@ public class SoloMainActivity extends AbstractMainActivity {
     public void onCreate(Bundle savedInstanceState) {
         mDB = new UnisonDB(getApplicationContext());
         super.onCreate(savedInstanceState);
-        // setReloadInterval(RELOAD_INTERVAL);
+        
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_player_fragment_title),
                 SoloPlayerFragment.class, null);

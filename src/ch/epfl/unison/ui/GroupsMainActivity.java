@@ -281,9 +281,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-    @Override
-    protected PlaylistItem getPlaylist() {
-        return null;
-    }
+//    @Override
+//    protected PlaylistItem getPlaylist() {
+//        return null;
+//    }
 
 }
