@@ -1,6 +1,8 @@
 package ch.epfl.unison.ui;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
@@ -156,6 +159,43 @@ public class LoginActivity extends SherlockActivity {
         }
 
         fillEmailPassword();
+    }
+    
+    public void resetPassword(View v) {
+    	AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this);
+
+        alert.setTitle(getString(R.string.login_forgot_password));
+        alert.setMessage(getString(R.string.login_email_hint));
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(LoginActivity.this);
+        alert.setView(input);
+
+        // When clicking on "OK", create the group.
+        alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok),
+                new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String email = input.getText().toString().trim();
+                UnisonAPI api = new UnisonAPI();
+                api.resetPassword(email, new UnisonAPI.Handler<JsonStruct.Success>() {
+
+					@Override
+					public void callback(Success struct) {
+						Toast.makeText(LoginActivity.this, R.string.login_sent_email, Toast.LENGTH_LONG).show();
+					}
+
+					@Override
+					public void onError(Error error) {
+						Toast.makeText(LoginActivity.this, R.string.login_error_occurred, Toast.LENGTH_LONG).show();
+					}
+				});
+            }
+        });
+
+        alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
+        alert.show();
     }
 
     private void fillEmailPassword() {

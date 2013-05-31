@@ -63,6 +63,9 @@
     <string name="login_signing_in">Signing in&#8230;</string>
  <!-- &#8230; is "..." -->
     <string name="login_menu_signup">Sign Up</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_error_occurred">Could not reset password</string>
+    <string name="login_sent_email">An e-mail was sent to the provided address</string>
 
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>

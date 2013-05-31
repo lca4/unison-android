@@ -293,6 +293,12 @@ public class UnisonAPI {
         .setAuth(mAuth).doDELETE();
     }
     
+    public void resetPassword(String email, Handler<JsonStruct.Success> handler) {
+    	URL url = urlFor("/resetpw");
+    	AsyncRequest.of(url, handler, JsonStruct.Success.class)
+    		.addParam("email", email).doPOST();
+    }
+    
 
     // ---------------
     // TAGS

@@ -42,6 +42,16 @@
       android:layout_marginLeft="40dp"
       android:layout_marginRight="40dp"
       android:text="@string/login_loginBtn" />
+  
+  <Button
+      android:id="@+id/forgotPwBtn"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:layout_marginLeft="40dp"
+      android:layout_marginRight="40dp"
+      android:text="@string/login_forgot_password" 
+      android:onClick="resetPassword" />
 
   <TextView
       android:id="@+id/signupTxt"
