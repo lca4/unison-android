@@ -63,10 +63,10 @@ public class SoloMainActivity extends AbstractMainActivity {
         super.onCreate(savedInstanceState);
         
         getTabsAdapter().addTab(
-                getSupportActBar().newTab().setText(R.string.solo_player_fragment_title),
+                getSupportActBar().newTab().setText(R.string.solo_fragment_player_title),
                 SoloPlayerFragment.class, null);
         getTabsAdapter().addTab(
-                getSupportActBar().newTab().setText(R.string.solo_playlist_fragment_title),
+                getSupportActBar().newTab().setText(R.string.solo_fragment_playlist_title),
                 SoloTracksFragment.class, null);
 
     }

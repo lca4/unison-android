@@ -30,7 +30,7 @@
   <!-- Text output wrapper -->
   
   <!-- Localy available playlists -->
-  <LinearLayout android:orientation="horizontal"
+  <!-- <LinearLayout android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:padding="10dp"
@@ -47,11 +47,11 @@
       android:layout_height="0dp"
       android:layout_width="match_parent"
       android:layout_weight="1"
-      android:id="@+id/soloPlaylistsListLocal" />
+      android:id="@+id/soloPlaylistsListLocal" /> -->
   
     <!-- GroupStreamer playlists -->
     <!-- TODO Fragment -->
-    <LinearLayout android:orientation="horizontal"
+    <!-- <LinearLayout android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:padding="10dp"
@@ -68,6 +68,6 @@
       android:layout_height="0dp"
       android:layout_width="match_parent"
       android:layout_weight="1"
-      android:id="@+id/soloPlaylistsListRemote" />
+      android:id="@+id/soloPlaylistsListRemote" /> -->
 
 </LinearLayout>

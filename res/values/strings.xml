@@ -30,8 +30,11 @@
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
-    <string name="solo_player_fragment_title">Music</string>
-    <string name="solo_playlist_fragment_title">Tracks</string>
+    <string name="solo_fragment_player_title">Music</string>
+    <string name="solo_fragment_playlist_title">Tracks</string>
+    <string name="solo_fragment_playlists_local_title">Local</string>
+    <string name="solo_fragment_playlists_remote_title">Remote</string>
+    
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
