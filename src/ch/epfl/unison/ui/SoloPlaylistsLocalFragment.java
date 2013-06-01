@@ -259,8 +259,9 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
-                PlaylistItem pl = (PlaylistItem) mHostActivity.getDB().getItem(PlaylistItem.class,
-                        cur.getInt(colId));
+                int size = mHostActivity.getDB().getTracksCount(
+                        cur.getLong(colId));
+                PlaylistItem pl = null; // TODO
                 if (pl != null) {
                     pl.setTitle(cur.getString(colName));
                     mPlaylistsLocal.add(pl);

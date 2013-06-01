@@ -167,10 +167,8 @@ final class AndroidDB {
                 // MediaStore.Audio.Playlists.Members.AUDIO_ID,
                 MediaStore.Audio.Playlists.Members.PLAY_ORDER
         };
-        Uri contentUri = MediaStore.Audio.Playlists.Members
-                .getContentUri("external", pl.getLocalId()).buildUpon().build();
         // Sort the tracks by play_order
-        Cursor cur = resolver.query(contentUri,
+        Cursor cur = resolver.query(getPlaylistMembersUri(pl.getLocalId()),
                 projection,
                 null,
                 null,
@@ -188,6 +186,23 @@ final class AndroidDB {
             pl.setTracks(mTracks);
             cur.close();
         }
+    }
+    
+    static int getTracksCount(ContentResolver resolver, long playlistId) {
+        String[] projection = new String[] {
+                MediaStore.Audio.Playlists.Members.AUDIO_ID
+        };
+        Cursor cur = resolver.query(getPlaylistMembersUri(playlistId),
+                projection,
+                null,
+                null,
+                null);
+        int count = 0;
+        if (cur != null) {
+            count = cur.getCount();
+            cur.close();
+        }
+        return count;
     }
 
     static Set<PlaylistItem> getPlaylists(ContentResolver resolver) {
@@ -218,6 +233,11 @@ final class AndroidDB {
             cur.close();
         }
         return set;
+    }
+    
+    static Uri getPlaylistMembersUri(long playlistId) {
+        return MediaStore.Audio.Playlists.Members
+                .getContentUri("external", playlistId).buildUpon().build();
     }
 
 }

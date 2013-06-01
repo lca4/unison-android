@@ -244,6 +244,10 @@ public class UnisonDB {
         }
         return res;
     }
+    
+    public int getTracksCount(long playlistId) {
+        return AndroidDB.getTracksCount(mContext.getContentResolver(), playlistId);
+    }
 
     private PlaylistItem plylGetItem(long id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
