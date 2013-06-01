@@ -36,6 +36,9 @@ import ch.epfl.unison.data.PlaylistItem;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Activity that is displayed once you're inside the group. Displays the music
  * player and information about the group (through fragments).
@@ -101,7 +104,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
             Log.i(TAG, "joined group " + getGroupId());
 
             setTitle(mGroup.name);
-            AppData.getInstance(this).addToHistory(mGroup);
+            AppData data = AppData.getInstance(this);
+            data.addToHistory(mGroup);
+            data.setInGroup(true);
 
         }
     }
@@ -142,9 +147,19 @@ public class GroupsMainActivity extends AbstractMainActivity {
     }
 
     private NdefMessage getNdefFromGID(Long gid) {
+        if (gid == null) {
+            return null;
+        }
+        
+        String content;
+        try {
+            content = new JSONObject().put("gid", gid).toString();
+        } catch (JSONException e) {
+            content = gid.toString();
+        }
         NdefRecord[] records = {
                 new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
-                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
+                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], content
                                 .getBytes())
         };
 

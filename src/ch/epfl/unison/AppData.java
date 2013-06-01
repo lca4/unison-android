@@ -330,6 +330,22 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         String value = new GsonBuilder().create().toJson(history, mGroupHistoryMapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
     }
+    
+    public boolean setLoggedIn(boolean loggedIn) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.LOGGED_IN, loggedIn).commit();
+    }
+    
+    public boolean getLoggedIn() {
+        return mPrefs.getBoolean(Const.PrefKeys.LOGGED_IN, false);
+    }
+    
+    public boolean setInGroup(boolean inGroup) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.IN_GROUP, inGroup).commit();
+    }
+    
+    public boolean getInGroup() {
+        return mPrefs.getBoolean(Const.PrefKeys.IN_GROUP, false);
+    }
 
     /**
      * Simple LocationListener that differentiates updates from the network

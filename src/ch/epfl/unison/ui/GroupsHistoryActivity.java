@@ -1,16 +1,18 @@
 
 package ch.epfl.unison.ui;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -19,29 +21,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.Success;
-import ch.epfl.unison.api.UnisonAPI;
-import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Louis Activity that is used to display the history for groups. This
@@ -232,9 +219,9 @@ public class GroupsHistoryActivity extends SherlockActivity {
                     .putExtra(Const.Strings.GROUP, mGroupClicked)
                     .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             if (mAlreadyInGroup) {
-                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY_LEAVE_GROUP);
+                intent.setAction(GroupsActivity.ACTION_LEAVE_JOIN_GROUP);
             } else {
-                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY);
+                intent.setAction(GroupsActivity.ACTION_JOIN_GROUP);
             }
             startActivity(intent);
         }

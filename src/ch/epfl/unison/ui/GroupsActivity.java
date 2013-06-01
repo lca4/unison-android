@@ -67,9 +67,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
     public static final String ACTION_CREATE_AND_JOIN_GROUP =
             "ch.epfl.unison.action.CREATE_AND_JOIN_GROUP";
-    public static final String ACTION_FROM_HISTORY_LEAVE_GROUP =
-            "ch.epfl.unison.action.FROM_HISTORY_LEAVE_GROUP";
-    public static final String ACTION_FROM_HISTORY = "ch.epfl.unison.action.FROM_HISTORY";
+    public static final String ACTION_LEAVE_JOIN_GROUP =
+            "ch.epfl.unison.action.FROM_LEAVE_JOIN_GROUP";
+    public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
 
     private List<String> mSupportedActions = null;
 
@@ -130,6 +130,10 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
 
         AppData data = AppData.getInstance(GroupsActivity.this);
+        
+        
+        //We might still be in a group according to the server, but we know we are not in groupMainActivity
+        data.setInGroup(false);
 
         handleExtras();
         // Actions that should be taken whe activity is started.
@@ -139,7 +143,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             toggleActivityButtons(false);
             mProcessingAutoAction = true;
             if (ACTION_LEAVE_GROUP.equals(mAction)
-                    || ACTION_FROM_HISTORY_LEAVE_GROUP.equals(mAction)) {
+                    || ACTION_LEAVE_JOIN_GROUP.equals(mAction)) {
                 // We are coming back from a group - let's make sure the
                 // back-end
                 // knows.
@@ -150,7 +154,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 // ACTION_FROM_HISTORY_LEAVE_GROUP
                 leaveGroup(mGroupClicked);
                 mDismissedHelp = true;
-            } else if (ACTION_FROM_HISTORY.equals(mAction)) {
+            } else if (ACTION_JOIN_GROUP.equals(mAction)) {
                 // Automatic actions are going to be performed, we disable
                 // unwanted popups:
 
@@ -217,8 +221,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private void setSupportedActions() {
         mSupportedActions = new ArrayList<String>();
         mSupportedActions.add(ACTION_CREATE_AND_JOIN_GROUP);
-        mSupportedActions.add(ACTION_FROM_HISTORY);
-        mSupportedActions.add(ACTION_FROM_HISTORY_LEAVE_GROUP);
+        mSupportedActions.add(ACTION_JOIN_GROUP);
+        mSupportedActions.add(ACTION_LEAVE_JOIN_GROUP);
         mSupportedActions.add(ACTION_LEAVE_GROUP);
     }
 
@@ -847,8 +851,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         // if we join it using the history.
                         // This is in case of wrong automatic behavior.
 
-                        if (group.automatic && ACTION_FROM_HISTORY.equals(mAction)
-                                || ACTION_FROM_HISTORY_LEAVE_GROUP.equals(mAction)) {
+                        if (group.automatic && ACTION_JOIN_GROUP.equals(mAction)
+                                || ACTION_LEAVE_JOIN_GROUP.equals(mAction)) {
                             group.automatic = false;
                         }
                         startActivity(

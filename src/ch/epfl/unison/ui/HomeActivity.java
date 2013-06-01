@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import ch.epfl.unison.R;
 
@@ -25,7 +26,12 @@ public class HomeActivity extends SherlockActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return AbstractMenu.onCreateOptionsMenu(this, menu);
+        boolean success = AbstractMenu.onCreateOptionsMenu(this, menu);
+        if (success) {
+            MenuItem refreshItem = menu.findItem(R.id.menu_item_refresh);
+            refreshItem.setVisible(false);
+        }
+        return success;
     }
 
     public void onButtonClickGroups(View view) {

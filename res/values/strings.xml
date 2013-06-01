@@ -63,7 +63,7 @@
     <string name="login_signup">New to GroupStreamer ?</string>
     <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
     <string name="login_signing_in">Signing in&#8230;</string>
- <!-- &#8230; is "..." -->
+    <!-- &#8230; is "..." -->
     <string name="login_menu_signup">Sign Up</string>
     <string name="login_forgot_password">Forgot Password?</string>
     <string name="login_error_occurred">Could not reset password</string>
@@ -100,8 +100,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="automatic_group_no_longer_exists_body">You can go back to the groups list or continue browsing your history.</string>
     <string name="group_no_longer_exists_dialog_recreate_group">Recreate group</string>
     <string name="group_no_longer_exists_dialog_go_groups_activity">Go back to groups list</string>
-    
-    
+
     <!-- Main -->
     <string name="main_set_password_title">Choose PIN</string>
     <string name="main_password_hint">Group Password</string>
@@ -122,9 +121,8 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
     <string name="solo_playlists_createBtn">Create playlist</string>
     <string name="solo_playlists_choosePL">or select one below :</string>
-    
-    
-    <!-- Solo playlists --> 
+
+    <!-- Solo playlists -->
     <string name="solo_playlists_createBtn">Create playlist</string>
     <string name="solo_playlists_choosePL">or select one below :</string>
     <string name="solo_playlists_localPL">My playlists</string>
@@ -150,6 +148,7 @@ You can also just cancel this action and stay in groups history.</string>
 
     <!-- Solo player -->
 
+
     <!-- Player -->
     <string name="player_unknown">unknown</string>
     <string name="player_not_playing">No track playing</string>
@@ -171,7 +170,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="signup_tou">I agree to the Terms of Use</string>
     <string name="signup_signupBtn">Sign Up</string>
     <string name="signup_signing_up">Signing up&#8230;</string>
- <!-- &#8230; is "..." -->
+    <!-- &#8230; is "..." -->
 
 
     <!-- SignUpForm -->
@@ -195,8 +194,6 @@ You can also just cancel this action and stay in groups history.</string>
     <!-- NFC -->
     <string name="NFC_reciever_wait">Wainting for an NFC transmission</string>
     <string name="NFC_send_button">Share group!</string>
-    
-    
 
     <!-- Errors. -->
     <string name="error_generic_server_response">Server responded:</string>
@@ -222,7 +219,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
     <string name="error_NFC_not_present">Sorry, your phone doesn\'t have NFC :\'(</string>
     <string name="error_NFC_not_active">Please turn on the NFC feature.</string>
-    
+
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
     <string name="error_solo_save_playlist">Unable to save the playlist to your device.</string>
     <string name="error_solo_remove_playlist_from_local_dbs">Unable to remove the playlist from your device.</string>

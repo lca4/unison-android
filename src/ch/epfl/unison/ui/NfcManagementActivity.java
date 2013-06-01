@@ -3,6 +3,9 @@ package ch.epfl.unison.ui;
 
 import java.util.Arrays;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +17,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -124,26 +128,41 @@ public class NfcManagementActivity extends SherlockActivity {
                 // Toast.LENGTH_SHORT).show();
                 //
                 // long groupID = Long.valueOf(result);
-                StringBuilder sb = new StringBuilder();
+                String plString;
+                int gid;
 
+                //Look for our custom message
                 for (NdefMessage msg : messages) {
                     NdefRecord[] records = msg.getRecords();
                     if (records != null) {
                         for (NdefRecord rec : records) {
                             if (rec != null) {
-                                byte[] pl = rec.getPayload();
-                                if (pl != null) {
-                                    sb.append(new String(pl));
-                                }
+                                if (rec.getTnf() == NdefRecord.TNF_EXTERNAL_TYPE
+                                        && byteArrayEqual(rec.getType(), Const.Strings.UNISON_NFC_MIME_TYPE.getBytes())) {
+                                    //This is it
+                                    byte[] pl = rec.getPayload();
+                                    if (pl != null) {
+                                        plString = new String(pl);
+                                        try {
+                                            JSONObject jo = new JSONObject(plString);
+                                            gid = jo.getInt("gid");
+                                            
+                                            //TODO do something with the group ID.
+                                        } catch (JSONException je) {
+                                            Toast.makeText(getApplicationContext(), "Intent Error...",
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                        break;
+                                    }
+                                } 
                             }
                         }
                     }
                 }
 
-                String result = sb.toString();
 
-                // FIXME
-                Log.d(TAG, "Read " + result);
+//                // FIXME
+//                Log.d(TAG, "Read " + result);
 
             }
         } else {
@@ -180,6 +199,21 @@ public class NfcManagementActivity extends SherlockActivity {
         // NdefRecord record = records[0];
         // String payload = new String(record.getPayload());
         // Log.d(TAG, "We recieved this payload: " + payload);
+    }
+    
+    private boolean byteArrayEqual(byte[] t1, byte[] t2) {
+        boolean eq = true;
+        if (t1 == null || t2 == null || t1.length != t2.length) {
+            eq = false;
+        } else {
+            for (int i = 0; i < t1.length; ++i) {
+                if (t1[i] != t2[i]) {
+                    eq = false;
+                    break;
+                }
+            }
+        }
+        return eq;
     }
 
 }
