@@ -7,7 +7,8 @@
     <!-- Requirements. -->
     <uses-sdk
         android:minSdkVersion="10"
-        android:targetSdkVersion="10" /> <!-- previously: 14 (https://developer.android.com/tools/extras/support-library.html#SettingUp) -->
+        android:targetSdkVersion="10" />
+ <!-- previously: 14 (https://developer.android.com/tools/extras/support-library.html#SettingUp) -->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -19,7 +20,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock" > <!-- FIX lint warning -->
+        android:theme="@style/Theme.Sherlock" >
+ <!-- FIX lint warning -->
 
 
         <!-- Activities. -->
@@ -115,8 +117,19 @@
             android:label="@string/title_activity_nfcsend_group" >
         </activity>
         <activity
-            android:name="ch.epfl.unison.ui.NFCRecieveGroupActivity"
+            android:name="ch.epfl.unison.ui.NFCReceiveGroupActivity"
             android:label="@string/title_activity_nfcrecieve_group" >
+        </activity>
+        <activity
+            android:name="ch.epfl.unison.ui.NfcManagementActivity"
+            android:label="@string/title_activity_nfc_management" >
+            <intent-filter >
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="vnd.android.nfc"
+                    android:host="ext"
+                    android:pathPrefix="/ch.epfl.unison:text/plain" />
+            </intent-filter>
         </activity>
     </application>
 

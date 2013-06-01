@@ -14,7 +14,7 @@ import ch.epfl.unison.R;
  * 
  * @author marc bourqui
  */
-public class HomeActivity extends SherlockActivity implements AbstractMenu.OnRefreshListener {
+public class HomeActivity extends SherlockActivity{
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
 
@@ -35,11 +35,6 @@ public class HomeActivity extends SherlockActivity implements AbstractMenu.OnRef
 
     public void onButtonClickSolo(View view) {
         startActivity(new Intent(HomeActivity.this, SoloPlaylistsActivity.class));
-    }
-
-    @Override
-    public void onRefresh() {
-        // Nothing to refresh
     }
 
 }

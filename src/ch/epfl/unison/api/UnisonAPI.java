@@ -1,17 +1,17 @@
 
 package ch.epfl.unison.api;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.json.JSONObject;
-
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Java interface to the Unison RESTful HTTP API.
@@ -283,15 +283,22 @@ public class UnisonAPI {
 
     public void listSharedPlaylists(Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/playlists/shared");
-        // TODO
+        //TODO
         AsyncRequest.of(url, handler, JsonStruct.PlaylistsList.class).setAuth(mAuth).doGET();
     }
-
+    
     public void removePlaylist(long uid, long plid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/solo/%d/playlist/%d", uid, plid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(mAuth).doDELETE();
     }
+    
+    public void resetPassword(String email, Handler<JsonStruct.Success> handler) {
+    	URL url = urlFor("/resetpw");
+    	AsyncRequest.of(url, handler, JsonStruct.Success.class)
+    		.addParam("email", email).doPOST();
+    }
+    
 
     // ---------------
     // TAGS
@@ -373,8 +380,11 @@ public class UnisonAPI {
         // Added by Vincent:
         public static final int MISSING_CLUSTER = 0x0e;
         public static final int FORBIDDEN = 0x0f;
+//        public static final int GROUP_JOIN_FORBIDDEN = 15;
+        public static final int PASSWORD_EXPECTED = 0x10;
         // Added by Marc:
         public static final int IS_EMPTY = 32;
+        
     }
 
 }

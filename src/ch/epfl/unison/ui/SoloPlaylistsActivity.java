@@ -188,7 +188,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
                                     @Override
                                     public void onError(UnisonAPI.Error error) {
-                                        Log.d(TAG, error.toString());
+                                        if (error != null) {
+                                            Log.d(TAG, error.toString());
+                                        }
                                         Toast.makeText(
                                                 SoloPlaylistsActivity.this,
                                                 R.string
@@ -213,7 +215,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
                                 @Override
                                 public void onError(Error error) {
-                                    Log.d(TAG, error.toString());
+                                    if (error != null) {
+                                        Log.d(TAG, error.toString());
+                                    }
                                     Toast.makeText(SoloPlaylistsActivity.this,
                                             R.string.error_solo_remove_playlist_from_gs_server,
                                             Toast.LENGTH_LONG).show();
@@ -573,7 +577,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
                             @Override
                             public void onError(Error error) {
-                                Log.d(TAG, error.toString());
+                            	if (error != null) {
+                            		Log.d(TAG, error.toString());
+                            	}
                                 if (SoloPlaylistsActivity.this != null) {
                                     Toast.makeText(SoloPlaylistsActivity.this,
                                             R.string.error_creating_playlist,
