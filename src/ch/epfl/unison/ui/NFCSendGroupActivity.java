@@ -26,7 +26,7 @@ public class NFCSendGroupActivity extends SherlockActivity {
     private NfcAdapter mAdapter = null;
     private boolean mNFCStatusChecked = false;
     private byte[] mDummyByte = {
-        new Integer(1).byteValue()
+            new Integer(1).byteValue()
     };
     private NdefMessage mMessage = null;
     private int mDebugGroupID = 123;
