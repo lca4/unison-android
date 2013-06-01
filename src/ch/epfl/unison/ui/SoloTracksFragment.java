@@ -27,7 +27,7 @@ public class SoloTracksFragment extends AbstractListFragment
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloTracksFragment.this.getList()
-        .setAdapter(new TracksAdapter(getMainActivity().getPlaylist()));
+                .setAdapter(new TracksAdapter(getMainActivity().getPlaylist()));
         return v;
     }
 

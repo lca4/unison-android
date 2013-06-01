@@ -117,9 +117,9 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
             @Override
             public void onError(Error error) {
-            	if (error != null) {
-            		Log.d(TAG, error.toString());
-            	}
+                if (error != null) {
+                    Log.d(TAG, error.toString());
+                }
                 if (GroupsRatingsActivity.this != null) {
                     Toast.makeText(GroupsRatingsActivity.this, R.string.error_loading_ratings,
                             Toast.LENGTH_LONG).show();
@@ -210,9 +210,9 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
                         @Override
                         public void onError(Error error) {
-                        	if (error != null) {
-                        		Log.d(TAG, error.toString());
-                        	}
+                            if (error != null) {
+                                Log.d(TAG, error.toString());
+                            }
                             if (GroupsRatingsActivity.this != null) {
                                 Toast.makeText(GroupsRatingsActivity.this,
                                         R.string.error_updating_rating,

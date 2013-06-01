@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.app.AlertDialog;
@@ -40,7 +41,6 @@ import java.util.Set;
  * player and information about the group (through fragments).
  * 
  * @see AbstractMainActivity
- * 
  * @author lum
  */
 public class GroupsMainActivity extends AbstractMainActivity {
@@ -49,12 +49,13 @@ public class GroupsMainActivity extends AbstractMainActivity {
     public interface OnGroupInfoListener {
         void onGroupInfo(JsonStruct.Group groupInfo);
     }
+
     private static final String TAG = "ch.epfl.unison.MainActivity";
 
     private static final double MAX_DISTANCE = 2000;
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
-    
+
     private NfcAdapter mNfcAdapter = null;
 
     private JsonStruct.Group mGroup;
@@ -111,62 +112,68 @@ public class GroupsMainActivity extends AbstractMainActivity {
         // First choice: we restart the activity:
         startActivity(intent);
         finish();
-        
-        //Second choice:
-//        setIntent(intent); //optional
-//        handleExtras(intent.getExtras());
+
+        // Second choice:
+        // setIntent(intent); //optional
+        // handleExtras(intent.getExtras());
     }
 
     private void setupNFC() {
         NfcManager manager = (NfcManager) GroupsMainActivity
                 .this.getSystemService(Context.NFC_SERVICE);
-        
+
         mNfcAdapter = manager.getDefaultAdapter();
-        
+
         if (mNfcAdapter == null) {
-            //FIXME
-//            Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+            // FIXME
+            // Toast.makeText(GroupsMainActivity.this, "fixme",
+            // Toast.LENGTH_LONG).show();
             return;
         }
-        
+
         if (!mNfcAdapter.isEnabled()) {
-            //FIXME
-//            Toast.makeText(GroupsMainActivity.this, "fixme", Toast.LENGTH_LONG).show();
+            // FIXME
+            // Toast.makeText(GroupsMainActivity.this, "fixme",
+            // Toast.LENGTH_LONG).show();
             return;
         }
-        
+
         Log.d(TAG, "NFC is enabled");
     }
-    
+
     private NdefMessage getNdefFromGID(Long gid) {
-        NdefRecord[] records = {new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, 
-                Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString().getBytes())};
-        
+        NdefRecord[] records = {
+            new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
+                    Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
+                            .getBytes())
+        };
+
         return new NdefMessage(records);
     }
-    
+
     private void enableGIDOverNFC() {
         if (mNfcAdapter != null && mGroup != null && mGroup.gid != null) {
-            mNfcAdapter.enableForegroundNdefPush(GroupsMainActivity.this, getNdefFromGID(mGroup.gid));
+            mNfcAdapter.enableForegroundNdefPush(GroupsMainActivity.this,
+                    getNdefFromGID(mGroup.gid));
         }
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
-        
+
         if (mNfcAdapter != null) {
             mNfcAdapter.disableForegroundNdefPush(GroupsMainActivity.this);
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         enableGIDOverNFC();
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,10 +186,10 @@ public class GroupsMainActivity extends AbstractMainActivity {
                 getSupportActBar().newTab().setText(
                         R.string.fragment_title_stats),
                 GroupsStatsFragment.class, null);
-        
+
         setupNFC();
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean res = super.onCreateOptionsMenu(menu);
@@ -217,7 +224,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
 
                     @Override
                     public void onError(UnisonAPI.Error error) {
-                        if (error != null) {                    
+                        if (error != null) {
                             Log.d(TAG, error.toString());
                         }
                         if (GroupsMainActivity.this != null) {
@@ -262,96 +269,91 @@ public class GroupsMainActivity extends AbstractMainActivity {
             }
         }
     };
-    
+
     private void sendPassword(final String pw) {
         final AppData data = AppData.getInstance(GroupsMainActivity.this);
         UnisonAPI api = data.getAPI();
-        
-        api.setGroupPassword(mGroup.gid, pw, 
+
+        api.setGroupPassword(mGroup.gid, pw,
                 new UnisonAPI.Handler<JsonStruct.Success>() {
 
-            @Override
-            public void callback(Success struct) {
-                if (GroupsMainActivity.this != null) {
-                    Toast.makeText(GroupsMainActivity.this, 
-                            R.string.main_success_setting_password,
-                            Toast.LENGTH_LONG).show();
-                }
-
-                mGroup.password = !pw.equals(""); 
-                data.addToHistory(mGroup);
-            }
-
-            @Override
-            public void onError(Error error) {
-                if (GroupsMainActivity.this != null) {
-                    Toast.makeText(GroupsMainActivity.this, 
-                            R.string.error_setting_password,
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-    
-    
-    public void displayPasswordDialog() {
-           if (isDJ()) {
-               AlertDialog.Builder builder = new AlertDialog.Builder(GroupsMainActivity.this);
-               builder.setTitle(R.string.main_set_password_title);
-               LayoutInflater layoutInflater = (LayoutInflater) 
-                       getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-               View dialogView = layoutInflater.inflate(R.layout.set_password_dialog, null);
-               builder.setView(dialogView);
-               EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
-               
-               
-               
-               builder.setPositiveButton(getString(R.string.main_password_ok), mPasswordClick);
-               builder.setNegativeButton(getString(R.string.main_password_cancel), mPasswordClick);
-
-               final AlertDialog dialog = builder.create();
-               
-               ((Button) dialogView.findViewById(R.id.rstPassword))
-                   .setOnClickListener(new View.OnClickListener() {
-                    
                     @Override
-                    public void onClick(View v) {
-                        sendPassword("");
-                        dialog.dismiss();
+                    public void callback(Success struct) {
+                        if (GroupsMainActivity.this != null) {
+                            Toast.makeText(GroupsMainActivity.this,
+                                    R.string.main_success_setting_password,
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        mGroup.password = !pw.equals("");
+                        data.addToHistory(mGroup);
+                    }
+
+                    @Override
+                    public void onError(Error error) {
+                        if (GroupsMainActivity.this != null) {
+                            Toast.makeText(GroupsMainActivity.this,
+                                    R.string.error_setting_password,
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
-                    
-               password.addTextChangedListener(new TextWatcher() {
-                
+    }
+
+    public void displayPasswordDialog() {
+        if (isDJ()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(GroupsMainActivity.this);
+            builder.setTitle(R.string.main_set_password_title);
+            LayoutInflater layoutInflater = (LayoutInflater)
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View dialogView = layoutInflater.inflate(R.layout.set_password_dialog, null);
+            builder.setView(dialogView);
+            EditText password = (EditText) dialogView.findViewById(R.id.groupPassword);
+
+            builder.setPositiveButton(getString(R.string.main_password_ok), mPasswordClick);
+            builder.setNegativeButton(getString(R.string.main_password_cancel), mPasswordClick);
+
+            final AlertDialog dialog = builder.create();
+
+            ((Button) dialogView.findViewById(R.id.rstPassword))
+                    .setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            sendPassword("");
+                            dialog.dismiss();
+                        }
+                    });
+
+            password.addTextChangedListener(new TextWatcher() {
+
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     dialog.getButton(Dialog.BUTTON_POSITIVE)
                             .setEnabled(s.length() == AppData
                                     .getInstance(GroupsMainActivity.this).getGroupPasswordLength());
                 }
-                
+
                 @Override
                 public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                    //Do nothing
+                    // Do nothing
                 }
-                
+
                 @Override
                 public void afterTextChanged(Editable arg0) {
-                    //Do nothing
+                    // Do nothing
                 }
             });
-               
-               dialog.show();
-               dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
-           }
+
+            dialog.show();
+            dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(false);
         }
+    }
 
     @Override
     protected PlaylistItem getPlaylist() {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
 
 }

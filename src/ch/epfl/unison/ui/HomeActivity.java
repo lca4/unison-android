@@ -11,10 +11,9 @@ import com.actionbarsherlock.view.Menu;
 import ch.epfl.unison.R;
 
 /**
- * 
  * @author marc bourqui
  */
-public class HomeActivity extends SherlockActivity{
+public class HomeActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
 
@@ -23,7 +22,7 @@ public class HomeActivity extends SherlockActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return AbstractMenu.onCreateOptionsMenu(this, menu);

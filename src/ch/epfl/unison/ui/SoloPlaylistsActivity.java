@@ -103,7 +103,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         registerForContextMenu(mPlaylistsLocalListView);
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
         initLocalPlaylists();
-        
+
         mPlaylistsRemote = new ArrayList<PlaylistItem>();
         mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
         mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
@@ -577,9 +577,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
 
                             @Override
                             public void onError(Error error) {
-                            	if (error != null) {
-                            		Log.d(TAG, error.toString());
-                            	}
+                                if (error != null) {
+                                    Log.d(TAG, error.toString());
+                                }
                                 if (SoloPlaylistsActivity.this != null) {
                                     Toast.makeText(SoloPlaylistsActivity.this,
                                             R.string.error_creating_playlist,
@@ -601,8 +601,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             // TODO on click, display list of tracks
-            
-            
+
             // SoloPlaylistsActivity.this.startActivity(
             // new Intent(SoloPlaylistsActivity.this, SoloMainActivity.class)
             // .putExtra(Const.Strings.LOCAL_ID,

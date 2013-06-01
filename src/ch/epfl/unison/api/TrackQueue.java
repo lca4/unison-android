@@ -165,7 +165,7 @@ public class TrackQueue {
 
             @Override
             public void onError(UnisonAPI.Error error) {
-                if (error != null) {                    
+                if (error != null) {
                     Log.d(TAG, error.toString());
                 }
                 requestTracks(trials - 1);

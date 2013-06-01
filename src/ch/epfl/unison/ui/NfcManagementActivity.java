@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import java.util.Arrays;
@@ -18,84 +19,83 @@ import ch.epfl.unison.R;
 import com.actionbarsherlock.app.SherlockActivity;
 
 /**
- * 
  * @author vincent source: http://stackoverflow.com/questions/14222831/
  *         how-to-display-ndef-message-after-ndef-discovered-activity-launched
  */
 public class NfcManagementActivity extends SherlockActivity {
 
-	private static final String TAG = "ch.epfl.unison.NfcManagementActivity";
+    private static final String TAG = "ch.epfl.unison.NfcManagementActivity";
 
-	// private boolean mNFCStatusChecked = false;
-	private NfcAdapter mAdapter = null;
-	// private NdefMessage mMessage = null;
-	// private int mDebugGroupID = 123;
-	private PendingIntent mNfcIntent = null;
+    // private boolean mNFCStatusChecked = false;
+    private NfcAdapter mAdapter = null;
+    // private NdefMessage mMessage = null;
+    // private int mDebugGroupID = 123;
+    private PendingIntent mNfcIntent = null;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_nfc_management);
-//		setupNFC();
-		handleNFCIntent(getIntent());
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_nfc_management);
+        // setupNFC();
+        handleNFCIntent(getIntent());
+    }
 
-	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
 
-		if (mAdapter != null) {
-			mAdapter.enableForegroundDispatch(this, mNfcIntent, null, null);
-		}
-	}
+        if (mAdapter != null) {
+            mAdapter.enableForegroundDispatch(this, mNfcIntent, null, null);
+        }
+    }
 
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		if (mAdapter != null) {
-			mAdapter.disableForegroundDispatch(this);
-		}
-	}
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        if (mAdapter != null) {
+            mAdapter.disableForegroundDispatch(this);
+        }
+    }
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		// TODO Auto-generated method stub
-		super.onNewIntent(intent);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // TODO Auto-generated method stub
+        super.onNewIntent(intent);
 
-		handleNFCIntent(intent);
+        handleNFCIntent(intent);
 
-	}
+    }
 
-	private void setupNFC() {
+    private void setupNFC() {
 
-		NfcManager manager = (NfcManager) getApplicationContext()
-				.getSystemService(Context.NFC_SERVICE);
-		mAdapter = manager.getDefaultAdapter();
-		if (mAdapter == null) {
-			Toast.makeText(NfcManagementActivity.this,
-					R.string.error_NFC_not_present, Toast.LENGTH_LONG).show();
-			finish();
-			return;
-		}
+        NfcManager manager = (NfcManager) getApplicationContext()
+                .getSystemService(Context.NFC_SERVICE);
+        mAdapter = manager.getDefaultAdapter();
+        if (mAdapter == null) {
+            Toast.makeText(NfcManagementActivity.this,
+                    R.string.error_NFC_not_present, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
-		if (!mAdapter.isEnabled()) {
-			Toast.makeText(NfcManagementActivity.this,
-					R.string.error_NFC_not_active, Toast.LENGTH_LONG).show();
-			// startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
-		} else {
-			Log.d(TAG, "NFC is enabled!");
-			mNfcIntent = PendingIntent.getActivity(getApplicationContext(), 3,
-					new Intent(this, NFCReceiveGroupActivity.class)
-							.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        if (!mAdapter.isEnabled()) {
+            Toast.makeText(NfcManagementActivity.this,
+                    R.string.error_NFC_not_active, Toast.LENGTH_LONG).show();
+            // startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        } else {
+            Log.d(TAG, "NFC is enabled!");
+            mNfcIntent = PendingIntent.getActivity(getApplicationContext(), 3,
+                    new Intent(this, NFCReceiveGroupActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-		}
+        }
 
-	}
-	
-	private void handleNFCIntent(Intent intent) {
-	    if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+    }
+
+    private void handleNFCIntent(Intent intent) {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             NdefMessage[] messages = null;
             Parcelable[] rawMsgs = intent
                     .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -115,18 +115,18 @@ public class NfcManagementActivity extends SherlockActivity {
             }
             if (messages != null && messages[0] != null
                     && messages[0].getRecords() != null) {
-//              String result = "";
-//              byte[] payload = messages[0].getRecords()[0].getPayload();
-//              for (int b = 0; b < payload.length; b++) {
-//                  result += (char) payload[b];
-//              }
-//              Toast.makeText(getApplicationContext(), "Read: " + result,
-//                      Toast.LENGTH_SHORT).show();
-//
-//              long groupID = Long.valueOf(result);
-                StringBuilder sb = new StringBuilder();              
+                // String result = "";
+                // byte[] payload = messages[0].getRecords()[0].getPayload();
+                // for (int b = 0; b < payload.length; b++) {
+                // result += (char) payload[b];
+                // }
+                // Toast.makeText(getApplicationContext(), "Read: " + result,
+                // Toast.LENGTH_SHORT).show();
+                //
+                // long groupID = Long.valueOf(result);
+                StringBuilder sb = new StringBuilder();
 
-                for (NdefMessage msg: messages) {
+                for (NdefMessage msg : messages) {
                     NdefRecord[] records = msg.getRecords();
                     if (records != null) {
                         for (NdefRecord rec : records) {
@@ -142,7 +142,7 @@ public class NfcManagementActivity extends SherlockActivity {
 
                 String result = sb.toString();
 
-                //FIXME
+                // FIXME
                 Log.d(TAG, "Read " + result);
 
             }
@@ -152,20 +152,14 @@ public class NfcManagementActivity extends SherlockActivity {
         }
 
         /*
-         * Log.d(TAG, "Recieved intent : " + intent.toString());
-         * 
-         * Bundle extras = intent.getExtras(); Log.d(TAG,
-         * "Containing the extras : " + extras.toString());
-         * 
-         * for (String key : extras.keySet()) { Log.d(TAG, key);
-         * 
-         * } NdefMessage[] messages =
+         * Log.d(TAG, "Recieved intent : " + intent.toString()); Bundle extras =
+         * intent.getExtras(); Log.d(TAG, "Containing the extras : " +
+         * extras.toString()); for (String key : extras.keySet()) { Log.d(TAG,
+         * key); } NdefMessage[] messages =
          * extras.getParcelableArray(NfcAdapter.EXTRA_NDEF_MESSAGES); Log.d(TAG,
-         * "we got " + messages.length + " messages.");
-         * 
-         * if (intent.getAction() == NfcAdapter.ACTION_NDEF_DISCOVERED) {
-         * 
-         * } else { Log.d(TAG, "ignoring intent because not related to NFC"); }
+         * "we got " + messages.length + " messages."); if (intent.getAction()
+         * == NfcAdapter.ACTION_NDEF_DISCOVERED) { } else { Log.d(TAG,
+         * "ignoring intent because not related to NFC"); }
          */
 
         // CRAP:
@@ -186,6 +180,6 @@ public class NfcManagementActivity extends SherlockActivity {
         // NdefRecord record = records[0];
         // String payload = new String(record.getPayload());
         // Log.d(TAG, "We recieved this payload: " + payload);
-	}
+    }
 
 }
