@@ -107,6 +107,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
             AppData data = AppData.getInstance(this);
             data.addToHistory(mGroup);
             data.setInGroup(true);
+            data.setCurrentGID(getGroupId());
 
         }
     }

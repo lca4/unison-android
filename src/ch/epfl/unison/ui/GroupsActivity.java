@@ -395,11 +395,12 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
     private void leaveGroup(final Group group) {
         // Make sure the user is not marked as present in any group.
-        AppData data = AppData.getInstance(this);
-        data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+        final AppData data = AppData.getInstance(this);
+        data.getAPI().leaveGroup(data.getUid(), data.getCurrentGID(), new UnisonAPI.Handler<JsonStruct.Success>() {
 
             @Override
             public void callback(Success struct) {
+                data.setCurrentGID(null);
                 Log.d(TAG, "successfully left group");
                 if (group != null) {
                     if (group.password) {

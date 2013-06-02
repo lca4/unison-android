@@ -354,6 +354,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     public boolean getInSolo() {
         return mPrefs.getBoolean(Const.PrefKeys.IN_SOLO, false);
     }
+    
+    public boolean setCurrentGID(Long gid) {
+        return mPrefs.edit().putLong(Const.PrefKeys.CURRENT_GID, gid).commit();
+    }
+    
+    public Long getCurrentGID() {
+        return mPrefs.getLong(Const.PrefKeys.CURRENT_GID, -1);
+    }
 
     /**
      * Simple LocationListener that differentiates updates from the network
