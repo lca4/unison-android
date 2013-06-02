@@ -346,6 +346,14 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     public boolean getInGroup() {
         return mPrefs.getBoolean(Const.PrefKeys.IN_GROUP, false);
     }
+    
+    public boolean setInSolo(boolean solo) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.IN_SOLO, solo).commit();
+    }
+    
+    public boolean getInSolo() {
+        return mPrefs.getBoolean(Const.PrefKeys.IN_SOLO, false);
+    }
 
     /**
      * Simple LocationListener that differentiates updates from the network

@@ -39,6 +39,8 @@ public class LoginActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.LoginActivity";
 
+    public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
+    
     private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
@@ -224,14 +226,28 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void nextActivity(JsonStruct.User user) {
-        if (user.gid != null) {
-            // Directly go into group.
-            startActivity(new Intent(this, GroupsMainActivity.class)
-                    .putExtra(Const.Strings.GID, user.gid));
+        if (getIntent() != null && ACTION_JOIN_GROUP.equals(getIntent().getAction())
+                && getIntent().getExtras() != null) {
+            JsonStruct.Group group = (JsonStruct.Group) getIntent().getExtras().get(Const.Strings.GROUP);
+            if (group != null) {
+                startActivity(new Intent(this, GroupsMainActivity.class)
+                .setAction(GroupsActivity.ACTION_JOIN_GROUP)
+                .putExtra(Const.Strings.GROUP, group));
+            } else {
+                //SHould never happen.
+                startActivity(new Intent(this, HomeActivity.class));
+            }
         } else {
-            // Display list of groups.
-            // startActivity(new Intent(this, GroupsActivity.class));
-            startActivity(new Intent(this, HomeActivity.class));
+        
+            if (user.gid != null) {
+                // Directly go into group.
+                startActivity(new Intent(this, GroupsMainActivity.class)
+                        .putExtra(Const.Strings.GID, user.gid));
+            } else {
+                // Display list of groups.
+                // startActivity(new Intent(this, GroupsActivity.class));
+                startActivity(new Intent(this, HomeActivity.class));
+            }
         }
         // Close this activity.
 

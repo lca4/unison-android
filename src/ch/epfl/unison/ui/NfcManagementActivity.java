@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
+import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
@@ -129,7 +130,7 @@ public class NfcManagementActivity extends SherlockActivity {
                 //
                 // long groupID = Long.valueOf(result);
                 String plString;
-                int gid;
+                Long gid;
 
                 //Look for our custom message
                 for (NdefMessage msg : messages) {
@@ -145,9 +146,12 @@ public class NfcManagementActivity extends SherlockActivity {
                                         plString = new String(pl);
                                         try {
                                             JSONObject jo = new JSONObject(plString);
-                                            gid = jo.getInt("gid");
+                                            gid = jo.getLong("gid");
                                             
-                                            //TODO do something with the group ID.
+                                            AutoJoin aj = new AutoJoin(
+                                                    AppData.getInstance(NfcManagementActivity.this),
+                                                    NfcManagementActivity.this);
+                                            aj.joinByGID(gid);
                                         } catch (JSONException je) {
                                             Toast.makeText(getApplicationContext(), "Intent Error...",
                                                     Toast.LENGTH_LONG).show();
@@ -199,6 +203,8 @@ public class NfcManagementActivity extends SherlockActivity {
         // NdefRecord record = records[0];
         // String payload = new String(record.getPayload());
         // Log.d(TAG, "We recieved this payload: " + payload);
+        
+//        finish();
     }
     
     private boolean byteArrayEqual(byte[] t1, byte[] t2) {
