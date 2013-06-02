@@ -234,7 +234,7 @@ public class LoginActivity extends SherlockActivity {
                 .setAction(GroupsActivity.ACTION_JOIN_GROUP)
                 .putExtra(Const.Strings.GROUP, group));
             } else {
-                //SHould never happen.
+                //Should never happen.
                 startActivity(new Intent(this, HomeActivity.class));
             }
         } else {

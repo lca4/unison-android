@@ -193,7 +193,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(
                         R.string.fragment_title_player),

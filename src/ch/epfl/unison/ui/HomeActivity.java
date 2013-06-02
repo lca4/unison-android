@@ -1,8 +1,12 @@
 
 package ch.epfl.unison.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -18,10 +22,19 @@ public class HomeActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
 
+    private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
+        // This activity should finish on logout.
+        registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
     }
 
     @Override
@@ -32,6 +45,11 @@ public class HomeActivity extends SherlockActivity {
             refreshItem.setVisible(false);
         }
         return success;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return AbstractMenu.onOptionsItemSelected(this, null, item);
     }
 
     public void onButtonClickGroups(View view) {

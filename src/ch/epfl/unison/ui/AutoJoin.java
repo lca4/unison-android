@@ -138,7 +138,7 @@ public class AutoJoin {
         }
     }
 
-    private void fetchInfoForJoin(Long gid) {
+    private void fetchInfoForJoin(final Long gid) {
         UnisonAPI api = mData.getAPI();
 
         api.getGroupInfo(gid.longValue(), new UnisonAPI.Handler<JsonStruct.Group>() {
@@ -149,6 +149,7 @@ public class AutoJoin {
                     onError(null);
                     return;
                 }
+                group.gid = gid;
                 mRetrievedGroup = group;
                 if (mActivity != null) {
                     successNextActivity();
@@ -164,7 +165,7 @@ public class AutoJoin {
                 }
                 if (mActivity != null) {
                     errorNextActivity();
-                    Toast.makeText(mActivity, "Received group was invalid", Toast.LENGTH_LONG)
+                    Toast.makeText(mActivity, "Not logged in, or received group was invalid", Toast.LENGTH_LONG)
                             .show();
                     mActivity.finish();
                 }
@@ -173,7 +174,7 @@ public class AutoJoin {
     }
 
     private boolean validGroup(JsonStruct.Group group) {
-        return group != null && group.gid != null;
+        return group != null;
     }
 
     // private void setData(AppData data) {

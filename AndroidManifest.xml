@@ -28,33 +28,42 @@
         <!-- Activities. -->
         <activity
             android:name="ch.epfl.unison.ui.PrefsActivity"
-            android:label="@string/activity_title_prefs" />
+            android:label="@string/activity_title_prefs"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsRatingsActivity"
-            android:label="@string/activity_title_ratings" />
+            android:label="@string/activity_title_ratings"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.HelpActivity"
-            android:label="@string/activity_title_help" />
+            android:label="@string/activity_title_help"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsActivity"
-            android:label="@string/activity_title_groups" />
+            android:label="@string/activity_title_groups"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsHistoryActivity"
-            android:label="@string/activity_title_history" />
+            android:label="@string/activity_title_history"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.SoloMainActivity"
-            android:label="@string/activity_title_solo_main" />
+            android:label="@string/activity_title_solo_main"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.SoloPlaylistsActivity"
-            android:label="@string/activity_title_solo_playlists" />
+            android:label="@string/activity_title_solo_playlists"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.HomeActivity"
-            android:label="@string/activity_title_home" />
+            android:label="@string/activity_title_home"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Sherlock.NoActionBar" >
+            android:theme="@style/Theme.Sherlock.NoActionBar"
+            android:taskAffinity="ch.epfl.unison.taskname" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -70,12 +79,14 @@
         <activity
             android:name="ch.epfl.unison.ui.SignupActivity"
             android:label="@string/activity_title_signup"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsMainActivity"
             android:label="@string/activity_title_main"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:taskAffinity="ch.epfl.unison.taskname" />
         <!--
         See doc on singleTask:
         http://developer.android.com/guide/components/tasks-and-back-stack.html 
@@ -83,6 +94,23 @@
         FLAG_ACTIVITY_REORDER_TO_FRONT
         when creating the pending intent in MusicService for the notification
         -->
+        
+        <activity
+            android:name="ch.epfl.unison.ui.NfcManagementActivity"
+            android:label="@string/title_activity_nfc_management"
+            android:taskAffinity="ch.epfl.unison.taskname"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="ext"
+                    android:pathPrefix="/ch.epfl.unison:text/plain"
+                    android:scheme="vnd.android.nfc" />
+            </intent-filter>
+        </activity>
 
 
         <!-- Services. -->
@@ -120,20 +148,6 @@
         <activity
             android:name="ch.epfl.unison.ui.NFCReceiveGroupActivity"
             android:label="@string/title_activity_nfcrecieve_group" >
-        </activity>
-        <activity
-            android:name="ch.epfl.unison.ui.NfcManagementActivity"
-            android:label="@string/title_activity_nfc_management" >
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data
-                    android:host="ext"
-                    android:pathPrefix="/ch.epfl.unison:text/plain"
-                    android:scheme="vnd.android.nfc" />
-            </intent-filter>
         </activity>
     </application>
 
