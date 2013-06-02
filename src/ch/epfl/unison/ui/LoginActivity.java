@@ -78,7 +78,9 @@ public class LoginActivity extends SherlockActivity {
         });
 
         // Initialize the AppData instance.
-        AppData.getInstance(this);
+        AppData data = AppData.getInstance(this);
+        
+        data.setLoggedIn(false);
     }
 
     @Override
@@ -247,6 +249,7 @@ public class LoginActivity extends SherlockActivity {
             public void callback(JsonStruct.User user) {
                 LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
                 LoginActivity.this.nextActivity(user);
+                AppData.getInstance(LoginActivity.this).setLoggedIn(true);
                 dialog.dismiss();
             }
 
