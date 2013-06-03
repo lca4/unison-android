@@ -283,8 +283,8 @@ public class LoginActivity extends SherlockActivity {
             @Override
             public void callback(JsonStruct.User user) {
                 LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
-                LoginActivity.this.nextActivity(user);
                 AppData.getInstance(LoginActivity.this).setLoggedIn(true);
+                LoginActivity.this.nextActivity(user);
                 dialog.dismiss();
             }
 
