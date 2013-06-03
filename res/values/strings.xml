@@ -194,6 +194,7 @@ You can also just cancel this action and stay in groups history.</string>
     <!-- NFC -->
     <string name="NFC_reciever_wait">Wainting for an NFC transmission</string>
     <string name="NFC_send_button">Share group!</string>
+    <string name="NFC_processing_message">Received an NFC message, processing our next action!</string>
 
     <!-- Errors. -->
     <string name="error_generic_server_response">Server responded:</string>
