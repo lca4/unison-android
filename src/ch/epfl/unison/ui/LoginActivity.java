@@ -41,6 +41,9 @@ public class LoginActivity extends SherlockActivity {
 
     public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
     
+    public static final String ACTION_JOIN_GROUP_FROM_GID = 
+            "ch.epfl.unison.action.JOIN_GROUP_FROM_GID";
+    
     private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
@@ -226,33 +229,49 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void nextActivity(JsonStruct.User user) {
-        if (getIntent() != null && ACTION_JOIN_GROUP.equals(getIntent().getAction())
-                && getIntent().getExtras() != null) {
-            JsonStruct.Group group = (JsonStruct.Group) getIntent().getExtras().get(Const.Strings.GROUP);
-            if (group != null) {
-                startActivity(new Intent(this, GroupsMainActivity.class)
-                .setAction(GroupsActivity.ACTION_JOIN_GROUP)
-                .putExtra(Const.Strings.GROUP, group));
-            } else {
-                //Should never happen.
-                startActivity(new Intent(this, HomeActivity.class));
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            if (ACTION_JOIN_GROUP.equals(getIntent().getAction())) {
+                JsonStruct.Group group = (JsonStruct.Group) getIntent().getExtras().get(
+                        Const.Strings.GROUP);
+                if (group != null) {
+                    startActivity(new Intent(this, GroupsMainActivity.class)
+                            .setAction(GroupsActivity.ACTION_JOIN_GROUP)
+                            .putExtra(Const.Strings.GROUP, group));
+                } else {
+                    // Should never happen.
+                    startActivity(new Intent(this, HomeActivity.class));
+                }
+            } else if (ACTION_JOIN_GROUP_FROM_GID.equals(getIntent().getAction())) {
+                Long gid = (Long) getIntent().getExtras().get(
+                        Const.Strings.GID);
+                if (gid != null) {
+                    AutoJoin aj = new AutoJoin(
+                            AppData.getInstance(LoginActivity.this), LoginActivity.this);
+                    aj.joinByGID(gid);
+                }else {
+                    // Should never happen.
+                    startActivity(new Intent(this, HomeActivity.class));
+                }
             }
         } else {
-        
-            if (user.gid != null) {
-                // Directly go into group.
-                startActivity(new Intent(this, GroupsMainActivity.class)
-                        .putExtra(Const.Strings.GID, user.gid));
-            } else {
-                // Display list of groups.
-                // startActivity(new Intent(this, GroupsActivity.class));
-                startActivity(new Intent(this, HomeActivity.class));
-            }
+            nextWithoutActions(user);
         }
         // Close this activity.
 
         Log.d(TAG, "Going to finish LoginActiviy");
         finish();
+    }
+    
+    private void nextWithoutActions(JsonStruct.User user) {
+        if (user.gid != null) {
+            // Directly go into group.
+            startActivity(new Intent(this, GroupsMainActivity.class)
+                    .putExtra(Const.Strings.GID, user.gid));
+        } else {
+            // Display list of groups.
+            // startActivity(new Intent(this, GroupsActivity.class));
+            startActivity(new Intent(this, HomeActivity.class));
+        }
     }
 
     private void login(final String email, final String password) {

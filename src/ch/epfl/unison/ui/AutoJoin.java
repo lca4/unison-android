@@ -2,7 +2,6 @@
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
@@ -59,8 +58,19 @@ public class AutoJoin {
         if (gid == null) {
             return false;
         }
+        
+        State state = checkState();
+        
+        if (state == State.NotLoggedIn) {
+            mActivity.startActivity(new Intent(mActivity, LoginActivity.class)
+                    .putExtra(Const.Strings.GID, gid)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .setAction(LoginActivity.ACTION_JOIN_GROUP_FROM_GID));
+            mActivity.finish();
+        } else {
+            fetchInfoForJoin(gid);           
+        }
 
-        fetchInfoForJoin(gid);
 
         return true;
     }
