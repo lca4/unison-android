@@ -139,7 +139,8 @@ public class NfcManagementActivity extends SherlockActivity {
                         for (NdefRecord rec : records) {
                             if (rec != null) {
                                 if (rec.getTnf() == NdefRecord.TNF_EXTERNAL_TYPE
-                                        && byteArrayEqual(rec.getType(), Const.Strings.UNISON_NFC_MIME_TYPE.getBytes())) {
+                                        && byteArrayEqual(rec.getType(),
+                                                Const.Strings.UNISON_NFC_MIME_TYPE.getBytes())) {
                                     //This is it
                                     byte[] pl = rec.getPayload();
                                     if (pl != null) {
@@ -153,7 +154,8 @@ public class NfcManagementActivity extends SherlockActivity {
                                                     NfcManagementActivity.this);
                                             aj.joinByGID(gid);
                                         } catch (JSONException je) {
-                                            Toast.makeText(getApplicationContext(), "Intent Error...",
+                                            Toast.makeText(getApplicationContext(),
+                                                    "Intent Error...",
                                                     Toast.LENGTH_LONG).show();
                                         }
                                         break;

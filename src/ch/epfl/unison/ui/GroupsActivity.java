@@ -365,7 +365,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         }
         // switchSuggestionButtonState(data.showGroupSuggestion());
 
-        updateSuggestionButton(!mProcessingAutoAction);
+//        updateSuggestionButton(!mProcessingAutoAction);
+        toggleActivityButtons(!mProcessingAutoAction);
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
         }
@@ -925,12 +926,25 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == Dialog.BUTTON_POSITIVE) {
                         joinGroup(group, password.getText().toString());
+                    } else if (which == Dialog.BUTTON_NEGATIVE) {
+                        mProcessingAutoAction = false;
+                        onRefresh();
                     }
                 }
             };
 
             builder.setPositiveButton(getString(R.string.main_password_ok), passwordClick);
             builder.setNegativeButton(getString(R.string.main_password_cancel), passwordClick);
+            
+            // This is supposed to handle the situation where the user presses the
+            // BACK key too.
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    mProcessingAutoAction = false;
+                    onRefresh();
+                }
+            });
 
             final AlertDialog dialog = builder.create();
 

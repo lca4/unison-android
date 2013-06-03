@@ -248,10 +248,14 @@ public class LoginActivity extends SherlockActivity {
                     AutoJoin aj = new AutoJoin(
                             AppData.getInstance(LoginActivity.this), LoginActivity.this);
                     aj.joinByGID(gid);
-                }else {
+                    //the login activity is going to be finished by AutoJoin.
+                    return;
+                } else {
                     // Should never happen.
                     startActivity(new Intent(this, HomeActivity.class));
                 }
+            } else {
+                nextWithoutActions(user);
             }
         } else {
             nextWithoutActions(user);

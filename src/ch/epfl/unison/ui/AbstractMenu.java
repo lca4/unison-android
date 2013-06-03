@@ -3,6 +3,8 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.widget.Toast;
+import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
@@ -62,6 +64,18 @@ public abstract class AbstractMenu {
                         Const.Strings.CALLER, activity.getClass().getName()));
                 break;
             case R.id.menu_item_logout:
+                
+                //check if the user is in a group:
+                AppData data = AppData.getInstance(activity);
+                if (data.getInGroup()) {
+                    //here we notify the user that he should leave the group first:
+                    if (activity != null) {
+                        Toast.makeText(activity, activity.getString(
+                                R.string.error_logout_while_in_group), Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                }
+                
                 activity.startActivity(new Intent(activity, LoginActivity.class)
                         .putExtra(Const.Strings.LOGOUT, true));
                 // Send broadcast to all activities that can only be used when

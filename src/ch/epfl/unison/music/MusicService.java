@@ -224,7 +224,8 @@ public class MusicService extends Service
     private void setUpAsForeground(String text) {
         Context context = getApplicationContext();
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                new Intent(getApplicationContext(), GroupsMainActivity.class),
+                new Intent(getApplicationContext(),
+                        GroupsMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         mNotification = new Notification();
         mNotification.tickerText = text;
