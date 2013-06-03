@@ -29,34 +29,42 @@
         <activity
             android:name="ch.epfl.unison.ui.PrefsActivity"
             android:label="@string/activity_title_prefs"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsRatingsActivity"
             android:label="@string/activity_title_ratings"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.HelpActivity"
             android:label="@string/activity_title_help"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsActivity"
+            android:screenOrientation="portrait"
             android:label="@string/activity_title_groups"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.GroupsHistoryActivity"
             android:label="@string/activity_title_history"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.SoloMainActivity"
             android:label="@string/activity_title_solo_main"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.SoloPlaylistsActivity"
             android:label="@string/activity_title_solo_playlists"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.HomeActivity"
             android:label="@string/activity_title_home"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname" />
         <activity
             android:name="ch.epfl.unison.ui.LoginActivity"
@@ -98,6 +106,7 @@
         <activity
             android:name="ch.epfl.unison.ui.NfcManagementActivity"
             android:label="@string/title_activity_nfc_management"
+            android:screenOrientation="portrait"
             android:taskAffinity="ch.epfl.unison.taskname"
             android:launchMode="singleTask" >
             <intent-filter>
