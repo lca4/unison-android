@@ -46,6 +46,7 @@ public class TrackQueue {
     private boolean mIsActive;
     private boolean mIsPending;
     private Handler mHandler;
+    private Poller mPoller;
 
     private Context mContext;
     private long mGroupId;
@@ -65,12 +66,14 @@ public class TrackQueue {
     public TrackQueue start() {
         mIsActive = true;
         ensureEnoughElements();
-        mHandler.postDelayed(new Poller(), POLL_INTERVAL);
+        mPoller = new Poller();
+        mHandler.postDelayed(mPoller, POLL_INTERVAL);
         return this;
     }
 
     public void stop() {
         this.mIsActive = false;
+        mHandler.removeCallbacks(mPoller);
         this.mPlaylist.clear();
         this.mNextPtr = 0;
     }

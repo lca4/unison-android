@@ -335,15 +335,19 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                     // the server.
                     notifySkip();
                 }
+                Log.d(mTag, "Calling next");
 
                 if (mHistPointer > 0) {
                     mHistPointer -= 1;
+                    Log.d(mTag, "Calling play");
                     play(mHistory.get(mHistPointer));
                 } else {
+                    Log.d(mTag, "Calling requestTrack");
                     // We need a new track.
-                    if (requestTrack()) {
-                        play(mHistory.get(0));
-                    }
+                    requestTrack();
+//                    if (requestTrack()) {
+//                        play(mHistory.get(0));
+//                    }
                 }
                 break;
             case Solo:
@@ -375,6 +379,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     @Override
     public void onClick(View v) {
         if (v == mToggleBtn) {
+            Log.d(mTag, "Clicked on play button, status = " + getStatus());
             if (getStatus() == Status.Stopped) {
                 next();
             } else { // Paused or Playing.
@@ -654,6 +659,10 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
     protected void setMode(Mode mode) {
         this.mMode = mode;
+    }
+    
+    protected List<MusicItem> getHistory() {
+        return this.mHistory;
     }
 
     // protected void setTag(String tag) {

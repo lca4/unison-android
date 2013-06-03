@@ -117,6 +117,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
+        if (mTrackQueue != null) {
+            mTrackQueue.stop();
+        }
         ((GroupsMainActivity) getMainActivity())
                 .unregisterGroupInfoListener(this);
     }
@@ -409,6 +412,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             public void callback(MusicItem item) {
                 addToHistory(item);
                 mTrackAdded = true;
+                play(getHistory().get(0));
             }
 
             @Override
@@ -421,6 +425,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 mTrackAdded = false;
             }
         });
+        Log.d(TAG, "RequestTrack returning: " + mTrackAdded);
         return mTrackAdded;
     }
 
