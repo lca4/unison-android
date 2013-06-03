@@ -16,6 +16,7 @@ import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.data.PlaylistItem;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockListFragment;
 
 /**
  * Offers a fragment containing a list. A header can be
@@ -24,7 +25,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  * @see {@link ListFragment} What can be done there?
  * @author marc
  */
-public abstract class AbstractListFragment extends SherlockFragment {
+public abstract class AbstractListFragment extends SherlockListFragment {
 
     private String mClassTag = "ch.epfl.unison.ui.AbstractFragment";
 

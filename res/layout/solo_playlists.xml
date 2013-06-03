@@ -26,6 +26,11 @@
         android:text="@string/solo_playlists_choosePL"/>
 
   </LinearLayout>
+  
+  
+  <!-- Fragments -->
+  <!-- See https://developer.android.com/guide/components/fragments.html#Creating -->
+  
 
   <!-- Text output wrapper -->
   

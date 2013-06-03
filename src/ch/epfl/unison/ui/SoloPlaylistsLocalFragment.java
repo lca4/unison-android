@@ -33,14 +33,22 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
+import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment.OnSavePlaylistListener;
 
 /**
  * Shows the locally stored playlists made with GS.
  * 
  * @author marc
  */
-public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
-        SoloPlaylistsActivity.OnPlaylistsLocalInfoListener {
+public class SoloPlaylistsLocalFragment extends AbstractListFragment { 
+//    implements SoloPlaylistsActivity.OnPlaylistsLocalInfoListener {
+    
+    /** Container Activity must implement this interface.  */
+    public interface OnDeletePlaylistListener {
+        boolean onDeletePlaylist(PlaylistItem playlist);
+    }
+    
+    private OnDeletePlaylistListener mListener;
 
     // Not really useful, but nice to avoid explicit casting every time
     private SoloPlaylistsActivity mHostActivity;
@@ -57,15 +65,23 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        // mHostActivity = (SoloPlaylistsActivity) activity;
-        mHostActivity = (SoloPlaylistsActivity) getActivity();
+         mHostActivity = (SoloPlaylistsActivity) activity;
+//        mHostActivity = (SoloPlaylistsActivity) getActivity();
+        try {
+            mListener = (OnDeletePlaylistListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() 
+                    + " must implement OnDeletePlaylistListener");
+        }
+        mPlaylistsLocal = new ArrayList<PlaylistItem>();
     }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDB = new UnisonDB(getActivity());
-        mHostActivity.registerPlaylistsLocalInfoListener(this);
+//        mHostActivity.registerPlaylistsLocalInfoListener(this);
+        initPlaylistsLocal();
     }
 
     @Override
@@ -104,7 +120,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                 try {
                     // Set local_id to null on GS server
                     data.getAPI().updatePlaylist(data.getUid(),
-                            mHostActivity.getPlaylistsLocal()
+                            mPlaylistsLocal
                                     .get(info.position).getPLId(),
                             new JSONObject().put("local_id", JSONObject.NULL),
                             new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
@@ -113,13 +129,10 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                                 public void callback(JsonStruct.PlaylistJS struct) {
                                     // Then from local databases
                                     if (mHostActivity.getDB().delete(
-                                            ((SoloPlaylistsActivity) getHostActivity())
-                                                    .getPlaylistsLocal()
+                                            mPlaylistsLocal
                                                     .get(info.position)) > 0) {
-                                        mHostActivity
-                                                .getPlaylistsRemote().add(
-                                                        ((SoloPlaylistsActivity) getHostActivity())
-                                                                .getPlaylistsLocal()
+                                        mPlaylistsLocal.add(
+                                                mPlaylistsLocal
                                                                 .remove(info.position));
                                         Log.w(getClassTag(),
                                                 "Successfully removed playlist with id "
@@ -195,11 +208,11 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
         }
     }
 
-    @Override
-    public void onPlaylistsLocalInfo(Object contentInfo) {
-        // TODO Auto-generated method stub
-
-    }
+//    @Override
+//    public void onPlaylistsLocalInfo(Object contentInfo) {
+//        // TODO Auto-generated method stub
+//
+//    }
 
     /**
      * When clicking on a playlist, start MainActivity.
@@ -251,7 +264,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
     /**
      * To be used only once, at onCreate time.
      */
-    private void initLocalPlaylists() {
+    private void initPlaylistsLocal() {
         Cursor cur = mHostActivity.getContentResolver().query(mUri,
                 mPlaylistsIdNameProjection,
                 null, null, null);
@@ -279,5 +292,21 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
         //TODO update
 //        mHostActivity.mPlaylistsLocalListView
 //                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        if (isVisible()) {
+            getListView().setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        }
+    }
+    
+    /* ---------------------------------------
+     * PUBLIC METHODS (used by SoloPlaylistsActivity)
+     * --------------------------------------- */
+    
+    /**
+     * 
+     * @param playlist
+     * @return always true
+     */
+    public boolean add(PlaylistItem playlist) {
+        return mPlaylistsLocal.add(playlist);
     }
 }

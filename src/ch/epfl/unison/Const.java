@@ -36,6 +36,7 @@ public final class Const {
         public static final String SONG_ARTIST_TITLE = "songat";
         public static final String GROUP_TO_CREATE_NAME = "gtcn";
         public static final String URI = "uri";
+        public static final String TAG = "tag";
 
         private Strings() {
         } // Non-instantiable.
@@ -44,6 +45,7 @@ public final class Const {
     /** Various integer values. */
     public final class Integers {
         public static final int HUNDRED = 100;
+        public static final int REMOVED_PLAYLISTS = -1;
 
         private Integers() {
         } // Non-instantiable.
