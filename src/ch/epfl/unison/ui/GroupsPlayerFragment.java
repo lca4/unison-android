@@ -328,7 +328,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             dropDJSeat(api, uid, gid);
         }
         mIsDJ = wantsToBeDJ;
-        mMainActivity.setDJ(wantsToBeDJ);
+        ((GroupsMainActivity) mMainActivity).setDJ(wantsToBeDJ);
     }
 
     // /**

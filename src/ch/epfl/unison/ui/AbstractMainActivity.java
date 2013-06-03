@@ -19,7 +19,7 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
     private ActionBar mSupportActionBar;
 
-    private boolean mIsDj = false;
+    
 
     protected ActionBar getSupportActBar() {
         return mSupportActionBar;
@@ -41,13 +41,6 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
     }
 
-    public void setDJ(boolean dj) {
-        mIsDj = dj;
-        getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj);
-    }
-
-    public boolean isDJ() {
-        return mIsDj;
-    }
+    
 
 }
