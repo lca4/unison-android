@@ -47,6 +47,8 @@ import org.json.JSONObject;
  * @author lum
  */
 public class GroupsMainActivity extends AbstractMainActivity {
+    
+    private boolean mIsDj = false;
 
     /** Simple interface to be notified about group info updates. */
     public interface OnGroupInfoListener {
@@ -288,6 +290,15 @@ public class GroupsMainActivity extends AbstractMainActivity {
             }
         }
     };
+    
+    public void setDJ(boolean dj) {
+        mIsDj = dj;
+        getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj && !mGroup.automatic);
+    }
+
+    public boolean isDJ() {
+        return mIsDj;
+    }
 
     private void sendPassword(final String pw) {
         final AppData data = AppData.getInstance(GroupsMainActivity.this);
