@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct.Track;
 
@@ -488,6 +489,13 @@ public class PlaylistItem extends AbstractItem {
                 mMode = mode;
                 break;
         }
+    }
+    
+    public HashMap<String, String> toHashMap() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(Const.Strings.TITLE, mTitle);
+        map.put(Const.Strings.SIZE, String.valueOf(mSize));
+        return map;
     }
 
 }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -30,28 +33,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author marc
  */
 public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
-//    implements SoloPlaylistsActivity.OnPlaylistsRemoteInfoListener {
-    
-    /** Container Activity must implement this interface.  */
+    // implements SoloPlaylistsActivity.OnPlaylistsRemoteInfoListener {
+
+    /** Container Activity must implement this interface. */
     public interface OnSavePlaylistListener {
         boolean onSavePlaylist(PlaylistItem playlist);
     }
-    
+
     private OnSavePlaylistListener mListener;
 
-    
-    
     // Not really useful, but nice to avoid explicit casting every time
     private SoloPlaylistsActivity mHostActivity;
 
     private UnisonDB mDB;
     private ArrayList<PlaylistItem> mPlaylistsRemote;
-    
+    private ArrayList<HashMap<String, String>> mPlaylistsRemoteList;
+    private ListView mPlaylistsRemoteListView;
+    private PlaylistsAdapter mAdapter;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -59,26 +64,76 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         try {
             mListener = (OnSavePlaylistListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() 
+            throw new ClassCastException(activity.toString()
                     + " must implement OnSavePlaylistListener");
         }
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDB = new UnisonDB(getActivity());
-//        mHostActivity.registerPlaylistsRemoteInfoListener(this);
+        // mHostActivity.registerPlaylistsRemoteInfoListener(this);
         mPlaylistsRemote = new ArrayList<PlaylistItem>();
-        initPlaylistsRemote();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-            ViewGroup container, Bundle savedInstanceState) {
-//        return super.onCreateView(inflater, container, savedInstanceState);
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.list_fragment, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+
+        // template is blank layout
+        View v = inflater.inflate(R.layout.list_fragment, container, false);
+
+        return v;
+    }
+
+    // @Override
+    // public View onCreateView(LayoutInflater inflater,
+    // ViewGroup container, Bundle savedInstanceState) {
+    // // return super.onCreateView(inflater, container, savedInstanceState);
+    // // Inflate the layout for this fragment
+    // // initPlaylistsRemote();
+    // View v = inflater.inflate(R.layout.list_fragment, container, false);
+    // return v;
+    // }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // ArrayList<HashMap<String, String>> list = new
+        // ArrayList<HashMap<String, String>>();
+        // for (int i = 0; i < 5; i++) {
+        // HashMap<String, String> map = new HashMap<String, String>();
+        // map.put(Const.Strings.TITLE, "Title " + String.valueOf(i));
+        // map.put(Const.Strings.SIZE, "size " + String.valueOf(i));
+        // list.add(map);
+        // }
+        // String[] values = new String[] { "Android", "iPhone",
+        // "WindowsMobile",
+        // "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
+        // "Linux", "OS/2" };
+        // ArrayAdapter<String> adapter = new
+        // ArrayAdapter<String>(getActivity(),
+        // android.R.layout.simple_list_item_1, values);
+
+        mPlaylistsRemoteListView =
+                (ListView) getListView().findViewById(android.R.id.list);
+
+//        mPlaylistsRemoteList = new
+//                ArrayList<HashMap<String, String>>();
+//        for (PlaylistItem playlistItem : mPlaylistsRemote) {
+//            mPlaylistsRemoteList.add(playlistItem.toHashMap());
+//        }
+
+        mAdapter = new PlaylistsAdapter(getActivity(), mPlaylistsRemote);
+        setListAdapter(mAdapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshPlaylistsRemote();
     }
 
     @Override
@@ -93,7 +148,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     public boolean onContextItemSelected(android.view.MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-//        ListView lv = (ListView) info.targetView.getParent();
+        // ListView lv = (ListView) info.targetView.getParent();
         AppData data = AppData.getInstance(getHostActivity());
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
@@ -102,7 +157,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                         R.string.error_not_yet_available,
                         Toast.LENGTH_LONG).show();
                 return true;
-                
+
             case R.id.playlist_context_menu_item_save:
                 PlaylistItem pl = mPlaylistsRemote.get(info.position);
                 // Adds PL to local databases
@@ -138,15 +193,15 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                             R.string.error_solo_save_playlist,
                             Toast.LENGTH_LONG).show();
                 }
-              return true;
-                
+                return true;
+
             case R.id.playlist_context_menu_item_delete:
-              /*
-               * In the case of a local playlist, remove it from android and
-               * GS in-app DBs, but keeps it in the user library on GS server.
-               */
-              // Remove from server
-              data.getAPI().removePlaylist(data.getUid(),
+                /*
+                 * In the case of a local playlist, remove it from android and
+                 * GS in-app DBs, but keeps it in the user library on GS server.
+                 */
+                // Remove from server
+                data.getAPI().removePlaylist(data.getUid(),
                         mPlaylistsRemote.get(info.position).getPLId(),
                         new UnisonAPI.Handler<JsonStruct.Success>() {
 
@@ -164,33 +219,46 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                                         Toast.LENGTH_LONG).show();
                             }
                         });
-              return true;
+                return true;
 
             default:
                 return super.onContextItemSelected((android.view.MenuItem) item);
         }
     }
-    
-//    @Override
-//    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-//        if (playlistInfo.getTitle() != null) {
-//            getTitle().setText(playlistInfo.getTitle());
-//        }
-//        getList().setAdapter(new PlaylistsAdapter(playlistInfo));
-//    }
+
+    // @Override
+    // public void onPlaylistInfo(PlaylistItem playlistInfo) {
+    // if (playlistInfo.getTitle() != null) {
+    // getTitle().setText(playlistInfo.getTitle());
+    // }
+    // getList().setAdapter(new PlaylistsAdapter(playlistInfo));
+    // }
 
     /** ArrayAdapter that displays the tracks of the playlist. */
     private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
 
         public static final int ROW_LAYOUT = R.layout.list_row;
 
-        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-            super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
+        public PlaylistsAdapter(Activity activity, ArrayList<PlaylistItem> playlists) {
+            super(activity, 0, playlists);
+            // super(
+            // activity,
+            // playlists,
+            // ROW_LAYOUT,
+            // new String[] {
+            // Const.Strings.TITLE, Const.Strings.SIZE
+            // },
+            // new int[] {
+            // R.id.listrow_title, R.id.listrow_subtitle
+            // });
+
+            // super(SoloPlaylistsRemoteFragment.this.mHostActivity, 0,
+            // playlists);
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            PlaylistItem pl = getItem(position);
+            PlaylistItem pl = (PlaylistItem) getItem(position);
             if (view == null) {
                 LayoutInflater inflater =
                         (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
@@ -198,9 +266,9 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
             ((TextView) view.findViewById(R.id.listrow_title))
-                    .setText(getItem(position).getTitle());
+                    .setText((getItem(position)).getTitle());
             ((TextView) view.findViewById(R.id.listrow_subtitle))
-                    .setText(String.valueOf(getItem(position).size()));
+                    .setText(String.valueOf((getItem(position)).size()));
             // int rating = 0;
             // if (getItem(position).rating != null) {
             // rating = getItem(position).rating;
@@ -211,14 +279,14 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         }
     }
 
-//    @Override
-//    public void onPlaylistsRemoteInfo(Object contentInfo) {
-//        // TODO Auto-generated method stub
-//
-//    }
-    
+    // @Override
+    // public void onPlaylistsRemoteInfo(Object contentInfo) {
+    // // TODO Auto-generated method stub
+    //
+    // }
+
     void addToPlRemote() {
-        
+
     }
 
     /**
@@ -280,43 +348,98 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsRemote() {
-        //TODO update
-//        mHostActivity.mPlaylistsLocalListView
-//                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
-        if (isVisible()) {
-            getListView().setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
-        }
+        // TODO update
+        // mHostActivity.mPlaylistsLocalListView
+        // .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        // if (isVisible()) {
+        // getListView().setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+        // }
+        // ArrayList<HashMap<String, String>> map = new
+        // ArrayList<HashMap<String, String>>();
+        // for (PlaylistItem playlistItem : mPlaylistsRemote) {
+        // map.add(playlistItem.toHashMap());
+        // }
+        // setListAdapter(new PlaylistsAdapter(mHostActivity, map));
+
     }
-    
-    /* ---------------------------------------
-     * PUBLIC METHODS (used by SoloPlaylistsActivity)
-     * --------------------------------------- */
-    
+
+    public void refreshPlaylistsRemote(Activity activity) {
+        // TODO update
+        // mHostActivity.mPlaylistsLocalListView
+        // .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        // if (isVisible()) {
+        // getListView().setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+        // }
+        // ArrayList<HashMap<String, String>> map = new
+        // ArrayList<HashMap<String, String>>();
+        // for (PlaylistItem playlistItem : mPlaylistsRemote) {
+        // map.add(playlistItem.toHashMap());
+        // }
+        // PlaylistsAdapter adapter = new PlaylistsAdapter(activity, map);
+        // adapter.setViewBinder(new SimpleAdapter.ViewBinder() {
+        //
+        // @Override
+        // public boolean setViewValue(View view, Object data, String
+        // textRepresentation) {
+        // // TODO Auto-generated method stub
+        // return false;
+        // }
+        // });
+        // setListAdapter(adapter);
+
+        // ArrayList<HashMap<String, String>> list = new
+        // ArrayList<HashMap<String, String>>();
+        // for (int i = 0; i < 6; i++) {
+        // HashMap<String, String> map = new HashMap<String, String>();
+        // map.put(Const.Strings.TITLE, "Foo " + String.valueOf(i));
+        // map.put(Const.Strings.SIZE, "Bar " + String.valueOf(i));
+        // list.add(map);
+        // }
+        // mAdapter = new PlaylistsAdapter(activity, list);
+
+//        mPlaylistsRemoteList = new ArrayList<HashMap<String, String>>();
+//        for (PlaylistItem playlistItem : mPlaylistsRemote) {
+//            mPlaylistsRemoteList.add(playlistItem.toHashMap());
+//        }
+        // mAdapter = new PlaylistsAdapter(activity, mPlayslitsRemoteListView);
+        // mAdapter.notifyDataSetChanged();
+        mAdapter.clear();
+        mAdapter.addAll(mPlaylistsRemote);
+//        mAdapter = new PlaylistsAdapter(activity, mPlaylistsRemote);
+        mAdapter.notifyDataSetChanged();
+        setListAdapter(mAdapter);
+    }
+
+    /*
+     * --------------------------------------- PUBLIC METHODS (used by
+     * SoloPlaylistsActivity) ---------------------------------------
+     */
+
     /**
-     * 
      * @param playlist
      * @return always true
      */
     public boolean add(PlaylistItem playlist) {
         return mPlaylistsRemote.add(playlist);
     }
-    
+
     /**
-     * 
      * @param index
      * @param playlist
      */
     public void add(int index, PlaylistItem playlist) {
         mPlaylistsRemote.add(index, playlist);
     }
-    
+
     /**
+     * Replaces the list of playlists by the <code>playlists</code>.
      * 
+     * @param activity
      * @param playlists
      */
-    public void set(ArrayList<PlaylistItem> playlists) {
+    public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
         mPlaylistsRemote = playlists;
-        refreshPlaylistsRemote();
+        refreshPlaylistsRemote(activity);
     }
 
 }

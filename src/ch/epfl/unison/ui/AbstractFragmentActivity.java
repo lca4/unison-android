@@ -231,7 +231,10 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
      * switch to the correct paged in the ViewPager whenever the selected tab
      * changes.
      * 
-     * @author no-freaking-idea
+     * @author 
+     * <a href="https://developer.android.com/reference/android/support/v4/view/ViewPager.html">
+     * developer.android.com</a> 
+     * 
      */
     public static class TabsAdapter extends FragmentPagerAdapter implements
             ActionBar.TabListener, ViewPager.OnPageChangeListener {

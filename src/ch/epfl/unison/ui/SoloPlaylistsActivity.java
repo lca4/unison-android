@@ -2,46 +2,35 @@
 package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
@@ -53,7 +42,7 @@ import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
 /**
- * Listing of the groups.
+ * Listing of the playlists.
  * 
  * @author marc bourqui
  */
@@ -72,6 +61,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     // private ListView mPlaylistsLocalListView;
     // private ListView mPlaylistsRemoteListView;
     // Hosted fragments
+    private Bundle fragmentBundleRemote;
     private SoloPlaylistsLocalFragment mPlaylistsLocalFragment;
     private SoloPlaylistsRemoteFragment mPlaylistsRemoteFragment;
 
@@ -113,22 +103,26 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.solo_playlists);
-        ((Button) findViewById(R.id.createPlaylistBtn))
-                .setOnClickListener(new OnCreatePlaylistListener());
+//        setContentView(R.layout.solo_playlists);
+//        ((Button) findViewById(R.id.createPlaylistBtn))
+//                .setOnClickListener(new OnCreatePlaylistListener());
 
-        Bundle b = new Bundle();
-        b.putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_local_tag));
+//        Bundle b = new Bundle();
+//        b.putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_local_tag));
+//        getTabsAdapter().addTab(
+//                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_local_title),
+//                SoloPlaylistsLocalFragment.class, null);
+//        // getSupportFragmentManager because targetVersion < API Level 11
+//        mPlaylistsLocalFragment = (SoloPlaylistsLocalFragment) getTabsAdapter().getItem(0);
+        fragmentBundleRemote = new Bundle();
+        fragmentBundleRemote
+        .putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_remote_tag));
         getTabsAdapter().addTab(
-                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_local_title),
-                SoloPlaylistsLocalFragment.class, b);
-        // getSupportFragmentManager because targetVersion < API Level 11
-        mPlaylistsLocalFragment = (SoloPlaylistsLocalFragment) getTabsAdapter().getItem(0);
-        getTabsAdapter().addTab(
-                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title),
-                SoloPlaylistsRemoteFragment.class, null);
-        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(1);
+                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title)
+                .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
+                SoloPlaylistsRemoteFragment.class, fragmentBundleRemote);
+        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
+        
 
         setReloadInterval(RELOAD_INTERVAL);
 
@@ -156,7 +150,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onResume() {
         super.onResume();
-        startService(new Intent(LibraryService.ACTION_UPDATE));
+//        startService(new Intent(LibraryService.ACTION_UPDATE));
     }
 
     // @Override
@@ -761,7 +755,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     private void refreshPlaylistsRemote(ArrayList<PlaylistItem> playlists) {
         // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
         // .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
-        mPlaylistsRemoteFragment.set(playlists);
+        mPlaylistsRemoteFragment.set(SoloPlaylistsActivity.this, playlists);
     }
 
     // protected ArrayList<PlaylistItem> getPlaylistsLocal() {

@@ -37,6 +37,7 @@ public final class Const {
         public static final String GROUP_TO_CREATE_NAME = "gtcn";
         public static final String URI = "uri";
         public static final String TAG = "tag";
+        public static final String SIZE = "size";
 
         private Strings() {
         } // Non-instantiable.
