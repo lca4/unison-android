@@ -129,6 +129,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean res = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_groups).setVisible(false);
         getMenu().findItem(R.id.menu_item_history).setVisible(true);
         return res;
     }

@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;

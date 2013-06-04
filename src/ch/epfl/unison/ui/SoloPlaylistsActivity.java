@@ -28,6 +28,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
@@ -145,6 +147,13 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         // OnRemotePlaylistSelectedListener());
         // registerForContextMenu(mPlaylistsLocalListView);
         // registerForContextMenu(mPlaylistsRemoteListView);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean b = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_solo).setVisible(false);
+        return b;
     }
 
     @Override

@@ -6,6 +6,9 @@ import java.util.Set;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.PlaylistItem;
@@ -69,6 +72,13 @@ public class SoloMainActivity extends AbstractMainActivity {
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlist_title),
                 SoloTracksFragment.class, null);
 
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean b = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_solo).setVisible(false);
+        return b;
     }
 
     @Override
