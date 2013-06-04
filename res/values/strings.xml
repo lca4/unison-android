@@ -99,7 +99,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="group_no_longer_exists_dialog_body">You can either create one with the same name.\nOr Jump back to the list of groups</string>
     <string name="automatic_group_no_longer_exists_body">You can go back to the groups list or continue browsing your history.</string>
     <string name="group_no_longer_exists_dialog_recreate_group">Recreate group</string>
-    <string name="group_no_longer_exists_dialog_go_groups_activity">Go back to groups list</string>
+    <string name="group_no_longer_exists_dialog_go_groups_activity">Go to history</string>
 
     <!-- Main -->
     <string name="main_set_password_title">Choose PIN</string>

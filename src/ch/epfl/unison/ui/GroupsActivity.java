@@ -1114,7 +1114,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     }
 
     public void errorDialogGoHistoryActivityPressed(View view) {
-        startActivity(new Intent(this, GroupsMainActivity.class));
+        startActivity(new Intent(this, GroupsHistoryActivity.class));
 
         mGroupNoLongerExistsDialog.dismiss();
         mProcessingAutoAction = false;
