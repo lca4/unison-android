@@ -57,7 +57,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
         if (groupInfo.track != null && groupInfo.track.title != null) {
             mTrackTitle.setText(groupInfo.track.title);
         }
-        mUsersList.setAdapter(new StatsAdapter(groupInfo));
+        GroupsStatsFragment.this.mUsersList.setAdapter(new StatsAdapter(groupInfo));
     }
 
     @Override

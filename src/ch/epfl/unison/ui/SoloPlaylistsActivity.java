@@ -124,6 +124,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                 .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
                 SoloPlaylistsRemoteFragment.class, fragmentBundleRemote);
         mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
+        mPlaylistsRemoteFragment.onAttach(this);
         
 
         setReloadInterval(RELOAD_INTERVAL);

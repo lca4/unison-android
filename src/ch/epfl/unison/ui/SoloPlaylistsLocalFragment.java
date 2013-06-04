@@ -95,7 +95,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getHostActivity().getMenuInflater();
+        MenuInflater inflater = mHostActivity.getMenuInflater();
         inflater.inflate(R.menu.playlist_local_context_menu, menu);
     }
 
@@ -104,11 +104,11 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
 //        ListView lv = (ListView) info.targetView.getParent();
-        AppData data = AppData.getInstance(getHostActivity());
+        AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
                 Log.i(getClassTag(), "Not yet implemented...");
-                Toast.makeText(getHostActivity(),
+                Toast.makeText(mHostActivity,
                         R.string.error_not_yet_available,
                         Toast.LENGTH_LONG).show();
                 return true;
@@ -142,7 +142,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                                         // refreshPlaylistsLocal();
                                     } else {
                                         Toast.makeText(
-                                                getHostActivity(),
+                                                mHostActivity,
                                                 R.string
                                                 .error_solo_remove_playlist_from_local_dbs,
                                                 Toast.LENGTH_LONG).show();

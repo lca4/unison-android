@@ -37,10 +37,12 @@
             android:label="@string/activity_title_history" />
         <activity
             android:name=".ui.SoloMainActivity"
-            android:label="@string/activity_title_solo_main" />
+            android:label="@string/activity_title_solo_main"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.SoloPlaylistsActivity"
-            android:label="@string/activity_title_solo_playlists" />
+            android:label="@string/activity_title_solo_playlists"
+            android:launchMode="singleTop" />
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/activity_title_home" />

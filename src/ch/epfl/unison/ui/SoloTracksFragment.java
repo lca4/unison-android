@@ -21,34 +21,37 @@ import ch.epfl.unison.data.PlaylistItem;
  */
 public class SoloTracksFragment extends AbstractListFragment
         implements SoloMainActivity.OnPlaylistInfoListener {
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        SoloTracksFragment.this.getList()
-        .setAdapter(new TracksAdapter(((SoloMainActivity) getHostActivity()).getPlaylist()));
-        return v;
-    }
+    
+    private SoloMainActivity mHostActivity;
+    
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//            Bundle savedInstanceState) {
+//        View v = super.onCreateView(inflater, container, savedInstanceState);
+//        SoloTracksFragment.this.getList()
+//        .setAdapter(new TracksAdapter(mHostActivity.getPlaylist()));
+//        return v;
+//    }
 
     @Override
     public void onPlaylistInfo(PlaylistItem playlistInfo) {
-        if (playlistInfo.getTitle() != null) {
-            getTitle().setText(playlistInfo.getTitle());
-        }
-        getList().setAdapter(new TracksAdapter(playlistInfo));
+//        if (playlistInfo.getTitle() != null) {
+//            getTitle().setText(playlistInfo.getTitle());
+//        }
+        setListAdapter(new TracksAdapter(playlistInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((SoloMainActivity) getHostActivity()).registerPlaylistInfoListener(this);
+        mHostActivity = (SoloMainActivity) activity;
+        mHostActivity.registerPlaylistInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        ((SoloMainActivity) getHostActivity()).unregisterPlaylistInfoListener(this);
+        mHostActivity.unregisterPlaylistInfoListener(this);
     }
 
     /** ArrayAdapter that displays the tracks of the playlist. */
