@@ -97,7 +97,7 @@ public class PlaylistItem extends AbstractItem {
             this.mLocalId = id;
             return this;
         }
-        
+
         public Builder size(long s) {
             this.mSize = s;
             return this;
@@ -349,11 +349,10 @@ public class PlaylistItem extends AbstractItem {
     public void setTitle(String title) {
         this.mTitle = title;
     }
-    
+
     public long size() {
         return this.mSize;
     }
-    
 
     public void setTracks(LinkedList<MusicItem> tracks) {
         this.mTracks = tracks;
@@ -490,7 +489,7 @@ public class PlaylistItem extends AbstractItem {
                 break;
         }
     }
-    
+
     public HashMap<String, String> toHashMap() {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(Const.Strings.TITLE, mTitle);

@@ -61,10 +61,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private SharedPreferences mPrefs;
     private Type mGroupHistoryMapType = new
             TypeToken<Map<Long, Pair<JsonStruct.Group, Date>>>() {
-            } .getType();
+            }.getType();
     private Type mLocationHistoryQueueType = new
             TypeToken<LinkedList<Pair<Pair<Double, Double>, Date>>>() {
-            } .getType();
+            }.getType();
 
     private LocationManager mLocationMgr;
     private UnisonLocationListener mGpsListener;

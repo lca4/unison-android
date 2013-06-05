@@ -142,9 +142,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
 
     private NdefMessage getNdefFromGID(Long gid) {
         NdefRecord[] records = {
-            new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
-                    Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
-                            .getBytes())
+                new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
+                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
+                                .getBytes())
         };
 
         return new NdefMessage(records);
@@ -350,9 +350,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-//    @Override
-//    protected PlaylistItem getPlaylist() {
-//        return null;
-//    }
+    // @Override
+    // protected PlaylistItem getPlaylist() {
+    // return null;
+    // }
 
 }

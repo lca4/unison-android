@@ -18,19 +18,19 @@ import ch.epfl.unison.data.PlaylistItem;
  */
 public class SoloTracksFragment extends AbstractListFragment
         implements SoloMainActivity.OnPlaylistInfoListener {
-    
+
     private SoloMainActivity mHostActivity;
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloTracksFragment.this
-        .setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity, 
-                mHostActivity.getPlaylist()));
+                .setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity,
+                        mHostActivity.getPlaylist()));
         return v;
     }
-    
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -39,9 +39,9 @@ public class SoloTracksFragment extends AbstractListFragment
 
     @Override
     public void onPlaylistInfo(PlaylistItem playlistInfo) {
-//        if (playlistInfo.getTitle() != null) {
-//            getTitle().setText(playlistInfo.getTitle());
-//        }
+        // if (playlistInfo.getTitle() != null) {
+        // getTitle().setText(playlistInfo.getTitle());
+        // }
         setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity, playlistInfo));
     }
 
@@ -58,5 +58,4 @@ public class SoloTracksFragment extends AbstractListFragment
         mHostActivity.unregisterPlaylistInfoListener(this);
     }
 
-    
 }

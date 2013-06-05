@@ -64,7 +64,7 @@ public class SoloMainActivity extends AbstractMainActivity {
     public void onCreate(Bundle savedInstanceState) {
         mDB = new UnisonDB(getApplicationContext());
         super.onCreate(savedInstanceState);
-        
+
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_player_title),
                 SoloPlayerFragment.class, null);
@@ -73,7 +73,7 @@ public class SoloMainActivity extends AbstractMainActivity {
                 SoloTracksFragment.class, null);
 
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);

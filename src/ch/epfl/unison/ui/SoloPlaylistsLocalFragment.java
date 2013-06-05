@@ -37,17 +37,18 @@ import java.util.ArrayList;
  * @author marc
  */
 public class SoloPlaylistsLocalFragment extends AbstractListFragment {
-    
-    /** Container Activity must implement this interface.  */
+
+    /** Container Activity must implement this interface. */
     public interface OnPlaylistsLocalListener {
         boolean onDeletePlaylist(PlaylistItem playlist);
+
         void setPlaylistsLocalFragmentTag(String tag);
     }
-    
+
     private SoloPlaylistsActivity mHostActivity;
     private OnPlaylistsLocalListener mListener;
 
-    private ArrayList<PlaylistItem> mPlaylistsLocal; 
+    private ArrayList<PlaylistItem> mPlaylistsLocal;
 
     @Override
     public void onAttach(Activity activity) {
@@ -69,11 +70,11 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             ViewGroup container, Bundle savedInstanceState) {
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
         View v = super.onCreateView(inflater, container, savedInstanceState);
-//        View v = inflater.inflate(R.layout.list_fragment, container, false);
+        // View v = inflater.inflate(R.layout.list_fragment, container, false);
         initPlaylistsLocal();
         return v;
     }
-    
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -86,12 +87,13 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mHostActivity.getMenuInflater();
         inflater.inflate(R.menu.solo_playlists_context_menu, menu);
-//        menu.findItem(R.id.solo_playlists_context_menu_item_edit).setVisible(true);
+        // menu.findItem(R.id.solo_playlists_context_menu_item_edit).setVisible(true);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
-        // @see http://stackoverflow.com/a/10125761 to learn more about this hack
+        // @see http://stackoverflow.com/a/10125761 to learn more about this
+        // hack
         if (!getUserVisibleHint()) {
             return super.onContextItemSelected((android.view.MenuItem) item);
         }
@@ -127,7 +129,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                                                     .get(info.position)) > 0) {
                                         mListener.onDeletePlaylist(
                                                 mPlaylistsLocal
-                                                                .remove(info.position));
+                                                        .remove(info.position));
                                         Log.w(getClassTag(),
                                                 "Successfully removed playlist with id "
                                                         + struct.gsPlaylistId
@@ -164,32 +166,32 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         }
     }
 
-//    /** ArrayAdapter that displays the tracks of the playlist. */
-//    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-//
-//        public static final int ROW_LAYOUT = R.layout.list_row;
-//
-//        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-//            super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
-//        }
-//
-//        @Override
-//        public View getView(int position, View view, ViewGroup parent) {
-//            PlaylistItem pl = getItem(position);
-//            if (view == null) {
-//                LayoutInflater inflater =
-//                        (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
-//                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(ROW_LAYOUT, parent, false);
-//            }
-//            ((TextView) view.findViewById(R.id.listrow_title))
-//                    .setText(getItem(position).getTitle());
-//            ((TextView) view.findViewById(R.id.listrow_subtitle))
-//                    .setText(String.valueOf(getItem(position).size()));
-//            view.setTag(pl);
-//            return view;
-//        }
-//    }
+    // /** ArrayAdapter that displays the tracks of the playlist. */
+    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+    //
+    // public static final int ROW_LAYOUT = R.layout.list_row;
+    //
+    // public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
+    // super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
+    // }
+    //
+    // @Override
+    // public View getView(int position, View view, ViewGroup parent) {
+    // PlaylistItem pl = getItem(position);
+    // if (view == null) {
+    // LayoutInflater inflater =
+    // (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
+    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    // view = inflater.inflate(ROW_LAYOUT, parent, false);
+    // }
+    // ((TextView) view.findViewById(R.id.listrow_title))
+    // .setText(getItem(position).getTitle());
+    // ((TextView) view.findViewById(R.id.listrow_subtitle))
+    // .setText(String.valueOf(getItem(position).size()));
+    // view.setTag(pl);
+    // return view;
+    // }
+    // }
 
     /**
      * When clicking on a playlist, start MainActivity.
@@ -273,13 +275,13 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     private void refreshPlaylistsLocal() {
         setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsLocal));
     }
-    
-    /* ---------------------------------------
-     * PUBLIC METHODS (used by SoloPlaylistsActivity)
-     * --------------------------------------- */
-    
+
+    /*
+     * --------------------------------------- PUBLIC METHODS (used by
+     * SoloPlaylistsActivity) ---------------------------------------
+     */
+
     /**
-     * 
      * @param playlist
      * @return always true
      */

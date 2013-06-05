@@ -33,6 +33,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     /** Container Activity must implement this interface. */
     public interface OnPlaylistsRemoteListener {
         boolean onSavePlaylist(PlaylistItem playlist);
+
         void setPlaylistsRemoteFragmentTag(String tag);
     }
 
@@ -40,7 +41,8 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     private OnPlaylistsRemoteListener mListener;
 
     private ArrayList<PlaylistItem> mPlaylistsRemote;
-//    private PlaylistsAdapter mAdapter;
+
+    // private PlaylistsAdapter mAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -62,10 +64,11 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         mPlaylistsRemote = new ArrayList<PlaylistItem>();
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloPlaylistsRemoteFragment.this
-        .setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
+                .setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity,
+                        mPlaylistsRemote));
         return v;
     }
-    
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,7 +80,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         super.onResume();
         refreshPlaylistsRemote();
     }
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
@@ -89,7 +92,8 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
-        // @see http://stackoverflow.com/a/10125761 to learn more about this hack
+        // @see http://stackoverflow.com/a/10125761 to learn more about this
+        // hack
         if (!getUserVisibleHint()) {
             return super.onContextItemSelected((android.view.MenuItem) item);
         }
@@ -173,95 +177,98 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         }
     }
 
-//    /** ArrayAdapter that displays the tracks of the playlist. */
-//    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-//
-//        public static final int ROW_LAYOUT = R.layout.list_row;
-//        
-//        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-//            super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
-//        }
-//
-//        @Override
-//        public View getView(int position, View view, ViewGroup parent) {
-//            PlaylistItem pl = (PlaylistItem) getItem(position);
-//            if (view == null) {
-//                LayoutInflater inflater =
-//                        (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
-//                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(ROW_LAYOUT, parent, false);
-//            }
-//            ((TextView) view.findViewById(R.id.listrow_title))
-//                    .setText((getItem(position)).getTitle());
-//            int size = (int) getItem(position).size();
-//            String subtitle = getString(R.string.default_empty);
-//            switch (size) {
-//                case 0:
-//                    subtitle = getString(R.string.solo_playlist_contains_no_track);
-//                    break;
-//                case 1:
-//                    subtitle = getString(R.string.solo_playlist_contains_track);
-//                default:
-//                    subtitle = getString(R.string.solo_playlist_contains_tracks, size);
-//                    break;
-//            }
-//            ((TextView) view.findViewById(R.id.listrow_subtitle))
-//                    .setText(subtitle);
-//            view.setTag(pl);
-//            return view;
-//        }
-//    }
+    // /** ArrayAdapter that displays the tracks of the playlist. */
+    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+    //
+    // public static final int ROW_LAYOUT = R.layout.list_row;
+    //
+    // public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
+    // super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
+    // }
+    //
+    // @Override
+    // public View getView(int position, View view, ViewGroup parent) {
+    // PlaylistItem pl = (PlaylistItem) getItem(position);
+    // if (view == null) {
+    // LayoutInflater inflater =
+    // (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
+    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    // view = inflater.inflate(ROW_LAYOUT, parent, false);
+    // }
+    // ((TextView) view.findViewById(R.id.listrow_title))
+    // .setText((getItem(position)).getTitle());
+    // int size = (int) getItem(position).size();
+    // String subtitle = getString(R.string.default_empty);
+    // switch (size) {
+    // case 0:
+    // subtitle = getString(R.string.solo_playlist_contains_no_track);
+    // break;
+    // case 1:
+    // subtitle = getString(R.string.solo_playlist_contains_track);
+    // default:
+    // subtitle = getString(R.string.solo_playlist_contains_tracks, size);
+    // break;
+    // }
+    // ((TextView) view.findViewById(R.id.listrow_subtitle))
+    // .setText(subtitle);
+    // view.setTag(pl);
+    // return view;
+    // }
+    // }
 
-//    /**
-//     * When clicking on a playlist, start MainActivity.
-//     */
-//    private class OnLocalPlaylistSelectedListener implements OnItemClickListener {
-//
-//        @Override
-//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//            // Give tracks to player here
-//            mHostActivity.startActivity(new Intent(mHostActivity,
-//                    SoloMainActivity.class)
-//                    .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
-//                    .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
-//            // .putExtra(Const.Strings.PLID,
-//            // view.getTag());
-//            // UnisonAPI api =
-//            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-//            // long uid =
-//            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-//            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
-//            // view.getTag();
-//
-//            // api.joinGroup(uid, playlist.plid, new
-//            // UnisonAPI.Handler<JsonStruct.Success>() {
-//            //
-//            // @Override
-//            // public void callback(Success struct) {
-//            // SoloPlaylistsActivity.this.startActivity(
-//            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-//            // .putExtra(Const.Strings.GID, playlist.plid)
-//            // .putExtra(Const.Strings.NAME, playlist.name));
-//            // }
-//            //
-//            // @Override
-//            // public void onError(Error error) {
-//            // Log.d(TAG, error.toString());
-//            // if (SoloPlaylistsActivity.this != null) {
-//            // Toast.makeText(SoloPlaylistsActivity.this,
-//            // R.string.error_joining_group,
-//            // Toast.LENGTH_LONG).show();
-//            // }
-//            // }
-//            //
-//            // });
-//        }
-//    }
+    // /**
+    // * When clicking on a playlist, start MainActivity.
+    // */
+    // private class OnLocalPlaylistSelectedListener implements
+    // OnItemClickListener {
+    //
+    // @Override
+    // public void onItemClick(AdapterView<?> parent, View view, int position,
+    // long id) {
+    //
+    // // Give tracks to player here
+    // mHostActivity.startActivity(new Intent(mHostActivity,
+    // SoloMainActivity.class)
+    // .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem)
+    // view.getTag()).getLocalId())
+    // .putExtra(Const.Strings.TITLE, ((PlaylistItem)
+    // view.getTag()).getTitle()));
+    // // .putExtra(Const.Strings.PLID,
+    // // view.getTag());
+    // // UnisonAPI api =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
+    // // long uid =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
+    // // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
+    // // view.getTag();
+    //
+    // // api.joinGroup(uid, playlist.plid, new
+    // // UnisonAPI.Handler<JsonStruct.Success>() {
+    // //
+    // // @Override
+    // // public void callback(Success struct) {
+    // // SoloPlaylistsActivity.this.startActivity(
+    // // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
+    // // .putExtra(Const.Strings.GID, playlist.plid)
+    // // .putExtra(Const.Strings.NAME, playlist.name));
+    // // }
+    // //
+    // // @Override
+    // // public void onError(Error error) {
+    // // Log.d(TAG, error.toString());
+    // // if (SoloPlaylistsActivity.this != null) {
+    // // Toast.makeText(SoloPlaylistsActivity.this,
+    // // R.string.error_joining_group,
+    // // Toast.LENGTH_LONG).show();
+    // // }
+    // // }
+    // //
+    // // });
+    // }
+    // }
 
     /**
-     * To be used only once, at onCreate time.
-     * TODO Use this to display an row 
+     * To be used only once, at onCreate time. TODO Use this to display an row
      * telling the list is empty.
      */
     private void initPlaylistsRemote() {
@@ -272,18 +279,17 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsRemote() {
-         setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
+        setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
 
     }
 
-//    public void refreshPlaylistsRemote(Activity activity) {
-//        setListAdapter(new PlaylistsAdapter(activity, mPlaylistsRemote));
-//    }
+    // public void refreshPlaylistsRemote(Activity activity) {
+    // setListAdapter(new PlaylistsAdapter(activity, mPlaylistsRemote));
+    // }
 
     /*
-     * ---------------------------------------
-     * PUBLIC METHODS (used by SoloPlaylistsActivity)
-     * ---------------------------------------
+     * --------------------------------------- PUBLIC METHODS (used by
+     * SoloPlaylistsActivity) ---------------------------------------
      */
 
     /**
@@ -311,11 +317,11 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      * @param activity
      * @param playlists
      */
-//    public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
-//        mPlaylistsRemote = playlists;
-//        refreshPlaylistsRemote(activity);
-//    }
-    
+    // public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
+    // mPlaylistsRemote = playlists;
+    // refreshPlaylistsRemote(activity);
+    // }
+
     /**
      * Replaces the list of playlists by the <code>playlists</code>.
      * 

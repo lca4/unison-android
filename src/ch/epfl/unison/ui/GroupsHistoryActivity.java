@@ -91,11 +91,11 @@ public class GroupsHistoryActivity extends SherlockActivity {
             Log.w(TAG, "group or activity is null?", e);
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);
-//        menu.findItem(R.id.menu_item_groups).setVisible(false);
+        // menu.findItem(R.id.menu_item_groups).setVisible(false);
         return b;
     }
 

@@ -1,3 +1,4 @@
+
 package ch.epfl.unison.ui;
 
 import android.annotation.SuppressLint;
@@ -39,9 +40,10 @@ import java.util.Set;
 public class SoloPlaylistsActivity extends AbstractFragmentActivity
         implements SoloPlaylistsLocalFragment.OnPlaylistsLocalListener,
         SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener {
-    
+
     /** Possible fragments. */
-    @SuppressLint("ValidFragment") // Avoids Lint wrong warning due to "Fragment" in the enum name
+    @SuppressLint("ValidFragment")
+    // Avoids Lint wrong warning due to "Fragment" in the enum name
     protected enum ChildFragment {
         LOCAL, REMOTE, SHARED
     }
@@ -63,34 +65,34 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
 
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_local_title)
-                .setTag(getString(R.string.solo_playlists_fragment_local_tag)),
+                        .setTag(getString(R.string.solo_playlists_fragment_local_tag)),
                 SoloPlaylistsLocalFragment.class, null);
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title)
-                .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
+                        .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
                 SoloPlaylistsRemoteFragment.class, null);
 
         setReloadInterval(RELOAD_INTERVAL);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);
         getMenu().findItem(R.id.menu_item_solo).setVisible(false);
         getMenu().add(
-                Menu.NONE, 
-                R.id.solo_menu_create_playlist, 
-                1, 
+                Menu.NONE,
+                R.id.solo_menu_create_playlist,
+                1,
                 R.string.solo_menu_create_playlist);
         SoloPlaylistsActivity.this.getSupportMenuInflater().inflate(
-                    R.menu.solo_playlists_menu, 
-                    getMenu());
+                R.menu.solo_playlists_menu,
+                getMenu());
         return b;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
-        
+
         switch (item.getItemId()) {
             case R.id.solo_menu_create_playlist:
                 PickItemsDialogFragment pickSeedDialog = new PickItemsDialogFragment(SeedType.TAGS);
@@ -100,16 +102,15 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
-        
+
         return true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        startService(new Intent(LibraryService.ACTION_UPDATE));
+        // startService(new Intent(LibraryService.ACTION_UPDATE));
     }
-
 
     @Override
     public void onRefresh() {
@@ -181,131 +182,138 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         data.getAPI().listTopTags(data.getUid(), tagsHandler);
     }
 
-//    /** Adapter used to populate the ListView listing the playlists. 
-//     * Kept for reference, may be remove later on.
-//     * */
-//    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-//
-//        public static final int ROW_LAYOUT = R.layout.list_row;
-//
-//        public PlaylistsAdapter(ArrayList<PlaylistItem> list) {
-//            super(SoloPlaylistsActivity.this, 0, list);
-//        }
-//
-//        @Override
-//        public View getView(int position, View view, ViewGroup parent) {
-//            PlaylistItem playlist = getItem(position);
-//            if (view == null) {
-//                LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
-//                        .getSystemService(
-//                        Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(ROW_LAYOUT, parent, false);
-//            }
-//            ((TextView) view.findViewById(R.id.listrow_title)).setText(playlist.getTitle());
-//            String subtitle = null;
-//            if (playlist.getListeners() > 0) {
-//                String plural = "s";
-//                if (playlist.getListeners() == 1) {
-//                    plural = "";
-//                }
-//                subtitle = String.format("%d tracks - %d listener" + plural, playlist.getSize(),
-//                        playlist.getListeners());
-//            } else {
-//                subtitle = String.format("%d tracks", playlist.getSize());
-//            }
-//            ((TextView) view.findViewById(R.id.listrow_subtitle)).setText(subtitle);
-//
-//            view.setTag(playlist);
-//            return view;
-//        }
-//    }
+    // /** Adapter used to populate the ListView listing the playlists.
+    // * Kept for reference, may be remove later on.
+    // * */
+    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+    //
+    // public static final int ROW_LAYOUT = R.layout.list_row;
+    //
+    // public PlaylistsAdapter(ArrayList<PlaylistItem> list) {
+    // super(SoloPlaylistsActivity.this, 0, list);
+    // }
+    //
+    // @Override
+    // public View getView(int position, View view, ViewGroup parent) {
+    // PlaylistItem playlist = getItem(position);
+    // if (view == null) {
+    // LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
+    // .getSystemService(
+    // Context.LAYOUT_INFLATER_SERVICE);
+    // view = inflater.inflate(ROW_LAYOUT, parent, false);
+    // }
+    // ((TextView)
+    // view.findViewById(R.id.listrow_title)).setText(playlist.getTitle());
+    // String subtitle = null;
+    // if (playlist.getListeners() > 0) {
+    // String plural = "s";
+    // if (playlist.getListeners() == 1) {
+    // plural = "";
+    // }
+    // subtitle = String.format("%d tracks - %d listener" + plural,
+    // playlist.getSize(),
+    // playlist.getListeners());
+    // } else {
+    // subtitle = String.format("%d tracks", playlist.getSize());
+    // }
+    // ((TextView) view.findViewById(R.id.listrow_subtitle)).setText(subtitle);
+    //
+    // view.setTag(playlist);
+    // return view;
+    // }
+    // }
 
-//    /**
-//     * When clicking on "create new group", trigger an AlertView that asks for a
-//     * group name and creates the group on the back-end through the API.
-//     */
-//    private class OnCreatePlaylistListener implements OnClickListener {
-//
-//        @Override
-//        public void onClick(View v) {
-//
-//            /*
-//             * TODO allow user to specify title. In order to achieve this, use a
-//             * custom view, like the one found on
-//             * http://prativas.wordpress.com/category
-//             * /android/expandable-list-view-in-android/
-//             */
-//
-//            PickSeedDialogFragment pickSeedDialog = new PickSeedDialogFragment();
-//            pickSeedDialog.show(getSupportFragmentManager(), "seedTypes");
-//
-//            // AlertDialog.Builder alert = new
-//            // AlertDialog.Builder(SoloPlaylistsActivity.this);
-//            //
-//            // alert.setTitle(getString(R.string.solo_playlists_alert_newplaylist_title));
-//            // alert.setMessage(getString(R.string.solo_playlists_alert_newplaylist_message));
-//            //
-//            // // Set an EditText view to get user input
-//            // final EditText input = new EditText(SoloPlaylistsActivity.this);
-//            // alert.setView(input);
-//            //
-//            // // When clicking on "OK", create the group.
-//            // alert.setPositiveButton(getString(R.string.solo_playlists_alert_newplaylist_ok),
-//            // new DialogInterface.OnClickListener() {
-//            //
-//            // @Override
-//            // public void onClick(DialogInterface dialog, int whichButton) {
-//            // String name = input.getText().toString().trim();
-//            // OnCreatePlaylistListener.this.createPlaylist(name);
-//            // }
-//            // });
-//            //
-//            // alert.setNegativeButton(getString(R.string.solo_playlists_alert_newplaylist_cancel),
-//            // null);
-//            // alert.show();
-//        }
-//
-//        /**
-//         * @author marc
-//         */
-//        @SuppressLint({
-//                "ValidFragment", "NewApi"
-//        })
-//        private class PickSeedDialogFragment extends android.support.v4.app.DialogFragment {
-//
-//            @Override
-//            public Dialog onCreateDialog(Bundle savedInstanceState) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                builder.setTitle(R.string.solo_playlists_dialog_pick_seedtype);
-//                builder.setItems(R.array.seedtypes, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        // The 'which' argument contains the index position
-//                        // of the selected item
-//                        Resources res = getResources();
-//                        TypedArray seedsTypes = res.obtainTypedArray(R.array.seedtypes);
-//                        String seed = seedsTypes.getString(which);
-//                        seedsTypes.recycle();
-//                        if (seed != null) {
-//                            SeedType seedType = SeedType.getSeedType(seed);
-//                            PickItemsDialogFragment pickItemsDialog = new PickItemsDialogFragment(
-//                                    seedType);
-//                            if (pickItemsDialog != null) {
-//                                pickItemsDialog.show(getFragmentManager(), seed);
-//                            }
-//                        }
-//                    }
-//                });
-//                return builder.create();
-//            }
-//        }
-//        
-//
-//    }
-    
+    // /**
+    // * When clicking on "create new group", trigger an AlertView that asks for
+    // a
+    // * group name and creates the group on the back-end through the API.
+    // */
+    // private class OnCreatePlaylistListener implements OnClickListener {
+    //
+    // @Override
+    // public void onClick(View v) {
+    //
+    // /*
+    // * TODO allow user to specify title. In order to achieve this, use a
+    // * custom view, like the one found on
+    // * http://prativas.wordpress.com/category
+    // * /android/expandable-list-view-in-android/
+    // */
+    //
+    // PickSeedDialogFragment pickSeedDialog = new PickSeedDialogFragment();
+    // pickSeedDialog.show(getSupportFragmentManager(), "seedTypes");
+    //
+    // // AlertDialog.Builder alert = new
+    // // AlertDialog.Builder(SoloPlaylistsActivity.this);
+    // //
+    // //
+    // alert.setTitle(getString(R.string.solo_playlists_alert_newplaylist_title));
+    // //
+    // alert.setMessage(getString(R.string.solo_playlists_alert_newplaylist_message));
+    // //
+    // // // Set an EditText view to get user input
+    // // final EditText input = new EditText(SoloPlaylistsActivity.this);
+    // // alert.setView(input);
+    // //
+    // // // When clicking on "OK", create the group.
+    // //
+    // alert.setPositiveButton(getString(R.string.solo_playlists_alert_newplaylist_ok),
+    // // new DialogInterface.OnClickListener() {
+    // //
+    // // @Override
+    // // public void onClick(DialogInterface dialog, int whichButton) {
+    // // String name = input.getText().toString().trim();
+    // // OnCreatePlaylistListener.this.createPlaylist(name);
+    // // }
+    // // });
+    // //
+    // //
+    // alert.setNegativeButton(getString(R.string.solo_playlists_alert_newplaylist_cancel),
+    // // null);
+    // // alert.show();
+    // }
+    //
+    // /**
+    // * @author marc
+    // */
+    // @SuppressLint({
+    // "ValidFragment", "NewApi"
+    // })
+    // private class PickSeedDialogFragment extends
+    // android.support.v4.app.DialogFragment {
+    //
+    // @Override
+    // public Dialog onCreateDialog(Bundle savedInstanceState) {
+    // AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    // builder.setTitle(R.string.solo_playlists_dialog_pick_seedtype);
+    // builder.setItems(R.array.seedtypes, new DialogInterface.OnClickListener()
+    // {
+    // public void onClick(DialogInterface dialog, int which) {
+    // // The 'which' argument contains the index position
+    // // of the selected item
+    // Resources res = getResources();
+    // TypedArray seedsTypes = res.obtainTypedArray(R.array.seedtypes);
+    // String seed = seedsTypes.getString(which);
+    // seedsTypes.recycle();
+    // if (seed != null) {
+    // SeedType seedType = SeedType.getSeedType(seed);
+    // PickItemsDialogFragment pickItemsDialog = new PickItemsDialogFragment(
+    // seedType);
+    // if (pickItemsDialog != null) {
+    // pickItemsDialog.show(getFragmentManager(), seed);
+    // }
+    // }
+    // }
+    // });
+    // return builder.create();
+    // }
+    // }
+    //
+    //
+    // }
+
     /**
-     * 
      * @author marc
-     *
      */
     @SuppressLint("ValidFragment")
     private class PickItemsDialogFragment extends android.support.v4.app.DialogFragment {
@@ -433,7 +441,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         }
     }
 
-
     private void refreshPlaylistsRemote(ArrayList<PlaylistItem> playlists) {
         getPlaylistsRemoteFragment().set(playlists);
     }
@@ -441,16 +448,14 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     protected UnisonDB getDB() {
         return mDB;
     }
-    
+
     private SoloPlaylistsRemoteFragment getPlaylistsRemoteFragment() {
-        return (SoloPlaylistsRemoteFragment) 
-                getSupportFragmentManager()
+        return (SoloPlaylistsRemoteFragment) getSupportFragmentManager()
                 .findFragmentByTag(mChildFragments.get(ChildFragment.REMOTE));
     }
-    
+
     private SoloPlaylistsLocalFragment getPlaylistsLocalFragment() {
-        return (SoloPlaylistsLocalFragment) 
-                getSupportFragmentManager()
+        return (SoloPlaylistsLocalFragment) getSupportFragmentManager()
                 .findFragmentByTag(mChildFragments.get(ChildFragment.LOCAL));
     }
 
@@ -458,7 +463,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     public boolean onSavePlaylist(PlaylistItem playlist) {
         return getPlaylistsLocalFragment().add(playlist);
     }
-    
+
     @Override
     public void setPlaylistsRemoteFragmentTag(String tag) {
         mChildFragments.put(ChildFragment.REMOTE, tag);

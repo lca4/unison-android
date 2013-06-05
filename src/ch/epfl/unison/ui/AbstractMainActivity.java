@@ -15,11 +15,11 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
     private static final String TAG = "ch.epfl.unison.UnisonMainActivity";
 
-    private boolean mIsDj = false;  
+    private boolean mIsDj = false;
 
     protected abstract void handleExtras(Bundle extras);
 
-//    protected abstract PlaylistItem getPlaylist();
+    // protected abstract PlaylistItem getPlaylist();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

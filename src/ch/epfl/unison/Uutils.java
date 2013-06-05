@@ -134,29 +134,28 @@ public final class Uutils {
         // Empirically seen that the index is at the end
         return Integer.parseInt(u.getPathSegments().get(u.getPathSegments().size() - 1));
     }
-    
+
     /** Container of adapters. */
     public static final class Adapters {
-        
+
         private static int smRowLayout = R.layout.listrow; // default layout
         private static Activity smActivity;
-        
+
         private Adapters() {
             // Can't be instantiated
         }
-    
+
         /** ArrayAdapter that displays the tracks of the playlist. */
         public static class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-    
-//            private static final int ROW_LAYOUT = R.layout.list_row;
-            
-            
+
+            // private static final int ROW_LAYOUT = R.layout.list_row;
+
             public PlaylistsAdapter(Activity activity, ArrayList<PlaylistItem> playlists) {
                 super(activity, 0, playlists);
                 smActivity = activity;
                 smRowLayout = R.layout.listrow_playlist;
             }
-    
+
             @Override
             public View getView(int position, View view, ViewGroup parent) {
                 PlaylistItem pl = (PlaylistItem) getItem(position);
@@ -178,7 +177,7 @@ public final class Uutils {
                         subtitle = smActivity.getString(R.string.solo_playlist_contains_track);
                     default:
                         subtitle = smActivity
-                            .getString(R.string.solo_playlist_contains_tracks, size);
+                                .getString(R.string.solo_playlist_contains_tracks, size);
                         break;
                 }
                 ((TextView) view.findViewById(R.id.listrow_playlist_nbTracks))
@@ -187,7 +186,7 @@ public final class Uutils {
                 return view;
             }
         }
-        
+
         /** ArrayAdapter that displays the tracks of the playlist. */
         public static class TracksAdapter extends ArrayAdapter<MusicItem> {
 
@@ -206,14 +205,15 @@ public final class Uutils {
                     view = inflater.inflate(smRowLayout, parent, false);
                 }
                 ((TextView) view.findViewById(R.id.listrow_track_title))
-                    .setText(getItem(position).title);
+                        .setText(getItem(position).title);
                 ((TextView) view.findViewById(R.id.listrow_track_artist))
-                    .setText(getItem(position).artist);
+                        .setText(getItem(position).artist);
                 // int rating = 0;
                 // if (getItem(position).rating != null) {
                 // rating = getItem(position).rating;
                 // }
-                // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+                // ((RatingBar)
+                // view.findViewById(R.id.trRating)).setRating(rating);
                 view.setTag(track);
                 return view;
             }
