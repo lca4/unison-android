@@ -32,16 +32,13 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.data.UnisonDB;
-import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener;
 
 /**
  * Shows the locally stored playlists made with GS.
  * 
  * @author marc
  */
-public class SoloPlaylistsLocalFragment extends AbstractListFragment { 
-//    implements SoloPlaylistsActivity.OnPlaylistsLocalInfoListener {
+public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     
     /** Container Activity must implement this interface.  */
     public interface OnPlaylistsLocalListener {
@@ -49,10 +46,8 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         void setPlaylistsLocalFragmentTag(String tag);
     }
     
-    private OnPlaylistsLocalListener mListener;
-
-    // Not really useful, but nice to avoid explicit casting every time
     private SoloPlaylistsActivity mHostActivity;
+    private OnPlaylistsLocalListener mListener;
 
     private ArrayList<PlaylistItem> mPlaylistsLocal;
     
@@ -65,29 +60,27 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-         mHostActivity = (SoloPlaylistsActivity) activity;
-//        mHostActivity = (SoloPlaylistsActivity) getActivity();
+        mHostActivity = (SoloPlaylistsActivity) activity;
         try {
             mListener = (OnPlaylistsLocalListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() 
-                    + " must implement OnDeletePlaylistListener");
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnSavePlaylistListener");
         }
+        String tag = SoloPlaylistsLocalFragment.this.getTag();
+        mListener.setPlaylistsLocalFragmentTag(tag);
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
-    }
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        mHostActivity.registerPlaylistsLocalInfoListener(this);
-        initPlaylistsLocal();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-//        return super.onCreateView(inflater, container, savedInstanceState);
-        return inflater.inflate(R.layout.list_fragment, container, false);
+        mPlaylistsLocal = new ArrayList<PlaylistItem>();
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+//        View v = inflater.inflate(R.layout.list_fragment, container, false);
+//        registerForContextMenu(getListView());
+        initPlaylistsLocal();
+        return v;
     }
 
     @Override
@@ -95,14 +88,13 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mHostActivity.getMenuInflater();
-        inflater.inflate(R.menu.playlist_local_context_menu, menu);
+        inflater.inflate(R.menu.solo_playlists_local_context_menu, menu);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-//        ListView lv = (ListView) info.targetView.getParent();
         AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
@@ -167,14 +159,6 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                 return super.onContextItemSelected((android.view.MenuItem) item);
         }
     }
-    
-//    @Override
-//    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-//        if (playlistInfo.getTitle() != null) {
-//            getTitle().setText(playlistInfo.getTitle());
-//        }
-//        getList().setAdapter(new PlaylistsAdapter(playlistInfo));
-//    }
 
     /** ArrayAdapter that displays the tracks of the playlist. */
     private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
@@ -198,21 +182,10 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                     .setText(getItem(position).getTitle());
             ((TextView) view.findViewById(R.id.listrow_subtitle))
                     .setText(String.valueOf(getItem(position).size()));
-            // int rating = 0;
-            // if (getItem(position).rating != null) {
-            // rating = getItem(position).rating;
-            // }
-            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
             view.setTag(pl);
             return view;
         }
     }
-
-//    @Override
-//    public void onPlaylistsLocalInfo(Object contentInfo) {
-//        // TODO Auto-generated method stub
-//
-//    }
 
     /**
      * When clicking on a playlist, start MainActivity.
@@ -289,12 +262,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsLocal() {
-        //TODO update
-//        mHostActivity.mPlaylistsLocalListView
-//                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
-        if (isVisible()) {
-            getListView().setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
-        }
+        setListAdapter(new PlaylistsAdapter(mPlaylistsLocal));
     }
     
     /* ---------------------------------------

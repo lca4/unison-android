@@ -4,12 +4,26 @@ package ch.epfl.unison.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
+import ch.epfl.unison.api.JsonStruct;
+import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
@@ -19,7 +33,6 @@ import java.util.ArrayList;
  * @author marc
  */
 public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
-    // implements SoloPlaylistsActivity.OnPlaylistsRemoteInfoListener {
 
     /** Container Activity must implement this interface. */
     public interface OnPlaylistsRemoteListener {
@@ -27,6 +40,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         void setPlaylistsRemoteFragmentTag(String tag);
     }
 
+    private SoloPlaylistsActivity mHostActivity;
     private OnPlaylistsRemoteListener mListener;
 
     private ArrayList<PlaylistItem> mPlaylistsRemote;
@@ -35,6 +49,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mHostActivity = (SoloPlaylistsActivity) activity;
         try {
             mListener = (OnPlaylistsRemoteListener) activity;
         } catch (ClassCastException e) {
@@ -43,7 +58,6 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         }
         String tag = SoloPlaylistsRemoteFragment.this.getTag();
         mListener.setPlaylistsRemoteFragmentTag(tag);
-        
     }
 
     @Override
@@ -53,7 +67,14 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloPlaylistsRemoteFragment.this
         .setListAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+//        registerForContextMenu(getListView());
         return v;
+    }
+    
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        registerForContextMenu(getListView());
     }
 
 
@@ -62,96 +83,96 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
 //        super.onResume();
 //        refreshPlaylistsRemote();
 //    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = mHostActivity.getMenuInflater();
+        inflater.inflate(R.menu.solo_playlists_local_context_menu, menu);
+    }
 
-//    @Override
-//    public void onCreateContextMenu(ContextMenu menu, View v,
-//            ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, v, menuInfo);
-//        MenuInflater inflater = mHostActivity.getMenuInflater();
-//        inflater.inflate(R.menu.playlist_local_context_menu, menu);
-//    }
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        // ListView lv = (ListView) info.targetView.getParent();
+        AppData data = AppData.getInstance(mHostActivity);
+        switch (item.getItemId()) {
+            case R.id.playlist_context_menu_item_edit:
+                Log.i(getClassTag(), "Not yet implemented...");
+                Toast.makeText(mHostActivity,
+                        R.string.error_not_yet_available,
+                        Toast.LENGTH_LONG).show();
+                return true;
 
-//    @Override
-//    public boolean onContextItemSelected(android.view.MenuItem item) {
-//        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-//                .getMenuInfo();
-//        // ListView lv = (ListView) info.targetView.getParent();
-//        AppData data = AppData.getInstance(mHostActivity);
-//        switch (item.getItemId()) {
-//            case R.id.playlist_context_menu_item_edit:
-//                Log.i(getClassTag(), "Not yet implemented...");
-//                Toast.makeText(mHostActivity,
-//                        R.string.error_not_yet_available,
-//                        Toast.LENGTH_LONG).show();
-//                return true;
-//
-//            case R.id.playlist_context_menu_item_save:
-//                PlaylistItem pl = mPlaylistsRemote.get(info.position);
-//                // Adds PL to local databases
-//                long localId = mDB.insert(pl);
-//                if (localId >= 0) {
-//                    try {
-//                        // Updates the local_id on server
-//                        JSONObject json = new JSONObject();
-//                        json.put("local_id", localId);
-//                        data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
-//                                new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
-//
-//                                    @Override
-//                                    public void callback(JsonStruct.PlaylistJS struct) {
-//                                        // TODO some verifications?
-//                                        // (local_id)
-//                                    }
-//
-//                                    @Override
-//                                    public void onError(UnisonAPI.Error error) {
-//                                        Log.d(getClassTag(), error.toString());
-//                                    }
-//                                });
-//                    } catch (JSONException e) {
-//                        // TODO Auto-generated catch block
-//                        e.printStackTrace();
-//                    }
-//                    mListener.onSavePlaylist(mPlaylistsRemote.remove(info.position));
-//                    // refreshPlaylistsLocal();
-//                    refreshPlaylistsRemote();
-//                } else {
-//                    Toast.makeText(mHostActivity,
-//                            R.string.error_solo_save_playlist,
-//                            Toast.LENGTH_LONG).show();
-//                }
-//                return true;
-//
-//            case R.id.playlist_context_menu_item_delete:
-//                /*
-//                 * In the case of a local playlist, remove it from android and
-//                 * GS in-app DBs, but keeps it in the user library on GS server.
-//                 */
-//                // Remove from server
-//                data.getAPI().removePlaylist(data.getUid(),
-//                        mPlaylistsRemote.get(info.position).getPLId(),
-//                        new UnisonAPI.Handler<JsonStruct.Success>() {
-//
-//                            @Override
-//                            public void callback(JsonStruct.Success struct) {
-//                                mPlaylistsRemote.remove(info.position);
-//                                refreshPlaylistsRemote();
-//                            }
-//
-//                            @Override
-//                            public void onError(UnisonAPI.Error error) {
-//                                Log.d(getClassTag(), error.toString());
-//                                Toast.makeText(mHostActivity,
-//                                        R.string.error_solo_remove_playlist_from_gs_server,
-//                                        Toast.LENGTH_LONG).show();
-//                            }
-//                        });
-//                return true;
-//
-//            default:
-//                return super.onContextItemSelected((android.view.MenuItem) item);
-//        }
-//    }
+            case R.id.playlist_context_menu_item_save:
+                PlaylistItem pl = mPlaylistsRemote.get(info.position);
+                // Adds PL to local databases
+                long localId = mHostActivity.getDB().insert(pl);
+                if (localId >= 0) {
+                    try {
+                        // Updates the local_id on server
+                        JSONObject json = new JSONObject();
+                        json.put("local_id", localId);
+                        data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
+                                new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
+
+                                    @Override
+                                    public void callback(JsonStruct.PlaylistJS struct) {
+                                        // TODO some verifications?
+                                        // (local_id)
+                                    }
+
+                                    @Override
+                                    public void onError(UnisonAPI.Error error) {
+                                        Log.d(getClassTag(), error.toString());
+                                    }
+                                });
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    mListener.onSavePlaylist(mPlaylistsRemote.remove(info.position));
+                    // refreshPlaylistsLocal();
+                    refreshPlaylistsRemote();
+                } else {
+                    Toast.makeText(mHostActivity,
+                            R.string.error_solo_save_playlist,
+                            Toast.LENGTH_LONG).show();
+                }
+                return true;
+
+            case R.id.playlist_context_menu_item_delete:
+                /*
+                 * In the case of a local playlist, remove it from android and
+                 * GS in-app DBs, but keeps it in the user library on GS server.
+                 */
+                // Remove from server
+                data.getAPI().removePlaylist(data.getUid(),
+                        mPlaylistsRemote.get(info.position).getPLId(),
+                        new UnisonAPI.Handler<JsonStruct.Success>() {
+
+                            @Override
+                            public void callback(JsonStruct.Success struct) {
+                                mPlaylistsRemote.remove(info.position);
+                                refreshPlaylistsRemote();
+                            }
+
+                            @Override
+                            public void onError(UnisonAPI.Error error) {
+                                Log.d(getClassTag(), error.toString());
+                                Toast.makeText(mHostActivity,
+                                        R.string.error_solo_remove_playlist_from_gs_server,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                return true;
+
+            default:
+                return super.onContextItemSelected((android.view.MenuItem) item);
+        }
+    }
 
 
     /** ArrayAdapter that displays the tracks of the playlist. */
