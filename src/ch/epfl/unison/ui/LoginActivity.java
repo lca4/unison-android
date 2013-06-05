@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -49,6 +47,7 @@ public class LoginActivity extends SherlockActivity {
     private Button mLoginBtn;
     private TextView mSignupTxt;
 
+    private AppData mData;
     private EditText mEmail;
     private EditText mPassword;
 
@@ -83,9 +82,9 @@ public class LoginActivity extends SherlockActivity {
         });
 
         // Initialize the AppData instance.
-        AppData data = AppData.getInstance(this);
+        mData = AppData.getInstance(this);
         
-        data.setLoggedIn(false);
+        mData.setLoggedIn(false);
     }
 
     @Override
@@ -110,13 +109,18 @@ public class LoginActivity extends SherlockActivity {
     private void logout() {
         Log.d(TAG, "logging out");
         // Remove e-mail and password from the preferences.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(Const.PrefKeys.EMAIL);
-        editor.remove(Const.PrefKeys.PASSWORD);
-        editor.remove(Const.PrefKeys.UID);
-        editor.remove(Const.PrefKeys.LASTUPDATE);
-        editor.commit();
+        
+        //THIS SHOULD NEVER BE USED
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = prefs.edit();
+//        editor.remove(Const.PrefKeys.EMAIL);
+//        editor.remove(Const.PrefKeys.PASSWORD);
+//        editor.remove(Const.PrefKeys.UID);
+//        editor.remove(Const.PrefKeys.LASTUPDATE);
+//        editor.commit();
+        mData.deleteEmailAndPassword();
+        mData.deleteUID();
+        mData.deleteLastUpdate();
 
         // Truncate the library.
         startService(new Intent(LibraryService.ACTION_TRUNCATE));
@@ -128,13 +132,18 @@ public class LoginActivity extends SherlockActivity {
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Const.PrefKeys.EMAIL, email);
-        editor.putString(Const.PrefKeys.PASSWORD, password);
-        editor.remove(Const.PrefKeys.UID);
-        editor.remove(Const.PrefKeys.LASTUPDATE);
-        editor.commit();
+        //THIS SHOULD NEVER BE USED
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = prefs.edit();
+//        editor.putString(Const.PrefKeys.EMAIL, email);
+//        editor.putString(Const.PrefKeys.PASSWORD, password);
+//        editor.remove(Const.PrefKeys.UID);
+//        editor.remove(Const.PrefKeys.LASTUPDATE);
+//        editor.commit();
+        mData.storeEmail(email);
+        mData.storePassword(password);
+        mData.deleteUID();
+        mData.deleteLastUpdate();
 
         // Truncate the library. You never know.
         startService(new Intent(LibraryService.ACTION_TRUNCATE));
@@ -157,9 +166,11 @@ public class LoginActivity extends SherlockActivity {
         }
 
         // Try to login from the saved preferences.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String email = prefs.getString(Const.PrefKeys.EMAIL, null);
-        String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        String email = prefs.getString(Const.PrefKeys.EMAIL, null);
+//        String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
+        String email = mData.getEmail();
+        String password = mData.getPassword();
 
         if (email != null && password != null) {
             login(email, password);
@@ -208,24 +219,31 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void fillEmailPassword() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
-        mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
+//        mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
+        mEmail.setText(mData.getEmail());
+        mPassword.setText(mData.getPassword());
+        
     }
 
     private void storeInfo(String email, String password, String nickname, Long uid) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString(Const.PrefKeys.EMAIL, email);
-        editor.putString(Const.PrefKeys.PASSWORD, password);
-        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+//        editor.putString(Const.PrefKeys.EMAIL, email);
+//        editor.putString(Const.PrefKeys.PASSWORD, password);
+//        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        mData.storeEmail(email);
+        mData.storePassword(password);
+        mData.storeNickname(nickname);
+        
         if (uid != null) {
-            editor.putLong(Const.PrefKeys.UID, uid);
+            mData.storeUID(uid);
         } else {
-            editor.putLong(Const.PrefKeys.UID, -1);
+            mData.storeUID(-1);
         }
-        editor.commit();
+//        editor.commit();
     }
 
     private void nextActivity(JsonStruct.User user) {

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.location.LocationListener;
@@ -74,6 +75,8 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private AppData(Context context) {
         mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        //Here the shared prefs are explicitely set to mode private.
+//        mPrefs = context.getSharedPreferences(context.getPackageName()+".sp", Context.MODE_PRIVATE);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -363,6 +366,55 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         return mPrefs.getLong(Const.PrefKeys.CURRENT_GID, -1);
     }
 
+    public void deleteEmailAndPassword() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.EMAIL);
+        editor.remove(Const.PrefKeys.PASSWORD);
+        editor.remove(Const.PrefKeys.UID);
+        editor.remove(Const.PrefKeys.LASTUPDATE);
+        editor.commit();
+    }
+    
+    public void storeEmail(String email) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.EMAIL, email);
+        editor.commit();
+    }
+    public void storePassword(String password) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.PASSWORD, password);
+        editor.commit();
+    }
+    
+    public void deleteUID() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.UID);
+        editor.commit();
+    }
+    public void deleteLastUpdate() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.LASTUPDATE);
+        editor.commit();
+    }
+    public void storeNickname(String nickname) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        editor.commit();
+    }
+    public void storeUID(long uid) {
+        Editor editor = mPrefs.edit();
+        editor.putLong(Const.PrefKeys.UID, uid);
+        editor.commit();
+    }
+    
+    
+    public String getEmail() {
+        return mPrefs.getString(Const.PrefKeys.EMAIL, null);
+    }
+    public String getPassword() {
+        return mPrefs.getString(Const.PrefKeys.PASSWORD, null);
+    }
+    
     /**
      * Simple LocationListener that differentiates updates from the network
      * provider and those from the GPS provider.
