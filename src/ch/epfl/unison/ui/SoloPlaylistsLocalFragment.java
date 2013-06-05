@@ -49,13 +49,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     private SoloPlaylistsActivity mHostActivity;
     private OnPlaylistsLocalListener mListener;
 
-    private ArrayList<PlaylistItem> mPlaylistsLocal;
-    
-    private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-    private final String[] mPlaylistsIdNameProjection = new String[] {
-            MediaStore.Audio.Playlists._ID,
-            MediaStore.Audio.Playlists.NAME
-    };
+    private ArrayList<PlaylistItem> mPlaylistsLocal; 
 
     @Override
     public void onAttach(Activity activity) {
@@ -78,9 +72,14 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
         View v = super.onCreateView(inflater, container, savedInstanceState);
 //        View v = inflater.inflate(R.layout.list_fragment, container, false);
-//        registerForContextMenu(getListView());
         initPlaylistsLocal();
         return v;
+    }
+    
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        registerForContextMenu(getListView());
     }
 
     @Override
@@ -123,14 +122,14 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                                     if (mHostActivity.getDB().delete(
                                             mPlaylistsLocal
                                                     .get(info.position)) > 0) {
-                                        mPlaylistsLocal.add(
+                                        mListener.onDeletePlaylist(
                                                 mPlaylistsLocal
                                                                 .remove(info.position));
                                         Log.w(getClassTag(),
                                                 "Successfully removed playlist with id "
                                                         + struct.gsPlaylistId
                                                         + " from user library");
-                                        // refreshPlaylistsLocal();
+                                        refreshPlaylistsLocal();
                                     } else {
                                         Toast.makeText(
                                                 mHostActivity,
@@ -238,6 +237,11 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
      * To be used only once, at onCreate time.
      */
     private void initPlaylistsLocal() {
+        final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        final String[] mPlaylistsIdNameProjection = new String[] {
+                MediaStore.Audio.Playlists._ID,
+                MediaStore.Audio.Playlists.NAME
+        };
         Cursor cur = mHostActivity.getContentResolver().query(mUri,
                 mPlaylistsIdNameProjection,
                 null, null, null);
@@ -275,6 +279,8 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
      * @return always true
      */
     public boolean add(PlaylistItem playlist) {
-        return mPlaylistsLocal.add(playlist);
+        boolean b = mPlaylistsLocal.add(playlist);
+        refreshPlaylistsLocal();
+        return b;
     }
 }

@@ -144,6 +144,9 @@ You can also just cancel this action and stay in groups history.</string>
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
     <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
+    <string name="solo_playlist_contains_no_track">No track</string>
+    <string name="solo_playlist_contains_track">1 track</string>
+    <string name="solo_playlist_contains_tracks">%d tracks</string>
     
     <!-- Solo Fragments tags -->
     <string name="solo_playlists_fragment_local_tag">solo playlists fragment local</string>
@@ -154,6 +157,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="playlist_context_menu_item_share">Share with other users</string>
     <string name="playlist_context_menu_item_edit">Edit</string>
     <string name="playlist_context_menu_item_save">Save to phone</string>
+
 
     <!-- Home -->
     <string name="home_title">How many are you?</string>

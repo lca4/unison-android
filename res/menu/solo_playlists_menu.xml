@@ -4,6 +4,6 @@
     <item
         android:id="@+id/solo_menu_create_playlist"
         android:title="@string/solo_menu_create_playlist"
-        android:icon="@drawable/ic_menu_star"
+        android:icon="@drawable/ic_dark_content_new"
         android:showAsAction="ifRoom|withText" />
 </menu>

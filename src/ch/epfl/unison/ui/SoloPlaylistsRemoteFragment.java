@@ -67,7 +67,6 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloPlaylistsRemoteFragment.this
         .setListAdapter(new PlaylistsAdapter(mPlaylistsRemote));
-//        registerForContextMenu(getListView());
         return v;
     }
     
@@ -89,14 +88,13 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mHostActivity.getMenuInflater();
-        inflater.inflate(R.menu.solo_playlists_local_context_menu, menu);
+        inflater.inflate(R.menu.solo_playlists_remote_context_menu, menu);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-        // ListView lv = (ListView) info.targetView.getParent();
         AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
             case R.id.playlist_context_menu_item_edit:
@@ -203,8 +201,20 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
             }
             ((TextView) view.findViewById(R.id.listrow_title))
                     .setText((getItem(position)).getTitle());
+            int size = (int) getItem(position).size();
+            String subtitle = getString(R.string.default_empty);
+            switch (size) {
+                case 0:
+                    subtitle = getString(R.string.solo_playlist_contains_no_track);
+                    break;
+                case 1:
+                    subtitle = getString(R.string.solo_playlist_contains_track);
+                default:
+                    subtitle = getString(R.string.solo_playlist_contains_tracks, size);
+                    break;
+            }
             ((TextView) view.findViewById(R.id.listrow_subtitle))
-                    .setText(String.valueOf((getItem(position)).size()));
+                    .setText(subtitle);
             view.setTag(pl);
             return view;
         }
@@ -290,7 +300,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      */
     public boolean add(PlaylistItem playlist) {
         boolean b = mPlaylistsRemote.add(playlist);
-        setListAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+        refreshPlaylistsRemote();
         return b;
     }
 
@@ -300,6 +310,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      */
     public void add(int index, PlaylistItem playlist) {
         mPlaylistsRemote.add(index, playlist);
+        refreshPlaylistsRemote();
     }
 
     /**
