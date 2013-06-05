@@ -13,10 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,8 +23,6 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.data.UnisonDB;
-
 import java.util.ArrayList;
 
 /**
@@ -88,23 +84,29 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mHostActivity.getMenuInflater();
-        inflater.inflate(R.menu.solo_playlists_remote_context_menu, menu);
+        inflater.inflate(R.menu.solo_playlists_context_menu, menu);
+        menu.findItem(R.id.solo_playlists_context_menu_item_save).setVisible(true);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
+        // @see http://stackoverflow.com/a/10125761 to learn more about this hack
+        if (!getUserVisibleHint()) {
+            return super.onContextItemSelected((android.view.MenuItem) item);
+        }
+        super.onContextItemSelected(item);
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
         AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
-            case R.id.playlist_context_menu_item_edit:
+            case R.id.solo_playlists_context_menu_item_edit:
                 Log.i(getClassTag(), "Not yet implemented...");
                 Toast.makeText(mHostActivity,
                         R.string.error_not_yet_available,
                         Toast.LENGTH_LONG).show();
                 return true;
 
-            case R.id.playlist_context_menu_item_save:
+            case R.id.solo_playlists_context_menu_item_save:
                 PlaylistItem pl = mPlaylistsRemote.get(info.position);
                 // Adds PL to local databases
                 long localId = mHostActivity.getDB().insert(pl);
@@ -141,7 +143,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                 }
                 return true;
 
-            case R.id.playlist_context_menu_item_delete:
+            case R.id.solo_playlists_context_menu_item_delete:
                 /*
                  * In the case of a local playlist, remove it from android and
                  * GS in-app DBs, but keeps it in the user library on GS server.

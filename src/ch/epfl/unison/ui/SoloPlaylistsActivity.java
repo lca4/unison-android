@@ -110,7 +110,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                 break;
 
             default:
-                break;
+                return super.onOptionsItemSelected(item);
         }
         
         return true;

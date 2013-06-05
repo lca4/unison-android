@@ -26,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -83,27 +85,31 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = mHostActivity.getMenuInflater();
-        inflater.inflate(R.menu.solo_playlists_local_context_menu, menu);
+        inflater.inflate(R.menu.solo_playlists_context_menu, menu);
+//        menu.findItem(R.id.solo_playlists_context_menu_item_edit).setVisible(true);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
+        // @see http://stackoverflow.com/a/10125761 to learn more about this hack
+        if (!getUserVisibleHint()) {
+            return super.onContextItemSelected((android.view.MenuItem) item);
+        }
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
         AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
-            case R.id.playlist_context_menu_item_edit:
+            case R.id.solo_playlists_context_menu_item_edit:
                 Log.i(getClassTag(), "Not yet implemented...");
                 Toast.makeText(mHostActivity,
                         R.string.error_not_yet_available,
                         Toast.LENGTH_LONG).show();
                 return true;
 
-            case R.id.playlist_context_menu_item_delete:
+            case R.id.solo_playlists_context_menu_item_delete:
                 /*
                  * In the case of a local playlist, remove it from android and
                  * GS in-app DBs, but keeps it in the user library on GS server.
@@ -151,6 +157,8 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                             });
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (IndexOutOfBoundsException ioobe) {
+                    ioobe.printStackTrace();
                 }
                 return true;
 
