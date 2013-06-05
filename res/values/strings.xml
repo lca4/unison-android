@@ -119,8 +119,6 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_alert_newplaylist_message">Pick a name for the playlist:</string>
     <string name="solo_playlists_alert_newplaylist_ok">OK</string>
     <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
-    <string name="solo_playlists_createBtn">Create playlist</string>
-    <string name="solo_playlists_choosePL">or select one below :</string>
 
     <!-- Solo playlists -->
     <string name="solo_playlists_createBtn">Create playlist</string>
@@ -128,7 +126,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_localPL">My playlists</string>
     <string name="solo_playlists_remotePL">Available playlists</string>
     <string name="solo_playlists_noRemotePL">Sorry, no playlist is available</string>
-    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
+
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
     <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
