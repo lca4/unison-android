@@ -154,7 +154,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
     /** Adapter used to populate the ListView listing the groups. */
     private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
-        public static final int ROW_LAYOUT = R.layout.group_history_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_groups_history;
 
         public GroupsAdapter() {
             super(GroupsHistoryActivity.this, 0, mGroupsHistory);

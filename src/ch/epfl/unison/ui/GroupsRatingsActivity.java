@@ -159,7 +159,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
     /** Adapter used to display tracks and their ratings in a ListView. */
     private class RatingsAdapter extends ArrayAdapter<MusicItem> {
 
-        public static final int ROW_LAYOUT = R.layout.ratings_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_ratings;
 
         private GroupsRatingsActivity mActivity;
 

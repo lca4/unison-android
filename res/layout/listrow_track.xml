@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listrow_track"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -16,7 +17,7 @@
       android:orientation="vertical">
 
     <TextView
-        android:id="@+id/trackrow_title"
+        android:id="@+id/listrow_track_title"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="@string/default_title"
@@ -25,7 +26,7 @@
         android:singleLine="true" />
 
    <TextView
-        android:id="@+id/trackrow_subtitle"
+        android:id="@+id/listrow_track_artist"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:text="@string/default_subtitle"

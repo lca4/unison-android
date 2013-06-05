@@ -18,6 +18,7 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
@@ -31,6 +32,7 @@ import com.actionbarsherlock.view.Menu;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
@@ -81,6 +83,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getListView().setOnItemClickListener(new OnLocalPlaylistSelectedListener());
         registerForContextMenu(getListView());
     }
 
@@ -167,32 +170,32 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         }
     }
 
-    /** ArrayAdapter that displays the tracks of the playlist. */
-    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-
-        public static final int ROW_LAYOUT = R.layout.list_row;
-
-        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-            super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            PlaylistItem pl = getItem(position);
-            if (view == null) {
-                LayoutInflater inflater =
-                        (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
-                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(ROW_LAYOUT, parent, false);
-            }
-            ((TextView) view.findViewById(R.id.listrow_title))
-                    .setText(getItem(position).getTitle());
-            ((TextView) view.findViewById(R.id.listrow_subtitle))
-                    .setText(String.valueOf(getItem(position).size()));
-            view.setTag(pl);
-            return view;
-        }
-    }
+//    /** ArrayAdapter that displays the tracks of the playlist. */
+//    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+//
+//        public static final int ROW_LAYOUT = R.layout.list_row;
+//
+//        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
+//            super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
+//        }
+//
+//        @Override
+//        public View getView(int position, View view, ViewGroup parent) {
+//            PlaylistItem pl = getItem(position);
+//            if (view == null) {
+//                LayoutInflater inflater =
+//                        (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
+//                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                view = inflater.inflate(ROW_LAYOUT, parent, false);
+//            }
+//            ((TextView) view.findViewById(R.id.listrow_title))
+//                    .setText(getItem(position).getTitle());
+//            ((TextView) view.findViewById(R.id.listrow_subtitle))
+//                    .setText(String.valueOf(getItem(position).size()));
+//            view.setTag(pl);
+//            return view;
+//        }
+//    }
 
     /**
      * When clicking on a playlist, start MainActivity.
@@ -274,7 +277,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsLocal() {
-        setListAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsLocal));
     }
     
     /* ---------------------------------------

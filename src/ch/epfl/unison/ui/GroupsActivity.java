@@ -520,7 +520,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         ListView userView = (ListView) dialogView.findViewById(R.id.suggestionUserList);
         final CheckBox cbox = (CheckBox) dialogView.findViewById(R.id.suggestionCheckbox);
         ArrayAdapter<String> userAdapter = new ArrayAdapter<String>(GroupsActivity.this,
-                R.layout.group_suggestion_user_row,
+                R.layout.listrow_group_suggestion_user,
                 R.id.group_suggestion_username, mSuggestion.users);
         userView.setAdapter(userAdapter);
         userView.setSelector(android.R.color.transparent);
@@ -673,7 +673,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     /** Adapter used to populate the ListView listing the groups. */
     private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
-        public static final int ROW_LAYOUT = R.layout.groups_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_groups;
 
         public GroupsAdapter(JsonStruct.GroupsList list) {
             super(GroupsActivity.this, 0, list.groups);

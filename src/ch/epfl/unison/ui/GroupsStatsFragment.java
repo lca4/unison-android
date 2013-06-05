@@ -79,7 +79,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
      */
     private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
 
-        public static final int ROW_LAYOUT = R.layout.stats_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_stats;
 
         public StatsAdapter(JsonStruct.Group group) {
             super(GroupsStatsFragment.this.getActivity(), 0, group.users);

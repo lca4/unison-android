@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
@@ -40,7 +41,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     private OnPlaylistsRemoteListener mListener;
 
     private ArrayList<PlaylistItem> mPlaylistsRemote;
-    private PlaylistsAdapter mAdapter;
+//    private PlaylistsAdapter mAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -62,7 +63,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         mPlaylistsRemote = new ArrayList<PlaylistItem>();
         View v = super.onCreateView(inflater, container, savedInstanceState);
         SoloPlaylistsRemoteFragment.this
-        .setListAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+        .setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
         return v;
     }
     
@@ -72,12 +73,11 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         registerForContextMenu(getListView());
     }
 
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        refreshPlaylistsRemote();
-//    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshPlaylistsRemote();
+    }
     
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -174,53 +174,44 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         }
     }
 
-
-    /** ArrayAdapter that displays the tracks of the playlist. */
-    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-
-        public static final int ROW_LAYOUT = R.layout.list_row;
-
-        public PlaylistsAdapter(Activity activity, ArrayList<PlaylistItem> playlists) {
-            super(activity, 0, playlists);
-        }
-        
-        /**
-         * If this doesn't work (NullPointerException, use {@link #PlaylistsAdapter}.
-         * @param playlists
-         */
-        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-            super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            PlaylistItem pl = (PlaylistItem) getItem(position);
-            if (view == null) {
-                LayoutInflater inflater =
-                        (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
-                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(ROW_LAYOUT, parent, false);
-            }
-            ((TextView) view.findViewById(R.id.listrow_title))
-                    .setText((getItem(position)).getTitle());
-            int size = (int) getItem(position).size();
-            String subtitle = getString(R.string.default_empty);
-            switch (size) {
-                case 0:
-                    subtitle = getString(R.string.solo_playlist_contains_no_track);
-                    break;
-                case 1:
-                    subtitle = getString(R.string.solo_playlist_contains_track);
-                default:
-                    subtitle = getString(R.string.solo_playlist_contains_tracks, size);
-                    break;
-            }
-            ((TextView) view.findViewById(R.id.listrow_subtitle))
-                    .setText(subtitle);
-            view.setTag(pl);
-            return view;
-        }
-    }
+//    /** ArrayAdapter that displays the tracks of the playlist. */
+//    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+//
+//        public static final int ROW_LAYOUT = R.layout.list_row;
+//        
+//        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
+//            super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
+//        }
+//
+//        @Override
+//        public View getView(int position, View view, ViewGroup parent) {
+//            PlaylistItem pl = (PlaylistItem) getItem(position);
+//            if (view == null) {
+//                LayoutInflater inflater =
+//                        (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
+//                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                view = inflater.inflate(ROW_LAYOUT, parent, false);
+//            }
+//            ((TextView) view.findViewById(R.id.listrow_title))
+//                    .setText((getItem(position)).getTitle());
+//            int size = (int) getItem(position).size();
+//            String subtitle = getString(R.string.default_empty);
+//            switch (size) {
+//                case 0:
+//                    subtitle = getString(R.string.solo_playlist_contains_no_track);
+//                    break;
+//                case 1:
+//                    subtitle = getString(R.string.solo_playlist_contains_track);
+//                default:
+//                    subtitle = getString(R.string.solo_playlist_contains_tracks, size);
+//                    break;
+//            }
+//            ((TextView) view.findViewById(R.id.listrow_subtitle))
+//                    .setText(subtitle);
+//            view.setTag(pl);
+//            return view;
+//        }
+//    }
 
 //    /**
 //     * When clicking on a playlist, start MainActivity.
@@ -282,13 +273,13 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsRemote() {
-         setListAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+         setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
 
     }
 
-    public void refreshPlaylistsRemote(Activity activity) {
-        setListAdapter(new PlaylistsAdapter(activity, mPlaylistsRemote));
-    }
+//    public void refreshPlaylistsRemote(Activity activity) {
+//        setListAdapter(new PlaylistsAdapter(activity, mPlaylistsRemote));
+//    }
 
     /*
      * ---------------------------------------
@@ -321,9 +312,19 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
      * @param activity
      * @param playlists
      */
-    public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
+//    public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
+//        mPlaylistsRemote = playlists;
+//        refreshPlaylistsRemote(activity);
+//    }
+    
+    /**
+     * Replaces the list of playlists by the <code>playlists</code>.
+     * 
+     * @param playlists
+     */
+    public void set(ArrayList<PlaylistItem> playlists) {
         mPlaylistsRemote = playlists;
-        refreshPlaylistsRemote(activity);
+        refreshPlaylistsRemote();
     }
 
 }

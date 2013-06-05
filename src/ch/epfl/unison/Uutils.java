@@ -5,18 +5,31 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment;
+import ch.epfl.unison.ui.SoloTracksFragment;
 
 /**
  * Small utilities needed here and there.
@@ -122,5 +135,90 @@ public final class Uutils {
     public static int lastInsert(Uri u) {
         // Empirically seen that the index is at the end
         return Integer.parseInt(u.getPathSegments().get(u.getPathSegments().size() - 1));
+    }
+    
+    /** Container of adapters. */
+    public static final class Adapters {
+        
+        private static int smRowLayout = R.layout.listrow; // default layout
+        private static Activity smActivity;
+        
+        private Adapters() {
+            // Can't be instantiated
+        }
+    
+        /** ArrayAdapter that displays the tracks of the playlist. */
+        public static class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+    
+//            private static final int ROW_LAYOUT = R.layout.list_row;
+            
+            
+            public PlaylistsAdapter(Activity activity, ArrayList<PlaylistItem> playlists) {
+                super(activity, 0, playlists);
+                smActivity = activity;
+                smRowLayout = R.layout.listrow_playlist;
+            }
+    
+            @Override
+            public View getView(int position, View view, ViewGroup parent) {
+                PlaylistItem pl = (PlaylistItem) getItem(position);
+                if (view == null) {
+                    LayoutInflater inflater =
+                            (LayoutInflater) smActivity
+                                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    view = inflater.inflate(smRowLayout, parent, false);
+                }
+                ((TextView) view.findViewById(R.id.listrow_playlist_title))
+                        .setText((getItem(position)).getTitle());
+                int size = (int) getItem(position).size();
+                String subtitle = smActivity.getString(R.string.default_empty);
+                switch (size) {
+                    case 0:
+                        subtitle = smActivity.getString(R.string.solo_playlist_contains_no_track);
+                        break;
+                    case 1:
+                        subtitle = smActivity.getString(R.string.solo_playlist_contains_track);
+                    default:
+                        subtitle = smActivity
+                            .getString(R.string.solo_playlist_contains_tracks, size);
+                        break;
+                }
+                ((TextView) view.findViewById(R.id.listrow_playlist_nbTracks))
+                        .setText(subtitle);
+                view.setTag(pl);
+                return view;
+            }
+        }
+        
+        /** ArrayAdapter that displays the tracks of the playlist. */
+        public static class TracksAdapter extends ArrayAdapter<MusicItem> {
+
+            public TracksAdapter(Activity activity, PlaylistItem playlist) {
+                super(activity, 0, playlist.getTracks());
+                smActivity = activity;
+                smRowLayout = R.layout.listrow_track;
+            }
+
+            @Override
+            public View getView(int position, View view, ViewGroup parent) {
+                MusicItem track = getItem(position);
+                if (view == null) {
+                    LayoutInflater inflater = (LayoutInflater) smActivity
+                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    view = inflater.inflate(smRowLayout, parent, false);
+                }
+                ((TextView) view.findViewById(R.id.listrow_track_title))
+                    .setText(getItem(position).title);
+                ((TextView) view.findViewById(R.id.listrow_track_artist))
+                    .setText(getItem(position).artist);
+                // int rating = 0;
+                // if (getItem(position).rating != null) {
+                // rating = getItem(position).rating;
+                // }
+                // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
+                view.setTag(track);
+                return view;
+            }
+        }
     }
 }
