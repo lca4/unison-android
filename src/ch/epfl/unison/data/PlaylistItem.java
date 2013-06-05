@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct.Track;
 
@@ -29,6 +30,7 @@ public class PlaylistItem extends AbstractItem {
     }
 
     private long mLocalId = -1; // Android sqlite
+    private long mSize = 0;
     private Date mLocalLastUpdated;
     private boolean mCreatedByGS; // maybe useless
     private long mGSPLId; // GS database id
@@ -72,6 +74,7 @@ public class PlaylistItem extends AbstractItem {
      */
     public static class Builder {
         private long mLocalId; // Android sqlite
+        private long mSize;
         private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
@@ -81,7 +84,7 @@ public class PlaylistItem extends AbstractItem {
         private Date mDateModified;
         private int mAuthorId;
         private String mAuthorName; // Not yet available
-        private int mSize;
+        private int mGSSize;
         private LinkedList<MusicItem> mTracks;
         private int mUserRating;
         private String mUserComment;
@@ -92,6 +95,11 @@ public class PlaylistItem extends AbstractItem {
 
         public Builder localId(long id) {
             this.mLocalId = id;
+            return this;
+        }
+        
+        public Builder size(long s) {
+            this.mSize = s;
             return this;
         }
 
@@ -200,6 +208,7 @@ public class PlaylistItem extends AbstractItem {
 
         public Builder tracks(LinkedList<MusicItem> ll) {
             this.mTracks = ll;
+            this.mSize = mTracks.size();
             return this;
         }
 
@@ -212,6 +221,7 @@ public class PlaylistItem extends AbstractItem {
                 }
             }
             this.mTracks = ll;
+            this.mSize = mTracks.size();
             return this;
         }
 
@@ -247,6 +257,7 @@ public class PlaylistItem extends AbstractItem {
 
     private PlaylistItem(Builder builder) {
         this.mLocalId = builder.mLocalId;
+        this.mSize = builder.mSize;
         this.mLocalLastUpdated = builder.mLocalLastUpdated;
         this.mCreatedByGS = builder.mCreatedByGS;
         this.mGSPLId = builder.mGSPLId;
@@ -255,7 +266,7 @@ public class PlaylistItem extends AbstractItem {
         this.mGSLastUpdated = builder.mGSUpdated;
         this.mAuthorId = builder.mAuthorId;
         this.mAuthorName = builder.mAuthorName;
-        this.mGSSize = builder.mSize;
+        this.mGSSize = builder.mGSSize;
         this.mTracks = builder.mTracks;
         this.mUserRating = builder.mUserRating;
         this.mUserComment = builder.mUserComment;
@@ -338,20 +349,26 @@ public class PlaylistItem extends AbstractItem {
     public void setTitle(String title) {
         this.mTitle = title;
     }
+    
+    public long size() {
+        return this.mSize;
+    }
+    
 
     public void setTracks(LinkedList<MusicItem> tracks) {
         this.mTracks = tracks;
+        this.mSize = mTracks.size();
     }
 
     public String getLastUpdated() {
         return mGSLastUpdated.toString();
     }
 
-    public void setLastUpdated(Date lastUpdated) {
+    private void setLastUpdated(Date lastUpdated) {
         this.mGSLastUpdated = lastUpdated;
     }
 
-    public void setLastUpdated(String lastUpdated) {
+    private void setLastUpdated(String lastUpdated) {
         try {
             this.mGSLastUpdated = Uutils.stringToDate(lastUpdated);
         } catch (ParseException e) {
@@ -360,7 +377,7 @@ public class PlaylistItem extends AbstractItem {
         }
     }
 
-    public void setCreated(String created) {
+    private void setCreated(String created) {
         try {
             this.mGSCreated = Uutils.stringToDate(created);
         } catch (ParseException e) {
@@ -472,6 +489,13 @@ public class PlaylistItem extends AbstractItem {
                 mMode = mode;
                 break;
         }
+    }
+    
+    public HashMap<String, String> toHashMap() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(Const.Strings.TITLE, mTitle);
+        map.put(Const.Strings.SIZE, String.valueOf(mSize));
+        return map;
     }
 
 }

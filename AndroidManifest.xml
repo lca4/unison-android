@@ -42,10 +42,12 @@
             android:label="@string/activity_title_history" />
         <activity
             android:name="ch.epfl.unison.ui.SoloMainActivity"
-            android:label="@string/activity_title_solo_main" />
+            android:label="@string/activity_title_solo_main"
+            android:launchMode="singleTop" />
         <activity
             android:name="ch.epfl.unison.ui.SoloPlaylistsActivity"
-            android:label="@string/activity_title_solo_playlists" />
+            android:label="@string/activity_title_solo_playlists"
+            android:launchMode="singleTop" />
         <activity
             android:name="ch.epfl.unison.ui.HomeActivity"
             android:label="@string/activity_title_home" />

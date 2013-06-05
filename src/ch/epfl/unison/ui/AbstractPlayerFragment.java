@@ -348,7 +348,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                 break;
             case Solo:
                 try {
-                    play(mMainActivity.getPlaylist().next());
+                    play(((SoloMainActivity) mMainActivity).getPlaylist().next());
                 } catch (NullPointerException npe) {
                     Log.i(getTag(), "next: " + npe.getMessage());
                 } catch (IndexOutOfBoundsException ioobe) {
@@ -535,9 +535,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
             case Solo:
                 try {
                     if (curPos < CLICK_INTERVAL) {
-                        play(mMainActivity.getPlaylist().previous());
+                        play(((SoloMainActivity) mMainActivity).getPlaylist().previous());
                     } else {
-                        play(mMainActivity.getPlaylist().current());
+                        play(((SoloMainActivity) mMainActivity).getPlaylist().current());
                     }
                 } catch (NullPointerException npe) {
                     // Internal error occured

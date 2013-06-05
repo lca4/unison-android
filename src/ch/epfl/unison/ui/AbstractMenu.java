@@ -53,10 +53,12 @@ public abstract class AbstractMenu {
             case R.id.menu_item_help:
                 activity.startActivity(new Intent(activity, HelpActivity.class));
                 break;
-            // case R.id.menu_item_solo:
-            // activity.startActivity(new Intent(activity,
-            // SoloPlaylistsActivity.class));
-            // break;
+            case R.id.menu_item_groups:
+                activity.startActivity(new Intent(activity, GroupsActivity.class));
+                break;
+            case R.id.menu_item_solo:
+                 activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
+                 break;
             case R.id.menu_item_history:
                 activity.startActivity(new Intent(activity, GroupsHistoryActivity.class).putExtra(
                         Const.Strings.CALLER, activity.getClass().getName()));

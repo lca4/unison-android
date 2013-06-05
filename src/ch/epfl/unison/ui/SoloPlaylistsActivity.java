@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
@@ -15,32 +14,25 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.view.Menu;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
@@ -51,230 +43,275 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
-/*
- * TODO
- * 
- * - retrieve playlists stored in android database
- * 
- */
-
 /**
- * Listing of the groups.
+ * Listing of the playlists.
  * 
  * @author marc bourqui
  */
-public class SoloPlaylistsActivity extends AbstractFragmentActivity {
-    // extends SherlockFragmentActivity implements UnisonMenu.OnRefreshListener
-    // {
+public class SoloPlaylistsActivity extends AbstractFragmentActivity
+        implements SoloPlaylistsLocalFragment.OnDeletePlaylistListener,
+        SoloPlaylistsRemoteFragment.OnSavePlaylistListener {
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
     private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
 
-    // private Playlist mPlaylist;
     private UnisonDB mDB;
-    private ArrayList<PlaylistItem> mPlaylistsLocal;
-    private ArrayList<PlaylistItem> mPlaylistsRemote;
+//    private ArrayList<PlaylistItem> mPlaylistsLocal;
+    // private ArrayList<PlaylistItem> mPlaylistsRemote;
 
     // GUI specific
-    private ListView mPlaylistsLocalListView;
-    private ListView mPlaylistsRemoteListView;
+    // private ListView mPlaylistsLocalListView;
+    // private ListView mPlaylistsRemoteListView;
+    // Hosted fragments
+    private Bundle fragmentBundleRemote;
+    private SoloPlaylistsLocalFragment mPlaylistsLocalFragment;
+    private SoloPlaylistsRemoteFragment mPlaylistsRemoteFragment;
+    private String mRemoteTag;
 
-    private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-    private final String[] mPlaylistsIdNameProjection = new String[] {
-            MediaStore.Audio.Playlists._ID,
-            MediaStore.Audio.Playlists.NAME
-    };
+//    private Set<OnPlaylistsLocalInfoListener> mListenersLocal =
+//            new HashSet<OnPlaylistsLocalInfoListener>();
+//    private Set<OnPlaylistsRemoteInfoListener> mListenersRemote =
+//            new HashSet<OnPlaylistsRemoteInfoListener>();
 
+//    private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+
+    // private final String[] mPlaylistsIdNameProjection = new String[] {
+    // MediaStore.Audio.Playlists._ID,
+    // MediaStore.Audio.Playlists.NAME
+    // };
+
+    /** Simple interface to be notified about playlist info updates. */
+    public interface OnPlaylistsLocalInfoListener {
+        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+
+        void onPlaylistsLocalInfo(Object contentInfo);
+    }
+
+    /** Simple interface to be notified about playlist info updates. */
+    public interface OnPlaylistsRemoteInfoListener {
+        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+
+        void onPlaylistsRemoteInfo(Object contentInfo);
+    }
+
+    // /** Simple interface to be notified about playlist info updates. */
+    // public interface OnPlaylistsLocalInfoListener {
+    // // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
+    //
+    // void onPlaylistsLocalInfo(Object contentInfo);
+    // }
+
+    @SuppressLint("NewApi")
+    // Concerns fragments' stuff
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setContentView(R.layout.solo_playlists);
+//        ((Button) findViewById(R.id.createPlaylistBtn))
+//                .setOnClickListener(new OnCreatePlaylistListener());
+
+//        Bundle b = new Bundle();
+//        b.putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_local_tag));
+//        getTabsAdapter().addTab(
+//                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_local_title),
+//                SoloPlaylistsLocalFragment.class, null);
+//        // getSupportFragmentManager because targetVersion < API Level 11
+//        mPlaylistsLocalFragment = (SoloPlaylistsLocalFragment) getTabsAdapter().getItem(0);
+//        fragmentBundleRemote = new Bundle();
+//        fragmentBundleRemote
+//        .putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_remote_tag));
+        getTabsAdapter().addTab(
+                getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title)
+                .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
+                SoloPlaylistsRemoteFragment.class, null);
+//        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
+//        mPlaylistsRemoteFragment.onAttach(this);
+        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) 
+                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+        
 
         setReloadInterval(RELOAD_INTERVAL);
 
-        // mPlaylist = new Playlist();
         mDB = new UnisonDB(this);
 
-        setContentView(R.layout.solo_playlists);
-        ((Button) findViewById(R.id.createPlaylistBtn))
-                .setOnClickListener(new OnCreatePlaylistListener());
+        
 
-        mPlaylistsLocalListView = (ListView) findViewById(R.id.soloPlaylistsListLocal);
-        mPlaylistsLocalListView.setOnItemClickListener(new OnLocalPlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsLocalListView);
-        mPlaylistsLocal = new ArrayList<PlaylistItem>();
-        initLocalPlaylists();
+        // mPlaylistsLocalListView = (ListView)
+        // findViewById(R.id.soloPlaylistsListLocal);
+        // mPlaylistsLocalListView.setOnItemClickListener(new
+        // OnLocalPlaylistSelectedListener());
+        // registerForContextMenu(mPlaylistsLocalListView);
+//        mPlaylistsLocal = new ArrayList<PlaylistItem>();
+        // initLocalPlaylists();
 
-        mPlaylistsRemote = new ArrayList<PlaylistItem>();
-        mPlaylistsRemoteListView = (ListView) findViewById(R.id.soloPlaylistsListRemote);
-        mPlaylistsRemoteListView.setOnItemClickListener(new OnRemotePlaylistSelectedListener());
-        registerForContextMenu(mPlaylistsLocalListView);
-        registerForContextMenu(mPlaylistsRemoteListView);
-
-        // // Actions that should be taken when activity is started.
-        // if (ACTION_LEAVE_GROUP.equals(getIntent().getAction())) {
-        // // We are coming back from a group - let's make sure the back-end
-        // // knows.
-        // leaveGroup();
-        // } else if (AppData.getInstance(this).showHelpDialog()) {
-        // showHelpDialog();
-        // }
+        // mPlaylistsRemote = new ArrayList<PlaylistItem>();
+        // mPlaylistsRemoteListView = (ListView)
+        // findViewById(R.id.soloPlaylistsListRemote);
+        // mPlaylistsRemoteListView.setOnItemClickListener(new
+        // OnRemotePlaylistSelectedListener());
+        // registerForContextMenu(mPlaylistsLocalListView);
+        // registerForContextMenu(mPlaylistsRemoteListView);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean b = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_solo).setVisible(false);
+        return b;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        startService(new Intent(LibraryService.ACTION_UPDATE));
+//        startService(new Intent(LibraryService.ACTION_UPDATE));
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        if (v == mPlaylistsLocalListView) {
-            inflater.inflate(R.menu.playlist_local_context_menu, menu);
-        } else {
-            inflater.inflate(R.menu.playlist_remote_context_menu, menu);
-        }
-    }
+    // @Override
+    // public void onCreateContextMenu(ContextMenu menu, View v,
+    // ContextMenuInfo menuInfo) {
+    // super.onCreateContextMenu(menu, v, menuInfo);
+    // MenuInflater inflater = getMenuInflater();
+    // if (v == mPlaylistsLocalListView) {
+    // inflater.inflate(R.menu.playlist_local_context_menu, menu);
+    // } else {
+    // inflater.inflate(R.menu.playlist_remote_context_menu, menu);
+    // }
+    // }
 
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-                .getMenuInfo();
-        ListView lv = (ListView) info.targetView.getParent();
-        AppData data = AppData.getInstance(this);
-        switch (item.getItemId()) {
-            case R.id.playlist_context_menu_item_edit:
-                if (lv == mPlaylistsLocalListView) {
-                    Log.i(TAG, "Not yet implemented...");
-                    Toast.makeText(SoloPlaylistsActivity.this,
-                            R.string.error_not_yet_available,
-                            Toast.LENGTH_LONG).show();
-                }
-                return true;
-
-            case R.id.playlist_context_menu_item_delete:
-                /*
-                 * In the case of a local playlist, remove it from android and
-                 * GS in-app DBs, but keeps it in the user library on GS server.
-                 */
-                if (lv == mPlaylistsLocalListView) {
-                    try {
-                        // Set local_id to null on GS server
-                        data.getAPI().updatePlaylist(data.getUid(),
-                                mPlaylistsLocal.get(info.position).getPLId(),
-                                new JSONObject().put("local_id", JSONObject.NULL),
-                                new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
-
-                                    @Override
-                                    public void callback(JsonStruct.PlaylistJS struct) {
-                                        // Then from local databases
-                                        if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
-                                            mPlaylistsRemote.add(mPlaylistsLocal
-                                                    .remove(info.position));
-                                            Log.w(TAG, "Successfully removed playlist with id "
-                                                    + struct.gsPlaylistId + " from user library");
-                                            refreshPlaylistsLocal();
-                                            refreshPlaylistsRemote();
-                                        } else {
-                                            Toast.makeText(
-                                                    SoloPlaylistsActivity.this,
-                                                    R.string
-                                                    .error_solo_remove_playlist_from_local_dbs,
-                                                    Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError(UnisonAPI.Error error) {
-                                        if (error != null) {
-                                            Log.d(TAG, error.toString());
-                                        }
-                                        Toast.makeText(
-                                                SoloPlaylistsActivity.this,
-                                                R.string
-                                                .error_solo_remove_playlist_from_local_dbs,
-                                                Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else if (lv == mPlaylistsRemoteListView) {
-                    // Remove from server
-                    data.getAPI().removePlaylist(data.getUid(),
-                            mPlaylistsRemote.get(info.position).getPLId(),
-                            new UnisonAPI.Handler<JsonStruct.Success>() {
-
-                                @Override
-                                public void callback(JsonStruct.Success struct) {
-                                    mPlaylistsRemote.remove(info.position);
-                                    refreshPlaylistsRemote();
-                                }
-
-                                @Override
-                                public void onError(Error error) {
-                                    if (error != null) {
-                                        Log.d(TAG, error.toString());
-                                    }
-                                    Toast.makeText(SoloPlaylistsActivity.this,
-                                            R.string.error_solo_remove_playlist_from_gs_server,
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
-                }
-                return true;
-
-            case R.id.playlist_context_menu_item_save:
-                if (lv == mPlaylistsRemoteListView) {
-                    PlaylistItem pl = mPlaylistsRemote.get(info.position);
-                    // Adds PL to local databases
-                    long localId = mDB.insert(pl);
-                    if (localId >= 0) {
-                        try {
-                            // Updates the local_id on server
-                            JSONObject json = new JSONObject();
-                            json.put("local_id", localId);
-                            data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
-                                    new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
-
-                                        @Override
-                                        public void callback(JsonStruct.PlaylistJS struct) {
-                                            // TODO some verifications?
-                                            // (local_id)
-                                        }
-
-                                        @Override
-                                        public void onError(Error error) {
-                                            Log.d(TAG, error.toString());
-                                        }
-                                    });
-                        } catch (JSONException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        mPlaylistsLocal.add(mPlaylistsRemote.remove(info.position));
-                        refreshPlaylistsLocal();
-                        refreshPlaylistsRemote();
-                    } else {
-                        Toast.makeText(SoloPlaylistsActivity.this,
-                                R.string.error_solo_save_playlist,
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                return true;
-            default:
-                return super.onContextItemSelected((android.view.MenuItem) item);
-        }
-    }
+    // @Override
+    // public boolean onContextItemSelected(android.view.MenuItem item) {
+    // final AdapterView.AdapterContextMenuInfo info =
+    // (AdapterView.AdapterContextMenuInfo) item
+    // .getMenuInfo();
+    // ListView lv = (ListView) info.targetView.getParent();
+    // AppData data = AppData.getInstance(this);
+    // switch (item.getItemId()) {
+    // case R.id.playlist_context_menu_item_edit:
+    // if (lv == mPlaylistsLocalListView) {
+    // Log.i(TAG, "Not yet implemented...");
+    // Toast.makeText(SoloPlaylistsActivity.this,
+    // R.string.error_not_yet_available,
+    // Toast.LENGTH_LONG).show();
+    // }
+    // return true;
+    //
+    // case R.id.playlist_context_menu_item_delete:
+    // /*
+    // * In the case of a local playlist, remove it from android and
+    // * GS in-app DBs, but keeps it in the user library on GS server.
+    // */
+    // if (lv == mPlaylistsLocalListView) {
+    // try {
+    // // Set local_id to null on GS server
+    // data.getAPI().updatePlaylist(data.getUid(),
+    // mPlaylistsLocal.get(info.position).getPLId(),
+    // new JSONObject().put("local_id", JSONObject.NULL),
+    // new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
+    //
+    // @Override
+    // public void callback(JsonStruct.PlaylistJS struct) {
+    // // Then from local databases
+    // if (mDB.delete(mPlaylistsLocal.get(info.position)) > 0) {
+    // mPlaylistsRemote.add(mPlaylistsLocal
+    // .remove(info.position));
+    // Log.w(TAG, "Successfully removed playlist with id "
+    // + struct.gsPlaylistId + " from user library");
+    // // refreshPlaylistsLocal();
+    // refreshPlaylistsRemote();
+    // } else {
+    // Toast.makeText(
+    // SoloPlaylistsActivity.this,
+    // R.string
+    // .error_solo_remove_playlist_from_local_dbs,
+    // Toast.LENGTH_LONG).show();
+    // }
+    // }
+    //
+    // @Override
+    // public void onError(UnisonAPI.Error error) {
+    // Log.d(TAG, error.toString());
+    // Toast.makeText(
+    // SoloPlaylistsActivity.this,
+    // R.string
+    // .error_solo_remove_playlist_from_local_dbs,
+    // Toast.LENGTH_LONG).show();
+    // }
+    // });
+    // } catch (JSONException e) {
+    // e.printStackTrace();
+    // }
+    // } else if (lv == mPlaylistsRemoteListView) {
+    // // Remove from server
+    // data.getAPI().removePlaylist(data.getUid(),
+    // mPlaylistsRemote.get(info.position).getPLId(),
+    // new UnisonAPI.Handler<JsonStruct.Success>() {
+    //
+    // @Override
+    // public void callback(JsonStruct.Success struct) {
+    // mPlaylistsRemote.remove(info.position);
+    // refreshPlaylistsRemote();
+    // }
+    //
+    // @Override
+    // public void onError(Error error) {
+    // Log.d(TAG, error.toString());
+    // Toast.makeText(SoloPlaylistsActivity.this,
+    // R.string.error_solo_remove_playlist_from_gs_server,
+    // Toast.LENGTH_LONG).show();
+    // }
+    // });
+    // }
+    // return true;
+    //
+    // case R.id.playlist_context_menu_item_save:
+    // if (lv == mPlaylistsRemoteListView) {
+    // PlaylistItem pl = mPlaylistsRemote.get(info.position);
+    // // Adds PL to local databases
+    // long localId = mDB.insert(pl);
+    // if (localId >= 0) {
+    // try {
+    // // Updates the local_id on server
+    // JSONObject json = new JSONObject();
+    // json.put("local_id", localId);
+    // data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
+    // new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
+    //
+    // @Override
+    // public void callback(JsonStruct.PlaylistJS struct) {
+    // // TODO some verifications?
+    // // (local_id)
+    // }
+    //
+    // @Override
+    // public void onError(Error error) {
+    // Log.d(TAG, error.toString());
+    // }
+    // });
+    // } catch (JSONException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // }
+    // mPlaylistsLocal.add(mPlaylistsRemote.remove(info.position));
+    // // refreshPlaylistsLocal();
+    // refreshPlaylistsRemote();
+    // } else {
+    // Toast.makeText(SoloPlaylistsActivity.this,
+    // R.string.error_solo_save_playlist,
+    // Toast.LENGTH_LONG).show();
+    // }
+    // }
+    // return true;
+    // default:
+    // return super.onContextItemSelected((android.view.MenuItem) item);
+    // }
+    // }
 
     @Override
     public void onRefresh() {
         repaintRefresh(true);
 
-        SoloPlaylistsActivity.this.mPlaylistsLocalListView
-                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        // SoloPlaylistsActivity.this.mPlaylistsLocalListView
+        // .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
 
         // Update remote playlists
         UnisonAPI.Handler<JsonStruct.PlaylistsList> playlistsHandler =
@@ -283,8 +320,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                     @Override
                     public void callback(PlaylistsList struct) {
                         try {
+                            ArrayList<PlaylistItem> mPlaylistsRemote =
+                                    new ArrayList<PlaylistItem>();
                             if (struct.isEmtpy()) {
-                                mPlaylistsRemote.clear();
+                                // mPlaylistsRemote.clear();
                                 // TODO display row item to tell no playlist is
                                 // available
                                 Toast.makeText(SoloPlaylistsActivity.this,
@@ -292,7 +331,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                                         Toast.LENGTH_LONG).show();
                             } else {
                                 mPlaylistsRemote = struct.toObject();
-                                // refreshRemotePlaylists();
+                                refreshPlaylistsRemote(mPlaylistsRemote);
                                 SoloPlaylistsActivity.this.repaintRefresh(false);
                             }
                         } catch (NullPointerException e) {
@@ -362,7 +401,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                         Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.lr_title)).setText(playlist.getTitle());
+            ((TextView) view.findViewById(R.id.listrow_title)).setText(playlist.getTitle());
             String subtitle = null;
             if (playlist.getListeners() > 0) {
                 String plural = "s";
@@ -374,7 +413,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
             } else {
                 subtitle = String.format("%d tracks", playlist.getSize());
             }
-            ((TextView) view.findViewById(R.id.lr_notifRight)).setText(subtitle);
+            ((TextView) view.findViewById(R.id.listrow_subtitle)).setText(subtitle);
 
             view.setTag(playlist);
             return view;
@@ -564,9 +603,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
                             public void callback(JsonStruct.PlaylistJS struct) {
                                 if (struct != null) {
                                     Log.i(TAG, "Playlist created!");
-                                    mPlaylistsRemote.add(0, struct.toObject());
-                                    SoloPlaylistsActivity.this.mPlaylistsRemoteListView
-                                            .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+                                    mPlaylistsRemoteFragment.add(0, struct.toObject());
+                                    // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
+                                    // .setAdapter(new
+                                    // PlaylistsAdapter(mPlaylistsRemote));
                                     // SoloPlaylistsActivity.this.mPlaylistsListRemote
                                     // .setAdapter(new
                                     // PlaylistsAdapter(struct.toObject()));
@@ -643,86 +683,147 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity {
         }
     }
 
-    /**
-     * When clicking on a playlist, start MainActivity.
-     */
-    private class OnLocalPlaylistSelectedListener implements OnItemClickListener {
+    // /**
+    // * When clicking on a playlist, start MainActivity.
+    // */
+    // private class OnLocalPlaylistSelectedListener implements
+    // OnItemClickListener {
+    //
+    // @Override
+    // public void onItemClick(AdapterView<?> parent, View view, int position,
+    // long id) {
+    //
+    // // Give tracks to player here
+    // SoloPlaylistsActivity.this.startActivity(new
+    // Intent(SoloPlaylistsActivity.this,
+    // SoloMainActivity.class)
+    // .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem)
+    // view.getTag()).getLocalId())
+    // .putExtra(Const.Strings.TITLE, ((PlaylistItem)
+    // view.getTag()).getTitle()));
+    // // .putExtra(Const.Strings.PLID,
+    // // view.getTag());
+    // // UnisonAPI api =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
+    // // long uid =
+    // // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
+    // // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
+    // // view.getTag();
+    //
+    // // api.joinGroup(uid, playlist.plid, new
+    // // UnisonAPI.Handler<JsonStruct.Success>() {
+    // //
+    // // @Override
+    // // public void callback(Success struct) {
+    // // SoloPlaylistsActivity.this.startActivity(
+    // // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
+    // // .putExtra(Const.Strings.GID, playlist.plid)
+    // // .putExtra(Const.Strings.NAME, playlist.name));
+    // // }
+    // //
+    // // @Override
+    // // public void onError(Error error) {
+    // // Log.d(TAG, error.toString());
+    // // if (SoloPlaylistsActivity.this != null) {
+    // // Toast.makeText(SoloPlaylistsActivity.this,
+    // // R.string.error_joining_group,
+    // // Toast.LENGTH_LONG).show();
+    // // }
+    // // }
+    // //
+    // // });
+    // }
+    // }
+    //
+    // /**
+    // * To be used only once, at onCreate time.
+    // */
+    // private void initLocalPlaylists() {
+    // Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
+    // mPlaylistsIdNameProjection,
+    // null, null, null);
+    // if (cur != null && cur.moveToFirst()) {
+    // int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+    // int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+    // do {
+    // PlaylistItem pl = (PlaylistItem) mDB.getItem(PlaylistItem.class,
+    // cur.getInt(colId));
+    // if (pl != null) {
+    // pl.setTitle(cur.getString(colName));
+    // mPlaylistsLocal.add(pl);
+    // }
+    // // Non-GS playlists not shown
+    // } while (cur.moveToNext());
+    // cur.close();
+    // }
+    // refreshPlaylistsLocal();
+    // }
+    //
+    // /**
+    // * To be used to refresh the ListView when changes are made to ArraList.
+    // */
+    // private void refreshPlaylistsLocal() {
+    // SoloPlaylistsActivity.this.mPlaylistsLocalListView
+    // .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+    // }
 
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            // Give tracks to player here
-            SoloPlaylistsActivity.this.startActivity(new Intent(SoloPlaylistsActivity.this,
-                    SoloMainActivity.class)
-                    .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
-                    .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
-            // .putExtra(Const.Strings.PLID,
-            // view.getTag());
-            // UnisonAPI api =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-            // long uid =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
-            // view.getTag();
-
-            // api.joinGroup(uid, playlist.plid, new
-            // UnisonAPI.Handler<JsonStruct.Success>() {
-            //
-            // @Override
-            // public void callback(Success struct) {
-            // SoloPlaylistsActivity.this.startActivity(
-            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-            // .putExtra(Const.Strings.GID, playlist.plid)
-            // .putExtra(Const.Strings.NAME, playlist.name));
-            // }
-            //
-            // @Override
-            // public void onError(Error error) {
-            // Log.d(TAG, error.toString());
-            // if (SoloPlaylistsActivity.this != null) {
-            // Toast.makeText(SoloPlaylistsActivity.this,
-            // R.string.error_joining_group,
-            // Toast.LENGTH_LONG).show();
-            // }
-            // }
-            //
-            // });
-        }
+    private void refreshPlaylistsRemote(ArrayList<PlaylistItem> playlists) {
+        // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
+        // .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+        SoloPlaylistsRemoteFragment frag = 
+        (SoloPlaylistsRemoteFragment) 
+                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+        frag.set(SoloPlaylistsActivity.this, playlists);
     }
 
-    /**
-     * To be used only once, at onCreate time.
-     */
-    private void initLocalPlaylists() {
-        Cursor cur = SoloPlaylistsActivity.this.getContentResolver().query(mUri,
-                mPlaylistsIdNameProjection,
-                null, null, null);
-        if (cur != null && cur.moveToFirst()) {
-            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
-            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
-            do {
-                PlaylistItem pl = (PlaylistItem) mDB.getItem(PlaylistItem.class, cur.getInt(colId));
-                if (pl != null) {
-                    pl.setTitle(cur.getString(colName));
-                    mPlaylistsLocal.add(pl);
-                }
-                // Non-GS playlists not shown
-            } while (cur.moveToNext());
-            cur.close();
-        }
-        refreshPlaylistsLocal();
+    // protected ArrayList<PlaylistItem> getPlaylistsLocal() {
+    // return mPlaylistsLocal;
+    // }
+
+    // protected ArrayList<PlaylistItem> getPlaylistsRemote() {
+    // return mPlaylistsRemote;
+    // }
+
+    protected UnisonDB getDB() {
+        return mDB;
     }
 
-    /**
-     * To be used to refresh the ListView when changes are made to ArraList.
-     */
-    private void refreshPlaylistsLocal() {
-        SoloPlaylistsActivity.this.mPlaylistsLocalListView
-                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+    // public void
+    // registerPlaylistsLocalInfoListener(OnPlaylistsLocalInfoListener listener)
+    // {
+    // mListenersLocal.add(listener);
+    // }
+    //
+    // public void
+    // unregisterPlaylistsLocalInfoListener(OnPlaylistsLocalInfoListener
+    // listener) {
+    // mListenersLocal.remove(listener);
+    // }
+    //
+    // public void
+    // registerPlaylistsRemoteInfoListener(OnPlaylistsRemoteInfoListener
+    // listener) {
+    // mListenersRemote.add(listener);
+    // }
+    //
+    // public void
+    // unregisterPlaylistsremoteInfoListener(OnPlaylistsRemoteInfoListener
+    // listener) {
+    // mListenersRemote.remove(listener);
+    // }
+
+    @Override
+    public boolean onSavePlaylist(PlaylistItem playlist) {
+        return mPlaylistsLocalFragment.add(playlist);
+    }
+    
+    @Override
+    public void setRemoteFragmentTag(String tag) {
+        mRemoteTag = tag;
     }
 
-    private void refreshPlaylistsRemote() {
-        SoloPlaylistsActivity.this.mPlaylistsRemoteListView
-                .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
+    @Override
+    public boolean onDeletePlaylist(PlaylistItem playlist) {
+        return mPlaylistsRemoteFragment.add(playlist);
     }
 }

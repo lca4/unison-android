@@ -4,11 +4,14 @@
     <string name="app_name">Group Streamer</string>
     <string name="hello_world">Hello world!</string>
 
+    <!-- Global values -->
     <!-- Generic values -->
     <string name="generic_ok">OK</string>
     <string name="generic_cancel">Cancel</string>
-    <string name="defaul_title">Title</string>
+    <!-- Default values -->
+    <string name="default_title">Title</string>
     <string name="default_subtitle">Subtitle</string>
+    <string name="default_empty">Sorry, there\'s nothing to show</string>
 
     <!-- Activity titles. -->
     <string name="activity_title_ratings">Ratings</string>
@@ -30,8 +33,11 @@
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
-    <string name="solo_player_fragment_title">Music</string>
-    <string name="solo_playlist_fragment_title">Tracks</string>
+    <string name="solo_fragment_player_title">Music</string>
+    <string name="solo_fragment_playlist_title">Tracks</string>
+    <string name="solo_fragment_playlists_local_title">Local</string>
+    <string name="solo_fragment_playlists_remote_title">Remote</string>
+    
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
@@ -122,6 +128,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_alert_newplaylist_cancel">Cancel</string>
     <string name="solo_playlists_createBtn">Create playlist</string>
     <string name="solo_playlists_choosePL">or select one below :</string>
+    <string name="solo_playlists_fragment_local_list_row_image_desc">Playlist icon</string>
     
     
     <!-- Solo playlists --> 
@@ -134,6 +141,10 @@ You can also just cancel this action and stay in groups history.</string>
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
     <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
+    
+    <!-- Solo Fragments tags -->
+    <string name="solo_playlists_fragment_local_tag">solo playlists fragment local</string>
+    <string name="solo_playlists_fragment_remote_tag">solo playlists fragment remote</string>
 
     <!-- Solo playlist context menu -->
     <string name="playlist_context_menu_item_delete">Delete</string>

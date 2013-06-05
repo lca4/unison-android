@@ -21,34 +21,37 @@ import ch.epfl.unison.data.PlaylistItem;
  */
 public class SoloTracksFragment extends AbstractListFragment
         implements SoloMainActivity.OnPlaylistInfoListener {
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        SoloTracksFragment.this.getList()
-                .setAdapter(new TracksAdapter(getMainActivity().getPlaylist()));
-        return v;
-    }
+    
+    private SoloMainActivity mHostActivity;
+    
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//            Bundle savedInstanceState) {
+//        View v = super.onCreateView(inflater, container, savedInstanceState);
+//        SoloTracksFragment.this.getList()
+//        .setAdapter(new TracksAdapter(mHostActivity.getPlaylist()));
+//        return v;
+//    }
 
     @Override
     public void onPlaylistInfo(PlaylistItem playlistInfo) {
-        if (playlistInfo.getTitle() != null) {
-            getTitle().setText(playlistInfo.getTitle());
-        }
-        getList().setAdapter(new TracksAdapter(playlistInfo));
+//        if (playlistInfo.getTitle() != null) {
+//            getTitle().setText(playlistInfo.getTitle());
+//        }
+        setListAdapter(new TracksAdapter(playlistInfo));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((SoloMainActivity) getMainActivity()).registerPlaylistInfoListener(this);
+        mHostActivity = (SoloMainActivity) activity;
+        mHostActivity.registerPlaylistInfoListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        ((SoloMainActivity) getMainActivity()).unregisterPlaylistInfoListener(this);
+        mHostActivity.unregisterPlaylistInfoListener(this);
     }
 
     /** ArrayAdapter that displays the tracks of the playlist. */
@@ -68,7 +71,7 @@ public class SoloTracksFragment extends AbstractListFragment
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(TRACK_ROW_LAYOUT, parent, false);
             }
-            ((TextView) view.findViewById(R.id.trackTitle)).setText(getItem(position).title);
+            ((TextView) view.findViewById(R.id.trackrow_title)).setText(getItem(position).title);
             // int rating = 0;
             // if (getItem(position).rating != null) {
             // rating = getItem(position).rating;

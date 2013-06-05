@@ -193,6 +193,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean res = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_groups).setVisible(false);
         getMenu().findItem(R.id.menu_item_history).setVisible(true);
         return res;
     }
@@ -350,10 +351,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-    @Override
-    protected PlaylistItem getPlaylist() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    @Override
+//    protected PlaylistItem getPlaylist() {
+//        return null;
+//    }
 
 }

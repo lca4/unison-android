@@ -311,6 +311,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
         boolean res = AbstractMenu.onCreateOptionsMenu(this, menu);
+        mMenu.findItem(R.id.menu_item_groups).setVisible(false);
         mMenu.findItem(R.id.menu_item_history).setVisible(true);
         return res;
     }
