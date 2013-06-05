@@ -66,6 +66,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     private Bundle fragmentBundleRemote;
     private SoloPlaylistsLocalFragment mPlaylistsLocalFragment;
     private SoloPlaylistsRemoteFragment mPlaylistsRemoteFragment;
+    private String mRemoteTag;
 
 //    private Set<OnPlaylistsLocalInfoListener> mListenersLocal =
 //            new HashSet<OnPlaylistsLocalInfoListener>();
@@ -116,15 +117,17 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
 //                SoloPlaylistsLocalFragment.class, null);
 //        // getSupportFragmentManager because targetVersion < API Level 11
 //        mPlaylistsLocalFragment = (SoloPlaylistsLocalFragment) getTabsAdapter().getItem(0);
-        fragmentBundleRemote = new Bundle();
-        fragmentBundleRemote
-        .putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_remote_tag));
+//        fragmentBundleRemote = new Bundle();
+//        fragmentBundleRemote
+//        .putString(Const.Strings.TAG, getString(R.string.solo_playlists_fragment_remote_tag));
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title)
                 .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
-                SoloPlaylistsRemoteFragment.class, fragmentBundleRemote);
-        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
-        mPlaylistsRemoteFragment.onAttach(this);
+                SoloPlaylistsRemoteFragment.class, null);
+//        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
+//        mPlaylistsRemoteFragment.onAttach(this);
+        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) 
+                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
         
 
         setReloadInterval(RELOAD_INTERVAL);
@@ -765,7 +768,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     private void refreshPlaylistsRemote(ArrayList<PlaylistItem> playlists) {
         // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
         // .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
-        mPlaylistsRemoteFragment.set(SoloPlaylistsActivity.this, playlists);
+        SoloPlaylistsRemoteFragment frag = 
+        (SoloPlaylistsRemoteFragment) 
+                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+        frag.set(SoloPlaylistsActivity.this, playlists);
     }
 
     // protected ArrayList<PlaylistItem> getPlaylistsLocal() {
@@ -807,6 +813,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public boolean onSavePlaylist(PlaylistItem playlist) {
         return mPlaylistsLocalFragment.add(playlist);
+    }
+    
+    @Override
+    public void setRemoteFragmentTag(String tag) {
+        mRemoteTag = tag;
     }
 
     @Override

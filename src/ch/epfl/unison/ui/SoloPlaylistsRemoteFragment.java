@@ -24,9 +24,11 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     /** Container Activity must implement this interface. */
     public interface OnSavePlaylistListener {
         boolean onSavePlaylist(PlaylistItem playlist);
+        void setRemoteFragmentTag(String tag);
     }
 
     private OnSavePlaylistListener mListener;
+    
 
     // Not really useful, but nice to avoid explicit casting every time
     private SoloPlaylistsActivity mHostActivity;
@@ -47,6 +49,8 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnSavePlaylistListener");
         }
+        String tag = SoloPlaylistsRemoteFragment.this.getTag();
+        mListener.setRemoteFragmentTag(tag);
     }
 
 //    @Override
