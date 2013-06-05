@@ -33,7 +33,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
-import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment.OnSavePlaylistListener;
+import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener;
 
 /**
  * Shows the locally stored playlists made with GS.
@@ -44,16 +44,16 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
 //    implements SoloPlaylistsActivity.OnPlaylistsLocalInfoListener {
     
     /** Container Activity must implement this interface.  */
-    public interface OnDeletePlaylistListener {
+    public interface OnPlaylistsLocalListener {
         boolean onDeletePlaylist(PlaylistItem playlist);
+        void setPlaylistsLocalFragmentTag(String tag);
     }
     
-    private OnDeletePlaylistListener mListener;
+    private OnPlaylistsLocalListener mListener;
 
     // Not really useful, but nice to avoid explicit casting every time
     private SoloPlaylistsActivity mHostActivity;
 
-    private UnisonDB mDB;
     private ArrayList<PlaylistItem> mPlaylistsLocal;
     
     private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
@@ -68,7 +68,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
          mHostActivity = (SoloPlaylistsActivity) activity;
 //        mHostActivity = (SoloPlaylistsActivity) getActivity();
         try {
-            mListener = (OnDeletePlaylistListener) activity;
+            mListener = (OnPlaylistsLocalListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() 
                     + " must implement OnDeletePlaylistListener");
@@ -79,7 +79,6 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDB = new UnisonDB(getActivity());
 //        mHostActivity.registerPlaylistsLocalInfoListener(this);
         initPlaylistsLocal();
     }

@@ -1,7 +1,7 @@
-
 package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +31,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 
 import ch.epfl.unison.AppData;
-import ch.epfl.unison.Const;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -49,11 +48,17 @@ import ch.epfl.unison.data.UnisonDB;
  * @author marc bourqui
  */
 public class SoloPlaylistsActivity extends AbstractFragmentActivity
-        implements SoloPlaylistsLocalFragment.OnDeletePlaylistListener,
-        SoloPlaylistsRemoteFragment.OnSavePlaylistListener {
+        implements SoloPlaylistsLocalFragment.OnPlaylistsLocalListener,
+        SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener {
+    
+    /** Possible fragments. */
+    @SuppressLint("ValidFragment") // Avoids Lint wrong warning due to "Fragment" in the enum name
+    protected enum ChildFragment {
+        LOCAL, REMOTE, SHARED
+    }
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
-    private static final int RELOAD_INTERVAL = 120 * 1000; // in ms.
+    private static final int RELOAD_INTERVAL = 15 * 60 * 1000; // in ms.
 
     private UnisonDB mDB;
 //    private ArrayList<PlaylistItem> mPlaylistsLocal;
@@ -63,10 +68,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     // private ListView mPlaylistsLocalListView;
     // private ListView mPlaylistsRemoteListView;
     // Hosted fragments
-    private Bundle fragmentBundleRemote;
-    private SoloPlaylistsLocalFragment mPlaylistsLocalFragment;
-    private SoloPlaylistsRemoteFragment mPlaylistsRemoteFragment;
-    private String mRemoteTag;
+//    private Bundle fragmentBundleRemote;
+//    private SoloPlaylistsLocalFragment mPlaylistsLocalFragment;
+//    private SoloPlaylistsRemoteFragment mPlaylistsRemoteFragment;
+    private HashMap<ChildFragment, String> mChildFragments;
 
 //    private Set<OnPlaylistsLocalInfoListener> mListenersLocal =
 //            new HashSet<OnPlaylistsLocalInfoListener>();
@@ -106,6 +111,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mChildFragments = new HashMap<SoloPlaylistsActivity.ChildFragment, String>();
 //        setContentView(R.layout.solo_playlists);
 //        ((Button) findViewById(R.id.createPlaylistBtn))
 //                .setOnClickListener(new OnCreatePlaylistListener());
@@ -126,8 +132,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                 SoloPlaylistsRemoteFragment.class, null);
 //        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) getTabsAdapter().getItem(0);
 //        mPlaylistsRemoteFragment.onAttach(this);
-        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) 
-                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+//        mPlaylistsRemoteFragment = (SoloPlaylistsRemoteFragment) 
+//                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+        
         
 
         setReloadInterval(RELOAD_INTERVAL);
@@ -603,7 +610,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             public void callback(JsonStruct.PlaylistJS struct) {
                                 if (struct != null) {
                                     Log.i(TAG, "Playlist created!");
-                                    mPlaylistsRemoteFragment.add(0, struct.toObject());
+                                    getPlaylistsRemoteFragment().add(0, struct.toObject());
                                     // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
                                     // .setAdapter(new
                                     // PlaylistsAdapter(mPlaylistsRemote));
@@ -771,8 +778,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
         // .setAdapter(new PlaylistsAdapter(mPlaylistsRemote));
         SoloPlaylistsRemoteFragment frag = 
-        (SoloPlaylistsRemoteFragment) 
-                getSupportFragmentManager().findFragmentByTag(mRemoteTag);
+        (SoloPlaylistsRemoteFragment) getSupportFragmentManager()
+                .findFragmentByTag(mChildFragments.get(ChildFragment.REMOTE));
         frag.set(SoloPlaylistsActivity.this, playlists);
     }
 
@@ -811,19 +818,37 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     // listener) {
     // mListenersRemote.remove(listener);
     // }
+    
+    private SoloPlaylistsRemoteFragment getPlaylistsRemoteFragment() {
+        return (SoloPlaylistsRemoteFragment) 
+                getSupportFragmentManager()
+                .findFragmentByTag(mChildFragments.get(ChildFragment.REMOTE));
+    }
+    
+    private SoloPlaylistsLocalFragment getPlaylistsLocalFragment() {
+        return (SoloPlaylistsLocalFragment) 
+                getSupportFragmentManager()
+                .findFragmentByTag(mChildFragments.get(ChildFragment.LOCAL));
+    }
 
     @Override
     public boolean onSavePlaylist(PlaylistItem playlist) {
-        return mPlaylistsLocalFragment.add(playlist);
+        return getPlaylistsLocalFragment().add(playlist);
     }
     
     @Override
-    public void setRemoteFragmentTag(String tag) {
-        mRemoteTag = tag;
+    public void setPlaylistsRemoteFragmentTag(String tag) {
+//        mRemoteTag = tag;
+        mChildFragments.put(ChildFragment.REMOTE, tag);
     }
 
     @Override
     public boolean onDeletePlaylist(PlaylistItem playlist) {
-        return mPlaylistsRemoteFragment.add(playlist);
+        return getPlaylistsRemoteFragment().add(playlist);
+    }
+
+    @Override
+    public void setPlaylistsLocalFragmentTag(String tag) {
+        mChildFragments.put(ChildFragment.LOCAL, tag);
     }
 }
