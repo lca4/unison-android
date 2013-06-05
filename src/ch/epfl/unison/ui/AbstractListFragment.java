@@ -1,14 +1,10 @@
 
 package ch.epfl.unison.ui;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import ch.epfl.unison.R;
+
 import com.actionbarsherlock.app.SherlockListFragment;
 
 /**

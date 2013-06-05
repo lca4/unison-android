@@ -1,17 +1,6 @@
 
 package ch.epfl.unison;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,8 +17,17 @@ import android.widget.TextView;
 
 import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment;
-import ch.epfl.unison.ui.SoloTracksFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Small utilities needed here and there.

@@ -9,9 +9,9 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;

@@ -2,17 +2,16 @@
 package ch.epfl.unison.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;

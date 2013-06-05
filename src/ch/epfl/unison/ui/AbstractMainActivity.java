@@ -2,10 +2,8 @@
 package ch.epfl.unison.ui;
 
 import android.os.Bundle;
-import ch.epfl.unison.R;
-import ch.epfl.unison.data.PlaylistItem;
 
-import com.actionbarsherlock.app.ActionBar;
+import ch.epfl.unison.R;
 
 /**
  * To be used when using a player fragment. Provides some default behaviors.

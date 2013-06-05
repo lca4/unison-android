@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import ch.epfl.unison.R;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
-
-import ch.epfl.unison.R;
 
 /**
  * @author marc bourqui

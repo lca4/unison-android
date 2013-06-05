@@ -1,18 +1,18 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.actionbarsherlock.view.Menu;
 
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
+
+import com.actionbarsherlock.view.Menu;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
