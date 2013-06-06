@@ -405,6 +405,10 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         editor.putString(Const.PrefKeys.NICKNAME, nickname);
         editor.commit();
     }
+    
+    public String getNickname() {
+        return mPrefs.getString(Const.PrefKeys.NICKNAME, "user" + getUid());
+    }
 
     public void storeUID(long uid) {
         Editor editor = mPrefs.edit();

@@ -2,6 +2,7 @@
 package ch.epfl.unison.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -12,9 +13,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.nfc.NdefMessage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
@@ -62,6 +65,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     // EPFL Polydome.
     private static final double DEFAULT_LATITUDE = 46.52147800207456;
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
+    
+    private static final int MAXIMUM_GROUP_NAME_LENGTH = 30;
 
     private String mAction = null;
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
@@ -622,8 +627,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                             return;
                         }
                     }
-
                     // Sanity check on the Suggestion we just received.
+                   
                     mSuggestion = struct;
                     if (!validSuggestion(struct)) {
                         mSuggestion = null;
@@ -631,6 +636,17 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
                         return;
                     }
+                    
+                    String nick = AppData.getInstance(GroupsActivity.this).getNickname();
+                    if (nick != null) {
+                        Log.d(TAG, "removing " + nick + " from suggestion");
+                        ArrayList<String> users = new ArrayList<String>(
+                                Arrays.asList(mSuggestion.users));
+                        users.remove(nick);
+                        mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
+                                String[].class);;
+                    }
+                    
                     updateSuggestionButton(!mProcessingAutoAction);
 
                     if (!mProcessingAutoAction) {
@@ -728,6 +744,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             // Set an EditText view to get user input
             final EditText input = new EditText(GroupsActivity.this);
+            InputFilter inputFilter = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
+            input.setFilters(new InputFilter[]{inputFilter});
             alert.setView(input);
 
             // When clicking on "OK", create the group.
