@@ -2,7 +2,6 @@
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,9 +11,6 @@ import android.view.ViewGroup;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.music.MusicService;
-import ch.epfl.unison.ui.SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener;
 
 /**
  * Specialized Fragment for {@link SoloMainFragment}.

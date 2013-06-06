@@ -6,12 +6,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
-import ch.epfl.unison.data.PlaylistItem;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
