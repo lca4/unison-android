@@ -64,18 +64,19 @@ public abstract class AbstractMenu {
                         Const.Strings.CALLER, activity.getClass().getName()));
                 break;
             case R.id.menu_item_logout:
-                
-                //check if the user is in a group:
+
+                // check if the user is in a group:
                 AppData data = AppData.getInstance(activity);
                 if (data.getInGroup()) {
-                    //here we notify the user that he should leave the group first:
+                    // here we notify the user that he should leave the group
+                    // first:
                     if (activity != null) {
                         Toast.makeText(activity, activity.getString(
                                 R.string.error_logout_while_in_group), Toast.LENGTH_LONG).show();
                     }
                     break;
                 }
-                
+
                 activity.startActivity(new Intent(activity, LoginActivity.class)
                         .putExtra(Const.Strings.LOGOUT, true));
                 // Send broadcast to all activities that can only be used when

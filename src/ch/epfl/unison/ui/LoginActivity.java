@@ -38,10 +38,10 @@ public class LoginActivity extends SherlockActivity {
     private static final String TAG = "ch.epfl.unison.LoginActivity";
 
     public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
-    
-    public static final String ACTION_JOIN_GROUP_FROM_GID = 
+
+    public static final String ACTION_JOIN_GROUP_FROM_GID =
             "ch.epfl.unison.action.JOIN_GROUP_FROM_GID";
-    
+
     private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
@@ -83,7 +83,7 @@ public class LoginActivity extends SherlockActivity {
 
         // Initialize the AppData instance.
         mData = AppData.getInstance(this);
-        
+
         mData.setLoggedIn(false);
     }
 
@@ -109,15 +109,16 @@ public class LoginActivity extends SherlockActivity {
     private void logout() {
         Log.d(TAG, "logging out");
         // Remove e-mail and password from the preferences.
-        
-        //THIS SHOULD NEVER BE USED
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.remove(Const.PrefKeys.EMAIL);
-//        editor.remove(Const.PrefKeys.PASSWORD);
-//        editor.remove(Const.PrefKeys.UID);
-//        editor.remove(Const.PrefKeys.LASTUPDATE);
-//        editor.commit();
+
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.remove(Const.PrefKeys.EMAIL);
+        // editor.remove(Const.PrefKeys.PASSWORD);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
         mData.deleteEmailAndPassword();
         mData.deleteUID();
         mData.deleteLastUpdate();
@@ -132,14 +133,15 @@ public class LoginActivity extends SherlockActivity {
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
-        //THIS SHOULD NEVER BE USED
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.putString(Const.PrefKeys.EMAIL, email);
-//        editor.putString(Const.PrefKeys.PASSWORD, password);
-//        editor.remove(Const.PrefKeys.UID);
-//        editor.remove(Const.PrefKeys.LASTUPDATE);
-//        editor.commit();
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString(Const.PrefKeys.EMAIL, email);
+        // editor.putString(Const.PrefKeys.PASSWORD, password);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
         mData.storeEmail(email);
         mData.storePassword(password);
         mData.deleteUID();
@@ -166,9 +168,10 @@ public class LoginActivity extends SherlockActivity {
         }
 
         // Try to login from the saved preferences.
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        String email = prefs.getString(Const.PrefKeys.EMAIL, null);
-//        String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // String email = prefs.getString(Const.PrefKeys.EMAIL, null);
+        // String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
         String email = mData.getEmail();
         String password = mData.getPassword();
 
@@ -219,31 +222,33 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void fillEmailPassword() {
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
-//        mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
+        // mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
         mEmail.setText(mData.getEmail());
         mPassword.setText(mData.getPassword());
-        
+
     }
 
     private void storeInfo(String email, String password, String nickname, Long uid) {
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = prefs.edit();
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
 
-//        editor.putString(Const.PrefKeys.EMAIL, email);
-//        editor.putString(Const.PrefKeys.PASSWORD, password);
-//        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        // editor.putString(Const.PrefKeys.EMAIL, email);
+        // editor.putString(Const.PrefKeys.PASSWORD, password);
+        // editor.putString(Const.PrefKeys.NICKNAME, nickname);
         mData.storeEmail(email);
         mData.storePassword(password);
         mData.storeNickname(nickname);
-        
+
         if (uid != null) {
             mData.storeUID(uid);
         } else {
             mData.storeUID(-1);
         }
-//        editor.commit();
+        // editor.commit();
     }
 
     private void nextActivity(JsonStruct.User user) {
@@ -266,7 +271,7 @@ public class LoginActivity extends SherlockActivity {
                     AutoJoin aj = new AutoJoin(
                             AppData.getInstance(LoginActivity.this), LoginActivity.this);
                     aj.joinByGID(gid);
-                    //the login activity is going to be finished by AutoJoin.
+                    // the login activity is going to be finished by AutoJoin.
                     return;
                 } else {
                     // Should never happen.
@@ -283,7 +288,7 @@ public class LoginActivity extends SherlockActivity {
         Log.d(TAG, "Going to finish LoginActiviy");
         finish();
     }
-    
+
     private void nextWithoutActions(JsonStruct.User user) {
         if (user.gid != null) {
             // Directly go into group.

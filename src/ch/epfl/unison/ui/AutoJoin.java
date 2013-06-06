@@ -58,9 +58,9 @@ public class AutoJoin {
         if (gid == null) {
             return false;
         }
-        
+
         State state = checkState();
-        
+
         if (state == State.NotLoggedIn) {
             mActivity.startActivity(new Intent(mActivity, LoginActivity.class)
                     .putExtra(Const.Strings.GID, gid)
@@ -68,9 +68,8 @@ public class AutoJoin {
                     .setAction(LoginActivity.ACTION_JOIN_GROUP_FROM_GID));
             mActivity.finish();
         } else {
-            fetchInfoForJoin(gid);           
+            fetchInfoForJoin(gid);
         }
-
 
         return true;
     }
@@ -175,7 +174,8 @@ public class AutoJoin {
                 }
                 if (mActivity != null) {
                     errorNextActivity();
-                    Toast.makeText(mActivity, "Not logged in, or received group was invalid", Toast.LENGTH_LONG)
+                    Toast.makeText(mActivity, "Not logged in, or received group was invalid",
+                            Toast.LENGTH_LONG)
                             .show();
                     mActivity.finish();
                 }

@@ -132,7 +132,7 @@ public class NfcManagementActivity extends SherlockActivity {
                 String plString;
                 Long gid;
 
-                //Look for our custom message
+                // Look for our custom message
                 for (NdefMessage msg : messages) {
                     NdefRecord[] records = msg.getRecords();
                     if (records != null) {
@@ -141,14 +141,14 @@ public class NfcManagementActivity extends SherlockActivity {
                                 if (rec.getTnf() == NdefRecord.TNF_EXTERNAL_TYPE
                                         && byteArrayEqual(rec.getType(),
                                                 Const.Strings.UNISON_NFC_MIME_TYPE.getBytes())) {
-                                    //This is it
+                                    // This is it
                                     byte[] pl = rec.getPayload();
                                     if (pl != null) {
                                         plString = new String(pl);
                                         try {
                                             JSONObject jo = new JSONObject(plString);
                                             gid = jo.getLong("gid");
-                                            
+
                                             AutoJoin aj = new AutoJoin(
                                                     AppData.getInstance(NfcManagementActivity.this),
                                                     NfcManagementActivity.this);
@@ -160,15 +160,14 @@ public class NfcManagementActivity extends SherlockActivity {
                                         }
                                         break;
                                     }
-                                } 
+                                }
                             }
                         }
                     }
                 }
 
-
-//                // FIXME
-//                Log.d(TAG, "Read " + result);
+                // // FIXME
+                // Log.d(TAG, "Read " + result);
 
             }
         } else {
@@ -205,10 +204,10 @@ public class NfcManagementActivity extends SherlockActivity {
         // NdefRecord record = records[0];
         // String payload = new String(record.getPayload());
         // Log.d(TAG, "We recieved this payload: " + payload);
-        
-//        finish();
+
+        // finish();
     }
-    
+
     private boolean byteArrayEqual(byte[] t1, byte[] t2) {
         boolean eq = true;
         if (t1 == null || t2 == null || t1.length != t2.length) {

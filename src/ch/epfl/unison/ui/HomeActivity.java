@@ -28,7 +28,7 @@ public class HomeActivity extends SherlockActivity {
             finish();
         }
     };
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +46,7 @@ public class HomeActivity extends SherlockActivity {
         }
         return success;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return AbstractMenu.onOptionsItemSelected(this, null, item);

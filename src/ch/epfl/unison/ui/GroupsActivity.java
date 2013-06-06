@@ -130,9 +130,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         mGroupsList.setOnItemClickListener(new OnGroupSelectedListener());
 
         AppData data = AppData.getInstance(GroupsActivity.this);
-        
-        
-        //We might still be in a group according to the server, but we know we are not in groupMainActivity
+
+        // We might still be in a group according to the server, but we know we
+        // are not in groupMainActivity
         data.setInGroup(false);
 
         handleExtras();
@@ -365,7 +365,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         }
         // switchSuggestionButtonState(data.showGroupSuggestion());
 
-//        updateSuggestionButton(!mProcessingAutoAction);
+        // updateSuggestionButton(!mProcessingAutoAction);
         toggleActivityButtons(!mProcessingAutoAction);
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
@@ -398,42 +398,42 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         // Make sure the user is not marked as present in any group.
         final AppData data = AppData.getInstance(this);
         data.getAPI().leaveGroup(data.getUid(), data.getCurrentGID(),
-                new UnisonAPI.Handler<JsonStruct.Success>() {    
+                new UnisonAPI.Handler<JsonStruct.Success>() {
 
-            @Override
-            public void callback(Success struct) {
-                data.setCurrentGID(Long.valueOf(-1));
-                Log.d(TAG, "successfully left group");
-                if (group != null) {
-                    if (group.password) {
-                        promptForPassword(group);
-                    } else {
-                        joinGroup(group, null);
+                    @Override
+                    public void callback(Success struct) {
+                        data.setCurrentGID(Long.valueOf(-1));
+                        Log.d(TAG, "successfully left group");
+                        if (group != null) {
+                            if (group.password) {
+                                promptForPassword(group);
+                            } else {
+                                joinGroup(group, null);
+                            }
+                        } else {
+                            toggleActivityButtons(true);
+                            mProcessingAutoAction = false;
+                        }
                     }
-                } else {
-                    toggleActivityButtons(true);
-                    mProcessingAutoAction = false;
-                }
-            }
 
-            @Override
-            public void onError(Error error) {
-                if (error != null) {
-                    Log.d(TAG, error.toString());
-                } else {
-                    Log.d(TAG, "error on leaveGroup() and the error was null!");
-                }
-                if (group != null) {
-                    if (group.password) {
-                        promptForPassword(group);
-                    } else {
-                        joinGroup(group, null);
+                    @Override
+                    public void onError(Error error) {
+                        if (error != null) {
+                            Log.d(TAG, error.toString());
+                        } else {
+                            Log.d(TAG, "error on leaveGroup() and the error was null!");
+                        }
+                        if (group != null) {
+                            if (group.password) {
+                                promptForPassword(group);
+                            } else {
+                                joinGroup(group, null);
+                            }
+                        }
+                        toggleActivityButtons(true);
+                        mProcessingAutoAction = false;
                     }
-                }
-                toggleActivityButtons(true);
-                mProcessingAutoAction = false;
-            }
-        });
+                });
     }
 
     private void showHelpDialog() {
@@ -935,8 +935,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             builder.setPositiveButton(getString(R.string.main_password_ok), passwordClick);
             builder.setNegativeButton(getString(R.string.main_password_cancel), passwordClick);
-            
-            // This is supposed to handle the situation where the user presses the
+
+            // This is supposed to handle the situation where the user presses
+            // the
             // BACK key too.
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override

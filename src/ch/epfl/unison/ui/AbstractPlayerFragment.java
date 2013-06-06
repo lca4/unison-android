@@ -345,9 +345,9 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                     Log.d(mTag, "Calling requestTrack");
                     // We need a new track.
                     requestTrack();
-//                    if (requestTrack()) {
-//                        play(mHistory.get(0));
-//                    }
+                    // if (requestTrack()) {
+                    // play(mHistory.get(0));
+                    // }
                 }
                 break;
             case Solo:
@@ -660,7 +660,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     protected void setMode(Mode mode) {
         this.mMode = mode;
     }
-    
+
     protected List<MusicItem> getHistory() {
         return this.mHistory;
     }

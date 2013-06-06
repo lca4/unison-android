@@ -19,8 +19,6 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
 
     private ActionBar mSupportActionBar;
 
-    
-
     protected ActionBar getSupportActBar() {
         return mSupportActionBar;
     }
@@ -40,7 +38,5 @@ public abstract class AbstractMainActivity extends AbstractFragmentActivity {
         mSupportActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
     }
-
-    
 
 }

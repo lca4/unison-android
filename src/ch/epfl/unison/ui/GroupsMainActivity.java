@@ -47,7 +47,7 @@ import org.json.JSONObject;
  * @author lum
  */
 public class GroupsMainActivity extends AbstractMainActivity {
-    
+
     private boolean mIsDj = false;
 
     /** Simple interface to be notified about group info updates. */
@@ -114,20 +114,20 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        // First choice: we restart the activity:
-//
-//
-//        //NOT USED ANYMORE!
-////        startActivity(intent);
-////        finish();
-//
-//        // Second choice:
-//        // setIntent(intent); //optional
-//        // handleExtras(intent.getExtras());
-//    }
+    // @Override
+    // protected void onNewIntent(Intent intent) {
+    // super.onNewIntent(intent);
+    // // First choice: we restart the activity:
+    //
+    //
+    // //NOT USED ANYMORE!
+    // // startActivity(intent);
+    // // finish();
+    //
+    // // Second choice:
+    // // setIntent(intent); //optional
+    // // handleExtras(intent.getExtras());
+    // }
 
     private void setupNFC() {
         NfcManager manager = (NfcManager) GroupsMainActivity
@@ -156,7 +156,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
         if (gid == null) {
             return null;
         }
-        
+
         String content;
         try {
             content = new JSONObject().put("gid", gid).toString();
@@ -198,7 +198,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(
                         R.string.fragment_title_player),
@@ -290,7 +290,7 @@ public class GroupsMainActivity extends AbstractMainActivity {
             }
         }
     };
-    
+
     public void setDJ(boolean dj) {
         mIsDj = dj;
         getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj && !mGroup.automatic);

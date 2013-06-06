@@ -104,7 +104,7 @@ public class UnisonAPI {
     }
 
     public void leaveGroup(long uid, long gid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/group?gid=%d", uid,gid);
+        URL url = urlFor("/users/%d/group?gid=%d", uid, gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(mAuth).doDELETE();
     }
