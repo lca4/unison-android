@@ -1,9 +1,7 @@
 
 package ch.epfl.unison.ui;
 
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.app.Activity;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 
@@ -21,16 +19,16 @@ public abstract class AbstractListFragment extends SherlockListFragment {
 
     // private AbstractFragmentActivity mHostActivity;
 
-    private RelativeLayout mHeader;
-    private TextView mTitle;
-    private TextView mSubtitle;
-    private ListView mList;
+//    private RelativeLayout mHeader;
+//    private TextView mTitle;
+//    private TextView mSubtitle;
+//    private ListView mList;
 
-    // @Override
-    // public void onAttach(Activity activity) {
-    // super.onAttach(activity);
-    // mHostActivity = (AbstractFragmentActivity) activity;
-    // }
+     @Override
+     public void onAttach(Activity activity) {
+         super.onAttach(activity);
+         mClassTag = this.getClass().getName();
+     }
 
     // @Override
     // public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -41,11 +41,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         implements SoloPlaylistsLocalFragment.OnPlaylistsLocalListener,
         SoloPlaylistsRemoteFragment.OnPlaylistsRemoteListener {
 
-    /** Possible fragments. */
+    /** Hosted fragments. */
     @SuppressLint("ValidFragment")
     // Avoids Lint wrong warning due to "Fragment" in the enum name
-    protected enum ChildFragment {
-        LOCAL, REMOTE, SHARED
+    private enum ChildFragment {
+        LOCAL, REMOTE//, SHARED
     }
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
@@ -79,11 +79,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);
         getMenu().findItem(R.id.menu_item_solo).setVisible(false);
-        getMenu().add(
-                Menu.NONE,
-                R.id.solo_menu_create_playlist,
-                1,
-                R.string.solo_menu_create_playlist);
+//        getMenu().add(
+//                Menu.NONE,
+//                R.id.solo_menu_create_playlist,
+//                1,
+//                R.string.solo_menu_create_playlist);
         SoloPlaylistsActivity.this.getSupportMenuInflater().inflate(
                 R.menu.solo_playlists_menu,
                 getMenu());
@@ -131,10 +131,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                         Toast.LENGTH_LONG).show();
                             } else {
                                 refreshPlaylistsRemote(struct.toObject());
-                                SoloPlaylistsActivity.this.repaintRefresh(false);
                             }
                         } catch (NullPointerException e) {
                             Log.w(TAG, "playlist or activity is null?", e);
+                        } finally {
+                            SoloPlaylistsActivity.this.repaintRefresh(false);
                         }
                     }
 
@@ -147,8 +148,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             Toast.makeText(SoloPlaylistsActivity.this,
                                     R.string.error_loading_playlists,
                                     Toast.LENGTH_LONG).show();
-                            SoloPlaylistsActivity.this.repaintRefresh(false);
                         }
+                        SoloPlaylistsActivity.this.repaintRefresh(false);
                     }
                 };
 
@@ -161,6 +162,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                         for (int i = 0; i < struct.tags.length; i++) {
                             mDB.insert(struct.tags[i].getTagItem());
                         }
+                        SoloPlaylistsActivity.this.repaintRefresh(false);
                     }
 
                     @Override
@@ -172,8 +174,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             Toast.makeText(SoloPlaylistsActivity.this,
                                     R.string.error_loading_tags,
                                     Toast.LENGTH_LONG).show();
-                            SoloPlaylistsActivity.this.repaintRefresh(false);
                         }
+                        SoloPlaylistsActivity.this.repaintRefresh(false);
                     }
                 };
 

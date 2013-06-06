@@ -42,8 +42,6 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
 
     private ArrayList<PlaylistItem> mPlaylistsRemote;
 
-    // private PlaylistsAdapter mAdapter;
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -267,13 +265,13 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     // }
     // }
 
-    /**
-     * To be used only once, at onCreate time. TODO Use this to display an row
-     * telling the list is empty.
-     */
-    private void initPlaylistsRemote() {
-        refreshPlaylistsRemote();
-    }
+//    /**
+//     * To be used only once, at onCreate time. TODO Use this to display an row
+//     * telling the list is empty.
+//     */
+//    private void initPlaylistsRemote() {
+//        refreshPlaylistsRemote();
+//    }
 
     /**
      * To be used to refresh the ListView when changes are made to ArraList.

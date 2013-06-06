@@ -19,56 +19,51 @@ import ch.epfl.unison.data.PlaylistItem;
  * 
  * @author mbourqui
  */
-public class SoloTracksFragment extends AbstractListFragment
-        implements SoloMainActivity.OnPlaylistInfoListener {
+public class SoloTracksFragment extends AbstractListFragment {
 
     private SoloMainActivity mHostActivity;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        SoloTracksFragment.this
-                .setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity,
-                        mHostActivity.getPlaylist()));
-        return v;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-        // if (playlistInfo.getTitle() != null) {
-        // getTitle().setText(playlistInfo.getTitle());
-        // }
-        setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity, playlistInfo));
-        highlightCurrent();
-    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mHostActivity = (SoloMainActivity) activity;
-        mHostActivity.registerPlaylistInfoListener(this);
+    }
+    
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mHostActivity.unregisterPlaylistInfoListener(this);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        refresh();
     }
     
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+    
+    /**
+     * Doesn't work, getListView count is 0.
+     */
     private void highlightCurrent() {
-        ListView lv = getListView();
-        // Clear the background for every row
-        LinearLayout listrowTrack = (LinearLayout) lv
-                .findViewWithTag(mHostActivity.getPlaylist().current());
-//        listrowTrack.setBackgroundColor(); //TODO find background color
-        listrowTrack.findViewById(R.id.listrow_track_image).setVisibility(View.VISIBLE);
+        View v = getListView().findViewWithTag(mHostActivity.getPlaylist().current());
+        if (v != null) {
+            v.findViewById(R.id.listrow_track_image).setVisibility(View.VISIBLE);
+        }
+    }
+    
+    public void refreshView() {
+        refresh();
+    }
+    
+    private void refresh() {
+        setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity,
+                mHostActivity.getPlaylist()));
+        highlightCurrent();
     }
 
 }
