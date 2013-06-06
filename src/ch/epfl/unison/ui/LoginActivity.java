@@ -110,7 +110,6 @@ public class LoginActivity extends SherlockActivity {
         Log.d(TAG, "logging out");
         // Remove e-mail and password from the preferences.
         
-        //THIS SHOULD NEVER BE USED
 //        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 //        SharedPreferences.Editor editor = prefs.edit();
 //        editor.remove(Const.PrefKeys.EMAIL);
@@ -132,7 +131,7 @@ public class LoginActivity extends SherlockActivity {
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
-        //THIS SHOULD NEVER BE USED
+
 //        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 //        SharedPreferences.Editor editor = prefs.edit();
 //        editor.putString(Const.PrefKeys.EMAIL, email);
@@ -190,7 +189,7 @@ public class LoginActivity extends SherlockActivity {
         alert.setView(input);
 
         // When clicking on "OK", create the group.
-        alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok),
+        alert.setPositiveButton(getString(R.string.generic_ok),
                 new DialogInterface.OnClickListener() {
 
                     @Override
@@ -214,7 +213,7 @@ public class LoginActivity extends SherlockActivity {
                     }
                 });
 
-        alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
+        alert.setNegativeButton(getString(R.string.generic_cancel), null);
         alert.show();
     }
 
