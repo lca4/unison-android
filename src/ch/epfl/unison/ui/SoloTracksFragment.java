@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
+import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.data.PlaylistItem;
 
@@ -43,6 +46,7 @@ public class SoloTracksFragment extends AbstractListFragment
         // getTitle().setText(playlistInfo.getTitle());
         // }
         setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity, playlistInfo));
+        highlightCurrent();
     }
 
     @Override
@@ -56,6 +60,15 @@ public class SoloTracksFragment extends AbstractListFragment
     public void onDetach() {
         super.onDetach();
         mHostActivity.unregisterPlaylistInfoListener(this);
+    }
+    
+    private void highlightCurrent() {
+        ListView lv = getListView();
+        // Clear the background for every row
+        LinearLayout listrowTrack = (LinearLayout) lv
+                .findViewWithTag(mHostActivity.getPlaylist().current());
+//        listrowTrack.setBackgroundColor(); //TODO find background color
+        listrowTrack.findViewById(R.id.listrow_track_image).setVisibility(View.VISIBLE);
     }
 
 }
