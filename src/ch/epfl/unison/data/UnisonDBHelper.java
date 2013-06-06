@@ -22,7 +22,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.LIBE_C_ARTIST + " text, "
             + ConstDB.LIBE_C_TITLE + " text, "
             + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0"
-            + ")";
+            + ");";
 
     private static final String TAG_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + ConstDB.TAG_TABLE_NAME + " ("
@@ -56,7 +56,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_GS_IS_SHARED + " tinyint DEFAULT 0, "
             + ConstDB.PLYL_C_GS_IS_SYNCED + " tinyint DEFAULT 1, "
             + ConstDB.PLYL_C_GS_USER_RATING + " tinyint, "
-            + ConstDB.PLYL_C_GS_USER_COMMENT + " text "
+            + ConstDB.PLYL_C_GS_USER_COMMENT + " text, "
             + ConstDB.C_IS_CHECKED + " tinyint DEFAULT 0"
             + "); "
             // Create some indexes

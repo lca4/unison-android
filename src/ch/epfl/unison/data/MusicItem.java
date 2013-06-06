@@ -78,7 +78,7 @@ public class MusicItem extends AbstractItem {
 
     @Override
     public int compareTo(AbstractItem another) {
-        if (another instanceof TagItem) {
+        if (another instanceof MusicItem) {
             MusicItem musicItem = (MusicItem) another;
             int artistComp = artist.compareTo(musicItem.artist);
             if (artistComp != 0) {

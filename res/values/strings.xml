@@ -131,7 +131,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_fragment_local_list_row_image_desc">Playlist icon</string>
     
     <!-- Solo menu entries -->
-    <string name="solo_menu_create_playlist">Create</string>
+    <string name="solo_menu_create_playlist">Create a playlist</string>
     
     
     <!-- Solo playlists --> 

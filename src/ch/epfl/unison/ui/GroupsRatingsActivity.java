@@ -34,6 +34,7 @@ import ch.epfl.unison.data.UnisonDB;
 import com.actionbarsherlock.app.SherlockActivity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -131,7 +132,8 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
     private void initItems() {
         UnisonDB db = new UnisonDB(this);
-        mItems = new ArrayList<MusicItem>(db.getMusicItems());
+        mItems = new ArrayList<MusicItem>(
+                (Collection<? extends MusicItem>) db.getEntries(MusicItem.class));
         // LibraryHelper helper = new LibraryHelper(this);
         // mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);

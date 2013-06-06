@@ -91,7 +91,9 @@ public class UnisonDB {
     }
 
     private void closeCursor(Cursor openCursor) {
-        openCursor.close();
+        if (openCursor != null) {
+            openCursor.close();
+        }
         close();
     }
 
@@ -170,6 +172,7 @@ public class UnisonDB {
                         .build());
             } while (cur.moveToNext());
         }
+        closeCursor(cur);
         return set;
     }
 
@@ -294,9 +297,9 @@ public class UnisonDB {
                     .userRating(cur.getInt(colGSUserRating))
                     .userComment(cur.getString(colGSUserComment))
                     .build();
-            closeCursor(cur);
             AndroidDB.getTracks(mContext.getContentResolver(), pl);
         }
+        closeCursor(cur);
         return pl;
     }
 
@@ -304,11 +307,10 @@ public class UnisonDB {
      * lib_entry specific methods
      */
     /**
-     * @deprecated please use {@link #getEntries(MusicItem.class)} instead
      * @see #getEntries(Object)
      * @return
      */
-    public Set<MusicItem> getMusicItems() {
+    private Set<MusicItem> getMusicItems() {
         Cursor cur = getCursor(ConstDB.LIBE_TABLE_NAME,
                 new String[] {
                         ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
@@ -322,8 +324,8 @@ public class UnisonDB {
                 set.add(new MusicItem(cur.getInt(colId),
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
-            closeCursor(cur);
         }
+        closeCursor(cur);
         return set;
     }
 
@@ -399,8 +401,8 @@ public class UnisonDB {
                 tags.put(cursor.getString(colTitle) + " - " + cursor.getString(colArtist),
                         cursor.getInt(colId));
             } while (cursor.moveToNext());
-            closeCursor(cursor);
         }
+        closeCursor(cursor);
         return tags;
     }
 
@@ -446,8 +448,8 @@ public class UnisonDB {
             do {
                 tags.put(cursor.getString(colName), cursor.getInt(colId));
             } while (cursor.moveToNext());
-            closeCursor(cursor);
         }
+        closeCursor(cursor);
         return tags;
     }
 
@@ -467,8 +469,8 @@ public class UnisonDB {
                         cur.getString(colName), cur.getInt(colIsChecked),
                         cur.getLong(colRemoteId)));
             } while (cur.moveToNext());
-            closeCursor(cur);
         }
+        closeCursor(cur);
         return set;
     }
 
@@ -676,8 +678,8 @@ public class UnisonDB {
                 default:
                     throw new IllegalArgumentException();
             }
-            closeCursor(cur);
         }
+        closeCursor(cur);
         resetIsChecked(table);
         return json;
     }

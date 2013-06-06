@@ -16,6 +16,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.UnisonDB;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,6 +44,8 @@ public class LibraryService extends Service {
 
     private boolean mIsUpdating;
 
+    private UnisonDB mDB;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -52,6 +55,7 @@ public class LibraryService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "starting the library service");
         String action = intent.getAction();
+        mDB = new UnisonDB(this);
         if (action.equals(ACTION_UPDATE)) {
             update();
         } else if (action.equals(ACTION_TRUNCATE)) {
@@ -62,9 +66,11 @@ public class LibraryService extends Service {
 
     private void truncate() {
         Log.d(TAG, "truncating the user library");
-        LibraryHelper helper = new LibraryHelper(this);
-        helper.truncate();
-        helper.close();
+        // LibraryHelper helper = new LibraryHelper(this);
+        // helper.truncate();
+        // helper.close();
+        mDB.truncate(MusicItem.class);
+
     }
 
     private void update() {
@@ -75,8 +81,9 @@ public class LibraryService extends Service {
 
         if (!mIsUpdating && interval > MIN_UPDATE_INTERVAL) {
             mIsUpdating = true;
-            LibraryHelper helper = new LibraryHelper(this);
-            if (helper.isEmpty()) {
+            // LibraryHelper helper = new LibraryHelper(this);
+            // if (helper.isEmpty()) {
+            if (mDB.isEmpty(MusicItem.class)) {
                 // If the DB is empty, just PUT all the tracks.
                 Log.d(TAG, "uploading all the music");
                 new Uploader().execute();
@@ -143,9 +150,11 @@ public class LibraryService extends Service {
      */
     private class Updater extends LibraryTask {
 
-        private List<JsonStruct.Delta> getDeltas(LibraryHelper helper) {
+        // private List<JsonStruct.Delta> getDeltas(LibraryHelper helper) {
+        private List<JsonStruct.Delta> getDeltas() {
             // Setting up the expectations.
-            Set<MusicItem> expectation = helper.getEntries();
+            // Set<MusicItem> expectation = helper.getEntries();
+            Set<MusicItem> expectation = (Set<MusicItem>) mDB.getEntries(MusicItem.class);
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
@@ -176,8 +185,9 @@ public class LibraryService extends Service {
 
         @Override
         protected Boolean doInBackground(Void... arg0) {
-            LibraryHelper helper = new LibraryHelper(LibraryService.this);
-            List<JsonStruct.Delta> deltas = getDeltas(helper);
+            // LibraryHelper helper = new LibraryHelper(LibraryService.this);
+            // List<JsonStruct.Delta> deltas = getDeltas(helper);
+            List<JsonStruct.Delta> deltas = getDeltas();
 
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(LibraryService.this).getAPI();
@@ -198,13 +208,15 @@ public class LibraryService extends Service {
                 MusicItem item = new MusicItem(
                         delta.entry.localId, delta.entry.artist, delta.entry.title);
                 if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
-                    helper.insert(item);
+                    // helper.insert(item);
+                    mDB.insert(item);
                 } else { // TYPE_DELETE.
-                    helper.delete(item);
+                // helper.delete(item);
+                    mDB.delete(item);
                 }
             }
 
-            helper.close();
+            // helper.close();
             return true;
         }
     }
@@ -240,12 +252,13 @@ public class LibraryService extends Service {
             }
 
             // Store the music in the library.
-            LibraryHelper helper = new LibraryHelper(LibraryService.this);
+            // LibraryHelper helper = new LibraryHelper(LibraryService.this);
             for (MusicItem item : music) {
-                helper.insert(item);
+                // helper.insert(item);
+                mDB.insert(item);
             }
 
-            helper.close();
+            // helper.close();
             return true;
         }
 
