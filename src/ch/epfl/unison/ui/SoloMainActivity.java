@@ -22,8 +22,8 @@ import java.util.HashMap;
  * @author mbourqui
  */
 public class SoloMainActivity extends AbstractMainActivity
-    implements SoloPlayerFragment.OnSoloPlayerListener {
-    
+        implements SoloPlayerFragment.OnSoloPlayerListener {
+
     /** Hosted fragments. */
     @SuppressLint("ValidFragment")
     // Avoids Lint wrong warning due to "Fragment" in the enum name
@@ -37,19 +37,20 @@ public class SoloMainActivity extends AbstractMainActivity
 
         void onPlaylistInfo(PlaylistItem playlistInfo);
     }
-    
+
     private HashMap<ChildFragment, String> mChildFragments;
 
     private UnisonDB mDB;
     private PlaylistItem mPlaylist;
 
-//    private Set<OnPlaylistInfoListener> mListeners = new HashSet<OnPlaylistInfoListener>();
+    // private Set<OnPlaylistInfoListener> mListeners = new
+    // HashSet<OnPlaylistInfoListener>();
 
-//    public void dispatchPlaylistInfo(PlaylistItem playlistInfo) {
-//        for (OnPlaylistInfoListener listener : mListeners) {
-//            listener.onPlaylistInfo(playlistInfo);
-//        }
-//    }
+    // public void dispatchPlaylistInfo(PlaylistItem playlistInfo) {
+    // for (OnPlaylistInfoListener listener : mListeners) {
+    // listener.onPlaylistInfo(playlistInfo);
+    // }
+    // }
 
     protected void handleExtras(Bundle extras) {
         if (extras == null || !extras.containsKey(Const.Strings.LOCAL_ID)) {
@@ -70,7 +71,7 @@ public class SoloMainActivity extends AbstractMainActivity
     public void onCreate(Bundle savedInstanceState) {
         mDB = new UnisonDB(getApplicationContext());
         super.onCreate(savedInstanceState);
-        
+
         mChildFragments = new HashMap<ChildFragment, String>();
 
         getTabsAdapter().addTab(
@@ -91,7 +92,7 @@ public class SoloMainActivity extends AbstractMainActivity
 
     @Override
     public void onRefresh() {
-//        super.onRefresh();
+        // super.onRefresh();
         repaintRefresh(false);
         // UnisonAPI api = AppData.getInstance(this).getAPI();
 
@@ -99,13 +100,15 @@ public class SoloMainActivity extends AbstractMainActivity
 
     }
 
-//    public void registerPlaylistInfoListener(OnPlaylistInfoListener listener) {
-//        mListeners.add(listener);
-//    }
-//
-//    public void unregisterPlaylistInfoListener(OnPlaylistInfoListener listener) {
-//        mListeners.remove(listener);
-//    }
+    // public void registerPlaylistInfoListener(OnPlaylistInfoListener listener)
+    // {
+    // mListeners.add(listener);
+    // }
+    //
+    // public void unregisterPlaylistInfoListener(OnPlaylistInfoListener
+    // listener) {
+    // mListeners.remove(listener);
+    // }
 
     protected PlaylistItem getPlaylist() {
         return mPlaylist;
@@ -120,16 +123,15 @@ public class SoloMainActivity extends AbstractMainActivity
     public void setPlayerFragmentTag(String tag) {
         mChildFragments.put(ChildFragment.PLAYER, tag);
     }
-    
+
     private SoloPlayerFragment getPlayerFragment() {
         return (SoloPlayerFragment) getSupportFragmentManager()
                 .findFragmentByTag(mChildFragments.get(ChildFragment.PLAYER));
     }
-    
+
     private SoloTracksFragment getTracksFragment() {
         return (SoloTracksFragment) getSupportFragmentManager()
                 .findFragmentByTag(mChildFragments.get(ChildFragment.TRACKS));
     }
-
 
 }

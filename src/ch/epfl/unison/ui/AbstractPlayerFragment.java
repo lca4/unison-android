@@ -137,11 +137,12 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     }
 
     /**
-     * Running mode of the player.<br /><br />
-     * Not really a good idea. If the behavior depends on a mode, then the
-     * mode extending {@link AbstractFragmentActivity} should implement it,
-     * such that it works the way the mode requests it, disregarding how other
-     * modes needs it.
+     * Running mode of the player.<br />
+     * <br />
+     * Not really a good idea. If the behavior depends on a mode, then the mode
+     * extending {@link AbstractFragmentActivity} should implement it, such that
+     * it works the way the mode requests it, disregarding how other modes needs
+     * it.
      */
     @Deprecated
     protected enum Mode {

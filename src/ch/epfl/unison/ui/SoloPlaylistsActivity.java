@@ -45,7 +45,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @SuppressLint("ValidFragment")
     // Avoids Lint wrong warning due to "Fragment" in the enum name
     private enum ChildFragment {
-        LOCAL, REMOTE//, SHARED
+        LOCAL, REMOTE// , SHARED
     }
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
@@ -79,11 +79,11 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);
         getMenu().findItem(R.id.menu_item_solo).setVisible(false);
-//        getMenu().add(
-//                Menu.NONE,
-//                R.id.solo_menu_create_playlist,
-//                1,
-//                R.string.solo_menu_create_playlist);
+        // getMenu().add(
+        // Menu.NONE,
+        // R.id.solo_menu_create_playlist,
+        // 1,
+        // R.string.solo_menu_create_playlist);
         SoloPlaylistsActivity.this.getSupportMenuInflater().inflate(
                 R.menu.solo_playlists_menu,
                 getMenu());

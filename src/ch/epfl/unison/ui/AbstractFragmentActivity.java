@@ -220,15 +220,15 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
     protected ActionBar getSupportActBar() {
         return mSupportActionBar;
     }
-    
+
     protected void showRefresh(boolean visible) {
         getMenu().findItem(R.id.menu_item_refresh).setVisible(visible);
     }
-    
+
     protected void showSolo(boolean visible) {
         getMenu().findItem(R.id.menu_item_solo).setVisible(visible);
     }
-    
+
     protected void showGroups(boolean visible) {
         getMenu().findItem(R.id.menu_item_groups).setVisible(visible);
     }

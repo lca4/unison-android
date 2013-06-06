@@ -25,7 +25,7 @@ public class SoloTracksFragment extends AbstractListFragment {
         super.onAttach(activity);
         mHostActivity = (SoloMainActivity) activity;
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -37,12 +37,12 @@ public class SoloTracksFragment extends AbstractListFragment {
         super.onViewCreated(view, savedInstanceState);
         refresh();
     }
-    
+
     @Override
     public void onDetach() {
         super.onDetach();
     }
-    
+
     /**
      * Doesn't work, getListView count is 0.
      */
@@ -52,11 +52,11 @@ public class SoloTracksFragment extends AbstractListFragment {
             v.findViewById(R.id.listrow_track_image).setVisibility(View.VISIBLE);
         }
     }
-    
+
     public void refreshView() {
         refresh();
     }
-    
+
     private void refresh() {
         setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity,
                 mHostActivity.getPlaylist()));

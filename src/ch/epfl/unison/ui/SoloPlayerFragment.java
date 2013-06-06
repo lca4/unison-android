@@ -19,16 +19,17 @@ import ch.epfl.unison.data.MusicItem;
  * @author marc
  */
 public class SoloPlayerFragment extends AbstractPlayerFragment {
-    
+
     /** Container Activity must implement this interface. */
     public interface OnSoloPlayerListener {
         void onTrackChange();
+
         void setPlayerFragmentTag(String tag);
     }
 
     private SoloMainActivity mHostActivity;
     private OnSoloPlayerListener mListener;
-    
+
     // /**
     // * Handles instant ratings (when the user clicks on the rating button in
     // the
@@ -136,7 +137,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
         // }
         // });
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
