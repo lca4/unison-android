@@ -147,7 +147,7 @@ public class UnisonAPI {
         URL url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.Group.class)
                 .addParam("name", name).addParam("lat", lat)
-                .addParam("lon", lon).setAuth(mAuth).doPOST();
+                .addParam("lon", lon).addParam("list", false).setAuth(mAuth).doPOST();
     }
 
     public void getGroupInfo(long gid, Handler<JsonStruct.Group> handler) {
