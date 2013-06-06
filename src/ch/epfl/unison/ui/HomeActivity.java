@@ -20,6 +20,8 @@ import ch.epfl.unison.R;
  */
 public class HomeActivity extends SherlockActivity {
 
+    
+
     private static final String TAG = "ch.epfl.unison.HomelistsActivity";
 
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
@@ -35,6 +37,12 @@ public class HomeActivity extends SherlockActivity {
         setContentView(R.layout.home);
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mLogoutReceiver);
     }
 
     @Override
