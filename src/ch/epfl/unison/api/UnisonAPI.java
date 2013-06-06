@@ -352,12 +352,14 @@ public class UnisonAPI {
 
         @Override
         public String toString() {
-            if (hasJsonError()) {
+            if (hasJsonError() && jsonError.error != null && jsonError.message != null) {
                 return String.format("JSON error:\ncode: %d\nmessage: %s",
                         jsonError.error, jsonError.message);
-            } else {
+            } else if (error != null && response != null) {
                 return String.format("Error type: %s\nstatus: %d\nresponse: %s",
                         error.getClass().toString(), statusCode, response);
+            } else {
+                return "We got an error without anything to log";
             }
         }
     }
