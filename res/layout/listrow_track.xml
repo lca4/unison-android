@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <RatingBar
-        android:id="@+id/trackrow_rating"
+        android:id="@+id/listrow_track_rating"
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

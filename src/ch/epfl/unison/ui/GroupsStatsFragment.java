@@ -100,7 +100,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
                 score = getItem(position).score;
             }
             float rating = Math.round(score / TEN) / TWO;
-            ((RatingBar) view.findViewById(R.id.trackrow_rating)).setRating(rating);
+            ((RatingBar) view.findViewById(R.id.listrow_stats_rating)).setRating(rating);
 
             TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
             if (getItem(position).score == null || getItem(position).predicted == null) {

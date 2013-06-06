@@ -208,6 +208,7 @@ public final class Uutils {
                         .setText(getItem(position).title);
                 ((TextView) view.findViewById(R.id.listrow_track_artist))
                         .setText(getItem(position).artist);
+                view.findViewById(R.id.listrow_track_rating).setVisibility(View.INVISIBLE);
                 // int rating = 0;
                 // if (getItem(position).rating != null) {
                 // rating = getItem(position).rating;
