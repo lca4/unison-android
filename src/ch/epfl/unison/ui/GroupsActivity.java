@@ -1,6 +1,10 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -9,9 +13,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.nfc.NdefMessage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
@@ -46,9 +52,6 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Listing of the groups.
  * 
@@ -64,13 +67,15 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private static final double DEFAULT_LATITUDE = 46.52147800207456;
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
 
+    private static final int MAXIMUM_GROUP_NAME_LENGTH = 30;
+
     private String mAction = null;
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
     public static final String ACTION_CREATE_AND_JOIN_GROUP =
             "ch.epfl.unison.action.CREATE_AND_JOIN_GROUP";
-    public static final String ACTION_FROM_HISTORY_LEAVE_GROUP =
-            "ch.epfl.unison.action.FROM_HISTORY_LEAVE_GROUP";
-    public static final String ACTION_FROM_HISTORY = "ch.epfl.unison.action.FROM_HISTORY";
+    public static final String ACTION_LEAVE_JOIN_GROUP =
+            "ch.epfl.unison.action.LEAVE_JOIN_GROUP";
+    public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
 
     private List<String> mSupportedActions = null;
 
@@ -132,6 +137,10 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
         AppData data = AppData.getInstance(GroupsActivity.this);
 
+        // We might still be in a group according to the server, but we know we
+        // are not in groupMainActivity
+        data.setInGroup(false);
+
         handleExtras();
         // Actions that should be taken whe activity is started.
         setSupportedActions();
@@ -140,7 +149,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             toggleActivityButtons(false);
             mProcessingAutoAction = true;
             if (ACTION_LEAVE_GROUP.equals(mAction)
-                    || ACTION_FROM_HISTORY_LEAVE_GROUP.equals(mAction)) {
+                    || ACTION_LEAVE_JOIN_GROUP.equals(mAction)) {
                 // We are coming back from a group - let's make sure the
                 // back-end
                 // knows.
@@ -151,7 +160,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 // ACTION_FROM_HISTORY_LEAVE_GROUP
                 leaveGroup(mGroupClicked);
                 mDismissedHelp = true;
-            } else if (ACTION_FROM_HISTORY.equals(mAction)) {
+            } else if (ACTION_JOIN_GROUP.equals(mAction)) {
                 // Automatic actions are going to be performed, we disable
                 // unwanted popups:
 
@@ -218,8 +227,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private void setSupportedActions() {
         mSupportedActions = new ArrayList<String>();
         mSupportedActions.add(ACTION_CREATE_AND_JOIN_GROUP);
-        mSupportedActions.add(ACTION_FROM_HISTORY);
-        mSupportedActions.add(ACTION_FROM_HISTORY_LEAVE_GROUP);
+        mSupportedActions.add(ACTION_JOIN_GROUP);
+        mSupportedActions.add(ACTION_LEAVE_JOIN_GROUP);
         mSupportedActions.add(ACTION_LEAVE_GROUP);
     }
 
@@ -363,7 +372,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         }
         // switchSuggestionButtonState(data.showGroupSuggestion());
 
-        updateSuggestionButton(!mProcessingAutoAction);
+        // updateSuggestionButton(!mProcessingAutoAction);
+        toggleActivityButtons(!mProcessingAutoAction);
         if (mDismissedHelp && data.showGroupSuggestion()) {
             fetchGroupSuggestion();
         }
@@ -393,42 +403,44 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
     private void leaveGroup(final Group group) {
         // Make sure the user is not marked as present in any group.
-        AppData data = AppData.getInstance(this);
-        data.getAPI().leaveGroup(data.getUid(), new UnisonAPI.Handler<JsonStruct.Success>() {
+        final AppData data = AppData.getInstance(this);
+        data.getAPI().leaveGroup(data.getUid(), data.getCurrentGID(),
+                new UnisonAPI.Handler<JsonStruct.Success>() {
 
-            @Override
-            public void callback(Success struct) {
-                Log.d(TAG, "successfully left group");
-                if (group != null) {
-                    if (group.password) {
-                        promptForPassword(group);
-                    } else {
-                        joinGroup(group, null);
+                    @Override
+                    public void callback(Success struct) {
+                        data.setCurrentGID(Long.valueOf(-1));
+                        Log.d(TAG, "successfully left group");
+                        if (group != null) {
+                            if (group.password) {
+                                promptForPassword(group);
+                            } else {
+                                joinGroup(group, null);
+                            }
+                        } else {
+                            toggleActivityButtons(true);
+                            mProcessingAutoAction = false;
+                        }
                     }
-                } else {
-                    toggleActivityButtons(true);
-                    mProcessingAutoAction = false;
-                }
-            }
 
-            @Override
-            public void onError(Error error) {
-                if (error != null) {
-                    Log.d(TAG, error.toString());
-                } else {
-                    Log.d(TAG, "error on leaveGroup() and the error was null!");
-                }
-                if (group != null) {
-                    if (group.password) {
-                        promptForPassword(group);
-                    } else {
-                        joinGroup(group, null);
+                    @Override
+                    public void onError(Error error) {
+                        if (error != null) {
+                            Log.d(TAG, error.toString());
+                        } else {
+                            Log.d(TAG, "error on leaveGroup() and the error was null!");
+                        }
+                        if (group != null) {
+                            if (group.password) {
+                                promptForPassword(group);
+                            } else {
+                                joinGroup(group, null);
+                            }
+                        }
+                        toggleActivityButtons(true);
+                        mProcessingAutoAction = false;
                     }
-                }
-                toggleActivityButtons(true);
-                mProcessingAutoAction = false;
-            }
-        });
+                });
     }
 
     private void showHelpDialog() {
@@ -614,11 +626,23 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         if (mSuggestion.group.gid.equals(struct.group.gid)) {
                             mSuggestionIsForeground = false;
                             mSuggestion = struct;
+
+                            String nick = AppData.getInstance(GroupsActivity.this).getNickname();
+                            if (nick != null) {
+                                Log.d(TAG, "removing " + nick + " from suggestion");
+                                ArrayList<String> users = new ArrayList<String>(
+                                        Arrays.asList(mSuggestion.users));
+                                users.remove(nick);
+                                mSuggestion.users = Arrays.copyOf(users.toArray(),
+                                        users.toArray().length,
+                                        String[].class);
+                            }
+
                             return;
                         }
                     }
-
                     // Sanity check on the Suggestion we just received.
+
                     mSuggestion = struct;
                     if (!validSuggestion(struct)) {
                         mSuggestion = null;
@@ -626,6 +650,17 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
                         return;
                     }
+
+                    String nick = AppData.getInstance(GroupsActivity.this).getNickname();
+                    if (nick != null) {
+                        Log.d(TAG, "removing " + nick + " from suggestion");
+                        ArrayList<String> users = new ArrayList<String>(
+                                Arrays.asList(mSuggestion.users));
+                        users.remove(nick);
+                        mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
+                                String[].class);
+                    }
+
                     updateSuggestionButton(!mProcessingAutoAction);
 
                     if (!mProcessingAutoAction) {
@@ -723,6 +758,11 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             // Set an EditText view to get user input
             final EditText input = new EditText(GroupsActivity.this);
+            InputFilter filterLength = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
+            input.setFilters(new InputFilter[] {
+                filterLength
+            });
+            // input.setMaxLines(1);
             alert.setView(input);
 
             // When clicking on "OK", create the group.
@@ -732,6 +772,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String name = input.getText().toString().trim();
+                            name = name.replaceAll("[\n\t\r]", "");
                             OnCreateGroupListener.this.createGroup(name);
                         }
                     });
@@ -849,8 +890,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         // if we join it using the history.
                         // This is in case of wrong automatic behavior.
 
-                        if (group.automatic && ACTION_FROM_HISTORY.equals(mAction)
-                                || ACTION_FROM_HISTORY_LEAVE_GROUP.equals(mAction)) {
+                        if (group.automatic && ACTION_JOIN_GROUP.equals(mAction)
+                                || ACTION_LEAVE_JOIN_GROUP.equals(mAction)) {
                             group.automatic = false;
                         }
                         startActivity(
@@ -921,12 +962,26 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == Dialog.BUTTON_POSITIVE) {
                         joinGroup(group, password.getText().toString());
+                    } else if (which == Dialog.BUTTON_NEGATIVE) {
+                        mProcessingAutoAction = false;
+                        onRefresh();
                     }
                 }
             };
 
             builder.setPositiveButton(getString(R.string.main_password_ok), passwordClick);
             builder.setNegativeButton(getString(R.string.main_password_cancel), passwordClick);
+
+            // This is supposed to handle the situation where the user presses
+            // the
+            // BACK key too.
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    mProcessingAutoAction = false;
+                    onRefresh();
+                }
+            });
 
             final AlertDialog dialog = builder.create();
 
@@ -1096,7 +1151,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     }
 
     public void errorDialogGoHistoryActivityPressed(View view) {
-        startActivity(new Intent(this, GroupsMainActivity.class));
+        startActivity(new Intent(this, GroupsHistoryActivity.class));
 
         mGroupNoLongerExistsDialog.dismiss();
         mProcessingAutoAction = false;

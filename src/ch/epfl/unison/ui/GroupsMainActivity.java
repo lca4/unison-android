@@ -1,6 +1,12 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,7 +27,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -32,9 +37,6 @@ import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.view.Menu;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Activity that is displayed once you're inside the group. Displays the music
  * player and information about the group (through fragments).
@@ -43,6 +45,8 @@ import java.util.Set;
  * @author lum
  */
 public class GroupsMainActivity extends AbstractMainActivity {
+
+    private boolean mIsDj = false;
 
     /** Simple interface to be notified about group info updates. */
     public interface OnGroupInfoListener {
@@ -100,22 +104,28 @@ public class GroupsMainActivity extends AbstractMainActivity {
             Log.i(TAG, "joined group " + getGroupId());
 
             setTitle(mGroup.name);
-            AppData.getInstance(this).addToHistory(mGroup);
+            AppData data = AppData.getInstance(this);
+            data.addToHistory(mGroup);
+            data.setInGroup(true);
+            data.setCurrentGID(getGroupId());
 
         }
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        // First choice: we restart the activity:
-        startActivity(intent);
-        finish();
-
-        // Second choice:
-        // setIntent(intent); //optional
-        // handleExtras(intent.getExtras());
-    }
+    // @Override
+    // protected void onNewIntent(Intent intent) {
+    // super.onNewIntent(intent);
+    // // First choice: we restart the activity:
+    //
+    //
+    // //NOT USED ANYMORE!
+    // // startActivity(intent);
+    // // finish();
+    //
+    // // Second choice:
+    // // setIntent(intent); //optional
+    // // handleExtras(intent.getExtras());
+    // }
 
     private void setupNFC() {
         NfcManager manager = (NfcManager) GroupsMainActivity
@@ -141,9 +151,19 @@ public class GroupsMainActivity extends AbstractMainActivity {
     }
 
     private NdefMessage getNdefFromGID(Long gid) {
+        if (gid == null) {
+            return null;
+        }
+
+        String content;
+        try {
+            content = new JSONObject().put("gid", gid).toString();
+        } catch (JSONException e) {
+            content = gid.toString();
+        }
         NdefRecord[] records = {
                 new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
-                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
+                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], content
                                 .getBytes())
         };
 
@@ -270,6 +290,15 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     };
 
+    public void setDJ(boolean dj) {
+        mIsDj = dj;
+        getMenu().findItem(R.id.menu_item_manage_group).setVisible(mIsDj && !mGroup.automatic);
+    }
+
+    public boolean isDJ() {
+        return mIsDj;
+    }
+
     private void sendPassword(final String pw) {
         final AppData data = AppData.getInstance(GroupsMainActivity.this);
         UnisonAPI api = data.getAPI();
@@ -350,9 +379,10 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-    // @Override
-    // protected PlaylistItem getPlaylist() {
-    // return null;
-    // }
+//    @Override
+//    protected PlaylistItem getPlaylist() {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
 }

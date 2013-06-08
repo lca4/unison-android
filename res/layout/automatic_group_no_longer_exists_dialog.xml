@@ -18,7 +18,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
-      android:onClick="errorDialogGoGroupsActivityPressed"
+      android:onClick="errorDialogGoHistoryActivityPressed"
       android:text="@string/group_no_longer_exists_dialog_go_groups_activity" />
     
     <Button

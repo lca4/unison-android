@@ -92,13 +92,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean b = super.onCreateOptionsMenu(menu);
-        // menu.findItem(R.id.menu_item_groups).setVisible(false);
-        return b;
-    }
-
     private void mapOfGroupsToArrayListWithSort(Map<Long, Pair<JsonStruct.Group, Date>> map) {
         List<Pair<JsonStruct.Group, Date>> listOfGroups =
                 new ArrayList<Pair<JsonStruct.Group, Date>>(
@@ -228,9 +221,9 @@ public class GroupsHistoryActivity extends SherlockActivity {
                     .putExtra(Const.Strings.GROUP, mGroupClicked)
                     .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             if (mAlreadyInGroup) {
-                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY_LEAVE_GROUP);
+                intent.setAction(GroupsActivity.ACTION_LEAVE_JOIN_GROUP);
             } else {
-                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY);
+                intent.setAction(GroupsActivity.ACTION_JOIN_GROUP);
             }
             startActivity(intent);
         }

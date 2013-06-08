@@ -65,7 +65,7 @@ public class PrefsActivity extends SherlockPreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            final String newNick = newValue.toString();
+            final String newNick = newValue.toString().trim().replaceAll("[\n\t\r]", "");
             AppData data = AppData.getInstance(PrefsActivity.this);
             data.getAPI().setNickname(data.getUid(), newNick,
                     new UnisonAPI.Handler<JsonStruct.Success>() {

@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -40,11 +38,17 @@ public class LoginActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.LoginActivity";
 
+    public static final String ACTION_JOIN_GROUP = "ch.epfl.unison.action.JOIN_GROUP";
+
+    public static final String ACTION_JOIN_GROUP_FROM_GID =
+            "ch.epfl.unison.action.JOIN_GROUP_FROM_GID";
+
     private static final int SIGNUP_SUCCESS_RESULT_CODE = 0;
 
     private Button mLoginBtn;
     private TextView mSignupTxt;
 
+    private AppData mData;
     private EditText mEmail;
     private EditText mPassword;
 
@@ -79,7 +83,9 @@ public class LoginActivity extends SherlockActivity {
         });
 
         // Initialize the AppData instance.
-        AppData.getInstance(this);
+        mData = AppData.getInstance(this);
+
+        mData.setLoggedIn(false);
     }
 
     @Override
@@ -104,13 +110,19 @@ public class LoginActivity extends SherlockActivity {
     private void logout() {
         Log.d(TAG, "logging out");
         // Remove e-mail and password from the preferences.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(Const.PrefKeys.EMAIL);
-        editor.remove(Const.PrefKeys.PASSWORD);
-        editor.remove(Const.PrefKeys.UID);
-        editor.remove(Const.PrefKeys.LASTUPDATE);
-        editor.commit();
+
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.remove(Const.PrefKeys.EMAIL);
+        // editor.remove(Const.PrefKeys.PASSWORD);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
+        mData.deleteEmailAndPassword();
+        mData.deleteUID();
+        mData.deleteLastUpdate();
 
         // Truncate the library.
         startService(new Intent(LibraryService.ACTION_TRUNCATE));
@@ -122,13 +134,19 @@ public class LoginActivity extends SherlockActivity {
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Const.PrefKeys.EMAIL, email);
-        editor.putString(Const.PrefKeys.PASSWORD, password);
-        editor.remove(Const.PrefKeys.UID);
-        editor.remove(Const.PrefKeys.LASTUPDATE);
-        editor.commit();
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString(Const.PrefKeys.EMAIL, email);
+        // editor.putString(Const.PrefKeys.PASSWORD, password);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
+        mData.storeEmail(email);
+        mData.storePassword(password);
+        mData.deleteUID();
+        mData.deleteLastUpdate();
 
         // Truncate the library. You never know.
         startService(new Intent(LibraryService.ACTION_TRUNCATE));
@@ -151,9 +169,12 @@ public class LoginActivity extends SherlockActivity {
         }
 
         // Try to login from the saved preferences.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String email = prefs.getString(Const.PrefKeys.EMAIL, null);
-        String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // String email = prefs.getString(Const.PrefKeys.EMAIL, null);
+        // String password = prefs.getString(Const.PrefKeys.PASSWORD, null);
+        String email = mData.getEmail();
+        String password = mData.getPassword();
 
         if (email != null && password != null) {
             login(email, password);
@@ -173,7 +194,7 @@ public class LoginActivity extends SherlockActivity {
         alert.setView(input);
 
         // When clicking on "OK", create the group.
-        alert.setPositiveButton(getString(R.string.groups_alert_newgroup_ok),
+        alert.setPositiveButton(getString(R.string.generic_ok),
                 new DialogInterface.OnClickListener() {
 
                     @Override
@@ -197,32 +218,79 @@ public class LoginActivity extends SherlockActivity {
                     }
                 });
 
-        alert.setNegativeButton(getString(R.string.groups_alert_newgroup_cancel), null);
+        alert.setNegativeButton(getString(R.string.generic_cancel), null);
         alert.show();
     }
 
     private void fillEmailPassword() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
-        mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // mEmail.setText(prefs.getString(Const.PrefKeys.EMAIL, null));
+        // mPassword.setText(prefs.getString(Const.PrefKeys.PASSWORD, null));
+        mEmail.setText(mData.getEmail());
+        mPassword.setText(mData.getPassword());
+
     }
 
     private void storeInfo(String email, String password, String nickname, Long uid) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = prefs.edit();
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString(Const.PrefKeys.EMAIL, email);
-        editor.putString(Const.PrefKeys.PASSWORD, password);
-        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        // editor.putString(Const.PrefKeys.EMAIL, email);
+        // editor.putString(Const.PrefKeys.PASSWORD, password);
+        // editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        mData.storeEmail(email);
+        mData.storePassword(password);
+        mData.storeNickname(nickname);
+
         if (uid != null) {
-            editor.putLong(Const.PrefKeys.UID, uid);
+            mData.storeUID(uid);
         } else {
-            editor.putLong(Const.PrefKeys.UID, -1);
+            mData.storeUID(-1);
         }
-        editor.commit();
+        // editor.commit();
     }
 
     private void nextActivity(JsonStruct.User user) {
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            if (ACTION_JOIN_GROUP.equals(getIntent().getAction())) {
+                JsonStruct.Group group = (JsonStruct.Group) getIntent().getExtras().get(
+                        Const.Strings.GROUP);
+                if (group != null) {
+                    startActivity(new Intent(this, GroupsMainActivity.class)
+                            .setAction(GroupsActivity.ACTION_JOIN_GROUP)
+                            .putExtra(Const.Strings.GROUP, group));
+                } else {
+                    // Should never happen.
+                    startActivity(new Intent(this, HomeActivity.class));
+                }
+            } else if (ACTION_JOIN_GROUP_FROM_GID.equals(getIntent().getAction())) {
+                Long gid = (Long) getIntent().getExtras().get(
+                        Const.Strings.GID);
+                if (gid != null) {
+                    AutoJoin aj = new AutoJoin(
+                            AppData.getInstance(LoginActivity.this), LoginActivity.this);
+                    aj.joinByGID(gid);
+                    // the login activity is going to be finished by AutoJoin.
+                    return;
+                } else {
+                    // Should never happen.
+                    startActivity(new Intent(this, HomeActivity.class));
+                }
+            } else {
+                nextWithoutActions(user);
+            }
+        } else {
+            nextWithoutActions(user);
+        }
+        // Close this activity.
+
+        Log.d(TAG, "Going to finish LoginActiviy");
+        finish();
+    }
+
+    private void nextWithoutActions(JsonStruct.User user) {
         if (user.gid != null) {
             // Directly go into group.
             startActivity(new Intent(this, GroupsMainActivity.class)
@@ -232,10 +300,6 @@ public class LoginActivity extends SherlockActivity {
             // startActivity(new Intent(this, GroupsActivity.class));
             startActivity(new Intent(this, HomeActivity.class));
         }
-        // Close this activity.
-
-        Log.d(TAG, "Going to finish LoginActiviy");
-        finish();
     }
 
     private void login(final String email, final String password) {
@@ -247,6 +311,7 @@ public class LoginActivity extends SherlockActivity {
             @Override
             public void callback(JsonStruct.User user) {
                 LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
+                AppData.getInstance(LoginActivity.this).setLoggedIn(true);
                 LoginActivity.this.nextActivity(user);
                 dialog.dismiss();
             }

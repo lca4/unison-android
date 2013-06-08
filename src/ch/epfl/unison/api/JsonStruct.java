@@ -28,7 +28,7 @@ public abstract class JsonStruct {
     }
 
     /** Information about a user (used in both directions). */
-    public static class User extends JsonStruct {
+    public static class User extends JsonStruct implements Serializable {
 
         public Long uid;
         public String nickname;
@@ -62,7 +62,7 @@ public abstract class JsonStruct {
     }
 
     /** Information about a track (used in both directions). */
-    public static class Track extends JsonStruct {
+    public static class Track extends JsonStruct implements Serializable {
 
         public String artist;
         public String title;

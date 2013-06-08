@@ -18,6 +18,12 @@ public final class Const {
         public static final String GROUP_SUGGESTION = "gsuggestion";
         public static final String LOCATION_HISTORY = "lochist";
 
+        public static final String IN_SOLO = "solo";
+        public static final String LOGGED_IN = "loggedin";
+        public static final String IN_GROUP = "ingroup";
+
+        public static final String CURRENT_GID = "cgid";
+
         private PrefKeys() {
         } // Non-instantiable.
     }

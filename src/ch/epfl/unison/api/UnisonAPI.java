@@ -103,8 +103,8 @@ public class UnisonAPI {
                 .addParam("password", password).setAuth(mAuth).doPUT();
     }
 
-    public void leaveGroup(long uid, Handler<JsonStruct.Success> handler) {
-        URL url = urlFor("/users/%d/group", uid);
+    public void leaveGroup(long uid, long gid, Handler<JsonStruct.Success> handler) {
+        URL url = urlFor("/users/%d/group?gid=%d", uid, gid);
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .setAuth(mAuth).doDELETE();
     }
@@ -147,7 +147,7 @@ public class UnisonAPI {
         URL url = urlFor("/groups");
         AsyncRequest.of(url, handler, JsonStruct.Group.class)
                 .addParam("name", name).addParam("lat", lat)
-                .addParam("lon", lon).setAuth(mAuth).doPOST();
+                .addParam("lon", lon).addParam("list", false).setAuth(mAuth).doPOST();
     }
 
     public void getGroupInfo(long gid, Handler<JsonStruct.Group> handler) {
@@ -352,12 +352,14 @@ public class UnisonAPI {
 
         @Override
         public String toString() {
-            if (hasJsonError()) {
+            if (hasJsonError() && jsonError.error != null && jsonError.message != null) {
                 return String.format("JSON error:\ncode: %d\nmessage: %s",
                         jsonError.error, jsonError.message);
-            } else {
+            } else if (error != null && response != null) {
                 return String.format("Error type: %s\nstatus: %d\nresponse: %s",
                         error.getClass().toString(), statusCode, response);
+            } else {
+                return "We got an error without anything to log";
             }
         }
     }

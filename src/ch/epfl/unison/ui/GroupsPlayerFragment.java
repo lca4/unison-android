@@ -59,9 +59,6 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     public void onClick(View v) {
         super.onClick(v);
 
-        // Log.d(TAG, "debug: mIsDJ:" + mIsDJ + " , mProcessingDjRequest:" +
-        // mProcessingDjRequest);
-
         // now we check if the DJ button was clicked:
         if (v == mDjBtn) {
             if (mProcessingDjRequest) {
@@ -77,7 +74,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 Log.d(TAG, "The activity was null, aborting.");
                 return;
             }
-            setIsDJ(!mIsDJ, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(true, !mIsDJ, mApi, mUid, mGid, mLatitude, mLongitude);
         }
 
     }
@@ -121,6 +118,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
+        if (mTrackQueue != null) {
+            mTrackQueue.stop();
+        }
         ((GroupsMainActivity) getMainActivity())
                 .unregisterGroupInfoListener(this);
     }
@@ -137,11 +137,11 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         // now everything is set up.
         if (!isDJ() && groupInfo.master != null
                 && Long.valueOf(mUid).equals(groupInfo.master.uid)) {
-            setIsDJ(true, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(false, true, mApi, mUid, mGid, mLatitude, mLongitude);
         } else if (isDJ()
                 && (groupInfo.master == null || !Long.valueOf(mUid)
                         .equals(groupInfo.master.uid))) {
-            setIsDJ(false, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(false, false, mApi, mUid, mGid, mLatitude, mLongitude);
         }
 
         // Update track information.
@@ -197,12 +197,10 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 new UnisonAPI.Handler<JsonStruct.Success>() {
                     @Override
                     public void callback(JsonStruct.Success struct) {
-                        // Log.d(TAG, "debug: skip went well");
                     }
 
                     @Override
                     public void onError(Error error) {
-                        // Log.d(TAG, "debug: an error occured in skip");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -238,32 +236,21 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
                     @Override
                     public void callback(Success structure) {
-                        // Log.d(TAG,
-                        // "debug: got a positive answer from the server");
                         if (getActivity() == null) {
                             Log.d(TAG,
                                     "Tried to update an Activity that was null!");
                             return;
                         }
                         if (mIsDJ) {
-                            getDJBtn().setText(
-                                    getString(R.string.player_leave_dj));
-                            getToggleBtn().setBackgroundResource(
-                                    R.drawable.btn_play);
-                            getButtons().setVisibility(View.VISIBLE);
-                            getSeekBar().setVisibility(View.VISIBLE);
-                            getSeekBar().setEnabled(true);
-                            mTrackQueue = new TrackQueue(getActivity(), gid)
-                                    .start();
+                            toggleDJState(true, gid);
                         }
                         mProcessingDjRequest = false;
-                        mMainActivity.setDJ(true);
+                        ((GroupsMainActivity) mMainActivity).setDJ(true);
                         // Log.d(TAG, "mProcessing is now false");
                     }
 
                     @Override
                     public void onError(Error error) {
-                        // Log.d(TAG, "debug: got an error from the server");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -275,10 +262,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                         // this does not work, an error can happen for too many
                         // reasons.
 
-                        // GroupsPlayerFragment.this.setIsDJ(false, api, uid,
-                        // gid,
+                        // GroupsPlayerFragment.this.setIsDJ(true, false, api, uid, gid,
+                        // lat, lon);
 
-                        // }
                         mIsDJ = false;
 
                         mProcessingDjRequest = false;
@@ -305,30 +291,21 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
             @Override
             public void callback(Success structure) {
-                // Log.d(TAG, "debug: got a positive answer from the server");
                 if (getActivity() == null) {
                     Log.d(TAG, "Tried to update an Activity that was null!");
 
                     return;
                 }
                 if (!mIsDJ) {
-                    getDJBtn().setText(getString(R.string.player_become_dj));
-                    getButtons().setVisibility(View.INVISIBLE);
-                    getSeekBar().setVisibility(View.INVISIBLE);
-                    getSeekBar().setEnabled(false);
-
-                    getActivity().startService(
-                            new Intent(MusicService.ACTION_STOP));
-                    setStatus(Status.Stopped);
+                    toggleDJState(false, -1);
                 }
                 mProcessingDjRequest = false;
-                mMainActivity.setDJ(false);
+                ((GroupsMainActivity) mMainActivity).setDJ(false);
                 // Log.d(TAG, "mProcessing is now false");
             }
 
             @Override
             public void onError(Error error) {
-                // Log.d(TAG, "debug: got an error from the server");
                 if (error != null) {
                     Log.d(TAG, error.toString());
                 }
@@ -339,13 +316,18 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         });
     }
 
-    protected void setIsDJ(boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat,
+    protected void setIsDJ(boolean serverComm, boolean wantsToBeDJ, UnisonAPI api, long uid,
+            long gid, double lat,
             double lon) {
         mIsDJ = wantsToBeDJ;
-        if (wantsToBeDJ) {
-            grabDJSeat(api, uid, gid, lat, lon);
+        if (serverComm) {
+            if (wantsToBeDJ) {
+                grabDJSeat(api, uid, gid, lat, lon);
+            } else {
+                dropDJSeat(api, uid, gid);
+            }
         } else {
-            dropDJSeat(api, uid, gid);
+            toggleDJState(wantsToBeDJ, -1);
         }
     }
 
@@ -427,6 +409,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             public void callback(MusicItem item) {
                 addToHistory(item);
                 mTrackAdded = true;
+                play(getHistory().get(0));
             }
 
             @Override
@@ -476,5 +459,31 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         }
         complete = true;
         return complete;
+    }
+
+    private void toggleDJState(boolean isDJ, long gid) {
+        if (isDJ) {
+            if (gid == -1) {
+                Log.d(TAG, "something went wrong when calling toggleDJState");
+                return;
+            }
+            getDJBtn().setText(
+                    getString(R.string.player_leave_dj));
+            getToggleBtn().setBackgroundResource(
+                    R.drawable.btn_play);
+            getButtons().setVisibility(View.VISIBLE);
+            getSeekBar().setVisibility(View.VISIBLE);
+            getSeekBar().setEnabled(true);
+            mTrackQueue = new TrackQueue(getActivity(), gid)
+                    .start();
+        } else {
+            getDJBtn().setText(getString(R.string.player_become_dj));
+            getButtons().setVisibility(View.INVISIBLE);
+            getSeekBar().setVisibility(View.INVISIBLE);
+            getSeekBar().setEnabled(false);
+            getActivity().startService(
+                    new Intent(MusicService.ACTION_STOP));
+            setStatus(Status.Stopped);
+        }
     }
 }

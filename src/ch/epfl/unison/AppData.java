@@ -3,6 +3,7 @@ package ch.epfl.unison;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
 import android.location.LocationListener;
@@ -75,6 +76,9 @@ public final class AppData implements OnSharedPreferenceChangeListener {
     private AppData(Context context) {
         mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        // Here the shared prefs are explicitely set to mode private.
+        // mPrefs = context.getSharedPreferences(context.getPackageName()+".sp",
+        // Context.MODE_PRIVATE);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -330,6 +334,95 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         // Possible optimization heres
         String value = new GsonBuilder().create().toJson(history, mGroupHistoryMapType);
         return mPrefs.edit().putString(Const.PrefKeys.HISTORY, value).commit();
+    }
+
+    public boolean setLoggedIn(boolean loggedIn) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.LOGGED_IN, loggedIn).commit();
+    }
+
+    public boolean getLoggedIn() {
+        return mPrefs.getBoolean(Const.PrefKeys.LOGGED_IN, false);
+    }
+
+    public boolean setInGroup(boolean inGroup) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.IN_GROUP, inGroup).commit();
+    }
+
+    public boolean getInGroup() {
+        return mPrefs.getBoolean(Const.PrefKeys.IN_GROUP, false);
+    }
+
+    public boolean setInSolo(boolean solo) {
+        return mPrefs.edit().putBoolean(Const.PrefKeys.IN_SOLO, solo).commit();
+    }
+
+    public boolean getInSolo() {
+        return mPrefs.getBoolean(Const.PrefKeys.IN_SOLO, false);
+    }
+
+    public boolean setCurrentGID(Long gid) {
+        return mPrefs.edit().putLong(Const.PrefKeys.CURRENT_GID, gid).commit();
+    }
+
+    public Long getCurrentGID() {
+        return mPrefs.getLong(Const.PrefKeys.CURRENT_GID, -1);
+    }
+
+    public void deleteEmailAndPassword() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.EMAIL);
+        editor.remove(Const.PrefKeys.PASSWORD);
+        editor.remove(Const.PrefKeys.UID);
+        editor.remove(Const.PrefKeys.LASTUPDATE);
+        editor.commit();
+    }
+
+    public void storeEmail(String email) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.EMAIL, email);
+        editor.commit();
+    }
+
+    public void storePassword(String password) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.PASSWORD, password);
+        editor.commit();
+    }
+
+    public void deleteUID() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.UID);
+        editor.commit();
+    }
+
+    public void deleteLastUpdate() {
+        Editor editor = mPrefs.edit();
+        editor.remove(Const.PrefKeys.LASTUPDATE);
+        editor.commit();
+    }
+
+    public void storeNickname(String nickname) {
+        Editor editor = mPrefs.edit();
+        editor.putString(Const.PrefKeys.NICKNAME, nickname);
+        editor.commit();
+    }
+
+    public String getNickname() {
+        return mPrefs.getString(Const.PrefKeys.NICKNAME, "user" + getUid());
+    }
+
+    public void storeUID(long uid) {
+        Editor editor = mPrefs.edit();
+        editor.putLong(Const.PrefKeys.UID, uid);
+        editor.commit();
+    }
+
+    public String getEmail() {
+        return mPrefs.getString(Const.PrefKeys.EMAIL, null);
+    }
+
+    public String getPassword() {
+        return mPrefs.getString(Const.PrefKeys.PASSWORD, null);
     }
 
     /**
