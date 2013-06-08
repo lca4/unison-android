@@ -49,7 +49,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     }
 
     private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
-    private static final int RELOAD_INTERVAL = 15 * 60 * 1000; // in ms.
+//    private static final int RELOAD_INTERVAL = 30 * 60 * 60 * 1000; // in ms.
 
     private UnisonDB mDB;
 
@@ -60,6 +60,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setReloadInterval(RELOAD_INTERVAL);
+        setAutoRefresh(false);
         mDB = new UnisonDB(this);
         mChildFragments = new HashMap<SoloPlaylistsActivity.ChildFragment, String>();
 
@@ -71,8 +73,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_remote_title)
                         .setTag(getString(R.string.solo_playlists_fragment_remote_tag)),
                 SoloPlaylistsRemoteFragment.class, null);
-
-        setReloadInterval(RELOAD_INTERVAL);
+        this.onRefresh();
     }
 
     @Override

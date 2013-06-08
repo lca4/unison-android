@@ -41,9 +41,10 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
     private String mTag = "ch.epfl.unison.UnisonFragmentActivity";
     private static final int INITIAL_DELAY = 500; // in ms.
-    private static final int DEFAULT_RELOAD_INTERVAL = 30 * 1000; // in ms.
+    private static final int DEFAULT_RELOAD_INTERVAL = 1 * 60 * 1000; // in ms.
     private static int smReloadInterval;
     private boolean mIsForeground = false;
+    private boolean mAutoRefresh = true;
     private Menu mMenu;
 
     private TabsAdapter mTabsAdapter;
@@ -56,7 +57,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         public void run() {
             if (isForeground()) {
                 onRefresh();
-                getHandler().postDelayed(this, getReloadInterval());
+                mHandler.postDelayed(this, smReloadInterval);
             }
         }
     };
@@ -85,7 +86,9 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
     protected void onResume() {
         super.onResume();
         setToForeground(true);
-        getHandler().postDelayed(getUpdater(), getInitialDelay());
+        if (mAutoRefresh) {
+            mHandler.postDelayed(mUpdater, INITIAL_DELAY);
+        }
     }
 
     @Override
@@ -100,7 +103,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
         mTag = this.getClass().getName();
 
-        setReloadInterval(DEFAULT_RELOAD_INTERVAL);
+        smReloadInterval = DEFAULT_RELOAD_INTERVAL;
 
         // This activity should finish on logout.
         registerReceiver(mLogoutReceiver, new IntentFilter(
@@ -153,7 +156,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
     }
 
     /**
-     * Default implementation. Should be overridden to suitable behavior.
+     * Default implementation. Should be overridden to suitable behavior.<br />
      * Default implementation: repaintRefresh(true)
      */
     @Override
@@ -169,14 +172,6 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         this.mIsForeground = isForeground;
     }
 
-    protected BroadcastReceiver getLogoutReceiver() {
-        return mLogoutReceiver;
-    }
-
-    protected Handler getHandler() {
-        return mHandler;
-    }
-
     protected static int getInitialDelay() {
         return INITIAL_DELAY;
     }
@@ -189,10 +184,6 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         smReloadInterval = reloadInterval;
     }
 
-    protected Runnable getUpdater() {
-        return mUpdater;
-    }
-
     protected Menu getMenu() {
         return mMenu;
     }
@@ -201,7 +192,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         return mTabsAdapter;
     }
 
-    protected String getTag() {
+    protected String getClassTag() {
         return mTag;
     }
 
@@ -212,10 +203,6 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
     protected ViewPager getViewPager() {
         return mViewPager;
     }
-
-    // private void setViewPager(ViewPager vp) {
-    // this.mViewPager = vp;
-    // }
 
     protected ActionBar getSupportActBar() {
         return mSupportActionBar;
@@ -231,6 +218,10 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
     protected void showGroups(boolean visible) {
         getMenu().findItem(R.id.menu_item_groups).setVisible(visible);
+    }
+    
+    protected void setAutoRefresh(boolean enable) {
+        mAutoRefresh = enable;
     }
 
     /**
