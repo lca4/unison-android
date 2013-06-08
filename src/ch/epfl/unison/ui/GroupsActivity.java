@@ -624,6 +624,17 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         if (mSuggestion.group.gid.equals(struct.group.gid)) {
                             mSuggestionIsForeground = false;
                             mSuggestion = struct;
+                            
+                            String nick = AppData.getInstance(GroupsActivity.this).getNickname();
+                            if (nick != null) {
+                                Log.d(TAG, "removing " + nick + " from suggestion");
+                                ArrayList<String> users = new ArrayList<String>(
+                                        Arrays.asList(mSuggestion.users));
+                                users.remove(nick);
+                                mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
+                                        String[].class);
+                            }
+                            
                             return;
                         }
                     }
@@ -644,7 +655,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                                 Arrays.asList(mSuggestion.users));
                         users.remove(nick);
                         mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
-                                String[].class);;
+                                String[].class);
                     }
                     
                     updateSuggestionButton(!mProcessingAutoAction);
