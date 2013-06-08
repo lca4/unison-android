@@ -56,7 +56,10 @@ public abstract class AbstractMenu {
                 activity.startActivity(new Intent(activity, HelpActivity.class));
                 break;
             case R.id.menu_item_groups:
-                activity.startActivity(new Intent(activity, GroupsActivity.class));
+                activity.startActivity(new Intent(activity, GroupsActivity.class)
+                .setAction(
+                        GroupsActivity.ACTION_FROM_SOLO).addFlags(
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.menu_item_solo:
                 activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
