@@ -219,7 +219,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
     protected void showGroups(boolean visible) {
         getMenu().findItem(R.id.menu_item_groups).setVisible(visible);
     }
-    
+
     protected void setAutoRefresh(boolean enable) {
         mAutoRefresh = enable;
     }

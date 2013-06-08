@@ -211,7 +211,7 @@ public class LibraryService extends Service {
                     // helper.insert(item);
                     mDB.insert(item);
                 } else { // TYPE_DELETE.
-                // helper.delete(item);
+                    // helper.delete(item);
                     mDB.delete(item);
                 }
             }

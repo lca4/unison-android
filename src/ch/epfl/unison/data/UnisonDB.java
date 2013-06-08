@@ -248,7 +248,7 @@ public class UnisonDB {
         }
         return res;
     }
-    
+
     public int getTracksCount(long playlistId) {
         return AndroidDB.getTracksCount(mContext.getContentResolver(), playlistId);
     }

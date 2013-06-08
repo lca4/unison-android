@@ -188,7 +188,7 @@ final class AndroidDB {
             cur.close();
         }
     }
-    
+
     static int getTracksCount(ContentResolver resolver, long playlistId) {
         String[] projection = new String[] {
                 MediaStore.Audio.Playlists.Members.AUDIO_ID
@@ -235,7 +235,7 @@ final class AndroidDB {
         }
         return set;
     }
-    
+
     static Uri getPlaylistMembersUri(long playlistId) {
         return MediaStore.Audio.Playlists.Members
                 .getContentUri("external", playlistId).buildUpon().build();
