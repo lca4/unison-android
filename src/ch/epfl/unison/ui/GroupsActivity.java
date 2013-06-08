@@ -744,8 +744,9 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
             // Set an EditText view to get user input
             final EditText input = new EditText(GroupsActivity.this);
-            InputFilter inputFilter = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
-            input.setFilters(new InputFilter[]{inputFilter});
+            InputFilter filterLength = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
+            input.setFilters(new InputFilter[]{filterLength});
+//            input.setMaxLines(1);
             alert.setView(input);
 
             // When clicking on "OK", create the group.
@@ -755,6 +756,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String name = input.getText().toString().trim();
+                            name = name.replaceAll("[\n\t\r]", "");
                             OnCreateGroupListener.this.createGroup(name);
                         }
                     });
