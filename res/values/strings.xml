@@ -238,6 +238,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_NFC_not_present">Sorry, your phone doesn\'t have NFC :\'(</string>
     <string name="error_NFC_not_active">Please turn on the NFC feature.</string>
     <string name="error_logout_while_in_group">Please leave the group before logging out</string>
+    <string name="error_solo_while_in_group">Please leave the group before going in single-mode</string>
 
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
     <string name="error_solo_save_playlist">Unable to save the playlist to your device.</string>

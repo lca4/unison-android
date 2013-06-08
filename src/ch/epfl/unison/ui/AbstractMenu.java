@@ -40,6 +40,8 @@ public abstract class AbstractMenu {
 
     public static boolean onOptionsItemSelected(Activity activity,
             OnRefreshListener listener, MenuItem item) {
+        AppData data;
+        
         switch (item.getItemId()) {
             case R.id.menu_item_refresh:
                 if (listener != null) {
@@ -59,9 +61,20 @@ public abstract class AbstractMenu {
                 activity.startActivity(new Intent(activity, GroupsActivity.class)
                 .setAction(
                         GroupsActivity.ACTION_FROM_SOLO).addFlags(
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.menu_item_solo:
+                // check if the user is in a group:
+                data = AppData.getInstance(activity);
+                if (data.getInGroup()) {
+                    // here we notify the user that he should leave the group
+                    // first:
+                    if (activity != null) {
+                        Toast.makeText(activity, activity.getString(
+                                R.string.error_solo_while_in_group), Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                }
                 activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
                 break;
             case R.id.menu_item_history:
@@ -71,7 +84,7 @@ public abstract class AbstractMenu {
             case R.id.menu_item_logout:
 
                 // check if the user is in a group:
-                AppData data = AppData.getInstance(activity);
+                data = AppData.getInstance(activity);
                 if (data.getInGroup()) {
                     // here we notify the user that he should leave the group
                     // first:
