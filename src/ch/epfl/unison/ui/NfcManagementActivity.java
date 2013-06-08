@@ -116,6 +116,7 @@ public class NfcManagementActivity extends SherlockActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "No NDEF Message Read",
                         Toast.LENGTH_LONG).show();
+                finish();
                 return;
             }
             if (messages != null && messages[0] != null
@@ -157,6 +158,7 @@ public class NfcManagementActivity extends SherlockActivity {
                                             Toast.makeText(getApplicationContext(),
                                                     "Intent Error...",
                                                     Toast.LENGTH_LONG).show();
+                                            finish();
                                         }
                                         break;
                                     }
@@ -173,6 +175,7 @@ public class NfcManagementActivity extends SherlockActivity {
         } else {
             Toast.makeText(getApplicationContext(), "Intent Error...",
                     Toast.LENGTH_LONG).show();
+            finish();
         }
 
         /*
