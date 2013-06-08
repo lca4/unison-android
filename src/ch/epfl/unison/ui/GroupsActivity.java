@@ -65,7 +65,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     // EPFL Polydome.
     private static final double DEFAULT_LATITUDE = 46.52147800207456;
     private static final double DEFAULT_LONGITUDE = 6.568992733955383;
-    
+
     private static final int MAXIMUM_GROUP_NAME_LENGTH = 30;
 
     private String mAction = null;
@@ -624,22 +624,23 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         if (mSuggestion.group.gid.equals(struct.group.gid)) {
                             mSuggestionIsForeground = false;
                             mSuggestion = struct;
-                            
+
                             String nick = AppData.getInstance(GroupsActivity.this).getNickname();
                             if (nick != null) {
                                 Log.d(TAG, "removing " + nick + " from suggestion");
                                 ArrayList<String> users = new ArrayList<String>(
                                         Arrays.asList(mSuggestion.users));
                                 users.remove(nick);
-                                mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
+                                mSuggestion.users = Arrays.copyOf(users.toArray(),
+                                        users.toArray().length,
                                         String[].class);
                             }
-                            
+
                             return;
                         }
                     }
                     // Sanity check on the Suggestion we just received.
-                   
+
                     mSuggestion = struct;
                     if (!validSuggestion(struct)) {
                         mSuggestion = null;
@@ -647,7 +648,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
 
                         return;
                     }
-                    
+
                     String nick = AppData.getInstance(GroupsActivity.this).getNickname();
                     if (nick != null) {
                         Log.d(TAG, "removing " + nick + " from suggestion");
@@ -657,7 +658,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
                         mSuggestion.users = Arrays.copyOf(users.toArray(), users.toArray().length,
                                 String[].class);
                     }
-                    
+
                     updateSuggestionButton(!mProcessingAutoAction);
 
                     if (!mProcessingAutoAction) {
@@ -756,8 +757,10 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             // Set an EditText view to get user input
             final EditText input = new EditText(GroupsActivity.this);
             InputFilter filterLength = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
-            input.setFilters(new InputFilter[]{filterLength});
-//            input.setMaxLines(1);
+            input.setFilters(new InputFilter[] {
+                filterLength
+            });
+            // input.setMaxLines(1);
             alert.setView(input);
 
             // When clicking on "OK", create the group.

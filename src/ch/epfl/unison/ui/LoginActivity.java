@@ -109,15 +109,16 @@ public class LoginActivity extends SherlockActivity {
     private void logout() {
         Log.d(TAG, "logging out");
         // Remove e-mail and password from the preferences.
-        
-        //THIS SHOULD NEVER BE USED
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.remove(Const.PrefKeys.EMAIL);
-//        editor.remove(Const.PrefKeys.PASSWORD);
-//        editor.remove(Const.PrefKeys.UID);
-//        editor.remove(Const.PrefKeys.LASTUPDATE);
-//        editor.commit();
+
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.remove(Const.PrefKeys.EMAIL);
+        // editor.remove(Const.PrefKeys.PASSWORD);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
         mData.deleteEmailAndPassword();
         mData.deleteUID();
         mData.deleteLastUpdate();
@@ -132,14 +133,15 @@ public class LoginActivity extends SherlockActivity {
      */
     private void bootstrap(String email, String password) {
         // We're coming from the signup form (whether native or online).
-        //THIS SHOULD NEVER BE USED
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.putString(Const.PrefKeys.EMAIL, email);
-//        editor.putString(Const.PrefKeys.PASSWORD, password);
-//        editor.remove(Const.PrefKeys.UID);
-//        editor.remove(Const.PrefKeys.LASTUPDATE);
-//        editor.commit();
+        // THIS SHOULD NEVER BE USED
+        // SharedPreferences prefs =
+        // PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString(Const.PrefKeys.EMAIL, email);
+        // editor.putString(Const.PrefKeys.PASSWORD, password);
+        // editor.remove(Const.PrefKeys.UID);
+        // editor.remove(Const.PrefKeys.LASTUPDATE);
+        // editor.commit();
         mData.storeEmail(email);
         mData.storePassword(password);
         mData.deleteUID();

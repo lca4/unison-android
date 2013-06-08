@@ -308,7 +308,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         });
     }
 
-    protected void setIsDJ(boolean serverComm, boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat,
+    protected void setIsDJ(boolean serverComm, boolean wantsToBeDJ, UnisonAPI api, long uid,
+            long gid, double lat,
             double lon) {
         if (serverComm) {
             if (wantsToBeDJ) {
@@ -319,7 +320,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         } else {
             toggleDJState(wantsToBeDJ, -1);
         }
-        
+
         mIsDJ = wantsToBeDJ;
         ((GroupsMainActivity) mMainActivity).setDJ(wantsToBeDJ);
     }
@@ -454,7 +455,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         complete = true;
         return complete;
     }
-    
+
     private void toggleDJState(boolean isDJ, long gid) {
         if (isDJ) {
             if (gid == -1) {
@@ -469,7 +470,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             getSeekBar().setVisibility(View.VISIBLE);
             getSeekBar().setEnabled(true);
             mTrackQueue = new TrackQueue(getActivity(), gid)
-            .start();
+                    .start();
         } else {
             getDJBtn().setText(getString(R.string.player_become_dj));
             getButtons().setVisibility(View.INVISIBLE);
