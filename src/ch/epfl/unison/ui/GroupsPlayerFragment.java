@@ -73,7 +73,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 Log.d(TAG, "The activity was null, aborting.");
                 return;
             }
-            setIsDJ(!mIsDJ, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(true, !mIsDJ, mApi, mUid, mGid, mLatitude, mLongitude);
         }
 
     }
@@ -136,11 +136,11 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         // now everything is set up.
         if (!isDJ() && groupInfo.master != null
                 && Long.valueOf(mUid).equals(groupInfo.master.uid)) {
-            setIsDJ(true, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(false, true, mApi, mUid, mGid, mLatitude, mLongitude);
         } else if (isDJ()
                 && (groupInfo.master == null || !Long.valueOf(mUid)
                         .equals(groupInfo.master.uid))) {
-            setIsDJ(false, mApi, mUid, mGid, mLatitude, mLongitude);
+            setIsDJ(false, false, mApi, mUid, mGid, mLatitude, mLongitude);
         }
 
         // Update track information.
@@ -241,15 +241,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                             return;
                         }
                         if (mIsDJ) {
-                            getDJBtn().setText(
-                                    getString(R.string.player_leave_dj));
-                            getToggleBtn().setBackgroundResource(
-                                    R.drawable.btn_play);
-                            getButtons().setVisibility(View.VISIBLE);
-                            getSeekBar().setVisibility(View.VISIBLE);
-                            getSeekBar().setEnabled(true);
-                            mTrackQueue = new TrackQueue(getActivity(), gid)
-                                    .start();
+                            toggleDJState(true, gid);
                         }
                         mProcessingDjRequest = false;
                         // Log.d(TAG, "mProcessing is now false");
@@ -266,7 +258,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                                     R.string.error_becoming_dj,
                                     Toast.LENGTH_LONG).show();
                         }
-                        GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid,
+                        GroupsPlayerFragment.this.setIsDJ(true, false, api, uid, gid,
                                 lat, lon);
                         mProcessingDjRequest = false;
                         Log.d(TAG, "mProcessing is now false");
@@ -298,14 +290,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                     return;
                 }
                 if (!mIsDJ) {
-                    getDJBtn().setText(getString(R.string.player_become_dj));
-                    getButtons().setVisibility(View.INVISIBLE);
-                    getSeekBar().setVisibility(View.INVISIBLE);
-                    getSeekBar().setEnabled(false);
-
-                    getActivity().startService(
-                            new Intent(MusicService.ACTION_STOP));
-                    setStatus(Status.Stopped);
+                    toggleDJState(false, -1);
                 }
                 mProcessingDjRequest = false;
                 // Log.d(TAG, "mProcessing is now false");
@@ -323,13 +308,18 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         });
     }
 
-    protected void setIsDJ(boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat,
+    protected void setIsDJ(boolean serverComm, boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat,
             double lon) {
-        if (wantsToBeDJ) {
-            grabDJSeat(api, uid, gid, lat, lon);
+        if (serverComm) {
+            if (wantsToBeDJ) {
+                grabDJSeat(api, uid, gid, lat, lon);
+            } else {
+                dropDJSeat(api, uid, gid);
+            }
         } else {
-            dropDJSeat(api, uid, gid);
+            toggleDJState(wantsToBeDJ, -1);
         }
+        
         mIsDJ = wantsToBeDJ;
         ((GroupsMainActivity) mMainActivity).setDJ(wantsToBeDJ);
     }
@@ -463,5 +453,31 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         }
         complete = true;
         return complete;
+    }
+    
+    private void toggleDJState(boolean isDJ, long gid) {
+        if (isDJ) {
+            if (gid == -1) {
+                Log.d(TAG, "something went wrong when calling toggleDJState");
+                return;
+            }
+            getDJBtn().setText(
+                    getString(R.string.player_leave_dj));
+            getToggleBtn().setBackgroundResource(
+                    R.drawable.btn_play);
+            getButtons().setVisibility(View.VISIBLE);
+            getSeekBar().setVisibility(View.VISIBLE);
+            getSeekBar().setEnabled(true);
+            mTrackQueue = new TrackQueue(getActivity(), gid)
+            .start();
+        } else {
+            getDJBtn().setText(getString(R.string.player_become_dj));
+            getButtons().setVisibility(View.INVISIBLE);
+            getSeekBar().setVisibility(View.INVISIBLE);
+            getSeekBar().setEnabled(false);
+            getActivity().startService(
+                    new Intent(MusicService.ACTION_STOP));
+            setStatus(Status.Stopped);
+        }
     }
 }
