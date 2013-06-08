@@ -1,6 +1,9 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,7 +24,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -31,9 +33,6 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.view.Menu;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music

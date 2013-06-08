@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -59,8 +58,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     public void onClick(View v) {
         super.onClick(v);
 
-//        Log.d(TAG, "debug: mIsDJ:" + mIsDJ + " , mProcessingDjRequest:" + mProcessingDjRequest);
-        
+        // Log.d(TAG, "debug: mIsDJ:" + mIsDJ + " , mProcessingDjRequest:" +
+        // mProcessingDjRequest);
+
         // now we check if the DJ button was clicked:
         if (v == mDjBtn) {
             if (mProcessingDjRequest) {
@@ -196,12 +196,12 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 new UnisonAPI.Handler<JsonStruct.Success>() {
                     @Override
                     public void callback(JsonStruct.Success struct) {
-//                        Log.d(TAG, "debug: skip went well");
+                        // Log.d(TAG, "debug: skip went well");
                     }
 
                     @Override
                     public void onError(Error error) {
-//                        Log.d(TAG, "debug: an error occured in skip");
+                        // Log.d(TAG, "debug: an error occured in skip");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -237,7 +237,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
                     @Override
                     public void callback(Success structure) {
-//                        Log.d(TAG, "debug: got a positive answer from the server");
+                        // Log.d(TAG,
+                        // "debug: got a positive answer from the server");
                         if (getActivity() == null) {
                             Log.d(TAG,
                                     "Tried to update an Activity that was null!");
@@ -261,7 +262,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
                     @Override
                     public void onError(Error error) {
-//                        Log.d(TAG, "debug: got an error from the server");
+                        // Log.d(TAG, "debug: got an error from the server");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -270,13 +271,15 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                                     R.string.error_becoming_dj,
                                     Toast.LENGTH_LONG).show();
                         }
-                        //this does not work, an error can happen for too many reasons. 
+                        // this does not work, an error can happen for too many
+                        // reasons.
 
-//                        GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid,
+                        // GroupsPlayerFragment.this.setIsDJ(false, api, uid,
+                        // gid,
 
-//                        }
+                        // }
                         mIsDJ = false;
-                        
+
                         mProcessingDjRequest = false;
                         Log.d(TAG, "mProcessing is now false");
                     }
@@ -301,7 +304,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
             @Override
             public void callback(Success structure) {
-//                Log.d(TAG, "debug: got a positive answer from the server");
+                // Log.d(TAG, "debug: got a positive answer from the server");
                 if (getActivity() == null) {
                     Log.d(TAG, "Tried to update an Activity that was null!");
 
@@ -324,7 +327,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
             @Override
             public void onError(Error error) {
-//                Log.d(TAG, "debug: got an error from the server");
+                // Log.d(TAG, "debug: got an error from the server");
                 if (error != null) {
                     Log.d(TAG, error.toString());
                 }

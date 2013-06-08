@@ -1,10 +1,6 @@
 
 package ch.epfl.unison.data;
 
-import ch.epfl.unison.Const;
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
-
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +9,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import ch.epfl.unison.Const;
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -30,7 +30,7 @@ public class PlaylistItem extends AbstractItem {
     }
 
     private long mLocalId = -1; // Android sqlite
-    private long mSize = 0;
+    private int mSize = -1;
     private Date mLocalLastUpdated;
     private boolean mCreatedByGS; // maybe useless
     private long mGSPLId; // GS database id
@@ -74,7 +74,7 @@ public class PlaylistItem extends AbstractItem {
      */
     public static class Builder {
         private long mLocalId; // Android sqlite
-        private long mSize;
+        private int mSize;
         private Date mLocalLastUpdated;
         private String mTitle;
         private boolean mCreatedByGS;
@@ -95,11 +95,6 @@ public class PlaylistItem extends AbstractItem {
 
         public Builder localId(long id) {
             this.mLocalId = id;
-            return this;
-        }
-
-        public Builder size(long s) {
-            this.mSize = s;
             return this;
         }
 
@@ -350,8 +345,18 @@ public class PlaylistItem extends AbstractItem {
         this.mTitle = title;
     }
 
-    public long size() {
-        return this.mSize;
+    /**
+     * @return The arbitrary size if set, else the number of tracks, -1 if
+     *         nothing set.
+     */
+    public int size() {
+        if (mSize >= 0) {
+            return this.mSize;
+        } else if (mTracks != null) {
+            return this.mTracks.size();
+        } else {
+            return -1;
+        }
     }
 
     public void setTracks(LinkedList<MusicItem> tracks) {
@@ -441,6 +446,10 @@ public class PlaylistItem extends AbstractItem {
         return mAuthorName;
     }
 
+    /**
+     * @return the size as computed on the GS server. If you want the real size
+     *         of the playlist on the device, use {@link #size()} instead.
+     */
     public int getSize() {
         return mGSSize;
     }
@@ -467,8 +476,13 @@ public class PlaylistItem extends AbstractItem {
 
     @Override
     public int compareTo(AbstractItem another) {
-        // TODO Auto-generated method stub
-        return 0;
+        if (another instanceof PlaylistItem) {
+            PlaylistItem playlistItem = (PlaylistItem) another;
+            // TODO
+            return 0;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public void setMode(Mode mode) {

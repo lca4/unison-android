@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 
@@ -44,7 +43,8 @@ public class SoloTracksFragment extends AbstractListFragment {
     }
 
     /**
-     * Doesn't work, getListView count is 0.
+     * Doesn't work, getListView count is 0. It's kept in case this issue is
+     * resolved, then it should work.
      */
     private void highlightCurrent() {
         View v = getListView().findViewWithTag(mHostActivity.getPlaylist().current());

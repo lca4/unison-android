@@ -1,6 +1,8 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.Arrays;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +14,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
-
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;
-
-import java.util.Arrays;
 
 /**
  * @author vincent source: http://stackoverflow.com/questions/14222831/

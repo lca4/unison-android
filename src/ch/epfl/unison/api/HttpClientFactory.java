@@ -1,6 +1,8 @@
 
 package ch.epfl.unison.api;
 
+import java.net.URI;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectHandler;
@@ -14,8 +16,6 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
-
-import java.net.URI;
 
 /**
  * TODO(louismagarshack) Write the javadoc for this class.

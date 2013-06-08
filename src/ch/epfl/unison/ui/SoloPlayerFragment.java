@@ -7,13 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
 
 /**
- * Specialized Fragment for {@link SoloMainFragment}.
+ * Specialized Fragment for {@link SoloMainFragment}. Contains the music player.
  * 
  * @see AbstractMainActivity
  * @author marc
@@ -30,76 +29,10 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     private SoloMainActivity mHostActivity;
     private OnSoloPlayerListener mListener;
 
-    // /**
-    // * Handles instant ratings (when the user clicks on the rating button in
-    // the
-    // * player interface).
-    // */
-    // private class OnRatingClickListener implements OnClickListener {
-    //
-    // @Override
-    // public void onClick(View v) {
-    // if (getCurrentTrack() == null) {
-    // return;
-    // }
-    //
-    // AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-    // alert.setTitle(getString(R.string.player_rate));
-    // alert.setMessage(getString(R.string.player_like));
-    //
-    // LayoutInflater inflater = (LayoutInflater) getActivity()
-    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    // View layout = inflater.inflate(R.layout.rating_dialog, null);
-    // final RatingBar bar = (RatingBar) layout
-    // .findViewById(R.id.ratingBar);
-    //
-    // alert.setView(layout);
-    // alert.setPositiveButton(getString(R.string.player_ok),
-    // new DialogInterface.OnClickListener() {
-    //
-    // @Override
-    // public void onClick(DialogInterface dialog,
-    // int whichButton) {
-    // if (getCurrentTrack() != null) {
-    // int newRating = Math.max((int) bar.getRating(),
-    // 1);
-    // sendRating(getCurrentTrack(), newRating);
-    // }
-    // }
-    // });
-    //
-    // alert.setNegativeButton(getString(R.string.player_cancel), null);
-    // alert.show();
-    // }
-    //
-    // private void sendRating(MusicItem item, int rating) {
-    // Log.d(TAG, String.format("artist: %s, title: %s, rating: %d",
-    // item.artist, item.title, rating));
-    //
-    // UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
-    // // api.instantRate(mActivity.getGroupId(), item.artist, item.title,
-    // // rating,
-    // // new UnisonAPI.Handler<JsonStruct.Success>() {
-    // // @Override
-    // // public void callback(JsonStruct.Success struct) { }
-    // //
-    // // @Override
-    // // public void onError(Error error) {
-    // // Log.d(TAG, error.toString());
-    // // if (getActivity() != null) {
-    // // Toast.makeText(getActivity(),
-    // // R.string.error_sending_rating, Toast.LENGTH_LONG).show();
-    // // }
-    // // }
-    // // });
-    // }
-    // }
-
-    // private static final String TAG = "ch.epfl.unison.SoloPlayerFragment";
-
     @Override
     protected void notifyPlay(MusicItem item) {
         UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
+        // TODO tell the server to increment the listener counter
         // api.setCurrentTrack(mActivity.getGroupId(), item.artist,
         // item.title, new UnisonAPI.Handler<JsonStruct.Success>() {
         //
@@ -125,6 +58,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     @Override
     protected void notifySkip() {
         UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
+        // TODO tell the server to decrement the listener counter
         // api.skipTrack(mActivity.getGroupId(),
         // new UnisonAPI.Handler<JsonStruct.Success>() {
         // @Override
@@ -142,6 +76,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mHostActivity = (SoloMainActivity) activity;
+        // Ensure the host implements the interface
         try {
             mListener = (SoloMainActivity) activity;
         } catch (ClassCastException e) {

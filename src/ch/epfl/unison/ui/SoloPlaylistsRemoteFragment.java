@@ -1,6 +1,11 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -20,12 +24,9 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 /**
+ * Shows the playlists available on the GS server but not stored on the device.
+ * 
  * @author marc
  */
 public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
@@ -175,119 +176,21 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
         }
     }
 
-    // /** ArrayAdapter that displays the tracks of the playlist. */
-    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-    //
-    // public static final int ROW_LAYOUT = R.layout.list_row;
-    //
-    // public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-    // super(SoloPlaylistsRemoteFragment.this.getActivity(), 0, playlists);
-    // }
-    //
-    // @Override
-    // public View getView(int position, View view, ViewGroup parent) {
-    // PlaylistItem pl = (PlaylistItem) getItem(position);
-    // if (view == null) {
-    // LayoutInflater inflater =
-    // (LayoutInflater) SoloPlaylistsRemoteFragment.this.getActivity()
-    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    // view = inflater.inflate(ROW_LAYOUT, parent, false);
-    // }
-    // ((TextView) view.findViewById(R.id.listrow_title))
-    // .setText((getItem(position)).getTitle());
-    // int size = (int) getItem(position).size();
-    // String subtitle = getString(R.string.default_empty);
-    // switch (size) {
-    // case 0:
-    // subtitle = getString(R.string.solo_playlist_contains_no_track);
-    // break;
-    // case 1:
-    // subtitle = getString(R.string.solo_playlist_contains_track);
-    // default:
-    // subtitle = getString(R.string.solo_playlist_contains_tracks, size);
-    // break;
-    // }
-    // ((TextView) view.findViewById(R.id.listrow_subtitle))
-    // .setText(subtitle);
-    // view.setTag(pl);
-    // return view;
-    // }
-    // }
-
-    // /**
-    // * When clicking on a playlist, start MainActivity.
-    // */
-    // private class OnLocalPlaylistSelectedListener implements
-    // OnItemClickListener {
-    //
-    // @Override
-    // public void onItemClick(AdapterView<?> parent, View view, int position,
-    // long id) {
-    //
-    // // Give tracks to player here
-    // mHostActivity.startActivity(new Intent(mHostActivity,
-    // SoloMainActivity.class)
-    // .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem)
-    // view.getTag()).getLocalId())
-    // .putExtra(Const.Strings.TITLE, ((PlaylistItem)
-    // view.getTag()).getTitle()));
-    // // .putExtra(Const.Strings.PLID,
-    // // view.getTag());
-    // // UnisonAPI api =
-    // // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-    // // long uid =
-    // // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-    // // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
-    // // view.getTag();
-    //
-    // // api.joinGroup(uid, playlist.plid, new
-    // // UnisonAPI.Handler<JsonStruct.Success>() {
-    // //
-    // // @Override
-    // // public void callback(Success struct) {
-    // // SoloPlaylistsActivity.this.startActivity(
-    // // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-    // // .putExtra(Const.Strings.GID, playlist.plid)
-    // // .putExtra(Const.Strings.NAME, playlist.name));
-    // // }
-    // //
-    // // @Override
-    // // public void onError(Error error) {
-    // // Log.d(TAG, error.toString());
-    // // if (SoloPlaylistsActivity.this != null) {
-    // // Toast.makeText(SoloPlaylistsActivity.this,
-    // // R.string.error_joining_group,
-    // // Toast.LENGTH_LONG).show();
-    // // }
-    // // }
-    // //
-    // // });
-    // }
-    // }
-
-    // /**
-    // * To be used only once, at onCreate time. TODO Use this to display an row
-    // * telling the list is empty.
-    // */
-    // private void initPlaylistsRemote() {
-    // refreshPlaylistsRemote();
-    // }
+    // TODO When clicking on a playlist, show tracks
 
     /**
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsRemote() {
+        // TODO if mPlaylistsRemote is empty, tell it.
         setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsRemote));
 
     }
 
-    // public void refreshPlaylistsRemote(Activity activity) {
-    // setListAdapter(new PlaylistsAdapter(activity, mPlaylistsRemote));
-    // }
-
     /*
-     * --------------------------------------- PUBLIC METHODS (used by
-     * SoloPlaylistsActivity) ---------------------------------------
+     * -------------------------------------------------------------------------
+     * PUBLIC METHODS (used by SoloPlaylistsActivity)
+     * -------------------------------------------------------------------------
      */
 
     /**
@@ -312,22 +215,10 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
     /**
      * Replaces the list of playlists by the <code>playlists</code>.
      * 
-     * @param activity
-     * @param playlists
-     */
-    // public void set(Activity activity, ArrayList<PlaylistItem> playlists) {
-    // mPlaylistsRemote = playlists;
-    // refreshPlaylistsRemote(activity);
-    // }
-
-    /**
-     * Replaces the list of playlists by the <code>playlists</code>.
-     * 
      * @param playlists
      */
     public void set(ArrayList<PlaylistItem> playlists) {
         mPlaylistsRemote = playlists;
         refreshPlaylistsRemote();
     }
-
 }

@@ -3,7 +3,6 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
