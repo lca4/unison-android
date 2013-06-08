@@ -59,6 +59,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     public void onClick(View v) {
         super.onClick(v);
 
+//        Log.d(TAG, "debug: mIsDJ:" + mIsDJ + " , mProcessingDjRequest:" + mProcessingDjRequest);
+        
         // now we check if the DJ button was clicked:
         if (v == mDjBtn) {
             if (mProcessingDjRequest) {
@@ -194,10 +196,12 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 new UnisonAPI.Handler<JsonStruct.Success>() {
                     @Override
                     public void callback(JsonStruct.Success struct) {
+//                        Log.d(TAG, "debug: skip went well");
                     }
 
                     @Override
                     public void onError(Error error) {
+//                        Log.d(TAG, "debug: an error occured in skip");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -233,6 +237,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
                     @Override
                     public void callback(Success structure) {
+//                        Log.d(TAG, "debug: got a positive answer from the server");
                         if (getActivity() == null) {
                             Log.d(TAG,
                                     "Tried to update an Activity that was null!");
@@ -250,12 +255,13 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                                     .start();
                         }
                         mProcessingDjRequest = false;
+                        mMainActivity.setDJ(true);
                         // Log.d(TAG, "mProcessing is now false");
                     }
 
                     @Override
                     public void onError(Error error) {
-                        mIsDJ = false;
+//                        Log.d(TAG, "debug: got an error from the server");
                         if (error != null) {
                             Log.d(TAG, error.toString());
                         }
@@ -264,8 +270,13 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                                     R.string.error_becoming_dj,
                                     Toast.LENGTH_LONG).show();
                         }
-                        GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid,
-                                lat, lon);
+                        //this does not work, an error can happen for too many reasons. 
+
+//                        GroupsPlayerFragment.this.setIsDJ(false, api, uid, gid,
+
+//                        }
+                        mIsDJ = false;
+                        
                         mProcessingDjRequest = false;
                         Log.d(TAG, "mProcessing is now false");
                     }
@@ -290,6 +301,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
             @Override
             public void callback(Success structure) {
+//                Log.d(TAG, "debug: got a positive answer from the server");
                 if (getActivity() == null) {
                     Log.d(TAG, "Tried to update an Activity that was null!");
 
@@ -306,11 +318,13 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                     setStatus(Status.Stopped);
                 }
                 mProcessingDjRequest = false;
+                mMainActivity.setDJ(false);
                 // Log.d(TAG, "mProcessing is now false");
             }
 
             @Override
             public void onError(Error error) {
+//                Log.d(TAG, "debug: got an error from the server");
                 if (error != null) {
                     Log.d(TAG, error.toString());
                 }
@@ -323,13 +337,12 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
     protected void setIsDJ(boolean wantsToBeDJ, UnisonAPI api, long uid, long gid, double lat,
             double lon) {
+        mIsDJ = wantsToBeDJ;
         if (wantsToBeDJ) {
             grabDJSeat(api, uid, gid, lat, lon);
         } else {
             dropDJSeat(api, uid, gid);
         }
-        mIsDJ = wantsToBeDJ;
-        mMainActivity.setDJ(wantsToBeDJ);
     }
 
     // /**
