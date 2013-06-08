@@ -1,12 +1,6 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,6 +22,7 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
@@ -37,6 +32,13 @@ import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockActivity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Activity where the user can rate the music on his device (or, more precisely:
@@ -117,7 +119,9 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
             @Override
             public void onError(Error error) {
-                Log.d(TAG, error.toString());
+                if (error != null) {
+                    Log.d(TAG, error.toString());
+                }
                 if (GroupsRatingsActivity.this != null) {
                     Toast.makeText(GroupsRatingsActivity.this, R.string.error_loading_ratings,
                             Toast.LENGTH_LONG).show();
@@ -128,7 +132,8 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
     private void initItems() {
         UnisonDB db = new UnisonDB(this);
-        mItems = new ArrayList<MusicItem>(db.getMusicItems());
+        mItems = new ArrayList<MusicItem>(
+                (Collection<? extends MusicItem>) db.getEntries(MusicItem.class));
         // LibraryHelper helper = new LibraryHelper(this);
         // mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);
@@ -157,7 +162,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
     /** Adapter used to display tracks and their ratings in a ListView. */
     private class RatingsAdapter extends ArrayAdapter<MusicItem> {
 
-        public static final int ROW_LAYOUT = R.layout.ratings_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_ratings;
 
         private GroupsRatingsActivity mActivity;
 
@@ -208,7 +213,9 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
                         @Override
                         public void onError(Error error) {
-                            Log.d(TAG, error.toString());
+                            if (error != null) {
+                                Log.d(TAG, error.toString());
+                            }
                             if (GroupsRatingsActivity.this != null) {
                                 Toast.makeText(GroupsRatingsActivity.this,
                                         R.string.error_updating_rating,

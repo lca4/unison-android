@@ -3,6 +3,7 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 
@@ -53,10 +54,12 @@ public abstract class AbstractMenu {
             case R.id.menu_item_help:
                 activity.startActivity(new Intent(activity, HelpActivity.class));
                 break;
-            // case R.id.menu_item_solo:
-            // activity.startActivity(new Intent(activity,
-            // SoloPlaylistsActivity.class));
-            // break;
+            case R.id.menu_item_groups:
+                activity.startActivity(new Intent(activity, GroupsActivity.class));
+                break;
+            case R.id.menu_item_solo:
+                activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
+                break;
             case R.id.menu_item_history:
                 activity.startActivity(new Intent(activity, GroupsHistoryActivity.class).putExtra(
                         Const.Strings.CALLER, activity.getClass().getName()));
@@ -83,16 +86,17 @@ public abstract class AbstractMenu {
                 // GroupsActivity.class)
                 // .setAction(GroupsActivity.ACTION_LEAVE_GROUP)
                 // .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                
+
                 if (!(activity instanceof HomeActivity)) {
                     if (activity instanceof GroupsMainActivity) {
-                        activity.startActivity(new Intent(activity, GroupsActivity.class).setAction(
-                                GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
-                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        activity.startActivity(new Intent(activity, GroupsActivity.class)
+                                .setAction(
+                                        GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                     // Make sure the activity is finished, even if it was at the
                     // bottom of the stack.
-                    activity.finish();                    
+                    activity.finish();
                 }
                 break;
             default:

@@ -1,15 +1,16 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,8 +22,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.Menu;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -30,7 +29,11 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.PlaylistItem;
+
+import com.actionbarsherlock.view.Menu;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
@@ -51,6 +54,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
     private static final double MAX_DISTANCE = 2000;
 
     private Set<OnGroupInfoListener> mListeners = new HashSet<OnGroupInfoListener>();
+
+    private NfcAdapter mNfcAdapter = null;
 
     private JsonStruct.Group mGroup;
 
@@ -112,6 +117,62 @@ public class GroupsMainActivity extends AbstractMainActivity {
         // handleExtras(intent.getExtras());
     }
 
+    private void setupNFC() {
+        NfcManager manager = (NfcManager) GroupsMainActivity
+                .this.getSystemService(Context.NFC_SERVICE);
+
+        mNfcAdapter = manager.getDefaultAdapter();
+
+        if (mNfcAdapter == null) {
+            // FIXME
+            // Toast.makeText(GroupsMainActivity.this, "fixme",
+            // Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!mNfcAdapter.isEnabled()) {
+            // FIXME
+            // Toast.makeText(GroupsMainActivity.this, "fixme",
+            // Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Log.d(TAG, "NFC is enabled");
+    }
+
+    private NdefMessage getNdefFromGID(Long gid) {
+        NdefRecord[] records = {
+                new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
+                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0], gid.toString()
+                                .getBytes())
+        };
+
+        return new NdefMessage(records);
+    }
+
+    private void enableGIDOverNFC() {
+        if (mNfcAdapter != null && mGroup != null && mGroup.gid != null) {
+            mNfcAdapter.enableForegroundNdefPush(GroupsMainActivity.this,
+                    getNdefFromGID(mGroup.gid));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundNdefPush(GroupsMainActivity.this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        enableGIDOverNFC();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,11 +185,14 @@ public class GroupsMainActivity extends AbstractMainActivity {
                 getSupportActBar().newTab().setText(
                         R.string.fragment_title_stats),
                 GroupsStatsFragment.class, null);
+
+        setupNFC();
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean res = super.onCreateOptionsMenu(menu);
+        getMenu().findItem(R.id.menu_item_groups).setVisible(false);
         getMenu().findItem(R.id.menu_item_history).setVisible(true);
         return res;
     }
@@ -160,7 +224,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
 
                     @Override
                     public void onError(UnisonAPI.Error error) {
-                        Log.d(TAG, error.toString());
+                        if (error != null) {
+                            Log.d(TAG, error.toString());
+                        }
                         if (GroupsMainActivity.this != null) {
                             Toast.makeText(GroupsMainActivity.this,
                                     R.string.error_loading_info,
@@ -204,8 +270,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     };
 
-    private void sendPassword(String pw) {
-        AppData data = AppData.getInstance(GroupsMainActivity.this);
+    private void sendPassword(final String pw) {
+        final AppData data = AppData.getInstance(GroupsMainActivity.this);
         UnisonAPI api = data.getAPI();
 
         api.setGroupPassword(mGroup.gid, pw,
@@ -218,6 +284,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
                                     R.string.main_success_setting_password,
                                     Toast.LENGTH_LONG).show();
                         }
+
+                        mGroup.password = !pw.equals("");
+                        data.addToHistory(mGroup);
                     }
 
                     @Override
@@ -281,9 +350,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-//    @Override
-//    protected PlaylistItem getPlaylist() {
-//        return null;
-//    }
+    // @Override
+    // protected PlaylistItem getPlaylist() {
+    // return null;
+    // }
 
 }

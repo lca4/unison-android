@@ -1,19 +1,20 @@
 
 package ch.epfl.unison.api;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.JsonStruct.TracksList;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Implements an "infinite" playlist. Tracks are buffered locally such that we
@@ -165,7 +166,9 @@ public class TrackQueue {
 
             @Override
             public void onError(UnisonAPI.Error error) {
-                Log.d(TAG, error.toString());
+                if (error != null) {
+                    Log.d(TAG, error.toString());
+                }
                 requestTracks(trials - 1);
             }
         });

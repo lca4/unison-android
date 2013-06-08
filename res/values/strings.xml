@@ -26,12 +26,18 @@
     <string name="activity_title_history">Group History</string>
     <string name="activity_title_manage">Set Password</string>
     <string name="activity_title_home">GroupStreamer</string>
+    <string name="title_activity_nfcrecieve_group">Join Group Using NFC</string>
+    <string name="title_activity_nfcsend_group">Share Group Using NFC</string>
+    <string name="title_activity_nfc_management">NfcManagementActivity</string>
 
     <!-- Fragment titles -->
     <string name="fragment_title_player">Music</string>
     <string name="fragment_title_stats">Stats</string>
-    <string name="solo_player_fragment_title">Music</string>
-    <string name="solo_playlist_fragment_title">Tracks</string>
+    <string name="solo_fragment_player_title">Music</string>
+    <string name="solo_fragment_playlist_title">Tracks</string>
+    <string name="solo_fragment_playlists_local_title">Local</string>
+    <string name="solo_fragment_playlists_remote_title">Remote</string>
+    
 
     <!-- Menu. -->
     <string name="menu_title_refresh">Refresh</string>
@@ -42,7 +48,7 @@
     <string name="pref_title_nickname">Nickname</string>
     <string name="pref_summary_nickname">Lets other users identify you.</string>
     <string name="pref_title_uid">UUID</string>
-     <string name="pref_title_suggestion_enabled">Enable Suggestions</string>
+    <string name="pref_title_suggestion_enabled">Enable Suggestions</string>
 
     <!-- Ratings -->
     <string name="ratings_improve_gs">Ratings improve GroupStreamer\'s effectiveness.</string>
@@ -62,15 +68,12 @@
     <string name="login_loginBtn">Log In</string>
     <string name="login_signup">New to GroupStreamer ?</string>
     <string name="login_signup_html"><![CDATA[New to GroupStreamer? <a href="#">Sign up</a>.]]></string>
-    <string name="login_signing_in">Signing in&#8230;</string> <!-- &#8230; is "..." -->
+    <string name="login_signing_in">Signing in&#8230;</string>
+ <!-- &#8230; is "..." -->
     <string name="login_menu_signup">Sign Up</string>
-    
-    <!-- Home -->
-    <string name="home_button_groups">Groups</string>
-    <string name="home_button_groups_desc">Enter the groups mode</string>
-    <string name="home_button_solo">Single-user mode</string>
-    <string name="home_button_solo_desc">Enter the single-user mode</string>
-
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_error_occurred">Could not reset password</string>
+    <string name="login_sent_email">An e-mail was sent to the provided address</string>
 
     <!-- Groups -->
     <string name="groups_helpdialog_title">Welcome</string>
@@ -94,25 +97,27 @@
     <string name="groups_chooseGrp">or select one below :</string>
     <string name="groups_password_dialog_title">Enter group password</string>
     <string name="group_no_longer_exists_dialog_title">Ooops&#8230; this group no longer exists!</string>
-    <!-- <string name="group_no_longer_exists_dialog_body">You may want to recreate this group, or if someone else already did it, go back to the list of groups and join this new group as you usually do.
+    <!--
+<string name="group_no_longer_exists_dialog_body">You may want to recreate this group, or if someone else already did it, go back to the list of groups and join this new group as you usually do.
 
-You can also just cancel this action and stay in groups history.</string> -->
-	<string name="group_no_longer_exists_dialog_body">You can either create one with the same name.\nOr Jump back to the list of groups</string>
+You can also just cancel this action and stay in groups history.</string>
+    -->
+    <string name="group_no_longer_exists_dialog_body">You can either create one with the same name.\nOr Jump back to the list of groups</string>
     <string name="automatic_group_no_longer_exists_body">You can go back to the groups list or continue browsing your history.</string>
     <string name="group_no_longer_exists_dialog_recreate_group">Recreate group</string>
     <string name="group_no_longer_exists_dialog_go_groups_activity">Go back to groups list</string>
     
     
     <!-- Main -->
- 	<string name="main_set_password_title">Choose PIN</string>
-	<string name="main_password_hint">Group Password</string>
-	<string name="main_password_ok">OK</string>
-	<string name="main_password_cancel">Cancel</string>
-	<string name="main_success_setting_password">Successfully set Password</string>
-	<string name="main_password_reset">Reset Password</string>
+    <string name="main_set_password_title">Choose PIN</string>
+    <string name="main_password_hint">Group Password</string>
+    <string name="main_password_ok">OK</string>
+    <string name="main_password_cancel">Cancel</string>
+    <string name="main_success_setting_password">Successfully set Password</string>
+    <string name="main_password_reset">Reset Password</string>
 
     <!-- Single user mode -->
-   	<string name="solo_playlists_helpdialog_title">Welcome</string>
+    <string name="solo_playlists_helpdialog_title">Welcome</string>
     <string name="solo_playlists_helpdialog_message">Want to learn how to use the application ?</string>
     <string name="solo_playlists_helpdialog_chkbox">Don\'t show this again</string>
     <string name="solo_playlists_helpdialog_yesBtn">Yes</string>
@@ -125,6 +130,9 @@ You can also just cancel this action and stay in groups history.</string> -->
     <string name="solo_playlists_choosePL">or select one below :</string>
     <string name="solo_playlists_fragment_local_list_row_image_desc">Playlist icon</string>
     
+    <!-- Solo menu entries -->
+    <string name="solo_menu_create_playlist">Create a playlist</string>
+    
     
     <!-- Solo playlists --> 
     <string name="solo_playlists_createBtn">Create playlist</string>
@@ -136,20 +144,28 @@ You can also just cancel this action and stay in groups history.</string> -->
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
     <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
+    <string name="solo_playlist_contains_no_track">No track</string>
+    <string name="solo_playlist_contains_track">1 track</string>
+    <string name="solo_playlist_contains_tracks">%d tracks</string>
     
     <!-- Solo Fragments tags -->
     <string name="solo_playlists_fragment_local_tag">solo playlists fragment local</string>
     <string name="solo_playlists_fragment_remote_tag">solo playlists fragment remote</string>
-    
+
     <!-- Solo playlist context menu -->
     <string name="playlist_context_menu_item_delete">Delete</string>
     <string name="playlist_context_menu_item_share">Share with other users</string>
     <string name="playlist_context_menu_item_edit">Edit</string>
     <string name="playlist_context_menu_item_save">Save to phone</string>
-    
+
+
     <!-- Home -->
     <string name="home_title">How many are you?</string>
-    
+    <string name="home_button_groups">Groups</string>
+    <string name="home_button_groups_desc">Enter the groups mode</string>
+    <string name="home_button_solo">Single-user mode</string>
+    <string name="home_button_solo_desc">Enter the single-user mode</string>
+
     <!-- Solo player -->
 
     <!-- Player -->
@@ -172,7 +188,8 @@ You can also just cancel this action and stay in groups history.</string> -->
     <string name="signup_password_confirm_hint">Confirm password</string>
     <string name="signup_tou">I agree to the Terms of Use</string>
     <string name="signup_signupBtn">Sign Up</string>
-    <string name="signup_signing_up">Signing up&#8230;</string> <!-- &#8230; is "..." -->
+    <string name="signup_signing_up">Signing up&#8230;</string>
+ <!-- &#8230; is "..." -->
 
 
     <!-- SignUpForm -->
@@ -189,9 +206,15 @@ You can also just cancel this action and stay in groups history.</string> -->
     <!-- Stats -->
     <string name="stats_not_playing">No track playing</string>
     <string name="stats_taste">How do people like this song ?</string>
+
+    <!-- History -->
+    <string name="history_delete_label">Delete History</string>
+
+    <!-- NFC -->
+    <string name="NFC_reciever_wait">Wainting for an NFC transmission</string>
+    <string name="NFC_send_button">Share group!</string>
     
-    <!--  History -->
-	<string name="history_delete_label">Delete History</string>
+    
 
     <!-- Errors. -->
     <string name="error_generic_server_response">Server responded:</string>
@@ -215,11 +238,16 @@ You can also just cancel this action and stay in groups history.</string> -->
     <string name="error_sending_rating">Unable to save rating.</string>
     <string name="error_becoming_dj">Unable to take DJ spot - maybe someone is already there.</string>
     <string name="error_group_to_recreate">Sorry an error occurred while trying to recreate the group. Please do it manually.</string>
+    <string name="error_NFC_not_present">Sorry, your phone doesn\'t have NFC :\'(</string>
+    <string name="error_NFC_not_active">Please turn on the NFC feature.</string>
+    
     <!-- <string name="title_activity_group_history">GroupHistoryActivity</string> -->
     <string name="error_solo_save_playlist">Unable to save the playlist to your device.</string>
     <string name="error_solo_remove_playlist_from_local_dbs">Unable to remove the playlist from your device.</string>
     <string name="error_solo_remove_playlist_from_gs_server">Unable to remove the playlist from the server.</string>
     <string name="error_solo_generate_playlists">The server was unable to remove the playlist from the server.</string>
     <string name="error_not_yet_available">Sorry, this is not yet available&#8230;</string>
+    <string name="action_settings">Settings</string>
+    <string name="error_creating_suggestion_popup">There was an error while trying to suggest a group.</string>
 
 </resources>

@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 
@@ -57,7 +58,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
         if (groupInfo.track != null && groupInfo.track.title != null) {
             mTrackTitle.setText(groupInfo.track.title);
         }
-        mUsersList.setAdapter(new StatsAdapter(groupInfo));
+        GroupsStatsFragment.this.mUsersList.setAdapter(new StatsAdapter(groupInfo));
     }
 
     @Override
@@ -79,7 +80,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
      */
     private class StatsAdapter extends ArrayAdapter<JsonStruct.User> {
 
-        public static final int ROW_LAYOUT = R.layout.stats_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_stats;
 
         public StatsAdapter(JsonStruct.Group group) {
             super(GroupsStatsFragment.this.getActivity(), 0, group.users);
@@ -99,7 +100,7 @@ public class GroupsStatsFragment extends SherlockFragment implements
                 score = getItem(position).score;
             }
             float rating = Math.round(score / TEN) / TWO;
-            ((RatingBar) view.findViewById(R.id.trackrow_rating)).setRating(rating);
+            ((RatingBar) view.findViewById(R.id.listrow_stats_rating)).setRating(rating);
 
             TextView explanation = (TextView) view.findViewById(R.id.likingExplanation);
             if (getItem(position).score == null || getItem(position).predicted == null) {

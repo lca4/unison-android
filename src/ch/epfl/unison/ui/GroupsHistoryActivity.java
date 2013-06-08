@@ -1,23 +1,11 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -26,21 +14,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.JsonStruct.Success;
-import ch.epfl.unison.api.UnisonAPI;
-import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Louis Activity that is used to display the history for groups. This
@@ -49,12 +39,12 @@ import com.actionbarsherlock.view.MenuItem;
 public class GroupsHistoryActivity extends SherlockActivity {
 
     private static final String TAG = "ch.epfl.unison.GroupHistoryActivity";
-    private Menu mMenu;
+    // private Menu mMenu;
     private List<JsonStruct.Group> mGroupsHistory = null;
     private ListView mGroupsList;
     private JsonStruct.Group mGroupClicked = null;
     private boolean mAlreadyInGroup = false;
-    private AlertDialog mGroupNoLongerExistsDialog;
+    // private AlertDialog mGroupNoLongerExistsDialog;
 
     private BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
@@ -97,10 +87,16 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
         try {
             mGroupsList.setAdapter(new GroupsAdapter());
-            repaintRefresh(false);
         } catch (NullPointerException e) {
             Log.w(TAG, "group or activity is null?", e);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean b = super.onCreateOptionsMenu(menu);
+        // menu.findItem(R.id.menu_item_groups).setVisible(false);
+        return b;
     }
 
     private void mapOfGroupsToArrayListWithSort(Map<Long, Pair<JsonStruct.Group, Date>> map) {
@@ -147,7 +143,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
     /** Adapter used to populate the ListView listing the groups. */
     private class GroupsAdapter extends ArrayAdapter<JsonStruct.Group> {
 
-        public static final int ROW_LAYOUT = R.layout.group_history_row;
+        public static final int ROW_LAYOUT = R.layout.listrow_groups_history;
 
         public GroupsAdapter() {
             super(GroupsHistoryActivity.this, 0, mGroupsHistory);
@@ -180,31 +176,6 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
             view.setTag(group);
             return view;
-        }
-    }
-
-    // @Override
-    // public void onRefresh() {
-    // repaintRefresh(true);
-    // //No server comm for now.
-    // }
-
-    public void repaintRefresh(boolean isRefreshing) {
-        if (mMenu == null) {
-            return;
-        }
-
-        MenuItem refreshItem = mMenu.findItem(R.id.menu_item_refresh);
-        if (refreshItem != null) {
-            if (isRefreshing) {
-                LayoutInflater inflater = (LayoutInflater) getSupportActionBar()
-                        .getThemedContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View refreshView = inflater.inflate(
-                        R.layout.actionbar_indeterminate_progress, null);
-                refreshItem.setActionView(refreshView);
-            } else {
-                refreshItem.setActionView(null);
-            }
         }
     }
 
@@ -249,11 +220,19 @@ public class GroupsHistoryActivity extends SherlockActivity {
             // }
             // };
 
-            if (mGroupClicked.password) {
-                promptForPassword(mGroupClicked);
+            /*
+             * if (mGroupClicked.password) { promptForPassword(mGroupClicked); }
+             * else { joinGroup(mGroupClicked, null); }
+             */
+            Intent intent = new Intent(GroupsHistoryActivity.this, GroupsActivity.class)
+                    .putExtra(Const.Strings.GROUP, mGroupClicked)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            if (mAlreadyInGroup) {
+                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY_LEAVE_GROUP);
             } else {
-                joinGroup(mGroupClicked, null);
+                intent.setAction(GroupsActivity.ACTION_FROM_HISTORY);
             }
+            startActivity(intent);
         }
     }
 
@@ -287,162 +266,93 @@ public class GroupsHistoryActivity extends SherlockActivity {
     // });
     // }
 
-    private void joinGroup(final JsonStruct.Group group, String password) {
-        final AppData data = AppData.getInstance(GroupsHistoryActivity.this);
-        UnisonAPI api = data.getAPI();
-        long uid = data.getUid();
+    /*
+     * private void joinGroup(final JsonStruct.Group group, String password) {
+     * final AppData data = AppData.getInstance(GroupsHistoryActivity.this);
+     * UnisonAPI api = data.getAPI(); long uid = data.getUid();
+     * UnisonAPI.Handler<JsonStruct.Success> handler = new
+     * UnisonAPI.Handler<JsonStruct.Success>() {
+     * @Override public void callback(Success struct) { //This is done because
+     * we don't want to be kicked from a autogoup //if we join it using the
+     * history. //This is in case of wrong automatic behavior. group.automatic =
+     * false; GroupsHistoryActivity.this.startActivity( new
+     * Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
+     * .putExtra(Const.Strings.GROUP, group)
+     * .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
+     * @Override public void onError(Error error) { if (error != null) {
+     * Log.d(TAG, error.toString()); } if (GroupsHistoryActivity.this != null) {
+     * if (error.hasJsonError() && error.jsonError.error ==
+     * UnisonAPI.ErrorCodes.INVALID_GROUP) { //here the group no longer exists,
+     * the user needs to take an action: //you may comment this line for testing
+     * purpose only! data.removeOneHistoryItem(group.gid);
+     * mGroupsHistory.remove(group); mGroupsList.setAdapter(new
+     * GroupsAdapter()); showErrorPopup(); } else { Log.d(TAG,
+     * "The error was not due to an invalid group.");
+     * Toast.makeText(GroupsHistoryActivity.this, R.string.error_joining_group,
+     * Toast.LENGTH_LONG).show(); } } } }; if (group.password && password !=
+     * null) { // if (mAlreadyInGroup) { // leaveThenJoinGroup(handler, uid,
+     * group, password); // } else { api.joinProtectedGroup(uid, group.gid,
+     * password, handler); // } } else { // if (mAlreadyInGroup) { //
+     * leaveThenJoinGroup(handler, uid, group, null); // } else {
+     * api.joinGroup(uid, group.gid, handler); // } } }
+     */
 
-        UnisonAPI.Handler<JsonStruct.Success> handler =
-                new UnisonAPI.Handler<JsonStruct.Success>() {
+    /*
+     * private void showErrorPopup() { AlertDialog.Builder builder = new
+     * AlertDialog.Builder(GroupsHistoryActivity.this);
+     * builder.setTitle(R.string.group_no_longer_exists_dialog_title);
+     * LayoutInflater layoutInflater = (LayoutInflater)
+     * getSystemService(Context.LAYOUT_INFLATER_SERVICE); int layout =
+     * R.layout.group_no_longer_exists_dialog; if (mGroupClicked.automatic) {
+     * layout = R.layout.automatic_group_no_longer_exists_dialog; } View
+     * dialogView = layoutInflater.inflate(layout, null);
+     * builder.setView(dialogView); mGroupNoLongerExistsDialog =
+     * builder.create(); mGroupNoLongerExistsDialog.show(); } public void
+     * errorDialogCreateGroupPressed(View view) { startActivity(new Intent(this,
+     * GroupsActivity.class).setAction(
+     * GroupsActivity.ACTION_CREATE_AND_JOIN_GROUP).addFlags(
+     * Intent.FLAG_ACTIVITY_CLEAR_TOP)
+     * .putExtra(Const.Strings.GROUP_TO_CREATE_NAME, mGroupClicked.name));
+     * mGroupNoLongerExistsDialog.dismiss(); } public void
+     * errorDialogGoGroupsActivityPressed(View view) { if (mAlreadyInGroup) {
+     * startActivity(new Intent(this, GroupsActivity.class).setAction(
+     * GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
+     * Intent.FLAG_ACTIVITY_CLEAR_TOP)); } else { startActivity(new Intent(this,
+     * GroupsActivity.class).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP)); }
+     * mGroupNoLongerExistsDialog.dismiss(); finish(); } public void
+     * errorDialogCancelPressed(View view) {
+     * mGroupNoLongerExistsDialog.dismiss(); }
+     */
 
-                    @Override
-                    public void callback(Success struct) {
-                        // This is done because we don't want to be kicked from
-                        // a autogoup
-                        // if we join it using the history.
-                        // This is in case of wrong automatic behavior.
-                        group.automatic = false;
-                        GroupsHistoryActivity.this.startActivity(
-                                new Intent(GroupsHistoryActivity.this, GroupsMainActivity.class)
-                                        .putExtra(Const.Strings.GROUP, group)
-                                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        Log.d(TAG, error.toString());
-                        if (GroupsHistoryActivity.this != null) {
-
-                            if (error.hasJsonError()
-                                    && error.jsonError.error == UnisonAPI.ErrorCodes.INVALID_GROUP) {
-                                // here the group no longer exists, the user
-                                // needs to take an action:
-                                // you may comment this line for testing purpose
-                                // only!
-                                data.removeOneHistoryItem(group.gid);
-                                showErrorPopup();
-
-                            } else {
-                                Log.d(TAG, "The error was not due to an invalid group.");
-                                Toast.makeText(GroupsHistoryActivity.this,
-                                        R.string.error_joining_group,
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }
-
-                };
-        if (group.password && password != null) {
-            // if (mAlreadyInGroup) {
-            // leaveThenJoinGroup(handler, uid, group, password);
-            // } else {
-            api.joinProtectedGroup(uid, group.gid, password, handler);
-            // }
-        } else {
-            // if (mAlreadyInGroup) {
-            // leaveThenJoinGroup(handler, uid, group, null);
-            // } else {
-            api.joinGroup(uid, group.gid, handler);
-            // }
-        }
-    }
-
-    private void showErrorPopup() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(GroupsHistoryActivity.this);
-        builder.setTitle(R.string.group_no_longer_exists_dialog_title);
-        LayoutInflater layoutInflater = (LayoutInflater)
-                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        int layout = R.layout.group_no_longer_exists_dialog;
-        if (mGroupClicked.automatic) {
-            layout = R.layout.automatic_group_no_longer_exists_dialog;
-        }
-        View dialogView = layoutInflater.inflate(layout, null);
-        builder.setView(dialogView);
-
-        mGroupNoLongerExistsDialog = builder.create();
-        mGroupNoLongerExistsDialog.show();
-    }
-
-    public void errorDialogCreateGroupPressed(View view) {
-        startActivity(new Intent(this, GroupsActivity.class).setAction(
-                GroupsActivity.ACTION_CREATE_AND_JOIN_GROUP).addFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(Const.Strings.GROUP_TO_CREATE_NAME, mGroupClicked.name));
-
-        mGroupNoLongerExistsDialog.dismiss();
-    }
-
-    public void errorDialogGoGroupsActivityPressed(View view) {
-        if (mAlreadyInGroup) {
-            startActivity(new Intent(this, GroupsActivity.class).setAction(
-                    GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        } else {
-            startActivity(new Intent(this, GroupsActivity.class).addFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        }
-        mGroupNoLongerExistsDialog.dismiss();
-        finish();
-    }
-
-    public void errorDialogCancelPressed(View view) {
-        // repaintRefresh(false);
-        mGroupNoLongerExistsDialog.dismiss();
-    }
-
-    private void promptForPassword(final JsonStruct.Group group) {
-        if (group.password) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(GroupsHistoryActivity.this);
-            builder.setTitle(R.string.groups_password_dialog_title);
-
-            LayoutInflater layoutInflater = (LayoutInflater)
-                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View dialogView = layoutInflater.inflate(R.layout.password_prompt_dialog, null);
-            builder.setView(dialogView);
-
-            final EditText password = (EditText)
-                    dialogView.findViewById(R.id.groupPassword);
-
-            DialogInterface.OnClickListener passwordClick = new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == Dialog.BUTTON_POSITIVE) {
-                        joinGroup(group, password.getText().toString());
-                    }
-                }
-            };
-
-            builder.setPositiveButton(getString(R.string.generic_ok), passwordClick);
-            builder.setNegativeButton(getString(R.string.generic_cancel), passwordClick);
-
-            final AlertDialog dialog = builder.create();
-
-            password.addTextChangedListener(new TextWatcher() {
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                            .setEnabled(
-                                    s.length() == AppData.getInstance(GroupsHistoryActivity.this)
-                                            .getGroupPasswordLength());
-                }
-
-                @Override
-                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                    // Do nothing
-                }
-
-                @Override
-                public void afterTextChanged(Editable arg0) {
-                    // Do nothing
-                }
-            });
-
-            dialog.show();
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
-        }
-    }
+    /*
+     * private void promptForPassword(final JsonStruct.Group group) { if
+     * (group.password) { AlertDialog.Builder builder = new
+     * AlertDialog.Builder(GroupsHistoryActivity.this);
+     * builder.setTitle(R.string.groups_password_dialog_title); LayoutInflater
+     * layoutInflater = (LayoutInflater)
+     * getSystemService(Context.LAYOUT_INFLATER_SERVICE); View dialogView =
+     * layoutInflater.inflate(R.layout.password_prompt_dialog, null);
+     * builder.setView(dialogView); final EditText password = (EditText)
+     * dialogView.findViewById(R.id.groupPassword);
+     * DialogInterface.OnClickListener passwordClick = new
+     * DialogInterface.OnClickListener() {
+     * @Override public void onClick(DialogInterface dialog, int which) { if
+     * (which == Dialog.BUTTON_POSITIVE) { joinGroup(group,
+     * password.getText().toString()); } } };
+     * builder.setPositiveButton(getString(R.string.generic_ok), passwordClick);
+     * builder.setNegativeButton(getString(R.string.generic_cancel),
+     * passwordClick); final AlertDialog dialog = builder.create();
+     * password.addTextChangedListener(new TextWatcher() {
+     * @Override public void onTextChanged(CharSequence s, int start, int
+     * before, int count) { dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+     * .setEnabled(s.length() == AppData.getInstance(GroupsHistoryActivity.this)
+     * .getGroupPasswordLength()); }
+     * @Override public void beforeTextChanged(CharSequence arg0, int arg1, int
+     * arg2, int arg3) { //Do nothing }
+     * @Override public void afterTextChanged(Editable arg0) { //Do nothing }
+     * }); dialog.show();
+     * dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false); } }
+     */
 
     public void clearHistory(View view) {
         AppData data = AppData.getInstance(GroupsHistoryActivity.this);
@@ -461,7 +371,7 @@ public class GroupsHistoryActivity extends SherlockActivity {
 
             mGroupsList.setAdapter(new GroupsAdapter());
 
-            repaintRefresh(false);
         }
     }
+
 }

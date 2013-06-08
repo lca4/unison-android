@@ -1,14 +1,16 @@
 
 package ch.epfl.unison.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.PlaylistItem;
 
 /**
  * Specialized Fragment for {@link SoloMainFragment}.
@@ -16,8 +18,17 @@ import ch.epfl.unison.data.PlaylistItem;
  * @see AbstractMainActivity
  * @author marc
  */
-public class SoloPlayerFragment extends AbstractPlayerFragment implements
-        SoloMainActivity.OnPlaylistInfoListener {
+public class SoloPlayerFragment extends AbstractPlayerFragment {
+
+    /** Container Activity must implement this interface. */
+    public interface OnSoloPlayerListener {
+        void onTrackChange();
+
+        void setPlayerFragmentTag(String tag);
+    }
+
+    private SoloMainActivity mHostActivity;
+    private OnSoloPlayerListener mListener;
 
     // /**
     // * Handles instant ratings (when the user clicks on the rating button in
@@ -127,11 +138,19 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
         // });
     }
 
-    // @Override
-    // public void onAttach(Activity activity) {
-    // super.onAttach(activity);
-    // // mActivity.registerGroupInfoListener(this);
-    // }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mHostActivity = (SoloMainActivity) activity;
+        try {
+            mListener = (SoloMainActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnSavePlaylistListener");
+        }
+        String tag = SoloPlayerFragment.this.getTag();
+        mListener.setPlayerFragmentTag(tag);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,17 +158,6 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
         View v = super.onCreateView(inflater, container, savedInstanceState);
         setHistory(null); // TODO fetch a real playlist
         return v;
-    }
-
-    // @Override
-    // public void onDetach() {
-    // super.onDetach();
-    // // mActivity.unregisterGroupInfoListener(this);
-    // }
-
-    @Override
-    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -163,7 +171,14 @@ public class SoloPlayerFragment extends AbstractPlayerFragment implements
     }
 
     @Override
-    protected void setIsDJ(boolean wantsToBeDJ) {
-        // Unused, since there is no DJ
+    protected void next() {
+        try {
+            play(mHostActivity.getPlaylist().next());
+            mListener.onTrackChange();
+        } catch (NullPointerException npe) {
+            Log.i(getTag(), "next: " + npe.getMessage());
+        } catch (IndexOutOfBoundsException ioobe) {
+            Log.i(getTag(), "next: " + ioobe.getMessage());
+        }
     }
 }

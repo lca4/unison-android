@@ -1,8 +1,6 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.AbstractMenu.OnRefreshListener;
 
@@ -24,6 +23,8 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+
+import java.util.ArrayList;
 
 /**
  * Provides some default behaviors. Not supposed to be instantiated directly,
@@ -220,6 +221,18 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         return mSupportActionBar;
     }
 
+    protected void showRefresh(boolean visible) {
+        getMenu().findItem(R.id.menu_item_refresh).setVisible(visible);
+    }
+
+    protected void showSolo(boolean visible) {
+        getMenu().findItem(R.id.menu_item_solo).setVisible(visible);
+    }
+
+    protected void showGroups(boolean visible) {
+        getMenu().findItem(R.id.menu_item_groups).setVisible(visible);
+    }
+
     /**
      * This is a helper class that implements the management of tabs and all
      * details of connecting a ViewPager with associated TabHost. It relies on a
@@ -231,7 +244,9 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
      * switch to the correct paged in the ViewPager whenever the selected tab
      * changes.
      * 
-     * @author no-freaking-idea
+     * @author <a href=
+     *         "https://developer.android.com/reference/android/support/v4/view/ViewPager.html"
+     *         > developer.android.com</a>
      */
     public static class TabsAdapter extends FragmentPagerAdapter implements
             ActionBar.TabListener, ViewPager.OnPageChangeListener {

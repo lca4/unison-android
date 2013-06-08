@@ -16,19 +16,17 @@
       android:orientation="vertical">
 
     <TextView
-        android:id="@+id/trackrow_title"
+        android:id="@+id/username"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="@string/default_title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:ellipsize="end"
         android:singleLine="true" />
 
-   <TextView
-        android:id="@+id/trackrow_subtitle"
+    <TextView
+        android:id="@+id/likingExplanation"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="@string/default_subtitle"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:singleLine="true"
         android:ellipsize="end" />
@@ -39,7 +37,7 @@
       android:isIndicator="true"
       style="?android:attr/ratingBarStyleSmall"
       android:numStars="5"
-      android:id="@+id/trackrow_rating"
+      android:id="@+id/listrow_stats_rating"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
 

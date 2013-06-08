@@ -2,16 +2,13 @@
 package ch.epfl.unison.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+
 import ch.epfl.unison.R;
-import ch.epfl.unison.data.MusicItem;
-import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.Uutils;
 
 /**
  * Fragment that is displayed inside MainActivity (one of the tabs). Contains
@@ -19,63 +16,51 @@ import ch.epfl.unison.data.PlaylistItem;
  * 
  * @author mbourqui
  */
-public class SoloTracksFragment extends AbstractListFragment
-        implements SoloMainActivity.OnPlaylistInfoListener {
+public class SoloTracksFragment extends AbstractListFragment {
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        SoloTracksFragment.this.getList()
-        .setAdapter(new TracksAdapter(((SoloMainActivity) getHostActivity()).getPlaylist()));
-        return v;
-    }
-
-    @Override
-    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-        if (playlistInfo.getTitle() != null) {
-            getTitle().setText(playlistInfo.getTitle());
-        }
-        getList().setAdapter(new TracksAdapter(playlistInfo));
-    }
+    private SoloMainActivity mHostActivity;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((SoloMainActivity) getHostActivity()).registerPlaylistInfoListener(this);
+        mHostActivity = (SoloMainActivity) activity;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        refresh();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        ((SoloMainActivity) getHostActivity()).unregisterPlaylistInfoListener(this);
     }
 
-    /** ArrayAdapter that displays the tracks of the playlist. */
-    private class TracksAdapter extends ArrayAdapter<MusicItem> {
-
-        public static final int TRACK_ROW_LAYOUT = R.layout.track_row;
-
-        public TracksAdapter(PlaylistItem playlist) {
-            super(SoloTracksFragment.this.getActivity(), 0, playlist.getTracks());
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            MusicItem track = getItem(position);
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) SoloTracksFragment.this.getActivity()
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(TRACK_ROW_LAYOUT, parent, false);
-            }
-            ((TextView) view.findViewById(R.id.trackrow_title)).setText(getItem(position).title);
-            // int rating = 0;
-            // if (getItem(position).rating != null) {
-            // rating = getItem(position).rating;
-            // }
-            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
-            view.setTag(track);
-            return view;
+    /**
+     * Doesn't work, getListView count is 0.
+     */
+    private void highlightCurrent() {
+        View v = getListView().findViewWithTag(mHostActivity.getPlaylist().current());
+        if (v != null) {
+            v.findViewById(R.id.listrow_track_image).setVisibility(View.VISIBLE);
         }
     }
+
+    public void refreshView() {
+        refresh();
+    }
+
+    private void refresh() {
+        setListAdapter(new Uutils.Adapters.TracksAdapter(mHostActivity,
+                mHostActivity.getPlaylist()));
+        highlightCurrent();
+    }
+
 }

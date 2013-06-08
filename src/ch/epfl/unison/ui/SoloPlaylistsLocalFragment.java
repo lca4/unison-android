@@ -1,13 +1,7 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,88 +9,106 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.data.UnisonDB;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Shows the locally stored playlists made with GS.
  * 
  * @author marc
  */
-public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
-        SoloPlaylistsActivity.OnPlaylistsLocalInfoListener {
+public class SoloPlaylistsLocalFragment extends AbstractListFragment {
 
-    // Not really useful, but nice to avoid explicit casting every time
+    /** Container Activity must implement this interface. */
+    public interface OnPlaylistsLocalListener {
+        boolean onDeletePlaylist(PlaylistItem playlist);
+
+        void setPlaylistsLocalFragmentTag(String tag);
+    }
+
     private SoloPlaylistsActivity mHostActivity;
+    private OnPlaylistsLocalListener mListener;
 
-    private UnisonDB mDB;
     private ArrayList<PlaylistItem> mPlaylistsLocal;
-    
-    private final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-    private final String[] mPlaylistsIdNameProjection = new String[] {
-            MediaStore.Audio.Playlists._ID,
-            MediaStore.Audio.Playlists.NAME
-    };
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        // mHostActivity = (SoloPlaylistsActivity) activity;
-        mHostActivity = (SoloPlaylistsActivity) getActivity();
-    }
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mDB = new UnisonDB(getActivity());
-        mHostActivity.registerPlaylistsLocalInfoListener(this);
+        mHostActivity = (SoloPlaylistsActivity) activity;
+        try {
+            mListener = (OnPlaylistsLocalListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnSavePlaylistListener");
+        }
+        String tag = SoloPlaylistsLocalFragment.this.getTag();
+        mListener.setPlaylistsLocalFragmentTag(tag);
+        mPlaylistsLocal = new ArrayList<PlaylistItem>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        mPlaylistsLocal = new ArrayList<PlaylistItem>();
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        // View v = inflater.inflate(R.layout.list_fragment, container, false);
+        initPlaylistsLocal();
+        return v;
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getListView().setOnItemClickListener(new OnLocalPlaylistSelectedListener());
+        registerForContextMenu(getListView());
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getHostActivity().getMenuInflater();
-        inflater.inflate(R.menu.playlist_local_context_menu, menu);
+        MenuInflater inflater = mHostActivity.getMenuInflater();
+        inflater.inflate(R.menu.solo_playlists_context_menu, menu);
+        // menu.findItem(R.id.solo_playlists_context_menu_item_edit).setVisible(true);
     }
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
+        // @see http://stackoverflow.com/a/10125761 to learn more about this
+        // hack
+        if (!getUserVisibleHint()) {
+            return super.onContextItemSelected((android.view.MenuItem) item);
+        }
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-//        ListView lv = (ListView) info.targetView.getParent();
-        AppData data = AppData.getInstance(getHostActivity());
+        AppData data = AppData.getInstance(mHostActivity);
         switch (item.getItemId()) {
-            case R.id.playlist_context_menu_item_edit:
+            case R.id.solo_playlists_context_menu_item_edit:
                 Log.i(getClassTag(), "Not yet implemented...");
-                Toast.makeText(getHostActivity(),
+                Toast.makeText(mHostActivity,
                         R.string.error_not_yet_available,
                         Toast.LENGTH_LONG).show();
                 return true;
 
-            case R.id.playlist_context_menu_item_delete:
+            case R.id.solo_playlists_context_menu_item_delete:
                 /*
                  * In the case of a local playlist, remove it from android and
                  * GS in-app DBs, but keeps it in the user library on GS server.
@@ -104,7 +116,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                 try {
                     // Set local_id to null on GS server
                     data.getAPI().updatePlaylist(data.getUid(),
-                            mHostActivity.getPlaylistsLocal()
+                            mPlaylistsLocal
                                     .get(info.position).getPLId(),
                             new JSONObject().put("local_id", JSONObject.NULL),
                             new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
@@ -113,22 +125,19 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                                 public void callback(JsonStruct.PlaylistJS struct) {
                                     // Then from local databases
                                     if (mHostActivity.getDB().delete(
-                                            ((SoloPlaylistsActivity) getHostActivity())
-                                                    .getPlaylistsLocal()
+                                            mPlaylistsLocal
                                                     .get(info.position)) > 0) {
-                                        mHostActivity
-                                                .getPlaylistsRemote().add(
-                                                        ((SoloPlaylistsActivity) getHostActivity())
-                                                                .getPlaylistsLocal()
-                                                                .remove(info.position));
+                                        mListener.onDeletePlaylist(
+                                                mPlaylistsLocal
+                                                        .remove(info.position));
                                         Log.w(getClassTag(),
                                                 "Successfully removed playlist with id "
                                                         + struct.gsPlaylistId
                                                         + " from user library");
-                                        // refreshPlaylistsLocal();
+                                        refreshPlaylistsLocal();
                                     } else {
                                         Toast.makeText(
-                                                getHostActivity(),
+                                                mHostActivity,
                                                 R.string
                                                 .error_solo_remove_playlist_from_local_dbs,
                                                 Toast.LENGTH_LONG).show();
@@ -147,6 +156,8 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                             });
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (IndexOutOfBoundsException ioobe) {
+                    ioobe.printStackTrace();
                 }
                 return true;
 
@@ -154,52 +165,33 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
                 return super.onContextItemSelected((android.view.MenuItem) item);
         }
     }
-    
-//    @Override
-//    public void onPlaylistInfo(PlaylistItem playlistInfo) {
-//        if (playlistInfo.getTitle() != null) {
-//            getTitle().setText(playlistInfo.getTitle());
-//        }
-//        getList().setAdapter(new PlaylistsAdapter(playlistInfo));
-//    }
 
-    /** ArrayAdapter that displays the tracks of the playlist. */
-    private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-
-        public static final int ROW_LAYOUT = R.layout.list_row;
-
-        public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-            super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            PlaylistItem pl = getItem(position);
-            if (view == null) {
-                LayoutInflater inflater =
-                        (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
-                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(ROW_LAYOUT, parent, false);
-            }
-            ((TextView) view.findViewById(R.id.listrow_title))
-                    .setText(getItem(position).getTitle());
-            ((TextView) view.findViewById(R.id.listrow_subtitle))
-                    .setText(String.valueOf(getItem(position).size()));
-            // int rating = 0;
-            // if (getItem(position).rating != null) {
-            // rating = getItem(position).rating;
-            // }
-            // ((RatingBar) view.findViewById(R.id.trRating)).setRating(rating);
-            view.setTag(pl);
-            return view;
-        }
-    }
-
-    @Override
-    public void onPlaylistsLocalInfo(Object contentInfo) {
-        // TODO Auto-generated method stub
-
-    }
+    // /** ArrayAdapter that displays the tracks of the playlist. */
+    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
+    //
+    // public static final int ROW_LAYOUT = R.layout.list_row;
+    //
+    // public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
+    // super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
+    // }
+    //
+    // @Override
+    // public View getView(int position, View view, ViewGroup parent) {
+    // PlaylistItem pl = getItem(position);
+    // if (view == null) {
+    // LayoutInflater inflater =
+    // (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
+    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    // view = inflater.inflate(ROW_LAYOUT, parent, false);
+    // }
+    // ((TextView) view.findViewById(R.id.listrow_title))
+    // .setText(getItem(position).getTitle());
+    // ((TextView) view.findViewById(R.id.listrow_subtitle))
+    // .setText(String.valueOf(getItem(position).size()));
+    // view.setTag(pl);
+    // return view;
+    // }
+    // }
 
     /**
      * When clicking on a playlist, start MainActivity.
@@ -251,7 +243,12 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
     /**
      * To be used only once, at onCreate time.
      */
-    private void initLocalPlaylists() {
+    private void initPlaylistsLocal() {
+        final Uri mUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        final String[] mPlaylistsIdNameProjection = new String[] {
+                MediaStore.Audio.Playlists._ID,
+                MediaStore.Audio.Playlists.NAME
+        };
         Cursor cur = mHostActivity.getContentResolver().query(mUri,
                 mPlaylistsIdNameProjection,
                 null, null, null);
@@ -277,8 +274,21 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment implements
      * To be used to refresh the ListView when changes are made to ArraList.
      */
     private void refreshPlaylistsLocal() {
-        //TODO update
-//        mHostActivity.mPlaylistsLocalListView
-//                .setAdapter(new PlaylistsAdapter(mPlaylistsLocal));
+        setListAdapter(new Uutils.Adapters.PlaylistsAdapter(mHostActivity, mPlaylistsLocal));
+    }
+
+    /*
+     * --------------------------------------- PUBLIC METHODS (used by
+     * SoloPlaylistsActivity) ---------------------------------------
+     */
+
+    /**
+     * @param playlist
+     * @return always true
+     */
+    public boolean add(PlaylistItem playlist) {
+        boolean b = mPlaylistsLocal.add(playlist);
+        refreshPlaylistsLocal();
+        return b;
     }
 }
