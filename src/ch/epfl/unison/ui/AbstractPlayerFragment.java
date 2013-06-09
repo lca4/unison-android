@@ -360,6 +360,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                 }
                 break;
             case Solo:
+                // Useless, since overridden by SoloPlayerFragment
                 try {
                     play(((SoloMainActivity) mMainActivity).getPlaylist().next());
                 } catch (NullPointerException npe) {
