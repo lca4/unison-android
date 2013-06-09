@@ -145,16 +145,27 @@ public final class Request<T extends JsonStruct> {
             request = prepareRequest(request);
             Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
             try {
+            	Header[] requestHeaders = request.getAllHeaders();
+                Log.d(TAG, "sending " + requestHeaders.length + " headers.");
+                Log.d(TAG, "displaying request headers. . .");
+                for (Header h: requestHeaders) {
+                	if (h != null) {
+                		Log.d(TAG, "header " + h.getName() + " = " + h.getValue());
+                	}
+                }
+                Log.d(TAG, "displayed all headers.");
+                
+                
                 // Get the response as a string.
                 response = HttpClientFactory.getInstance().execute(request);            
                 
                 responseStatusLine = response.getStatusLine();
                 Log.d(TAG, "status = " + responseStatusLine.toString());
                 
-                Header[] headers = response.getAllHeaders();
-                Log.d(TAG, "received " + headers.length + " headers.");
-                Log.d(TAG, "displaying headers. . .");
-                for (Header h: headers) {
+                Header[] responseHeaders = response.getAllHeaders();
+                Log.d(TAG, "received " + responseHeaders.length + " headers.");
+                Log.d(TAG, "displaying response headers. . .");
+                for (Header h: responseHeaders) {
                 	if (h != null) {
                 		Log.d(TAG, "header " + h.getName() + " = " + h.getValue());
                 	}
