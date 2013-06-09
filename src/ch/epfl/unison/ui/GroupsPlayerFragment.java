@@ -80,6 +80,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     }
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
+    
+    private GroupsMainActivity mHostActivity;
 
     private TrackQueue mTrackQueue;
     private boolean mTrackAdded;
@@ -110,8 +112,10 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((GroupsMainActivity) getMainActivity())
-                .registerGroupInfoListener(this);
+        this.mHostActivity = (GroupsMainActivity) activity;
+        mHostActivity.registerGroupInfoListener(this);
+//        ((GroupsMainActivity) getMainActivity())
+//                .registerGroupInfoListener(this);
         setMode(Mode.Groups);
     }
 
@@ -121,8 +125,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         if (mTrackQueue != null) {
             mTrackQueue.stop();
         }
-        ((GroupsMainActivity) getMainActivity())
-                .unregisterGroupInfoListener(this);
+        mHostActivity.unregisterGroupInfoListener(this);
+//        ((GroupsMainActivity) getMainActivity())
+//                .unregisterGroupInfoListener(this);
     }
 
     @Override
@@ -163,9 +168,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
     @Override
     protected void notifyPlay(MusicItem item) {
-        UnisonAPI api = AppData.getInstance((getMainActivity())).getAPI();
+        UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         api.setCurrentTrack(
-                ((GroupsMainActivity) getMainActivity()).getGroupId(),
+                mHostActivity.getGroupId(),
                 item.artist, item.title,
                 new UnisonAPI.Handler<JsonStruct.Success>() {
 
@@ -173,7 +178,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                     public void callback(JsonStruct.Success struct) {
                         // Automatically refresh the content (in particular, to
                         // get the cover art).
-                        ((GroupsMainActivity) getMainActivity()).onRefresh();
+                        mHostActivity.onRefresh();
                     }
 
                     @Override
@@ -192,8 +197,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
     @Override
     protected void notifySkip() {
-        UnisonAPI api = AppData.getInstance((getMainActivity())).getAPI();
-        api.skipTrack(((GroupsMainActivity) getMainActivity()).getGroupId(),
+        UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
+        api.skipTrack(mHostActivity.getGroupId(),
                 new UnisonAPI.Handler<JsonStruct.Success>() {
                     @Override
                     public void callback(JsonStruct.Success struct) {
@@ -246,7 +251,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                             toggleDJState(true, gid);
                         }
                         mProcessingDjRequest = false;
-                        ((GroupsMainActivity) mMainActivity).setDJ(true);
+                        mHostActivity.setDJ(true);
                         // Log.d(TAG, "mProcessing is now false");
                     }
 
@@ -301,7 +306,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                     toggleDJState(false, -1);
                 }
                 mProcessingDjRequest = false;
-                ((GroupsMainActivity) mMainActivity).setDJ(false);
+                mHostActivity.setDJ(false);
                 // Log.d(TAG, "mProcessing is now false");
             }
 

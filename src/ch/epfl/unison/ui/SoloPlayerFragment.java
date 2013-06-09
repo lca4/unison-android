@@ -31,7 +31,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
 
     @Override
     protected void notifyPlay(MusicItem item) {
-        UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
+        UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         // TODO tell the server to increment the listener counter
         // api.setCurrentTrack(mActivity.getGroupId(), item.artist,
         // item.title, new UnisonAPI.Handler<JsonStruct.Success>() {
@@ -57,7 +57,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
 
     @Override
     protected void notifySkip() {
-        UnisonAPI api = AppData.getInstance(getMainActivity()).getAPI();
+        UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         // TODO tell the server to decrement the listener counter
         // api.skipTrack(mActivity.getGroupId(),
         // new UnisonAPI.Handler<JsonStruct.Success>() {
@@ -91,7 +91,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        setHistory(null); // TODO fetch a real playlist
+//        setHistory(null); // TODO fetch a real playlist
         return v;
     }
 
@@ -114,6 +114,22 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
             Log.i(getTag(), "next: " + npe.getMessage());
         } catch (IndexOutOfBoundsException ioobe) {
             Log.i(getTag(), "next: " + ioobe.getMessage());
+        }
+    }
+    
+    protected void prev() {
+        try {
+            if (getCurrentPosition() < getClickInterval()) {
+                play(mHostActivity.getPlaylist().previous());
+            } else {
+                play(mHostActivity.getPlaylist().current());
+            }
+        } catch (NullPointerException npe) {
+            // Internal error occured
+            Log.i(getTag(), "prev: internal error : playlist is null.");
+        } catch (IndexOutOfBoundsException ioobe) {
+            // TODO Else, display error message
+            Log.i(getTag(), "prev: no track found to play.");
         }
     }
 }

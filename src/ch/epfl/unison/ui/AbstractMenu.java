@@ -41,7 +41,7 @@ public abstract class AbstractMenu {
     public static boolean onOptionsItemSelected(Activity activity,
             OnRefreshListener listener, MenuItem item) {
         AppData data;
-        
+
         switch (item.getItemId()) {
             case R.id.menu_item_refresh:
                 if (listener != null) {
@@ -59,8 +59,8 @@ public abstract class AbstractMenu {
                 break;
             case R.id.menu_item_groups:
                 activity.startActivity(new Intent(activity, GroupsActivity.class)
-                .setAction(
-                        GroupsActivity.ACTION_FROM_SOLO).addFlags(
+                        .setAction(
+                                GroupsActivity.ACTION_FROM_SOLO).addFlags(
                                 Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.menu_item_solo:
@@ -75,7 +75,8 @@ public abstract class AbstractMenu {
                     }
                     break;
                 }
-                activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class));
+                activity.startActivity(new Intent(activity, SoloPlaylistsActivity.class).addFlags(
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 break;
             case R.id.menu_item_history:
                 activity.startActivity(new Intent(activity, GroupsHistoryActivity.class).putExtra(
