@@ -1,12 +1,17 @@
 
 package ch.epfl.unison.api;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -20,15 +25,11 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import android.util.Log;
+
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Helper class that facilitates HTTP requests returning JSON data.
@@ -145,9 +146,21 @@ public final class Request<T extends JsonStruct> {
             Log.i(TAG, String.format("%s request to %s", request.getMethod(), request.getURI()));
             try {
                 // Get the response as a string.
-                response = HttpClientFactory.getInstance().execute(request);
+                response = HttpClientFactory.getInstance().execute(request);            
+                
                 responseStatusLine = response.getStatusLine();
                 Log.d(TAG, "status = " + responseStatusLine.toString());
+                
+                Header[] headers = response.getAllHeaders();
+                Log.d(TAG, "received " + headers.length + " headers.");
+                Log.d(TAG, "displaying headers. . .");
+                for (Header h: headers) {
+                	if (h != null) {
+                		Log.d(TAG, "header " + h.getName() + " = " + h.getValue());
+                	}
+                }
+                Log.d(TAG, "displayed all headers.");
+                
                 responseContent = EntityUtils.toString(response.getEntity());
                 Log.d(TAG, "received: " + responseContent);
             } catch (IOException ioe) {
