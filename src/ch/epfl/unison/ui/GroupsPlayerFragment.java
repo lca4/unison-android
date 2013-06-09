@@ -1,6 +1,9 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +25,7 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.music.MusicService;
+import ch.epfl.unison.ui.AbstractPlayerFragment.Status;
 
 /**
  * Specialized Fragment for {@link GroupsMainFragment}.
@@ -38,7 +42,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         if (!mIsDJ) {
             // Just to make sure, when the activity is recreated.
             getButtons().setVisibility(View.INVISIBLE);
-            mDjBtn.setText(getString(R.string.player_become_dj));
+            getDjBtn().setText(getString(R.string.player_become_dj));
             getSeekBar().setVisibility(View.INVISIBLE);
         }
     }
@@ -60,7 +64,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
         // mProcessingDjRequest);
         // now we check if the DJ button was clicked:
-        if (v == mDjBtn) {
+        if (v == getDjBtn()) {
             if (mProcessingDjRequest) {
                 return;
             }
@@ -85,6 +89,10 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
     private TrackQueue mTrackQueue;
     private boolean mTrackAdded;
+    
+    private List<MusicItem> mHistory;
+
+    private int mHistPointer;
 
     private UnisonAPI mApi;
     private double mLatitude;
@@ -103,9 +111,11 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         // mDJSupport = false;
         mIsDJ = false;
         // setDJSupport(true);
+        mHistory = new ArrayList<MusicItem>();
+        mHistPointer = 0;
 
-        mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
-        mDjBtn.setVisibility(View.VISIBLE);
+        setDjBtn((Button) v.findViewById(R.id.djToggleBtn));
+        getDjBtn().setVisibility(View.VISIBLE);
         return v;
     }
 
@@ -116,7 +126,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         mHostActivity.registerGroupInfoListener(this);
 //        ((GroupsMainActivity) getMainActivity())
 //                .registerGroupInfoListener(this);
-        setMode(Mode.Groups);
+//        setMode(Mode.Groups);
     }
 
     @Override
@@ -163,6 +173,42 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         } else {
             setCurrentTrack(null);
             getCoverImg().setImageResource(R.drawable.cover);
+        }
+    }
+    
+    protected void next() {
+        if (!mHistory.isEmpty()
+                && mHistPointer == 0
+                && (getStatus() == Status.Playing || getStatus() == Status.Paused)) {
+            // We're skipping a song that is heard for the first time.
+            // Notify
+            // the server.
+            notifySkip();
+        }
+        Log.d(getClassTag(), "Calling next");
+
+        if (mHistPointer > 0) {
+            mHistPointer -= 1;
+            Log.d(getClassTag(), "Calling play");
+            play(mHistory.get(mHistPointer));
+        } else {
+            Log.d(getClassTag(), "Calling requestTrack");
+            // We need a new track.
+            requestTrack();
+            // if (requestTrack()) {
+            // play(mHistory.get(0));
+            // }
+        }
+    }
+    
+    protected void prev() {
+        if (getCurrentPosition() < getClickInterval() && mHistPointer < mHistory.size() - 1) {
+            // We play the *previous* track.
+            mHistPointer += 1;
+            play(mHistory.get(mHistPointer));
+        } else if (mHistPointer < mHistory.size()) {
+            // We just restart the current track.
+            play(mHistory.get(mHistPointer));
         }
     }
 
@@ -415,7 +461,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             public void callback(MusicItem item) {
                 addToHistory(item);
                 mTrackAdded = true;
-                play(getHistory().get(0));
+                play(mHistory.get(0));
             }
 
             @Override
@@ -431,9 +477,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         return mTrackAdded;
     }
 
-    Button getDJBtn() {
-        return mDjBtn;
-    }
+//    Button getDJBtn() {
+//        return mDjBtn;
+//    }
 
     protected boolean isDJ() {
         return mIsDJ;
@@ -473,7 +519,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                 Log.d(TAG, "something went wrong when calling toggleDJState");
                 return;
             }
-            getDJBtn().setText(
+            getDjBtn().setText(
                     getString(R.string.player_leave_dj));
             getToggleBtn().setBackgroundResource(
                     R.drawable.btn_play);
@@ -483,7 +529,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             mTrackQueue = new TrackQueue(getActivity(), gid)
                     .start();
         } else {
-            getDJBtn().setText(getString(R.string.player_become_dj));
+            getDjBtn().setText(getString(R.string.player_become_dj));
             getButtons().setVisibility(View.INVISIBLE);
             getSeekBar().setVisibility(View.INVISIBLE);
             getSeekBar().setEnabled(false);
@@ -491,5 +537,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                     new Intent(MusicService.ACTION_STOP));
             setStatus(Status.Stopped);
         }
+    }
+    
+    private void addToHistory(MusicItem item) {
+        mHistory.add(0, item);
     }
 }
