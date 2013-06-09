@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
-import android.nfc.NdefMessage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -69,7 +68,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
     private static final int MAXIMUM_GROUP_NAME_LENGTH = 30;
 
     private String mAction = null;
-    
+
     public static final String ACTION_FROM_SOLO = "ch.epfl.unison.action.FROM_SOLO";
     public static final String ACTION_LEAVE_GROUP = "ch.epfl.unison.action.LEAVE_GROUP";
     public static final String ACTION_CREATE_AND_JOIN_GROUP =
@@ -146,7 +145,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         // Actions that should be taken whe activity is started.
         setSupportedActions();
         mAction = getIntent().getAction();
-        if (mAction != null && mSupportedActions.contains(mAction) && !ACTION_FROM_SOLO.equals(mAction)) {
+        if (mAction != null && mSupportedActions.contains(mAction)
+                && !ACTION_FROM_SOLO.equals(mAction)) {
             toggleActivityButtons(false);
             mProcessingAutoAction = true;
             if (ACTION_LEAVE_GROUP.equals(mAction)
@@ -762,7 +762,7 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
             final EditText input = new EditText(GroupsActivity.this);
             InputFilter filterLength = new InputFilter.LengthFilter(MAXIMUM_GROUP_NAME_LENGTH);
             input.setFilters(new InputFilter[] {
-                filterLength
+                    filterLength
             });
             // input.setMaxLines(1);
             alert.setView(input);

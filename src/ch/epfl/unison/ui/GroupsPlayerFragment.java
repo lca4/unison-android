@@ -25,7 +25,6 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.music.MusicService;
-import ch.epfl.unison.ui.AbstractPlayerFragment.Status;
 
 /**
  * Specialized Fragment for {@link GroupsMainFragment}.
@@ -84,12 +83,12 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     }
 
     private static final String TAG = "ch.epfl.unison.PlayerFragment";
-    
+
     private GroupsMainActivity mHostActivity;
 
     private TrackQueue mTrackQueue;
     private boolean mTrackAdded;
-    
+
     private List<MusicItem> mHistory;
 
     private int mHistPointer;
@@ -124,9 +123,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         super.onAttach(activity);
         this.mHostActivity = (GroupsMainActivity) activity;
         mHostActivity.registerGroupInfoListener(this);
-//        ((GroupsMainActivity) getMainActivity())
-//                .registerGroupInfoListener(this);
-//        setMode(Mode.Groups);
+        // ((GroupsMainActivity) getMainActivity())
+        // .registerGroupInfoListener(this);
+        // setMode(Mode.Groups);
     }
 
     @Override
@@ -136,8 +135,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             mTrackQueue.stop();
         }
         mHostActivity.unregisterGroupInfoListener(this);
-//        ((GroupsMainActivity) getMainActivity())
-//                .unregisterGroupInfoListener(this);
+        // ((GroupsMainActivity) getMainActivity())
+        // .unregisterGroupInfoListener(this);
     }
 
     @Override
@@ -175,7 +174,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             getCoverImg().setImageResource(R.drawable.cover);
         }
     }
-    
+
     protected void next() {
         if (!mHistory.isEmpty()
                 && mHistPointer == 0
@@ -200,7 +199,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             // }
         }
     }
-    
+
     protected void prev() {
         if (getCurrentPosition() < getClickInterval() && mHistPointer < mHistory.size() - 1) {
             // We play the *previous* track.
@@ -314,7 +313,8 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
                         // this does not work, an error can happen for too many
                         // reasons.
 
-                        // GroupsPlayerFragment.this.setIsDJ(true, false, api, uid, gid,
+                        // GroupsPlayerFragment.this.setIsDJ(true, false, api,
+                        // uid, gid,
                         // lat, lon);
 
                         mIsDJ = false;
@@ -477,9 +477,9 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         return mTrackAdded;
     }
 
-//    Button getDJBtn() {
-//        return mDjBtn;
-//    }
+    // Button getDJBtn() {
+    // return mDjBtn;
+    // }
 
     protected boolean isDJ() {
         return mIsDJ;
@@ -538,7 +538,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
             setStatus(Status.Stopped);
         }
     }
-    
+
     private void addToHistory(MusicItem item) {
         mHistory.add(0, item);
     }

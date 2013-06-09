@@ -379,10 +379,10 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-//    @Override
-//    protected PlaylistItem getPlaylist() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
+    // @Override
+    // protected PlaylistItem getPlaylist() {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
 }

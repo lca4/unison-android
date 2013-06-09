@@ -29,7 +29,6 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
 
 /**
  * @author Louis Activity that is used to display the history for groups. This

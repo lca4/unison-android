@@ -91,7 +91,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-//        setHistory(null); // TODO fetch a real playlist
+        // setHistory(null); // TODO fetch a real playlist
         return v;
     }
 
@@ -116,7 +116,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
             Log.i(getTag(), "next: " + ioobe.getMessage());
         }
     }
-    
+
     protected void prev() {
         try {
             if (getCurrentPosition() < getClickInterval()) {
