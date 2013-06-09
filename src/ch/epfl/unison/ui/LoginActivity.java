@@ -117,8 +117,9 @@ public class LoginActivity extends SherlockActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.login_menu_item_signup:
-                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+            case R.id.login_menu_item_help:
+                startActivity(new Intent(LoginActivity.this, HelpActivity.class)
+                	.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             default:
                 break;
