@@ -247,7 +247,7 @@ public class UnisonDB {
         }
         return res;
     }
-    
+
     public boolean isMadeWithGS(long id) {
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
