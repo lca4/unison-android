@@ -196,14 +196,17 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
-                int size = mHostActivity.getDB().getTracksCount(
-                        cur.getLong(colId));
-                PlaylistItem pl = new PlaylistItem.Builder().size(size).build();
-                if (pl != null) {
-                    pl.setTitle(cur.getString(colName));
-                    mPlaylistsLocal.add(pl);
+                long localId = cur.getLong(colId);
+                if (mHostActivity.getDB().isMadeWithGS(localId)) {
+                    int size = mHostActivity.getDB().getTracksCount(localId);
+                    PlaylistItem pl = new PlaylistItem.Builder().localId(localId)
+                            .size(size).build();
+                    if (pl != null) {
+                        pl.setTitle(cur.getString(colName));
+                        mPlaylistsLocal.add(pl);
+                    }
                 }
-                // Non-GS playlists not shown
+                // Non-GS playlists are not shown
             } while (cur.moveToNext());
             cur.close();
         }

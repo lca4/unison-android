@@ -105,7 +105,6 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
         return false;
     }
 
-    @Override
     protected void next() {
         try {
             play(mHostActivity.getPlaylist().next());

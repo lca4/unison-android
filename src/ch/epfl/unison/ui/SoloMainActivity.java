@@ -53,6 +53,9 @@ public class SoloMainActivity extends AbstractMainActivity
             }
             mPlaylist = (PlaylistItem) mDB.getItem(PlaylistItem.class,
                     extras.getLong(Const.Strings.LOCAL_ID));
+            if (mPlaylist == null) {
+                finish();
+            }
         }
     }
 
