@@ -2,7 +2,6 @@
 package ch.epfl.unison.ui;
 
 import android.os.Bundle;
-
 import ch.epfl.unison.R;
 
 /**

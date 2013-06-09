@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -59,6 +58,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     public void onClick(View v) {
         super.onClick(v);
 
+        // mProcessingDjRequest);
         // now we check if the DJ button was clicked:
         if (v == mDjBtn) {
             if (mProcessingDjRequest) {
@@ -236,6 +236,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
 
                     @Override
                     public void callback(Success structure) {
+                        // "debug: got a positive answer from the server");
                         if (getActivity() == null) {
                             Log.d(TAG,
                                     "Tried to update an Activity that was null!");

@@ -1,6 +1,8 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.AbstractMenu.OnRefreshListener;
 
@@ -23,8 +24,6 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-
-import java.util.ArrayList;
 
 /**
  * Provides some default behaviors. Not supposed to be instantiated directly,
@@ -41,7 +40,7 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
 
     private String mTag = "ch.epfl.unison.UnisonFragmentActivity";
     private static final int INITIAL_DELAY = 500; // in ms.
-    private static final int DEFAULT_RELOAD_INTERVAL = 1 * 60 * 1000; // in ms.
+    private static final int DEFAULT_RELOAD_INTERVAL = 2 * 60 * 1000; // in ms.
     private static int smReloadInterval;
     private boolean mIsForeground = false;
     private boolean mAutoRefresh = true;
@@ -155,10 +154,6 @@ public abstract class AbstractFragmentActivity extends SherlockFragmentActivity
         }
     }
 
-    /**
-     * Default implementation. Should be overridden to suitable behavior.<br />
-     * Default implementation: repaintRefresh(true)
-     */
     @Override
     public void onRefresh() {
         repaintRefresh(true);

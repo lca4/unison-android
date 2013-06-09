@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;

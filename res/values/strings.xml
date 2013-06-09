@@ -21,7 +21,7 @@
     <string name="activity_title_help">Help</string>
     <string name="activity_title_solo">Single-user mode</string>
     <string name="activity_title_solo_main">Solo player</string>
-    <string name="activity_title_solo_playlists">Single-user mode</string>
+    <string name="activity_title_solo_playlists">Playlists</string>
     <string name="activity_title_signup">Sign Up</string>
     <string name="activity_title_history">Group History</string>
     <string name="activity_title_manage">Set Password</string>
@@ -130,7 +130,7 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="solo_playlists_fragment_local_list_row_image_desc">Playlist icon</string>
     
     <!-- Solo menu entries -->
-    <string name="solo_menu_create_playlist">Create a playlist</string>
+    <string name="solo_menu_create_playlist">New playlist</string>
     
     
     <!-- Solo playlists --> 
