@@ -73,7 +73,7 @@ public class MusicService extends Service
 
     private AudioFocus mFocus = AudioFocus.NoFocusNoDuck;
 
-    private String mTrackBeingPlayed = "Group Streamer"; // should always be
+    private String mTrackBeingPlayed = "GroupStreamer"; // should always be
                                                          // updated before
                                                          // displayed
 
