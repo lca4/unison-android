@@ -1,11 +1,11 @@
 
 package ch.epfl.unison.api;
 
-import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.data.TagItem;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.data.TagItem;
 
 /**
  * POJOs for JSON serialization / deserialization.
@@ -205,4 +205,9 @@ public abstract class JsonStruct {
 
         public Tag[] tags;
     }
+    
+    /** List of favorite tags for user's current preference */
+	public static class FavTagsList extends JsonStruct {
+		public String[] tags;
+	}
 }

@@ -1,10 +1,11 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.HashMap;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.PlaylistItem;
@@ -12,11 +13,9 @@ import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.view.Menu;
 
-import java.util.HashMap;
-
 /**
- * Activity that is displayed once you're inside the group. Displays the music
- * player and information about the playlist (through fragments).
+ * Activity that is displayed once you opened a playlist. Displays the music
+ * player and the list of the tracks (through fragments).
  * 
  * @see AbstractMainActivity
  * @author mbourqui
@@ -27,35 +26,25 @@ public class SoloMainActivity extends AbstractMainActivity
     /** Hosted fragments. */
     @SuppressLint("ValidFragment")
     // Avoids Lint wrong warning due to "Fragment" in the enum name
-    private enum ChildFragment {
+    private enum HostedFragment {
         PLAYER, TRACKS
     }
 
     /** Simple interface to be notified about playlist info updates. */
     public interface OnPlaylistInfoListener {
-        // void onPlaylistInfo(JsonStruct.PlaylistJS playlistInfo);
 
         void onPlaylistInfo(PlaylistItem playlistInfo);
     }
 
-    private HashMap<ChildFragment, String> mChildFragments;
+    private HashMap<HostedFragment, String> mHostedFragments;
 
     private UnisonDB mDB;
     private PlaylistItem mPlaylist;
 
-    // private Set<OnPlaylistInfoListener> mListeners = new
-    // HashSet<OnPlaylistInfoListener>();
-
-    // public void dispatchPlaylistInfo(PlaylistItem playlistInfo) {
-    // for (OnPlaylistInfoListener listener : mListeners) {
-    // listener.onPlaylistInfo(playlistInfo);
-    // }
-    // }
-
     protected void handleExtras(Bundle extras) {
         if (extras == null || !extras.containsKey(Const.Strings.LOCAL_ID)) {
             // Should never happen. If it does, redirect the user to the
-            // playlists list.
+            // SoloPlaylistsActivity.
             startActivity(new Intent(this, SoloPlaylistsActivity.class));
             finish();
         } else {
@@ -64,6 +53,9 @@ public class SoloMainActivity extends AbstractMainActivity
             }
             mPlaylist = (PlaylistItem) mDB.getItem(PlaylistItem.class,
                     extras.getLong(Const.Strings.LOCAL_ID));
+            if (mPlaylist == null) {
+                finish();
+            }
         }
     }
 
@@ -72,7 +64,7 @@ public class SoloMainActivity extends AbstractMainActivity
         mDB = new UnisonDB(getApplicationContext());
         super.onCreate(savedInstanceState);
 
-        mChildFragments = new HashMap<ChildFragment, String>();
+        mHostedFragments = new HashMap<HostedFragment, String>();
 
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_player_title),
@@ -100,16 +92,6 @@ public class SoloMainActivity extends AbstractMainActivity
 
     }
 
-    // public void registerPlaylistInfoListener(OnPlaylistInfoListener listener)
-    // {
-    // mListeners.add(listener);
-    // }
-    //
-    // public void unregisterPlaylistInfoListener(OnPlaylistInfoListener
-    // listener) {
-    // mListeners.remove(listener);
-    // }
-
     protected PlaylistItem getPlaylist() {
         return mPlaylist;
     }
@@ -121,17 +103,17 @@ public class SoloMainActivity extends AbstractMainActivity
 
     @Override
     public void setPlayerFragmentTag(String tag) {
-        mChildFragments.put(ChildFragment.PLAYER, tag);
+        mHostedFragments.put(HostedFragment.PLAYER, tag);
     }
 
     private SoloPlayerFragment getPlayerFragment() {
         return (SoloPlayerFragment) getSupportFragmentManager()
-                .findFragmentByTag(mChildFragments.get(ChildFragment.PLAYER));
+                .findFragmentByTag(mHostedFragments.get(HostedFragment.PLAYER));
     }
 
     private SoloTracksFragment getTracksFragment() {
         return (SoloTracksFragment) getSupportFragmentManager()
-                .findFragmentByTag(mChildFragments.get(ChildFragment.TRACKS));
+                .findFragmentByTag(mHostedFragments.get(HostedFragment.TRACKS));
     }
 
 }

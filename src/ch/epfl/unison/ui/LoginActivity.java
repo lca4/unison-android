@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
@@ -55,25 +54,32 @@ public class LoginActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         String action = getIntent().getAction();
         if (!isTaskRoot() && action != null && action.equals(Intent.ACTION_MAIN)) {
-            
-//          }
-//          if (!isTaskRoot() && ((mExtras != null && !mExtras.getBoolean(Const.Strings.LOGOUT))
-//                  || (mIntentAction != null && !mSupportedActions.contains(mIntentAction)))) {
-              
-              //This test should pass if you are comming from somewhere else in the app
-              //and either you did not press the logout button or you did not try to join a group
-              //when not already logged in (using autojoin) or you did not just created an account.
-              
-              //Here the application has been launched although another instance is already running
-              //but it should not (e.g. the NFC transfer was not done from the right activities).
-              //going to finish this instance to avoid duplicates
-              finish();
-              return;
-          }
-        
+
+            // }
+            // if (!isTaskRoot() && ((mExtras != null &&
+            // !mExtras.getBoolean(Const.Strings.LOGOUT))
+            // || (mIntentAction != null &&
+            // !mSupportedActions.contains(mIntentAction)))) {
+
+            // This test should pass if you are comming from somewhere else in
+            // the app
+            // and either you did not press the logout button or you did not try
+            // to join a group
+            // when not already logged in (using autojoin) or you did not just
+            // created an account.
+
+            // Here the application has been launched although another instance
+            // is already running
+            // but it should not (e.g. the NFC transfer was not done from the
+            // right activities).
+            // going to finish this instance to avoid duplicates
+            finish();
+            return;
+        }
+
         setContentView(R.layout.login);
 
         Log.d(TAG, "Calling LoginActivity.onCreate");

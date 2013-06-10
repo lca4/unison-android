@@ -1,17 +1,17 @@
 
 package ch.epfl.unison.api;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.json.JSONObject;
+
 import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Java interface to the Unison RESTful HTTP API.
@@ -87,6 +87,21 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.Success.class)
                 .addParam("password", password).setAuth(mAuth).doPUT();
     }
+    
+
+    public void getFavoriteTags(long uid, Handler<JsonStruct.FavTagsList> handler) {
+        URL url = urlFor("/users/%d/tags", uid);
+        AsyncRequest.of(url, handler, JsonStruct.FavTagsList.class)
+                .setAuth(mAuth).doGET();
+    }
+
+    public void updatePreference(long uid, String pref, Handler<JsonStruct.Success> handler) {
+    	Log.d("PREF", "update preference");
+        URL url = urlFor("/users/%d/pref", uid);
+        AsyncRequest.of(url, handler, JsonStruct.Success.class)
+                .addParam("pref", pref).setAuth(mAuth).doPUT();
+    }
+
 
     public void joinGroup(long uid, long gid, Handler<JsonStruct.Success> handler) {
         URL url = urlFor("/users/%d/group", uid);

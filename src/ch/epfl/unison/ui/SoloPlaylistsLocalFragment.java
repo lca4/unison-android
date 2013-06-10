@@ -1,6 +1,11 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -25,11 +29,6 @@ import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Shows the locally stored playlists made with GS.
@@ -70,7 +69,6 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             ViewGroup container, Bundle savedInstanceState) {
         mPlaylistsLocal = new ArrayList<PlaylistItem>();
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        // View v = inflater.inflate(R.layout.list_fragment, container, false);
         initPlaylistsLocal();
         return v;
     }
@@ -166,33 +164,6 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         }
     }
 
-    // /** ArrayAdapter that displays the tracks of the playlist. */
-    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-    //
-    // public static final int ROW_LAYOUT = R.layout.list_row;
-    //
-    // public PlaylistsAdapter(ArrayList<PlaylistItem> playlists) {
-    // super(SoloPlaylistsLocalFragment.this.getActivity(), 0, playlists);
-    // }
-    //
-    // @Override
-    // public View getView(int position, View view, ViewGroup parent) {
-    // PlaylistItem pl = getItem(position);
-    // if (view == null) {
-    // LayoutInflater inflater =
-    // (LayoutInflater) SoloPlaylistsLocalFragment.this.getActivity()
-    // .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    // view = inflater.inflate(ROW_LAYOUT, parent, false);
-    // }
-    // ((TextView) view.findViewById(R.id.listrow_title))
-    // .setText(getItem(position).getTitle());
-    // ((TextView) view.findViewById(R.id.listrow_subtitle))
-    // .setText(String.valueOf(getItem(position).size()));
-    // view.setTag(pl);
-    // return view;
-    // }
-    // }
-
     /**
      * When clicking on a playlist, start MainActivity.
      */
@@ -206,37 +177,6 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                     SoloMainActivity.class)
                     .putExtra(Const.Strings.LOCAL_ID, ((PlaylistItem) view.getTag()).getLocalId())
                     .putExtra(Const.Strings.TITLE, ((PlaylistItem) view.getTag()).getTitle()));
-            // .putExtra(Const.Strings.PLID,
-            // view.getTag());
-            // UnisonAPI api =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getAPI();
-            // long uid =
-            // AppData.getInstance(SoloPlaylistsActivity.this).getUid();
-            // final JsonStruct.Playlist playlist = (JsonStruct.Playlist)
-            // view.getTag();
-
-            // api.joinGroup(uid, playlist.plid, new
-            // UnisonAPI.Handler<JsonStruct.Success>() {
-            //
-            // @Override
-            // public void callback(Success struct) {
-            // SoloPlaylistsActivity.this.startActivity(
-            // new Intent(SoloPlaylistsActivity.this, MainActivity.class)
-            // .putExtra(Const.Strings.GID, playlist.plid)
-            // .putExtra(Const.Strings.NAME, playlist.name));
-            // }
-            //
-            // @Override
-            // public void onError(Error error) {
-            // Log.d(TAG, error.toString());
-            // if (SoloPlaylistsActivity.this != null) {
-            // Toast.makeText(SoloPlaylistsActivity.this,
-            // R.string.error_joining_group,
-            // Toast.LENGTH_LONG).show();
-            // }
-            // }
-            //
-            // });
         }
     }
 
@@ -256,14 +196,17 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
-                int size = mHostActivity.getDB().getTracksCount(
-                        cur.getLong(colId));
-                PlaylistItem pl = null; // TODO
-                if (pl != null) {
-                    pl.setTitle(cur.getString(colName));
-                    mPlaylistsLocal.add(pl);
+                long localId = cur.getLong(colId);
+                if (mHostActivity.getDB().isMadeWithGS(localId)) {
+                    int size = mHostActivity.getDB().getTracksCount(localId);
+                    PlaylistItem pl = new PlaylistItem.Builder().localId(localId)
+                            .size(size).build();
+                    if (pl != null) {
+                        pl.setTitle(cur.getString(colName));
+                        mPlaylistsLocal.add(pl);
+                    }
                 }
-                // Non-GS playlists not shown
+                // Non-GS playlists are not shown
             } while (cur.moveToNext());
             cur.close();
         }
@@ -278,8 +221,9 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
     }
 
     /*
-     * --------------------------------------- PUBLIC METHODS (used by
-     * SoloPlaylistsActivity) ---------------------------------------
+     * -------------------------------------------------------------------------
+     * PUBLIC METHODS (used by SoloPlaylistsActivity)
+     * -------------------------------------------------------------------------
      */
 
     /**

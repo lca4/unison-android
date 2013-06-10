@@ -2,7 +2,7 @@
 package ch.epfl.unison.ui;
 
 /**
- * To be done if enough time.
+ * To be done if a sharing opportunity is implemented.
  * 
  * @author marc
  */

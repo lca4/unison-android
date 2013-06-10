@@ -1,6 +1,15 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,7 +17,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.R;
@@ -23,15 +31,6 @@ import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.view.Menu;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Listing of the playlists.
  * 
@@ -44,26 +43,22 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     /** Hosted fragments. */
     @SuppressLint("ValidFragment")
     // Avoids Lint wrong warning due to "Fragment" in the enum name
-    private enum ChildFragment {
+    private enum HostedFragment {
         LOCAL, REMOTE// , SHARED
     }
 
-    private static final String TAG = "ch.epfl.unison.SoloPlaylistsActivity";
-    // private static final int RELOAD_INTERVAL = 30 * 60 * 60 * 1000; // in ms.
-
     private UnisonDB mDB;
 
-    private HashMap<ChildFragment, String> mChildFragments;
+    private HashMap<HostedFragment, String> mHostedFragments;
 
     @SuppressLint("NewApi")
     // Concerns fragments' stuff
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setReloadInterval(RELOAD_INTERVAL);
         setAutoRefresh(false);
         mDB = new UnisonDB(this);
-        mChildFragments = new HashMap<SoloPlaylistsActivity.ChildFragment, String>();
+        mHostedFragments = new HashMap<SoloPlaylistsActivity.HostedFragment, String>();
 
         getTabsAdapter().addTab(
                 getSupportActBar().newTab().setText(R.string.solo_fragment_playlists_local_title)
@@ -80,11 +75,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean b = super.onCreateOptionsMenu(menu);
         getMenu().findItem(R.id.menu_item_solo).setVisible(false);
-        // getMenu().add(
-        // Menu.NONE,
-        // R.id.solo_menu_create_playlist,
-        // 1,
-        // R.string.solo_menu_create_playlist);
         SoloPlaylistsActivity.this.getSupportMenuInflater().inflate(
                 R.menu.solo_playlists_menu,
                 getMenu());
@@ -110,7 +100,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onResume() {
         super.onResume();
-        // startService(new Intent(LibraryService.ACTION_UPDATE));
+        // startService(new Intent(PlaylistLibraryService.ACTION_UPDATE));
+        // //TODO
     }
 
     @Override
@@ -127,14 +118,14 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             if (struct.isEmtpy()) {
                                 // TODO display row item to tell no playlist is
                                 // available
-                                Toast.makeText(SoloPlaylistsActivity.this,
-                                        R.string.solo_playlists_noRemotePL,
-                                        Toast.LENGTH_LONG).show();
+                                // Toast.makeText(SoloPlaylistsActivity.this,
+                                // R.string.solo_playlists_noRemotePL,
+                                // Toast.LENGTH_LONG).show();
                             } else {
                                 refreshPlaylistsRemote(struct.toObject());
                             }
                         } catch (NullPointerException e) {
-                            Log.w(TAG, "playlist or activity is null?", e);
+                            Log.w(getClassTag(), "playlist or activity is null?", e);
                         } finally {
                             SoloPlaylistsActivity.this.repaintRefresh(false);
                         }
@@ -143,7 +134,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                     @Override
                     public void onError(UnisonAPI.Error error) {
                         if (error != null) {
-                            Log.d(TAG, error.toString());
+                            Log.d(getClassTag(), error.toString());
                         }
                         if (SoloPlaylistsActivity.this != null) {
                             Toast.makeText(SoloPlaylistsActivity.this,
@@ -169,7 +160,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                     @Override
                     public void onError(UnisonAPI.Error error) {
                         if (error != null) {
-                            Log.d(TAG, error.toString());
+                            Log.d(getClassTag(), error.toString());
                         }
                         if (SoloPlaylistsActivity.this != null) {
                             Toast.makeText(SoloPlaylistsActivity.this,
@@ -184,47 +175,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
         data.getAPI().listUserPlaylists(data.getUid(), playlistsHandler);
         data.getAPI().listTopTags(data.getUid(), tagsHandler);
     }
-
-    // /** Adapter used to populate the ListView listing the playlists.
-    // * Kept for reference, may be remove later on.
-    // * */
-    // private class PlaylistsAdapter extends ArrayAdapter<PlaylistItem> {
-    //
-    // public static final int ROW_LAYOUT = R.layout.list_row;
-    //
-    // public PlaylistsAdapter(ArrayList<PlaylistItem> list) {
-    // super(SoloPlaylistsActivity.this, 0, list);
-    // }
-    //
-    // @Override
-    // public View getView(int position, View view, ViewGroup parent) {
-    // PlaylistItem playlist = getItem(position);
-    // if (view == null) {
-    // LayoutInflater inflater = (LayoutInflater) SoloPlaylistsActivity.this
-    // .getSystemService(
-    // Context.LAYOUT_INFLATER_SERVICE);
-    // view = inflater.inflate(ROW_LAYOUT, parent, false);
-    // }
-    // ((TextView)
-    // view.findViewById(R.id.listrow_title)).setText(playlist.getTitle());
-    // String subtitle = null;
-    // if (playlist.getListeners() > 0) {
-    // String plural = "s";
-    // if (playlist.getListeners() == 1) {
-    // plural = "";
-    // }
-    // subtitle = String.format("%d tracks - %d listener" + plural,
-    // playlist.getSize(),
-    // playlist.getListeners());
-    // } else {
-    // subtitle = String.format("%d tracks", playlist.getSize());
-    // }
-    // ((TextView) view.findViewById(R.id.listrow_subtitle)).setText(subtitle);
-    //
-    // view.setTag(playlist);
-    // return view;
-    // }
-    // }
 
     // /**
     // * When clicking on "create new group", trigger an AlertView that asks for
@@ -360,7 +310,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        Log.i(TAG, mSelectedItems.toString());
+                                        Log.i(getClassTag(), mSelectedItems.toString());
                                         mDB.setChecked(mType, mItems, checkedItems);
                                         generatePlaylist();
                                     }
@@ -416,23 +366,18 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                         @Override
                         public void callback(JsonStruct.PlaylistJS struct) {
                             if (struct != null) {
-                                Log.i(TAG, "Playlist created!");
+                                Log.i(getClassTag(), "Playlist created!");
                                 getPlaylistsRemoteFragment().add(0, struct.toObject());
-                                // SoloPlaylistsActivity.this.mPlaylistsRemoteListView
-                                // .setAdapter(new
-                                // PlaylistsAdapter(mPlaylistsRemote));
-                                // SoloPlaylistsActivity.this.mPlaylistsListRemote
-                                // .setAdapter(new
-                                // PlaylistsAdapter(struct.toObject()));
                             } else {
-                                Log.i(TAG, "Playlist created, but could not be fetched...");
+                                Log.i(getClassTag(),
+                                        "Playlist created, but could not be fetched...");
                             }
                         }
 
                         @Override
                         public void onError(Error error) {
                             if (error != null) {
-                                Log.d(TAG, error.toString());
+                                Log.d(getClassTag(), error.toString());
                             }
                             if (SoloPlaylistsActivity.this != null) {
                                 Toast.makeText(SoloPlaylistsActivity.this,
@@ -454,12 +399,12 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
 
     private SoloPlaylistsRemoteFragment getPlaylistsRemoteFragment() {
         return (SoloPlaylistsRemoteFragment) getSupportFragmentManager()
-                .findFragmentByTag(mChildFragments.get(ChildFragment.REMOTE));
+                .findFragmentByTag(mHostedFragments.get(HostedFragment.REMOTE));
     }
 
     private SoloPlaylistsLocalFragment getPlaylistsLocalFragment() {
         return (SoloPlaylistsLocalFragment) getSupportFragmentManager()
-                .findFragmentByTag(mChildFragments.get(ChildFragment.LOCAL));
+                .findFragmentByTag(mHostedFragments.get(HostedFragment.LOCAL));
     }
 
     @Override
@@ -469,7 +414,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
 
     @Override
     public void setPlaylistsRemoteFragmentTag(String tag) {
-        mChildFragments.put(ChildFragment.REMOTE, tag);
+        mHostedFragments.put(HostedFragment.REMOTE, tag);
     }
 
     @Override
@@ -479,6 +424,6 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
 
     @Override
     public void setPlaylistsLocalFragmentTag(String tag) {
-        mChildFragments.put(ChildFragment.LOCAL, tag);
+        mHostedFragments.put(HostedFragment.LOCAL, tag);
     }
 }

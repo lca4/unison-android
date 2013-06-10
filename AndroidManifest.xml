@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Added by Vincent -->
     <uses-permission android:name="android.permission.NFC" />
+    <!-- Added by Marc -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"

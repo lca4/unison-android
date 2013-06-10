@@ -1,25 +1,24 @@
 
 package ch.epfl.unison.data;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.util.Log;
-
-import ch.epfl.unison.Const.SeedType;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.util.Log;
+import ch.epfl.unison.Const.SeedType;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
@@ -247,6 +246,25 @@ public class UnisonDB {
             throw new IllegalArgumentException();
         }
         return res;
+    }
+
+    public boolean isMadeWithGS(long id) {
+        Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
+                new String[] {
+                        ConstDB.PLYL_C_LOCAL_ID,
+                        ConstDB.PLYL_C_CREATED_BY_GS
+                }, ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
+                    String.valueOf(id)
+                });
+        boolean result = false;
+        if (cur != null && cur.getCount() == 1 && cur.moveToFirst()) {
+            int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
+            if (cur.getInt(colCreatedByGS) > 0) {
+                result = true;
+            }
+        }
+        closeCursor(cur);
+        return result;
     }
 
     public int getTracksCount(long playlistId) {
@@ -710,7 +728,7 @@ public class UnisonDB {
                 ContentValues values = new ContentValues();
                 values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
                 values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
-                values.put(ConstDB.PLYL_C_CREATED_BY_GS, true);
+                values.put(ConstDB.PLYL_C_CREATED_BY_GS, 1);
                 values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());
                 values.put(ConstDB.PLYL_C_GS_CREATION_TIME, pl.getCreationTime());
                 values.put(ConstDB.PLYL_C_GS_UPDATE_TIME, pl.getLastUpdated());

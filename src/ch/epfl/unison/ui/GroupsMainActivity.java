@@ -1,6 +1,7 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,6 +63,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
     private NfcAdapter mNfcAdapter = null;
 
     private JsonStruct.Group mGroup;
+    
+    private String[] favTags = null;
 
     private void autoLeave() {
         AppData data = AppData.getInstance(this);
@@ -207,6 +210,8 @@ public class GroupsMainActivity extends AbstractMainActivity {
                 GroupsStatsFragment.class, null);
 
         setupNFC();
+        
+        updateUserPreference();
     }
 
     @Override
@@ -269,6 +274,87 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+    
+ 	private void updateUserPreference() {
+ 		/** get favorite tags from server */
+ 		AppData data = AppData.getInstance(GroupsMainActivity.this);
+ 		String gpref = data.getGroupPrefs();
+ 		try {
+ 			if (gpref.indexOf(':') != -1) {
+ 				String[] pinfo = gpref.split(":");
+ 				long gid = Long.parseLong(pinfo[0]);
+ 				if (gid==mGroup.gid)
+ 					return;
+ 			}
+ 		} catch (Exception k) {
+ 			return;
+ 		}
+
+ 		data.getAPI().getFavoriteTags(data.getUid(),
+ 				new UnisonAPI.Handler<JsonStruct.FavTagsList>() {
+
+ 					@Override
+ 					public void callback(JsonStruct.FavTagsList favTagsList) {
+ 						try {
+ 							favTags = favTagsList.tags.clone();
+ 							promptUserPreference();
+ 						} catch (NullPointerException e) {
+ 							Log.w(TAG, "No Favorite Tag", e);
+ 						}
+ 					}
+
+ 					@Override
+ 					public void onError(UnisonAPI.Error error) {
+ 						Log.d(TAG, error.toString());
+ 					}
+
+ 				});
+ 		Log.d(TAG, "Favorite tags: " + Arrays.toString(favTags));
+ 	}
+
+ 	
+ 	private void promptUserPreference() {
+ 		/** Ask user for her current preference */
+ 		if (favTags != null) {
+ 			AlertDialog.Builder ab = new AlertDialog.Builder(
+ 					GroupsMainActivity.this);
+ 			ab.setTitle("Which music do you prefer today?");
+
+ 			ab.setItems(favTags, new DialogInterface.OnClickListener() {
+ 				public void onClick(DialogInterface d, int choice) {
+ 					String fav = "";
+ 					if (choice == 0) {
+ 						fav = favTags[0];
+ 					} else if (choice == 1) {
+ 						fav = favTags[1];
+ 					}
+ 					notifyUpdatePreference(fav);
+ 				}
+ 			});
+ 			ab.show();
+ 		}
+ 	}
+
+ 	private void notifyUpdatePreference(String fav) {
+ 		/** update current preference to server */
+ 		AppData data = AppData.getInstance(GroupsMainActivity.this);
+ 		if (!fav.equalsIgnoreCase("")){
+ 			data.getAPI().updatePreference(data.getUid(), fav,
+ 					new UnisonAPI.Handler<JsonStruct.Success>() {
+ 						@Override
+ 						public void callback(Success struct) {
+ 							Log.d(TAG, "successfully update preference");
+ 						}
+
+ 						@Override
+ 						public void onError(Error error) {
+ 							Log.e(TAG, error.toString());
+ 						}
+ 					});
+ 			data.setGroupPrefs(mGroup.gid, fav);
+ 		}
+ 	}
+    
 
     public void registerGroupInfoListener(OnGroupInfoListener listener) {
         mListeners.add(listener);
@@ -379,10 +465,10 @@ public class GroupsMainActivity extends AbstractMainActivity {
         }
     }
 
-//    @Override
-//    protected PlaylistItem getPlaylist() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
+    // @Override
+    // protected PlaylistItem getPlaylist() {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
 }
