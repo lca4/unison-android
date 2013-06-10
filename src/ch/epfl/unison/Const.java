@@ -44,7 +44,7 @@ public final class Const {
         public static final String URI = "uri";
         public static final String TAG = "tag";
         public static final String SIZE = "size";
-        
+
         public static final String GROUP_PREF = "gpref";
 
         public static final String UNISON_NFC_MIME_TYPE = "ch.epfl.unison:text/plain";

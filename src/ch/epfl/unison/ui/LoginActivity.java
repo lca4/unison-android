@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
@@ -125,7 +126,7 @@ public class LoginActivity extends SherlockActivity {
         switch (item.getItemId()) {
             case R.id.login_menu_item_help:
                 startActivity(new Intent(LoginActivity.this, HelpActivity.class)
-                	.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             default:
                 break;

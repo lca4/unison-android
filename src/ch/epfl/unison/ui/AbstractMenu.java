@@ -4,6 +4,7 @@ package ch.epfl.unison.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -119,15 +120,16 @@ public abstract class AbstractMenu {
                 // .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 
                 if (!(activity instanceof HomeActivity)) {
-                	// In GroupsMain we prefer going to Groups and leave the group.
+                    // In GroupsMain we prefer going to Groups and leave the
+                    // group.
                     if (activity instanceof GroupsMainActivity) {
                         activity.startActivity(new Intent(activity, GroupsActivity.class)
                                 .setAction(
                                         GroupsActivity.ACTION_LEAVE_GROUP).addFlags(
                                         Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     } else {
-                    	activity.startActivity(new Intent(activity, HomeActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        activity.startActivity(new Intent(activity, HomeActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                     // Make sure the activity is finished, even if it was at the
                     // bottom of the stack.

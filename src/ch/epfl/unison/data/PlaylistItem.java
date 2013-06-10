@@ -1,6 +1,10 @@
 
 package ch.epfl.unison.data;
 
+import ch.epfl.unison.Const;
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
+
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
@@ -9,10 +13,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
-import ch.epfl.unison.Const;
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the

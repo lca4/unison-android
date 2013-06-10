@@ -1,10 +1,10 @@
 
 package ch.epfl.unison.api;
 
+import android.os.AsyncTask;
+
 import java.net.URL;
 import java.util.HashMap;
-
-import android.os.AsyncTask;
 
 /**
  * Wraps a Request in an AsyncTask to allow non-blocking requests.

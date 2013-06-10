@@ -28,6 +28,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -56,14 +57,18 @@ import com.actionbarsherlock.app.SherlockFragment;
  */
 public abstract class AbstractPlayerFragment extends SherlockFragment implements
         OnClickListener {
-    
-    /* -------------------------------------------------------------------------
+
+    /*
+     * -------------------------------------------------------------------------
      * ABSTRACT METHODS
      * -------------------------------------------------------------------------
      */
     protected abstract void prev();
+
     protected abstract void next();
+
     protected abstract void notifyPlay(MusicItem item);
+
     protected abstract void notifySkip();
 
     /**
@@ -110,7 +115,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         private void sendRating(MusicItem item, int rating) {
             Log.d(mTag, String.format("artist: %s, title: %s, rating: %d",
                     item.artist, item.title, rating));
-            
+
             AppData data = AppData.getInstance(getActivity());
 
             UnisonAPI api = data.getAPI();
@@ -191,11 +196,11 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private Button mDjBtn;
 
     private SeekBar mSeekBar;
-    
+
     private TextView mArtistTxt;
     private TextView mTitleTxt;
     private ImageView mCoverImg;
-    
+
     private MusicServiceBinder mMusicService;
     private Handler mHandler = new Handler();
 
@@ -211,7 +216,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
 
     private boolean mIsBound;
-    
+
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -242,7 +247,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
             mHandler.postDelayed(this, UPDATE_INTERVAL);
         }
     };
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -345,7 +350,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         super.onDetach();
         mMainActivity.unregisterReceiver(mCompletedReceiver);
     }
-    
+
     @Override
     public void onStart() {
         super.onStart();
@@ -362,7 +367,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
                 new Intent(mMainActivity, MusicService.class),
                 mConnection, Context.BIND_AUTO_CREATE);
     }
-    
+
     @Override
     public void onStop() {
         super.onStop();
@@ -526,10 +531,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // break;
     // }
     // }
-    
-    
-
-    
 
     // TODO make this abstract
     // void prev() {
@@ -569,14 +570,14 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // }
     // }
 
-//    /**
-//     * Does not return explicitly a new track. A track should be added the
-//     * history through {@link #addToHistory(MusicItem)}. In case of success,
-//     * return true. Else, return false.
-//     * 
-//     * @return
-//     */
-//    protected abstract boolean requestTrack();
+    // /**
+    // * Does not return explicitly a new track. A track should be added the
+    // * history through {@link #addToHistory(MusicItem)}. In case of success,
+    // * return true. Else, return false.
+    // *
+    // * @return
+    // */
+    // protected abstract boolean requestTrack();
 
     // private void setArtistTxt(TextView artistTxt) {
     // this.mArtistTxt = artistTxt;
@@ -593,8 +594,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // private void setCoverImg(ImageView coverImg) {
     // this.mCoverImg = coverImg;
     // }
-
-    
 
     // /**
     // * Also makes the DJ toggle visible.

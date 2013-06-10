@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.MusicItem;
@@ -78,7 +79,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
             Log.i(getTag(), "prev: no track found to play.");
         }
     }
-    
+
     @Override
     protected void notifyPlay(MusicItem item) {
         UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
