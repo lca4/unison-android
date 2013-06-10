@@ -380,9 +380,21 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                 Log.d(getClassTag(), error.toString());
                             }
                             if (SoloPlaylistsActivity.this != null) {
-                                Toast.makeText(SoloPlaylistsActivity.this,
-                                        R.string.error_creating_playlist,
-                                        Toast.LENGTH_LONG).show();
+                                
+                                switch (error.statusCode) {
+                                    case UnisonAPI.ErrorCodes.IS_EMPTY:
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_creating_playlist_no_tracks,
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    case UnisonAPI.ErrorCodes.NO_TAGGED_TRACKS:
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_creating_playlist_no_tagged_tracks,
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     });
