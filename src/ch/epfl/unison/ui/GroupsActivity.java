@@ -126,6 +126,8 @@ public class GroupsActivity extends SherlockActivity implements AbstractMenu.OnR
         registerReceiver(mLogoutReceiver, new IntentFilter(AbstractMenu.ACTION_LOGOUT));
 
         setContentView(R.layout.groups);
+        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ((Button) findViewById(R.id.createGroupBtn))
                 .setOnClickListener(new OnCreateGroupListener());
