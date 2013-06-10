@@ -381,7 +381,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             }
                             if (SoloPlaylistsActivity.this != null) {
                                 
-                                switch (error.statusCode) {
+                                switch (error.jsonError.error) {
                                     case UnisonAPI.ErrorCodes.IS_EMPTY:
                                         Toast.makeText(SoloPlaylistsActivity.this,
                                                 R.string.error_creating_playlist_no_tracks,
@@ -393,6 +393,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                                 Toast.LENGTH_LONG).show();
                                         break;
                                     default:
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_creating_playlist,
+                                            Toast.LENGTH_LONG).show();
                                         break;
                                 }
                             }
