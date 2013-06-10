@@ -147,19 +147,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     }
 
     /**
-     * Running mode of the player.<br />
-     * <br />
-     * Not really a good idea. If the behavior depends on a mode, then the mode
-     * extending {@link AbstractFragmentActivity} should implement it, such that
-     * it works the way the mode requests it, disregarding how other modes needs
-     * it.
-     */
-    // @Deprecated
-    // protected enum Mode {
-    // Solo, Groups
-    // }
-
-    /**
      * Listens to broadcasts from the media player indicating when a track is
      * over.
      */
@@ -181,10 +168,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to the
                                                  // given max
 
-    // SEEK_BAR_MAX.
-    // private static int getSeekBarMax() {
-    // return SEEK_BAR_MAX;
-    // }
 
     private AbstractMainActivity mMainActivity;
 
@@ -205,14 +188,8 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private Handler mHandler = new Handler();
 
     private MusicItem mCurrentTrack;
-    // private List<MusicItem> mHistory;
-    //
-    // private int mHistPointer;
 
-    // private boolean mDJSupport;
-    // private boolean mIsDJ;
     private Status mStatus = Status.Stopped;
-    // private Mode mMode = Mode.Solo;
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
 
     private boolean mIsBound;
@@ -305,10 +282,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
         View v = inflater.inflate(R.layout.player, container, false);
 
-        // Default values
-        // mDJSupport = false;
-        // mIsDJ = false;
-
         mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
         mToggleBtn.setOnClickListener(this);
         mNextBtn = (Button) v.findViewById(R.id.musicNextBtn);
@@ -331,9 +304,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         this.mArtistTxt = (TextView) v.findViewById(R.id.musicArtist);
         this.mTitleTxt = (TextView) v.findViewById(R.id.musicTitle);
         this.mCoverImg = (ImageView) v.findViewById(R.id.musicCover);
-
-        // mHistory = new ArrayList<MusicItem>();
-        // mHistPointer = 0;
 
         return v;
     }
@@ -392,10 +362,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         return CLICK_INTERVAL;
     }
 
-    // protected void addToHistory(MusicItem item) {
-    // mHistory.add(0, item);
-    // }
-
     protected ImageView getCoverImg() {
         return mCoverImg;
     }
@@ -408,10 +374,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         }
     }
 
-    // private ServiceConnection getConnection() {
-    // return mConnection;
-    // }
-
     protected MusicItem getCurrentTrack() {
         return mCurrentTrack;
     }
@@ -419,26 +381,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     protected Button getDjBtn() {
         return mDjBtn;
     }
-
-    // private Handler getHandler() {
-    // return mHandler;
-    // }
-
-    // protected AbstractMainActivity getMainActivity() {
-    // return mMainActivity;
-    // }
-
-    // private MusicServiceBinder getMusicService() {
-    // return mMusicService;
-    // }
-
-    // private Button getNextBtn() {
-    // return mNextBtn;
-    // }
-
-    // private Button getPrevBtn() {
-    // return mPrevBtn;
-    // }
 
     protected SeekBar getSeekBar() {
         return mSeekBar;
@@ -486,170 +428,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         });
     }
 
-    // private boolean isBound() {
-    // return mIsBound;
-    // }
-
-    // TODO set abstract
-    // void next() {
-    // switch (mMode) {
-    // case Groups:
-    // if (!mHistory.isEmpty()
-    // && mHistPointer == 0
-    // && (getStatus() == Status.Playing || getStatus() == Status.Paused)) {
-    // // We're skipping a song that is heard for the first time.
-    // // Notify
-    // // the server.
-    // notifySkip();
-    // }
-    // Log.d(smTag, "Calling next");
-    //
-    // if (mHistPointer > 0) {
-    // mHistPointer -= 1;
-    // Log.d(smTag, "Calling play");
-    // play(mHistory.get(mHistPointer));
-    // } else {
-    // Log.d(smTag, "Calling requestTrack");
-    // // We need a new track.
-    // requestTrack();
-    // // if (requestTrack()) {
-    // // play(mHistory.get(0));
-    // // }
-    // }
-    // break;
-    // case Solo:
-    // // Useless, since overridden by SoloPlayerFragment
-    // try {
-    // play(((SoloMainActivity) mMainActivity).getPlaylist().next());
-    // } catch (NullPointerException npe) {
-    // Log.i(getTag(), "next: " + npe.getMessage());
-    // } catch (IndexOutOfBoundsException ioobe) {
-    // Log.i(getTag(), "next: " + ioobe.getMessage());
-    // }
-    // break;
-    // default:
-    // break;
-    // }
-    // }
-
-    // TODO make this abstract
-    // void prev() {
-    // int curPos = 0;
-    // if (isBound()) {
-    // curPos = getMusicService().getCurrentPosition();
-    // }
-    // switch (mMode) {
-    // case Groups:
-    // if (curPos < CLICK_INTERVAL && mHistPointer < mHistory.size() - 1) {
-    // // We play the *previous* track.
-    // mHistPointer += 1;
-    // play(mHistory.get(mHistPointer));
-    // } else if (mHistPointer < mHistory.size()) {
-    // // We just restart the current track.
-    // play(mHistory.get(mHistPointer));
-    // }
-    // break;
-    // case Solo:
-    // // Useless, since overridden by SoloPlayerFragment
-    // try {
-    // if (curPos < CLICK_INTERVAL) {
-    // play(((SoloMainActivity) mMainActivity).getPlaylist().previous());
-    // } else {
-    // play(((SoloMainActivity) mMainActivity).getPlaylist().current());
-    // }
-    // } catch (NullPointerException npe) {
-    // // Internal error occured
-    // Log.i(getTag(), "prev: internal error : playlist is null.");
-    // } catch (IndexOutOfBoundsException ioobe) {
-    // // TODO Else, display error message
-    // Log.i(getTag(), "prev: no track found to play.");
-    // }
-    // break;
-    // default:
-    // break;
-    // }
-    // }
-
-    // /**
-    // * Does not return explicitly a new track. A track should be added the
-    // * history through {@link #addToHistory(MusicItem)}. In case of success,
-    // * return true. Else, return false.
-    // *
-    // * @return
-    // */
-    // protected abstract boolean requestTrack();
-
-    // private void setArtistTxt(TextView artistTxt) {
-    // this.mArtistTxt = artistTxt;
-    // }
-
-    // private void setBound(boolean isBound) {
-    // this.mIsBound = isBound;
-    // }
-
-    // private void setButtons(View buttons) {
-    // this.mButtons = buttons;
-    // }
-
-    // private void setCoverImg(ImageView coverImg) {
-    // this.mCoverImg = coverImg;
-    // }
-
-    // /**
-    // * Also makes the DJ toggle visible.
-    // *
-    // * @param djSupport
-    // */
-    // protected void setDJSupport(boolean djSupport) {
-    // mDJSupport = djSupport;
-    // if (mDJSupport) {
-    // mDjBtn.setVisibility(View.VISIBLE);
-    // } else {
-    // mDjBtn.setVisibility(View.INVISIBLE);
-    // }
-    // }
-
-    // /**
-    // * Initialize the history, for example when giving a playlist from the
-    // * android database.
-    // *
-    // * @param history
-    // */
-    // protected void setHistory(List<MusicItem> history) {
-    // mHistory = history;
-    // }
-
-    // /**
-    // * Be sure you asked for DJ support first. If the DJ is not supported,
-    // * throws an UnsupportedOperationException.
-    // *
-    // * @param wantsToBeDJ
-    // */
-    // protected void setIsDJ(boolean wantsToBeDJ) {
-    // if (mDJSupport) {
-    // mIsDJ = wantsToBeDJ;
-    // mMainActivity.setDJ(wantsToBeDJ);
-    // } else {
-    // throw new UnsupportedOperationException();
-    // }
-    // }
-
-    // private void setMusicService(MusicServiceBinder musicService) {
-    // this.mMusicService = musicService;
-    // }
-
-    // private void setNextBtn(Button nextBtn) {
-    // this.mNextBtn = nextBtn;
-    // }
-
-    // private void setPrevBtn(Button prevBtn) {
-    // this.mPrevBtn = prevBtn;
-    // }
-
-    // private void setSeekBar(SeekBar seekBar) {
-    // this.mSeekBar = seekBar;
-    // }
-
     protected void play(MusicItem item) {
         Log.i(mTag, String.format("playing %s - %s", item.artist, item.title));
         // Send the song to the music player service.
@@ -675,22 +453,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
         notifyPlay(item); // Notify the server.
     }
-
-    // protected void setMode(Mode mode) {
-    // this.mMode = mode;
-    // }
-
-    // protected List<MusicItem> getHistory() {
-    // return this.mHistory;
-    // }
-
-    // protected void setTag(String tag) {
-    // mTag = tag;
-    // }
-
-    // private void setTitleTxt(TextView titleTxt) {
-    // this.mTitleTxt = titleTxt;
-    // }
 
     private void seek(int progress) {
         if ((mStatus == Status.Playing || mStatus == Status.Paused)) {
