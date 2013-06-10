@@ -110,10 +110,12 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         private void sendRating(MusicItem item, int rating) {
             Log.d(mTag, String.format("artist: %s, title: %s, rating: %d",
                     item.artist, item.title, rating));
+            
+            AppData data = AppData.getInstance(getActivity());
 
-            UnisonAPI api = AppData.getInstance(getActivity()).getAPI();
+            UnisonAPI api = data.getAPI();
             // TODO adapt
-            api.instantRate(0, item.artist, item.title, rating,
+            api.instantRate(data.getCurrentGID(), item.artist, item.title, rating,
                     new UnisonAPI.Handler<JsonStruct.Success>() {
                         @Override
                         public void callback(JsonStruct.Success struct) {
