@@ -23,9 +23,9 @@ public class UnisonAPI {
     private static final String TAG = "ch.epfl.unison.UnisonAPI";
 
     // TODO: revert to production server (make it a preference?).
-    private static final String API_ROOT = "http://staging.groupstreamer.com";
+//    private static final String API_ROOT = "http://staging.groupstreamer.com";
     // private static final String API_ROOT = "https://127.0.0.1"
-    // private static final String API_ROOT = "https://api.groupstreamer.com";
+    private static final String API_ROOT = "https://api.groupstreamer.com";
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
