@@ -19,7 +19,7 @@
     <string name="activity_title_prefs">Settings</string>
     <string name="activity_title_main">Group</string>
     <string name="activity_title_help">Help</string>
-    <string name="activity_title_solo">Single-user mode</string>
+    <string name="activity_title_solo">Playlists</string>
     <string name="activity_title_solo_main">Solo player</string>
     <string name="activity_title_solo_playlists">Playlists</string>
     <string name="activity_title_signup">Sign Up</string>
@@ -134,12 +134,9 @@ You can also just cancel this action and stay in groups history.</string>
     
     
     <!-- Solo playlists --> 
-    <string name="solo_playlists_createBtn">Create playlist</string>
-    <string name="solo_playlists_choosePL">or select one below :</string>
     <string name="solo_playlists_localPL">My playlists</string>
     <string name="solo_playlists_remotePL">Available playlists</string>
     <string name="solo_playlists_noRemotePL">Sorry, no playlist is available</string>
-    <string name="solo_playlists_alert_newplaylist_title">New Playlist</string>
     <!-- <string name="solo_playlists_dialog_pick_seed_type">Pick a seed type</string> -->
     <string name="solo_playlists_dialog_pick_seedtype">Pick the seed type</string>
     <string name="solo_playlists_dialog_pick_seeds">Pick the seeds</string>
@@ -222,6 +219,8 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
     <string name="error_creating_playlist">Unable to create the playlist.</string>
+    <string name="error_creating_playlist_no_tracks">Unable to create the playlist: you have no tracks.</string>
+    <string name="error_creating_playlist_no_tagged_tracks">Unable to create a playlist: the tracks are badly tagged.</string>
     <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
     <string name="error_creating_playlist_empty_name">Unable to create a group with empty name.</string>
     <string name="error_unauthorized">Incorrect password or e-mail address.</string>

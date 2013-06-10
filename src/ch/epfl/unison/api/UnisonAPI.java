@@ -400,6 +400,8 @@ public class UnisonAPI {
         public static final int PASSWORD_EXPECTED = 0x10;
         // Added by Marc:
         public static final int IS_EMPTY = 32;
+        public static final int OPERATION_FAILED = 0x21;
+        public static final int NO_TAGGED_TRACKS = 0x22;
 
     }
 
