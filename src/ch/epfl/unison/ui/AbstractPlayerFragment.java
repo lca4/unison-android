@@ -32,7 +32,6 @@ import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
-import ch.epfl.unison.api.TrackQueue;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
@@ -47,15 +46,25 @@ import com.actionbarsherlock.app.SherlockFragment;
  * art, ...). <br />
  * Provides:
  * <ul>
- * <li>the standard stuff for handling the music player.
- * <li>basic support for dj.
+ * <li>Default layout of the player,
+ * <li>MusicService interaction
  * </ul>
- * Does not offer a data structure for dynammic queues, like {@link TrackQueue}.
+ * Playlist management methods are abstract, sucht that every specialization has
+ * to specify how the tracks are handled.
  * 
  * @author marc
  */
 public abstract class AbstractPlayerFragment extends SherlockFragment implements
         OnClickListener {
+    
+    /* -------------------------------------------------------------------------
+     * ABSTRACT METHODS
+     * -------------------------------------------------------------------------
+     */
+    protected abstract void prev();
+    protected abstract void next();
+    protected abstract void notifyPlay(MusicItem item);
+    protected abstract void notifySkip();
 
     /**
      * Handles instant ratings (when the user clicks on the rating button in the
@@ -161,9 +170,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private String mTag = "ch.epfl.unison.AbstractPlayerFragment";
 
     private static final int UPDATE_INTERVAL = 1000; // In milliseconds.
-
     private static final int CLICK_INTERVAL = 5 * 1000; // In milliseconds.
-
     private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to the
                                                  // given max
 
@@ -174,6 +181,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
     private AbstractMainActivity mMainActivity;
 
+    private View mButtons;
     private Button mNextBtn;
     private Button mPrevBtn;
     private Button mToggleBtn;
@@ -181,12 +189,13 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private Button mDjBtn;
 
     private SeekBar mSeekBar;
-    private Handler mHandler = new Handler();
-    private View mButtons;
-
+    
     private TextView mArtistTxt;
     private TextView mTitleTxt;
     private ImageView mCoverImg;
+    
+    private MusicServiceBinder mMusicService;
+    private Handler mHandler = new Handler();
 
     private MusicItem mCurrentTrack;
     // private List<MusicItem> mHistory;
@@ -199,10 +208,8 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // private Mode mMode = Mode.Solo;
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
 
-    private MusicServiceBinder mMusicService;
-
     private boolean mIsBound;
-
+    
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -233,10 +240,134 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
             mHandler.postDelayed(this, UPDATE_INTERVAL);
         }
     };
+    
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mMainActivity = (AbstractMainActivity) activity;
+        mMainActivity.registerReceiver(mCompletedReceiver,
+                new IntentFilter(MusicService.ACTION_COMPLETED));
+        mTag = this.getClass().getName();
+    }
 
-    // protected void addToHistory(MusicItem item) {
-    // mHistory.add(0, item);
-    // }
+    @Override
+    public void onClick(View v) {
+        if (v == mToggleBtn) {
+            Log.d(mTag, "Clicked on play button, status = " + mStatus);
+            if (mStatus == Status.Stopped) {
+                next();
+            } else { // Paused or Playing.
+                toggle();
+            }
+        } else if (v == mNextBtn) {
+            next();
+        } else if (v == mPrevBtn) {
+            prev();
+        }
+        // else if (mDJSupport && v == mDjBtn) {
+        // Log.d(mTag, "Clicked DJ button");
+        // //Here we are (almost) sure that the main activity is still not null,
+        // so we collect usefull
+        // //information for latter servercomm:
+        // Activity activity = getActivity();
+        // if (activity == null) {
+        // //this should never happen
+        // Log.d(mTag,
+        // "Trying to get or release DJ seat while the activity was null! Aborting.");
+        // }
+        // AppData data = AppData.getInstance(activity);
+        // Location loc = data.getLocation();
+        // double lat, lon;
+        // if (loc != null) {
+        // lat = loc.getLatitude();
+        // lon = loc.getLongitude();
+        // } else {
+        // lat = DEFAULT_LATITUDE;
+        // lon = DEFAULT_LONGITUDE;
+        // Log.i(mTag, "location was null, using default values");
+        // }
+        //
+        // // setIsDJ(!mIsDJ, data.getAPI(), data.getUid(), activity.getG);
+        // }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        mTag = this.getClass().getName();
+
+        View v = inflater.inflate(R.layout.player, container, false);
+
+        // Default values
+        // mDJSupport = false;
+        // mIsDJ = false;
+
+        mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
+        mToggleBtn.setOnClickListener(this);
+        mNextBtn = (Button) v.findViewById(R.id.musicNextBtn);
+        mNextBtn.setOnClickListener(this);
+        mPrevBtn = (Button) v.findViewById(R.id.musicPrevBtn);
+        mPrevBtn.setOnClickListener(this);
+
+        mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
+        mDjBtn.setOnClickListener(this);
+        mDjBtn.setVisibility(View.INVISIBLE);
+
+        mRatingBtn = (Button) v.findViewById(R.id.ratingBtn);
+        mRatingBtn.setOnClickListener(new OnRatingClickListener());
+
+        this.mSeekBar = (SeekBar) v.findViewById(R.id.musicProgBar);
+        initSeekBar();
+
+        this.mButtons = v.findViewById(R.id.musicButtons);
+
+        this.mArtistTxt = (TextView) v.findViewById(R.id.musicArtist);
+        this.mTitleTxt = (TextView) v.findViewById(R.id.musicTitle);
+        this.mCoverImg = (ImageView) v.findViewById(R.id.musicCover);
+
+        // mHistory = new ArrayList<MusicItem>();
+        // mHistPointer = 0;
+
+        return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(getUpdateProgressTask());
+        getActivity().startService(new Intent(MusicService.ACTION_STOP));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mMainActivity.unregisterReceiver(mCompletedReceiver);
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        getSeekBar().setEnabled(true);
+        // if (mDJSupport && !mIsDJ) {
+        // // Just to make sure, when the activity is recreated.
+        // getButtons().setVisibility(View.INVISIBLE);
+        // mDjBtn.setText(getString(R.string.player_become_dj));
+        // getSeekBar().setVisibility(View.INVISIBLE);
+        // } else {
+        getSeekBar().setVisibility(View.VISIBLE);
+        // }
+        mMainActivity.bindService(
+                new Intent(mMainActivity, MusicService.class),
+                mConnection, Context.BIND_AUTO_CREATE);
+    }
+    
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mIsBound) {
+            mMainActivity.unbindService(mConnection);
+        }
+    }
 
     protected TextView getArtistTxt() {
         return mArtistTxt;
@@ -246,16 +377,40 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         return mButtons;
     }
 
-    // private ServiceConnection getConnection() {
-    // return mConnection;
+    protected String getClassTag() {
+        return mTag;
+    }
+
+    protected int getClickInterval() {
+        return CLICK_INTERVAL;
+    }
+
+    // protected void addToHistory(MusicItem item) {
+    // mHistory.add(0, item);
     // }
 
     protected ImageView getCoverImg() {
         return mCoverImg;
     }
 
+    protected int getCurrentPosition() {
+        if (mIsBound) {
+            return mMusicService.getCurrentPosition();
+        } else {
+            return 0;
+        }
+    }
+
+    // private ServiceConnection getConnection() {
+    // return mConnection;
+    // }
+
     protected MusicItem getCurrentTrack() {
         return mCurrentTrack;
+    }
+
+    protected Button getDjBtn() {
+        return mDjBtn;
     }
 
     // private Handler getHandler() {
@@ -369,168 +524,10 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // break;
     // }
     // }
+    
+    
 
-    protected abstract void notifyPlay(MusicItem item);
-
-    protected abstract void notifySkip();
-
-    protected abstract void next();
-
-    protected abstract void prev();
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mMainActivity = (AbstractMainActivity) activity;
-        mMainActivity.registerReceiver(mCompletedReceiver,
-                new IntentFilter(MusicService.ACTION_COMPLETED));
-        mTag = this.getClass().getName();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v == mToggleBtn) {
-            Log.d(mTag, "Clicked on play button, status = " + mStatus);
-            if (mStatus == Status.Stopped) {
-                next();
-            } else { // Paused or Playing.
-                toggle();
-            }
-        } else if (v == mNextBtn) {
-            next();
-        } else if (v == mPrevBtn) {
-            prev();
-        }
-        // else if (mDJSupport && v == mDjBtn) {
-        // Log.d(mTag, "Clicked DJ button");
-        // //Here we are (almost) sure that the main activity is still not null,
-        // so we collect usefull
-        // //information for latter servercomm:
-        // Activity activity = getActivity();
-        // if (activity == null) {
-        // //this should never happen
-        // Log.d(mTag,
-        // "Trying to get or release DJ seat while the activity was null! Aborting.");
-        // }
-        // AppData data = AppData.getInstance(activity);
-        // Location loc = data.getLocation();
-        // double lat, lon;
-        // if (loc != null) {
-        // lat = loc.getLatitude();
-        // lon = loc.getLongitude();
-        // } else {
-        // lat = DEFAULT_LATITUDE;
-        // lon = DEFAULT_LONGITUDE;
-        // Log.i(mTag, "location was null, using default values");
-        // }
-        //
-        // // setIsDJ(!mIsDJ, data.getAPI(), data.getUid(), activity.getG);
-        // }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mTag = this.getClass().getName();
-
-        View v = inflater.inflate(R.layout.player, container, false);
-
-        // Default values
-        // mDJSupport = false;
-        // mIsDJ = false;
-
-        mToggleBtn = (Button) v.findViewById(R.id.musicToggleBtn);
-        mToggleBtn.setOnClickListener(this);
-        mNextBtn = (Button) v.findViewById(R.id.musicNextBtn);
-        mNextBtn.setOnClickListener(this);
-        mPrevBtn = (Button) v.findViewById(R.id.musicPrevBtn);
-        mPrevBtn.setOnClickListener(this);
-
-        mDjBtn = (Button) v.findViewById(R.id.djToggleBtn);
-        mDjBtn.setOnClickListener(this);
-        mDjBtn.setVisibility(View.INVISIBLE);
-
-        mRatingBtn = (Button) v.findViewById(R.id.ratingBtn);
-        mRatingBtn.setOnClickListener(new OnRatingClickListener());
-
-        this.mSeekBar = (SeekBar) v.findViewById(R.id.musicProgBar);
-        initSeekBar();
-
-        this.mButtons = v.findViewById(R.id.musicButtons);
-
-        this.mArtistTxt = (TextView) v.findViewById(R.id.musicArtist);
-        this.mTitleTxt = (TextView) v.findViewById(R.id.musicTitle);
-        this.mCoverImg = (ImageView) v.findViewById(R.id.musicCover);
-
-        // mHistory = new ArrayList<MusicItem>();
-        // mHistPointer = 0;
-
-        return v;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mHandler.removeCallbacks(getUpdateProgressTask());
-        getActivity().startService(new Intent(MusicService.ACTION_STOP));
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mMainActivity.unregisterReceiver(mCompletedReceiver);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getSeekBar().setEnabled(true);
-        // if (mDJSupport && !mIsDJ) {
-        // // Just to make sure, when the activity is recreated.
-        // getButtons().setVisibility(View.INVISIBLE);
-        // mDjBtn.setText(getString(R.string.player_become_dj));
-        // getSeekBar().setVisibility(View.INVISIBLE);
-        // } else {
-        getSeekBar().setVisibility(View.VISIBLE);
-        // }
-        mMainActivity.bindService(
-                new Intent(mMainActivity, MusicService.class),
-                mConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mIsBound) {
-            mMainActivity.unbindService(mConnection);
-        }
-    }
-
-    protected void play(MusicItem item) {
-        Log.i(mTag, String.format("playing %s - %s", item.artist, item.title));
-        // Send the song to the music player service.
-        Uri uri = ContentUris.withAppendedId(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);
-        mMainActivity.startService(
-                new Intent(MusicService.ACTION_LOAD).setData(uri).putExtra(
-                        Const.Strings.SONG_ARTIST_TITLE,
-                        String.format("%s - %s", item.artist, item.title)));
-        this.mCurrentTrack = item;
-        this.mStatus = Status.Playing;
-
-        // Update the interface.
-        mToggleBtn.setBackgroundResource(R.drawable.btn_pause);
-        mCoverImg.setImageResource(R.drawable.cover);
-        mArtistTxt.setText(item.artist);
-        mTitleTxt.setText(item.title);
-
-        // Log.d(TAG, "musicService gave us a duration of " + duration + " ms");
-        getSeekBar().setProgress(0);
-        getSeekBar().setMax(SEEK_BAR_MAX);
-        updateProgressBar();
-
-        notifyPlay(item); // Notify the server.
-    }
+    
 
     // TODO make this abstract
     // void prev() {
@@ -570,20 +567,14 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // }
     // }
 
-    /**
-     * Does not return explicitly a new track. A track should be added the
-     * history through {@link #addToHistory(MusicItem)}. In case of success,
-     * return true. Else, return false.
-     * 
-     * @return
-     */
-    protected abstract boolean requestTrack();
-
-    private void seek(int progress) {
-        if ((mStatus == Status.Playing || mStatus == Status.Paused)) {
-            mMusicService.setCurrentPosition(progress);
-        }
-    }
+//    /**
+//     * Does not return explicitly a new track. A track should be added the
+//     * history through {@link #addToHistory(MusicItem)}. In case of success,
+//     * return true. Else, return false.
+//     * 
+//     * @return
+//     */
+//    protected abstract boolean requestTrack();
 
     // private void setArtistTxt(TextView artistTxt) {
     // this.mArtistTxt = artistTxt;
@@ -601,9 +592,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // this.mCoverImg = coverImg;
     // }
 
-    protected void setCurrentTrack(MusicItem currentTrack) {
-        this.mCurrentTrack = currentTrack;
-    }
+    
 
     // /**
     // * Also makes the DJ toggle visible.
@@ -660,8 +649,30 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // this.mSeekBar = seekBar;
     // }
 
-    protected void setStatus(Status status) {
-        this.mStatus = status;
+    protected void play(MusicItem item) {
+        Log.i(mTag, String.format("playing %s - %s", item.artist, item.title));
+        // Send the song to the music player service.
+        Uri uri = ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.localId);
+        mMainActivity.startService(
+                new Intent(MusicService.ACTION_LOAD).setData(uri).putExtra(
+                        Const.Strings.SONG_ARTIST_TITLE,
+                        String.format("%s - %s", item.artist, item.title)));
+        this.mCurrentTrack = item;
+        this.mStatus = Status.Playing;
+
+        // Update the interface.
+        mToggleBtn.setBackgroundResource(R.drawable.btn_pause);
+        mCoverImg.setImageResource(R.drawable.cover);
+        mArtistTxt.setText(item.artist);
+        mTitleTxt.setText(item.title);
+
+        // Log.d(TAG, "musicService gave us a duration of " + duration + " ms");
+        getSeekBar().setProgress(0);
+        getSeekBar().setMax(SEEK_BAR_MAX);
+        updateProgressBar();
+
+        notifyPlay(item); // Notify the server.
     }
 
     // protected void setMode(Mode mode) {
@@ -680,6 +691,24 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     // this.mTitleTxt = titleTxt;
     // }
 
+    private void seek(int progress) {
+        if ((mStatus == Status.Playing || mStatus == Status.Paused)) {
+            mMusicService.setCurrentPosition(progress);
+        }
+    }
+
+    protected void setCurrentTrack(MusicItem currentTrack) {
+        this.mCurrentTrack = currentTrack;
+    }
+
+    protected void setDjBtn(Button djBtn) {
+        this.mDjBtn = djBtn;
+    }
+
+    protected void setStatus(Status status) {
+        this.mStatus = status;
+    }
+
     private void toggle() {
         if (getStatus() == Status.Playing) {
             getActivity().startService(new Intent(MusicService.ACTION_PAUSE));
@@ -695,29 +724,5 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
     private void updateProgressBar() {
         mHandler.postDelayed(getUpdateProgressTask(), UPDATE_INTERVAL);
-    }
-
-    protected int getCurrentPosition() {
-        if (mIsBound) {
-            return mMusicService.getCurrentPosition();
-        } else {
-            return 0;
-        }
-    }
-
-    protected int getClickInterval() {
-        return CLICK_INTERVAL;
-    }
-
-    protected String getClassTag() {
-        return mTag;
-    }
-
-    protected Button getDjBtn() {
-        return mDjBtn;
-    }
-
-    protected void setDjBtn(Button djBtn) {
-        this.mDjBtn = djBtn;
     }
 }

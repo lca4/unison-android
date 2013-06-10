@@ -30,6 +30,56 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     private OnSoloPlayerListener mListener;
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mHostActivity = (SoloMainActivity) activity;
+        // Ensure the host implements the interface
+        try {
+            mListener = (SoloMainActivity) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnSavePlaylistListener");
+        }
+        String tag = SoloPlayerFragment.this.getTag();
+        mListener.setPlayerFragmentTag(tag);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        // setHistory(null); // TODO fetch a real playlist
+        return v;
+    }
+
+    protected void next() {
+        try {
+            play(mHostActivity.getPlaylist().next());
+            mListener.onTrackChange();
+        } catch (NullPointerException npe) {
+            Log.i(getTag(), "next: " + npe.getMessage());
+        } catch (IndexOutOfBoundsException ioobe) {
+            Log.i(getTag(), "next: " + ioobe.getMessage());
+        }
+    }
+
+    protected void prev() {
+        try {
+            if (getCurrentPosition() < getClickInterval()) {
+                play(mHostActivity.getPlaylist().previous());
+            } else {
+                play(mHostActivity.getPlaylist().current());
+            }
+        } catch (NullPointerException npe) {
+            // Internal error occured
+            Log.i(getTag(), "prev: internal error : playlist is null.");
+        } catch (IndexOutOfBoundsException ioobe) {
+            // TODO Else, display error message
+            Log.i(getTag(), "prev: no track found to play.");
+        }
+    }
+    
+    @Override
     protected void notifyPlay(MusicItem item) {
         UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         // TODO tell the server to increment the listener counter
@@ -70,65 +120,5 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
         // Log.d(TAG, error.toString());
         // }
         // });
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mHostActivity = (SoloMainActivity) activity;
-        // Ensure the host implements the interface
-        try {
-            mListener = (SoloMainActivity) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnSavePlaylistListener");
-        }
-        String tag = SoloPlayerFragment.this.getTag();
-        mListener.setPlayerFragmentTag(tag);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        // setHistory(null); // TODO fetch a real playlist
-        return v;
-    }
-
-    @Override
-    protected boolean requestTrack() {
-        /*
-         * Since the playlist is generated once and all the tracks are known
-         * before playing, there is no need to request for new tracks on the
-         * fly.
-         */
-        return false;
-    }
-
-    protected void next() {
-        try {
-            play(mHostActivity.getPlaylist().next());
-            mListener.onTrackChange();
-        } catch (NullPointerException npe) {
-            Log.i(getTag(), "next: " + npe.getMessage());
-        } catch (IndexOutOfBoundsException ioobe) {
-            Log.i(getTag(), "next: " + ioobe.getMessage());
-        }
-    }
-
-    protected void prev() {
-        try {
-            if (getCurrentPosition() < getClickInterval()) {
-                play(mHostActivity.getPlaylist().previous());
-            } else {
-                play(mHostActivity.getPlaylist().current());
-            }
-        } catch (NullPointerException npe) {
-            // Internal error occured
-            Log.i(getTag(), "prev: internal error : playlist is null.");
-        } catch (IndexOutOfBoundsException ioobe) {
-            // TODO Else, display error message
-            Log.i(getTag(), "prev: no track found to play.");
-        }
     }
 }
