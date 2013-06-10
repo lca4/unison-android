@@ -158,10 +158,12 @@ public class TrackQueue {
                     for (JsonStruct.Track track : chunk.tracks) {
                         Log.d(TAG, String.format("Adding %s - %s to the queue",
                                 track.artist, track.title));
-                        if (!mPlaylist.add(new MusicItem(track.localId, track.artist,
-                                track.title))) {
-                            mNextPtr = 0;
-                        }
+                        // Commit 9767af6583a91dc91591395e7553d78d5a26a3aa
+                        mPlaylist.add(new MusicItem(track.localId, track.artist, track.title));
+//                        if (!mPlaylist.add(new MusicItem(track.localId, track.artist,
+//                                track.title))) {
+//                            mNextPtr = 0;
+//                        }
                     }
                 }
             }
