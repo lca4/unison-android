@@ -152,6 +152,15 @@ public final class AppData implements OnSharedPreferenceChangeListener {
         mPrefs.edit().putBoolean(Const.PrefKeys.GROUP_SUGGESTION, value).commit();
     }
 
+ 	public String getGroupPrefs() {
+ 		return mPrefs.getString(Const.Strings.GROUP_PREF, "");
+ 	}
+
+ 	public void setGroupPrefs(long gid, String fav) {
+ 		String value = gid + ":" + fav;
+ 		mPrefs.edit().putString(Const.Strings.GROUP_PREF, value).commit();
+ 	}
+
     private LinkedList<Pair<Pair<Double, Double>, Date>> extractQueueFromString(String value) {
         if (value == null) {
             return new LinkedList<Pair<Pair<Double, Double>, Date>>();
