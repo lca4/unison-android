@@ -1,31 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <!-- Alignment of buttons: http://stackoverflow.com/questions/2614936/how-to-center-buttons-on-screen-horizontally-and-vertically-plus-equidistant-apa -->
     
-    <ImageButton
-        android:id="@+id/home_button_groups"
-        android:contentDescription="@string/home_button_groups_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_social_group"
-        android:onClick="onButtonClickGroups"
-        android:text="@string/home_button_groups"
-        android:layout_centerInParent="true" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+        
+        <ImageButton
+            android:id="@+id/home_button_groups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="50dip"
+            android:layout_marginRight="50dip"
+            android:layout_marginTop="20dip"
+            android:background="#00000000"
+            android:contentDescription="@string/home_button_groups_desc"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp"
+            android:onClick="onButtonClickGroups"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_social_group"
+            android:text="@string/home_button_groups" />
 
-    <ImageButton
-        android:id="@+id/home_button_solo"
-        android:contentDescription="@string/home_button_solo_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_social_person"
-        android:onClick="onButtonClickSolo"
-        android:text="@string/home_button_solo"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/home_button_groups"
-        android:layout_marginTop="30dip" />
+        <!-- android:layout_width="400dip"
+        android:layout_height="400dip"
+        android:scaleType="fitXY" -->
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_weight="1" >
 
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/home_button_solo"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="50dip"
+            android:layout_marginRight="50dip"
+            android:layout_marginTop="20dip"
+            android:background="#00000000"
+            android:contentDescription="@string/home_button_solo_desc"
+            android:onClick="onButtonClickSolo"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_social_person"
+            android:text="@string/home_button_solo" />
+
+    </LinearLayout>
+
+</LinearLayout>
