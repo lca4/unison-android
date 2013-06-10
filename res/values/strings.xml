@@ -215,12 +215,13 @@ You can also just cancel this action and stay in groups history.</string>
     <string name="error_setting_password">Unable to set password</string>
     <string name="error_loading_groups">Unable to load the list of groups.</string>
     <string name="error_loading_playlists">Unable to load the list of playlists</string>
+    <string name="error_loading_playlists_no_playlists">You haven\'t created any playlist</string>
     <string name="error_loading_tags">Unable to load the list of tags</string>
     <string name="error_joining_group">Unable to join the group.</string>
     <string name="error_creating_group">Unable to create the group.</string>
-    <string name="error_creating_playlist">Unable to create the playlist.</string>
-    <string name="error_creating_playlist_no_tracks">Unable to create the playlist: you have no tracks.</string>
-    <string name="error_creating_playlist_no_tagged_tracks">Unable to create a playlist: the tracks are badly tagged.</string>
+    <string name="error_creating_playlist">Unable to create the playlist</string>
+    <string name="error_creating_playlist_no_tracks">Unable to create the playlist: you have no tracks</string>
+    <string name="error_creating_playlist_no_tagged_tracks">Unable to create a playlist: the tracks are badly tagged</string>
     <string name="error_creating_group_empty_name">Unable to create a group with empty name.</string>
     <string name="error_creating_playlist_empty_name">Unable to create a group with empty name.</string>
     <string name="error_unauthorized">Incorrect password or e-mail address.</string>

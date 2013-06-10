@@ -138,9 +138,24 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                             Log.d(getClassTag(), error.toString());
                         }
                         if (SoloPlaylistsActivity.this != null) {
-                            Toast.makeText(SoloPlaylistsActivity.this,
-                                    R.string.error_loading_playlists,
-                                    Toast.LENGTH_LONG).show();
+                            if (error.hasJsonError()) {
+                                switch (error.jsonError.error) {
+                                    case UnisonAPI.ErrorCodes.IS_EMPTY:
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_loading_playlists_no_playlists,
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    default:
+                                        Toast.makeText(SoloPlaylistsActivity.this,
+                                                R.string.error_loading_playlists,
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                }
+                            } else {
+                                Toast.makeText(SoloPlaylistsActivity.this,
+                                        R.string.error_loading_playlists,
+                                        Toast.LENGTH_LONG).show();
+                            }
                         }
                         SoloPlaylistsActivity.this.repaintRefresh(false);
                     }
@@ -381,23 +396,29 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                 Log.d(getClassTag(), error.toString());
                             }
                             if (SoloPlaylistsActivity.this != null) {
-
-                                switch (error.jsonError.error) {
-                                    case UnisonAPI.ErrorCodes.IS_EMPTY:
-                                        Toast.makeText(SoloPlaylistsActivity.this,
-                                                R.string.error_creating_playlist_no_tracks,
-                                                Toast.LENGTH_LONG).show();
-                                        break;
-                                    case UnisonAPI.ErrorCodes.NO_TAGGED_TRACKS:
-                                        Toast.makeText(SoloPlaylistsActivity.this,
-                                                R.string.error_creating_playlist_no_tagged_tracks,
-                                                Toast.LENGTH_LONG).show();
-                                        break;
-                                    default:
-                                        Toast.makeText(SoloPlaylistsActivity.this,
-                                                R.string.error_creating_playlist,
-                                                Toast.LENGTH_LONG).show();
-                                        break;
+                                if (error.hasJsonError()) {
+                                    switch (error.jsonError.error) {
+                                        case UnisonAPI.ErrorCodes.IS_EMPTY:
+                                            Toast.makeText(SoloPlaylistsActivity.this,
+                                                    R.string.error_creating_playlist_no_tracks,
+                                                    Toast.LENGTH_LONG).show();
+                                            break;
+                                        case UnisonAPI.ErrorCodes.NO_TAGGED_TRACKS:
+                                            Toast.makeText(SoloPlaylistsActivity.this,
+                                                    R.string
+                                                    .error_creating_playlist_no_tagged_tracks,
+                                                    Toast.LENGTH_LONG).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(SoloPlaylistsActivity.this,
+                                                    R.string.error_creating_playlist,
+                                                    Toast.LENGTH_LONG).show();
+                                            break;
+                                    }
+                                } else {
+                                    Toast.makeText(SoloPlaylistsActivity.this,
+                                            R.string.error_creating_playlist,
+                                            Toast.LENGTH_LONG).show();
                                 }
                             }
                         }
