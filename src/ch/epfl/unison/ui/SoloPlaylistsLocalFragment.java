@@ -198,7 +198,8 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             do {
                 long localId = cur.getLong(colId);
-                if (mHostActivity.getDB().isMadeWithGS(localId)) {
+                final AppData data = AppData.getInstance(mHostActivity);
+                if (mHostActivity.getDB().isMadeWithGS(localId, data.getUid())) {
                     int size = mHostActivity.getDB().getTracksCount(localId);
                     PlaylistItem pl = new PlaylistItem.Builder().localId(localId)
                             .size(size).build();

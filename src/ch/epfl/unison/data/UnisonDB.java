@@ -25,7 +25,7 @@ import java.util.Set;
  * Class for accessing / managing the unison database. Note: we are talking
  * about the one *that GroupStreamer owns*, i.e. on the phone <br />
  * <br />
- * Ideas of improvements:
+ * Refactoring in progress:
  * <ul>
  * <li>1 private inner class for each table</li>
  * <li>interface implemented by every such inner classes</li>
@@ -103,6 +103,16 @@ public class UnisonDB {
         values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
         mDB.update(table, values, null, null);
         close();
+    }
+    
+    private interface ITableHandler {
+        boolean isEmpty();
+        boolean exists(AbstractItem i);
+        void insert(AbstractItem i);
+        AbstractItem getItem(long index);
+        Set<AbstractItem> getItems();
+        int delete(AbstractItem i);
+        void truncate();
     }
 
     /**
@@ -210,8 +220,9 @@ public class UnisonDB {
         }
     }
 
-    public void exists(Class<?> item) {
+    public boolean exists(Class<?> item) {
         // TODO
+        return false;
     }
 
     public int delete(Object item) {
@@ -263,6 +274,35 @@ public class UnisonDB {
             if (cur.getInt(colCreatedByGS) > 0) {
                 result = true;
             }
+        }
+        closeCursor(cur);
+        return result;
+    }
+    
+    /**
+     * Was the playlist plid made by the user uid with GS?
+     * 
+     * @param plid
+     * @param uid
+     * @return
+     */
+    public boolean isMadeWithGS(long plid, long uid) {
+        String selection = ConstDB.PLYL_C_LOCAL_ID + " = ? "
+                + "AND " + ConstDB.PLYL_C_CREATED_BY_GS + " = ? "
+                + "AND " + ConstDB.PLYL_C_GS_AUTHOR_ID + " = ? ";
+        Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
+                new String[] {
+                        ConstDB.PLYL_C_LOCAL_ID,
+                        ConstDB.PLYL_C_CREATED_BY_GS,
+                        ConstDB.PLYL_C_GS_AUTHOR_ID
+                }, selection, new String[] {
+                    String.valueOf(plid),
+                    String.valueOf(ConstDB.TRUE),
+                    String.valueOf(uid)
+                });
+        boolean result = false;
+        if (cur != null && cur.moveToFirst()) {
+            result = true;
         }
         closeCursor(cur);
         return result;
