@@ -38,9 +38,9 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     private static final String PLYL_SCHEMA = "CREATE TABLE IF NOT EXISTS "
             + ConstDB.PLAYLISTS_TABLE_NAME + " ("
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
-            + ConstDB.PLYL_C_USER_ID + "int, "
             + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
             + ConstDB.PLYL_C_LOCAL_UPDATE_TIME + " datetime, "
+            + ConstDB.PLYL_C_GS_USER_ID + "int, "
             + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT " + ConstDB.FALSE + ", "
             + ConstDB.PLYL_C_GS_ID + " bigint, "
@@ -57,10 +57,10 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.C_IS_CHECKED + " tinyint DEFAULT " + ConstDB.FALSE
             + "); "
             // Create some indexes
-            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_USER_ID + " ON "
-            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_USER_ID + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_LOCAL_ID + " ON "
             + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_LOCAL_ID + ");"
+            + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_USER_ID + " ON "
+            + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_USER_ID + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_ID + " ON "
             + ConstDB.PLAYLISTS_TABLE_NAME + "(" + ConstDB.PLYL_C_GS_ID + ");"
             + "CREATE INDEX IF NOT EXISTS " + ConstDB.PLYL_INDEX_GS_SIZE + " ON "

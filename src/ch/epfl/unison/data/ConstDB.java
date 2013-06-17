@@ -57,7 +57,7 @@ final class ConstDB {
      * since they're stored in the shared android playlist database!
      */
     static final String PLAYLISTS_TABLE_NAME = "playlist"; // Prefix: PLYL_
-    static final String PLYL_C_USER_ID = "user_id"; // from AppData (to support
+    static final String PLYL_C_GS_USER_ID = "user_id"; // from AppData (to support
     // several accounts on the same device)
     static final String PLYL_C_LOCAL_ID = "local_id";
     // =PlaylistsColumns.DATE_MODIFIED, needed to see if playlist modified
@@ -79,7 +79,7 @@ final class ConstDB {
     static final String PLYL_C_GS_USER_COMMENT = "gs_user_comment";
 
     // Indexes
-    static final String PLYL_INDEX_USER_ID = "plyl_user_id_idx";
+    static final String PLYL_INDEX_GS_USER_ID = "plyl_gs_user_id_idx";
     static final String PLYL_INDEX_LOCAL_ID = "plyl_local_id_idx";
     static final String PLYL_INDEX_GS_ID = "plyl_gs_playlist_id_idx";
     static final String PLYL_INDEX_GS_SIZE = "plyl_gs_size_idx";

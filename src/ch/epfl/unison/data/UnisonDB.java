@@ -289,12 +289,12 @@ public class UnisonDB {
     public boolean isMadeWithGS(long plid, long uid) {
         String selection = ConstDB.PLYL_C_LOCAL_ID + " = ? "
                 + "AND " + ConstDB.PLYL_C_CREATED_BY_GS + " = ? "
-                + "AND " + ConstDB.PLYL_C_GS_AUTHOR_ID + " = ? ";
+                + "AND " + ConstDB.PLYL_C_GS_USER_ID + " = ? ";
         Cursor cur = getCursor(ConstDB.PLAYLISTS_TABLE_NAME,
                 new String[] {
                         ConstDB.PLYL_C_LOCAL_ID,
                         ConstDB.PLYL_C_CREATED_BY_GS,
-                        ConstDB.PLYL_C_GS_AUTHOR_ID
+                        ConstDB.PLYL_C_GS_USER_ID
                 }, selection, new String[] {
                     String.valueOf(plid),
                     String.valueOf(ConstDB.TRUE),
