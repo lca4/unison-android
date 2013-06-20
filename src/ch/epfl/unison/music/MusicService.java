@@ -1,6 +1,8 @@
 
 package ch.epfl.unison.music;
 
+import java.io.IOException;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -17,12 +19,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
-
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.AbstractMainActivity;
-
-import java.io.IOException;
 
 /**
  * Music player service. Inspired by the Android SDK's sample application,
@@ -52,7 +51,7 @@ public class MusicService extends Service
     private AudioFocusHelper mFocusHelper;
     private MediaPlayer mMediaPlayer;
     private Notification mNotification;
-    
+
     private Class<AbstractMainActivity> mCallerClass;
 
     private MusicServiceBinder mBinder = new MusicServiceBinder();
@@ -340,8 +339,8 @@ public class MusicService extends Service
     public IBinder onBind(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            Class<AbstractMainActivity> caller = 
-                    (Class<AbstractMainActivity>) 
+            Class<AbstractMainActivity> caller =
+                    (Class<AbstractMainActivity>)
                     extras.getSerializable(Const.Intents.ABSTRACT_PLAYER_ONSTART);
             if (caller != null) {
                 mCallerClass = caller;

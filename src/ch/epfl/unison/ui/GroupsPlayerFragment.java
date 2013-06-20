@@ -1,6 +1,9 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
@@ -23,9 +25,6 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.MusicItem;
 import ch.epfl.unison.music.MusicService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Specialized Fragment for {@link GroupsMainFragment}.

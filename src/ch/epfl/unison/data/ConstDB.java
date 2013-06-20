@@ -53,11 +53,13 @@ final class ConstDB {
     /*
      * The playlists table will just be used to store additional data about the
      * playlists that has to be persistent. These infos include for e.g.
-     * isSynced. Be careful, the playlists can be modified outside of GroupStreamer,
-     * since they're stored in the shared android playlist database!
+     * isSynced. Be careful, the playlists can be modified outside of
+     * GroupStreamer, since they're stored in the shared android playlist
+     * database!
      */
     static final String PLAYLISTS_TABLE_NAME = "playlist"; // Prefix: PLYL_
-    static final String PLYL_C_GS_USER_ID = "user_id"; // from AppData (to support
+    static final String PLYL_C_GS_USER_ID = "user_id"; // from AppData (to
+                                                       // support
     // several accounts on the same device)
     static final String PLYL_C_LOCAL_ID = "local_id";
     // =PlaylistsColumns.DATE_MODIFIED, needed to see if playlist modified

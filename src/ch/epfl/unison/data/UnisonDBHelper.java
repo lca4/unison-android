@@ -73,7 +73,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
     }
-    
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
@@ -93,8 +93,8 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
          */
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
-        //db.execSQL("DROP TABLE IF EXISTS " + ConstDB.TAG_TABLE_NAME);
-        //TODO db.execSQL("UPDATE TABLE IF EXISTS playlists [...]");
+        // db.execSQL("DROP TABLE IF EXISTS " + ConstDB.TAG_TABLE_NAME);
+        // TODO db.execSQL("UPDATE TABLE IF EXISTS playlists [...]");
         onCreate(db);
     }
 }

@@ -1,10 +1,6 @@
 
 package ch.epfl.unison.data;
 
-import ch.epfl.unison.Const;
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
-
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +9,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import ch.epfl.unison.Const;
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 /**
  * Abstraction of a playlist. A Playlist object could be shared between the
@@ -197,7 +197,7 @@ public class PlaylistItem extends AbstractItem {
             this.mAuthorName = name;
             return this;
         }
-        
+
         public Builder userId(long uid) {
             this.mUserId = uid;
             return this;
@@ -405,7 +405,7 @@ public class PlaylistItem extends AbstractItem {
     public void setUserRating(int userRating) {
         this.mUserRating = userRating;
     }
-    
+
     public PlaylistItem setUserId(long uid) {
         this.mUserId = uid;
         return this;
@@ -458,7 +458,7 @@ public class PlaylistItem extends AbstractItem {
     public String getAuthorName() {
         return mAuthorName;
     }
-    
+
     public long getUserId() {
         return mUserId;
     }

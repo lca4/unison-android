@@ -1,6 +1,13 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,20 +23,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 
 import com.actionbarsherlock.app.SherlockActivity;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Louis Activity that is used to display the history for groups. This
@@ -65,9 +64,10 @@ public class GroupsHistoryActivity extends SherlockActivity {
         // ((Button) findViewById(R.id.deleteHistoryBtn))
         // .setOnClickListener(new OnDeleteHistoryListener());
 
-        //FIXME What about passing the serialized class instead? This would avoid a hard
+        // FIXME What about passing the serialized class instead? This would
+        // avoid a hard
         // coded string comparison (potential bug)
-//        String caller = getIntent().getStringExtra(Const.Strings.CALLER);
+        // String caller = getIntent().getStringExtra(Const.Strings.CALLER);
         Class caller = (Class) getIntent().getExtras()
                 .getSerializable(Const.Intents.ABSTRACT_MENU_ONOPTIONS);
         Log.d(TAG, "called by " + caller.getCanonicalName());
@@ -80,12 +80,13 @@ public class GroupsHistoryActivity extends SherlockActivity {
             Log.d(TAG, "going in groupsHistoryActitvity from groupsMainActivity");
         }
 
-//        Log.d(TAG, "called by" + caller);
-//
-//        if (caller != null) {
-//            mAlreadyInGroup = caller.contains("GroupsMainActivity");
-//            Log.d(TAG, "going in groupsHistoryActitvity from groupsMainActivity");
-//        }
+        // Log.d(TAG, "called by" + caller);
+        //
+        // if (caller != null) {
+        // mAlreadyInGroup = caller.contains("GroupsMainActivity");
+        // Log.d(TAG,
+        // "going in groupsHistoryActitvity from groupsMainActivity");
+        // }
 
         // get the map of visited groups, sorted by chronological order (newer
         // first).

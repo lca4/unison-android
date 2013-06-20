@@ -28,7 +28,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -167,7 +166,6 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private static final int CLICK_INTERVAL = 5 * 1000; // In milliseconds.
     private static final int SEEK_BAR_MAX = 100; // mSeekBar goes from 0 to the
                                                  // given max
-
 
     private AbstractMainActivity mMainActivity;
 
@@ -337,7 +335,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         extras.putSerializable(Const.Intents.ABSTRACT_PLAYER_ONSTART, mMainActivity.getClass());
         mMainActivity.bindService(
                 new Intent(mMainActivity, MusicService.class)
-                .putExtras(extras),
+                        .putExtras(extras),
                 mConnection, Context.BIND_AUTO_CREATE);
     }
 

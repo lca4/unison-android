@@ -52,16 +52,18 @@ public final class Const {
         private Strings() {
         } // Non-instantiable.
     }
-    
-    /** When a class is passed as Class serializable object, and not as a string. */
+
+    /**
+     * When a class is passed as Class serializable object, and not as a string.
+     */
     public final class Intents {
-        
+
         private static final String UNISON = "ch.epfl.unison";
-        public static final String ABSTRACT_PLAYER_ONSTART = 
+        public static final String ABSTRACT_PLAYER_ONSTART =
                 UNISON + ".AbstractPlayerFragment.onStart";
         public static final String ABSTRACT_MENU_ONOPTIONS = UNISON
                 + ".AbstractMenu.onOptionsItemSelected";
-        
+
         private Intents() {
         } // Non-instantiable.
     }

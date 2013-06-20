@@ -1,11 +1,11 @@
 
 package ch.epfl.unison.api;
 
-import ch.epfl.unison.data.PlaylistItem;
-import ch.epfl.unison.data.TagItem;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.data.TagItem;
 
 /**
  * POJOs for JSON serialization / deserialization.
@@ -146,7 +146,7 @@ public abstract class JsonStruct {
         public String image; // Not used for now
         public Integer authorId;
         public String authorName;
-//        public long userId; // Obvious: current user
+        // public long userId; // Obvious: current user
         public Integer gsSize;
         public Track[] tracks;
         public Integer gsListeners;

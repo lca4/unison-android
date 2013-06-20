@@ -1,25 +1,24 @@
 
 package ch.epfl.unison.data;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.util.Log;
-
-import ch.epfl.unison.Const.SeedType;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.util.Log;
+import ch.epfl.unison.Const.SeedType;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
@@ -54,8 +53,8 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-//         Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-//         mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
         // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
@@ -104,14 +103,20 @@ public class UnisonDB {
         mDB.update(table, values, null, null);
         close();
     }
-    
+
     private interface ITableHandler {
         boolean isEmpty();
+
         boolean exists(AbstractItem i);
+
         void insert(AbstractItem i);
+
         AbstractItem getItem(long index);
+
         Set<AbstractItem> getItems();
+
         int delete(AbstractItem i);
+
         void truncate();
     }
 
@@ -278,7 +283,7 @@ public class UnisonDB {
         closeCursor(cur);
         return result;
     }
-    
+
     /**
      * Was the playlist plid made by the user uid with GS?
      * 
@@ -296,9 +301,9 @@ public class UnisonDB {
                         ConstDB.PLYL_C_CREATED_BY_GS,
                         ConstDB.PLYL_C_GS_USER_ID
                 }, selection, new String[] {
-                    String.valueOf(plid),
-                    String.valueOf(ConstDB.TRUE),
-                    String.valueOf(uid)
+                        String.valueOf(plid),
+                        String.valueOf(ConstDB.TRUE),
+                        String.valueOf(uid)
                 });
         boolean result = false;
         if (cur != null && cur.moveToFirst()) {

@@ -1,6 +1,13 @@
 
 package ch.epfl.unison.ui;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -21,7 +28,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -31,13 +37,6 @@ import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 
 import com.actionbarsherlock.view.Menu;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Activity that is displayed once you're inside the group. Displays the music
@@ -166,9 +165,9 @@ public class GroupsMainActivity extends AbstractMainActivity {
             content = gid.toString();
         }
         NdefRecord[] records = {
-            new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
-                    Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0],
-                    content.getBytes())
+                new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,
+                        Const.Strings.UNISON_NFC_MIME_TYPE.getBytes(), new byte[0],
+                        content.getBytes())
         };
 
         return new NdefMessage(records);

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
@@ -84,8 +83,9 @@ public abstract class AbstractMenu {
                 Bundle extras = new Bundle();
                 extras.putSerializable(Const.Intents.ABSTRACT_MENU_ONOPTIONS, activity.getClass());
                 activity.startActivity(new Intent(activity, GroupsHistoryActivity.class)
-//                .putExtra(Const.Strings.CALLER, activity.getClass().getName())
-                .putExtras(extras)
+                        // .putExtra(Const.Strings.CALLER,
+                        // activity.getClass().getName())
+                        .putExtras(extras)
                         );
                 break;
             case R.id.menu_item_logout:
