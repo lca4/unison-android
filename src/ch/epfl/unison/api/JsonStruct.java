@@ -146,6 +146,7 @@ public abstract class JsonStruct {
         public String image; // Not used for now
         public Integer authorId;
         public String authorName;
+//        public long userId; // Obvious: current user
         public Integer gsSize;
         public Track[] tracks;
         public Integer gsListeners;

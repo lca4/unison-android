@@ -41,6 +41,7 @@ public class PlaylistItem extends AbstractItem {
     private Date mDateModified; // from android
     private int mAuthorId;
     private String mAuthorName;
+    private long mUserId;
     private int mGSSize;
     private List<MusicItem> mTracks;
     private int mUserRating;
@@ -84,6 +85,7 @@ public class PlaylistItem extends AbstractItem {
         private Date mDateModified;
         private int mAuthorId;
         private String mAuthorName; // Not yet available
+        private long mUserId;
         private int mGSSize;
         private LinkedList<MusicItem> mTracks;
         private int mUserRating;
@@ -195,6 +197,11 @@ public class PlaylistItem extends AbstractItem {
             this.mAuthorName = name;
             return this;
         }
+        
+        public Builder userId(long uid) {
+            this.mUserId = uid;
+            return this;
+        }
 
         public Builder size(int i) {
             this.mSize = i;
@@ -261,6 +268,7 @@ public class PlaylistItem extends AbstractItem {
         this.mGSLastUpdated = builder.mGSUpdated;
         this.mAuthorId = builder.mAuthorId;
         this.mAuthorName = builder.mAuthorName;
+        this.mUserId = builder.mUserId;
         this.mGSSize = builder.mGSSize;
         this.mTracks = builder.mTracks;
         this.mUserRating = builder.mUserRating;
@@ -397,6 +405,11 @@ public class PlaylistItem extends AbstractItem {
     public void setUserRating(int userRating) {
         this.mUserRating = userRating;
     }
+    
+    public PlaylistItem setUserId(long uid) {
+        this.mUserId = uid;
+        return this;
+    }
 
     public String getUserComment() {
         return mUserComment;
@@ -444,6 +457,10 @@ public class PlaylistItem extends AbstractItem {
 
     public String getAuthorName() {
         return mAuthorName;
+    }
+    
+    public long getUserId() {
+        return mUserId;
     }
 
     /**

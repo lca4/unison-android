@@ -54,8 +54,8 @@ public class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
+//         Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+//         mContext.deleteDatabase(ConstDB.DATABASE_NAME); // TODO remove for
         // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
@@ -768,6 +768,7 @@ public class UnisonDB {
             if (pl.getLocalId() >= 0) {
                 ContentValues values = new ContentValues();
                 values.put(ConstDB.PLYL_C_LOCAL_ID, pl.getLocalId());
+                values.put(ConstDB.PLYL_C_GS_USER_ID, pl.getUserId());
                 values.put(ConstDB.PLYL_C_GS_SIZE, pl.getSize());
                 values.put(ConstDB.PLYL_C_CREATED_BY_GS, 1);
                 values.put(ConstDB.PLYL_C_GS_ID, pl.getPLId());

@@ -375,7 +375,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                 mDB.getCheckedItems(SeedType.TRACKS));
 
         if (seeds != null) {
-            AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
+            final AppData data = AppData.getInstance(SoloPlaylistsActivity.this);
             JSONObject options = new JSONObject();
             data.getAPI().generatePlaylist(data.getUid(), seeds, options,
                     new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
@@ -383,7 +383,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                         public void callback(JsonStruct.PlaylistJS struct) {
                             if (struct != null) {
                                 Log.i(getClassTag(), "Playlist created!");
-                                getPlaylistsRemoteFragment().add(0, struct.toObject());
+                                getPlaylistsRemoteFragment()
+                                .add(0, struct.toObject().setUserId(data.getUid()));
                             } else {
                                 Log.i(getClassTag(),
                                         "Playlist created, but could not be fetched...");
