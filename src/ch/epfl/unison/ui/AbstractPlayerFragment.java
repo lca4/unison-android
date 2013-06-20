@@ -333,8 +333,11 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         // } else {
         getSeekBar().setVisibility(View.VISIBLE);
         // }
+        Bundle extras = new Bundle();
+        extras.putSerializable(Const.Intents.ABSTRACT_PLAYER_ONSTART, mMainActivity.getClass());
         mMainActivity.bindService(
-                new Intent(mMainActivity, MusicService.class),
+                new Intent(mMainActivity, MusicService.class)
+                .putExtras(extras),
                 mConnection, Context.BIND_AUTO_CREATE);
     }
 

@@ -3,6 +3,7 @@ package ch.epfl.unison.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
@@ -80,8 +81,12 @@ public abstract class AbstractMenu {
                         Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 break;
             case R.id.menu_item_history:
-                activity.startActivity(new Intent(activity, GroupsHistoryActivity.class).putExtra(
-                        Const.Strings.CALLER, activity.getClass().getName()));
+                Bundle extras = new Bundle();
+                extras.putSerializable(Const.Intents.ABSTRACT_MENU_ONOPTIONS, activity.getClass());
+                activity.startActivity(new Intent(activity, GroupsHistoryActivity.class)
+//                .putExtra(Const.Strings.CALLER, activity.getClass().getName())
+                .putExtras(extras)
+                        );
                 break;
             case R.id.menu_item_logout:
 

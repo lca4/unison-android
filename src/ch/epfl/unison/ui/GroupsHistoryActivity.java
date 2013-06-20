@@ -65,14 +65,27 @@ public class GroupsHistoryActivity extends SherlockActivity {
         // ((Button) findViewById(R.id.deleteHistoryBtn))
         // .setOnClickListener(new OnDeleteHistoryListener());
 
-        String caller = getIntent().getStringExtra(Const.Strings.CALLER);
-
-        Log.d(TAG, "called by" + caller);
-
+        //FIXME What about passing the serialized class instead? This would avoid a hard
+        // coded string comparison (potential bug)
+//        String caller = getIntent().getStringExtra(Const.Strings.CALLER);
+        Class caller = (Class) getIntent().getExtras()
+                .getSerializable(Const.Intents.ABSTRACT_MENU_ONOPTIONS);
+        Log.d(TAG, "called by " + caller.getCanonicalName());
         if (caller != null) {
-            mAlreadyInGroup = caller.contains("GroupsMainActivity");
+            if (caller == GroupsMainActivity.class) {
+                mAlreadyInGroup = true;
+            } else {
+                mAlreadyInGroup = false;
+            }
             Log.d(TAG, "going in groupsHistoryActitvity from groupsMainActivity");
         }
+
+//        Log.d(TAG, "called by" + caller);
+//
+//        if (caller != null) {
+//            mAlreadyInGroup = caller.contains("GroupsMainActivity");
+//            Log.d(TAG, "going in groupsHistoryActitvity from groupsMainActivity");
+//        }
 
         // get the map of visited groups, sorted by chronological order (newer
         // first).

@@ -13,13 +13,14 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
-import ch.epfl.unison.ui.GroupsMainActivity;
+import ch.epfl.unison.ui.AbstractMainActivity;
 
 import java.io.IOException;
 
@@ -51,6 +52,8 @@ public class MusicService extends Service
     private AudioFocusHelper mFocusHelper;
     private MediaPlayer mMediaPlayer;
     private Notification mNotification;
+    
+    private Class<AbstractMainActivity> mCallerClass;
 
     private MusicServiceBinder mBinder = new MusicServiceBinder();
 
@@ -226,7 +229,7 @@ public class MusicService extends Service
         Context context = getApplicationContext();
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(),
-                        GroupsMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                        mCallerClass).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 PendingIntent.FLAG_UPDATE_CURRENT);
         mNotification = new Notification();
         mNotification.tickerText = text;
@@ -335,6 +338,19 @@ public class MusicService extends Service
 
     @Override
     public IBinder onBind(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            Class<AbstractMainActivity> caller = 
+                    (Class<AbstractMainActivity>) 
+                    extras.getSerializable(Const.Intents.ABSTRACT_PLAYER_ONSTART);
+            if (caller != null) {
+                mCallerClass = caller;
+            } else {
+                throw new RuntimeException("Should not happen");
+            }
+        } else {
+            throw new RuntimeException("Should not happen");
+        }
         return mBinder;
     }
 }
