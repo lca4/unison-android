@@ -40,7 +40,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
             + ConstDB.PLYL_C_LOCAL_UPDATE_TIME + " datetime, "
-            + ConstDB.PLYL_C_GS_USER_ID + " bigint, "
+            + ConstDB.PLYL_C_GS_USER_ID + " bigint NOT NULL, "
             + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT " + ConstDB.FALSE + ", "
             + ConstDB.PLYL_C_GS_ID + " bigint, "
