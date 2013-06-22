@@ -1,17 +1,18 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.HashMap;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.view.Menu;
+
+import java.util.HashMap;
 
 /**
  * Activity that is displayed once you opened a playlist. Displays the music

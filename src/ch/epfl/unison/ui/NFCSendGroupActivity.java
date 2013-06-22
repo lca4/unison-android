@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;

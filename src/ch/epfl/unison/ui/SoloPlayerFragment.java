@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.TrackItem;

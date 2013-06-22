@@ -3,6 +3,7 @@ package ch.epfl.unison.ui;
 
 import android.os.Bundle;
 import android.webkit.WebView;
+
 import ch.epfl.unison.R;
 
 import com.actionbarsherlock.app.SherlockActivity;

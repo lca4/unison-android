@@ -1,15 +1,6 @@
 
 package ch.epfl.unison.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
 import ch.epfl.unison.R;
@@ -30,6 +22,15 @@ import ch.epfl.unison.data.PlaylistItem;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.view.Menu;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Listing of the playlists.

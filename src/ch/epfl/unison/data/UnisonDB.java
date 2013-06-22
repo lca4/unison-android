@@ -1,24 +1,25 @@
 
 package ch.epfl.unison.data;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+
 import ch.epfl.unison.Const.SeedType;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
@@ -80,10 +81,10 @@ public final class UnisonDB {
         return mDB.query(table, columns, selection, selectionArgs, null, null, null);
     }
 
-//    private Cursor getCursorW(String table, String[] columns) {
-//        openW();
-//        return mDB.query(table, columns, null, null, null, null, null);
-//    }
+    // private Cursor getCursorW(String table, String[] columns) {
+    // openW();
+    // return mDB.query(table, columns, null, null, null, null, null);
+    // }
 
     private void closeCursor(Cursor openCursor) {
         if (openCursor != null) {
@@ -99,7 +100,7 @@ public final class UnisonDB {
         mDB.update(table, values, null, null);
         close();
     }
-    
+
     public boolean exists(String table, String selection, String[] selectionArgs) {
         open();
         Cursor cur = mDB.query(table,
@@ -127,12 +128,11 @@ public final class UnisonDB {
             throw new SQLiteException("Table " + table + " does not exist.");
         }
     }
-    
+
     /**
      * All the inner classes have to implement these basic functionalities.
      * 
      * @author marc
-     *
      */
     private interface ITableHandler<T extends AbstractItem> {
         boolean isEmpty();
@@ -149,20 +149,20 @@ public final class UnisonDB {
 
         void truncate();
     }
-    
+
     /**
      * Music table handler.
      * 
      * @author marc
-     *
      */
     public final class Track implements ITableHandler<TrackItem> {
-        
+
         private final String mTable = ConstDB.LIBE_TABLE_NAME; // Just an alias
         private static final String LIBE_WHERE_ALL = ConstDB.LIBE_C_LOCAL_ID + " = ? AND "
                 + ConstDB.LIBE_C_ARTIST + " = ? AND " + ConstDB.LIBE_C_TITLE + " = ?";
-        
-        Track() { }
+
+        Track() {
+        }
 
         @Override
         public boolean isEmpty() {
@@ -172,8 +172,8 @@ public final class UnisonDB {
         @Override
         public boolean exists(TrackItem item) {
             return UnisonDB.this.exists(mTable, LIBE_WHERE_ALL, new String[] {
-                            String.valueOf(item.localId), item.artist, item.title
-                    });
+                    String.valueOf(item.localId), item.artist, item.title
+            });
         }
 
         @Override
@@ -232,7 +232,7 @@ public final class UnisonDB {
             mDB.delete(mTable, null, null);
             close();
         }
-        
+
         public LinkedHashMap<String, Integer> getLibEntries() {
             Cursor cursor = getCursor(mTable, new String[] {
                     ConstDB.C_ID, ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
@@ -252,24 +252,24 @@ public final class UnisonDB {
             closeCursor(cursor);
             return tags;
         }
-        
+
     }
-    
+
     /**
      * Tag table handler.
      * 
      * @author marc
-     *
      */
     public final class Tag implements ITableHandler<TagItem> {
-        
+
         private final String mTable = ConstDB.TAG_TABLE_NAME; // Just an alias
         private static final String TAGS_WHERE_ALL = ConstDB.C_ID + " = ? AND "
                 + ConstDB.TAG_C_NAME + " = ? AND "
                 + ConstDB.C_IS_CHECKED + " = ?";
         private static final String TAG_WHERE_NAME = ConstDB.TAG_C_NAME + " LIKE ? ";
-        
-        Tag() { }
+
+        Tag() {
+        }
 
         @Override
         public boolean isEmpty() {
@@ -279,8 +279,8 @@ public final class UnisonDB {
         @Override
         public boolean exists(TagItem item) {
             return UnisonDB.this.exists(mTable, TAG_WHERE_NAME, new String[] {
-                        item.name
-                    });
+                    item.name
+            });
         }
 
         /**
@@ -349,21 +349,21 @@ public final class UnisonDB {
             mDB.delete(mTable, null, null);
             close();
         }
-        
-//        public void setChecked(int tagId, boolean isChecked) {
-//            openW();
-//            ContentValues values = new ContentValues();
-//            if (isChecked) {
-//                values.put(ConstDB.C_IS_CHECKED, ConstDB.TRUE);
-//            } else {
-//                values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
-//            }
-//            mDB.update(mTable, values, "_id = ? ", new String[] {
-//                    String.valueOf(tagId)
-//            });
-//            close();
-//        }
-        
+
+        // public void setChecked(int tagId, boolean isChecked) {
+        // openW();
+        // ContentValues values = new ContentValues();
+        // if (isChecked) {
+        // values.put(ConstDB.C_IS_CHECKED, ConstDB.TRUE);
+        // } else {
+        // values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
+        // }
+        // mDB.update(mTable, values, "_id = ? ", new String[] {
+        // String.valueOf(tagId)
+        // });
+        // close();
+        // }
+
         public LinkedHashMap<String, Integer> getTags() {
             Cursor cursor = getCursor(mTable, new String[] {
                     ConstDB.C_ID, ConstDB.TAG_C_NAME
@@ -380,7 +380,7 @@ public final class UnisonDB {
             closeCursor(cursor);
             return tags;
         }
-        
+
         public JSONObject getCheckedItems(SeedType key) {
             String table = null;
             String[] columns = null;
@@ -412,7 +412,8 @@ public final class UnisonDB {
                         int colName = cur.getColumnIndex(ConstDB.TAG_C_NAME);
                         do {
                             try {
-                                // Ugly trick to get around missing json.append in
+                                // Ugly trick to get around missing json.append
+                                // in
                                 // android API
                                 if (json.has(key.getLabel())) {
                                     json.accumulate(key.getLabel(), cur.getString(colName));
@@ -433,7 +434,8 @@ public final class UnisonDB {
                             try {
                                 track.put("title", cur.getString(colTitle));
                                 track.put("artist", cur.getString(colArtist));
-                                // Ugly trick to get around missing json.append in
+                                // Ugly trick to get around missing json.append
+                                // in
                                 // android API
                                 if (json.has(key.getLabel())) {
                                     json.accumulate(key.getLabel(), track.toString());
@@ -454,7 +456,7 @@ public final class UnisonDB {
             resetIsChecked(table);
             return json;
         }
-        
+
         public void setChecked(SeedType type, LinkedHashMap<String, Integer> items,
                 boolean[] checked) {
             openW();
@@ -487,20 +489,21 @@ public final class UnisonDB {
             }
             close();
         }
-        
+
     }
-    
+
     /**
      * Playlist table handler.
      * 
      * @author marc
-     *
      */
     public final class Playlist implements ITableHandler<PlaylistItem> {
-        
-        private final String mTable = ConstDB.PLAYLISTS_TABLE_NAME; // Just an alias
-        
-        Playlist() { }
+
+        private final String mTable = ConstDB.PLAYLISTS_TABLE_NAME; // Just an
+                                                                    // alias
+
+        Playlist() {
+        }
 
         @Override
         public boolean isEmpty() {
@@ -515,10 +518,10 @@ public final class UnisonDB {
 
         /**
          * Adds the playlist to the android sqlite DB and to the GS in-app DB.<br />
-         * The insertions in the databases are made in an atomic way. If a failure
-         * occurs when trying to insert the playlist in either the Android or GS
-         * in-app database, changes done until failure are rolled back as if nothing
-         * happened.
+         * The insertions in the databases are made in an atomic way. If a
+         * failure occurs when trying to insert the playlist in either the
+         * Android or GS in-app database, changes done until failure are rolled
+         * back as if nothing happened.
          * 
          * @param pl
          * @return local id
@@ -710,7 +713,7 @@ public final class UnisonDB {
             mDB.delete(mTable, null, null);
             close();
         }
-        
+
         public boolean isMadeWithGS(long id) {
             Cursor cur = getCursor(mTable,
                     new String[] {
@@ -729,7 +732,7 @@ public final class UnisonDB {
             closeCursor(cur);
             return result;
         }
-        
+
         public boolean isMadeWithGS(long plid, long uid) {
             String selection = ConstDB.PLYL_C_LOCAL_ID + " = ? "
                     + "AND " + ConstDB.PLYL_C_CREATED_BY_GS + " = ? "
@@ -751,28 +754,27 @@ public final class UnisonDB {
             closeCursor(cur);
             return result;
         }
-        
+
         public int getTracksCount(long playlistId) {
             return AndroidDB.getTracksCount(mContext.getContentResolver(), playlistId);
         }
 
     }
-    
 
     /*
      * GETTERS
      */
-    
+
     public Track getTrackHandler() {
         return mTrackHandler;
     }
-    
+
     public Playlist getPlaylistHandler() {
         return mPlaylistHandler;
     }
-    
+
     public Tag getTagHandler() {
         return mTagHandler;
     }
-    
+
 }

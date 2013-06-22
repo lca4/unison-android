@@ -1,11 +1,6 @@
 
 package ch.epfl.unison.data;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -14,8 +9,14 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Utility to handle interactions with Original code from MarkG on <a

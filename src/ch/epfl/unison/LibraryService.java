@@ -1,11 +1,6 @@
 
 package ch.epfl.unison;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,11 +11,17 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
+
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.data.UnisonDB;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Android service that helps maintaining the back-end DB in sync with the

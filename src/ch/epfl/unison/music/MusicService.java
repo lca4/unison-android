@@ -1,8 +1,6 @@
 
 package ch.epfl.unison.music;
 
-import java.io.IOException;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -19,9 +17,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.ui.AbstractMainActivity;
+
+import java.io.IOException;
 
 /**
  * Music player service. Inspired by the Android SDK's sample application,
