@@ -167,7 +167,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                     @Override
                     public void callback(TagsList struct) {
                         for (int i = 0; i < struct.tags.length; i++) {
-                            mDB.insert(struct.tags[i].getTagItem());
+                            mDB.getTagHandler().insert(struct.tags[i].getTagItem());
                         }
                         SoloPlaylistsActivity.this.repaintRefresh(false);
                     }
@@ -294,10 +294,10 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
             this.mSelectedItems = new ArrayList<Integer>();
             switch (mType) {
                 case TAGS:
-                    mItems = mDB.getTags();
+                    mItems = mDB.getTagHandler().getTags();
                     break;
                 case TRACKS:
-                    mItems = mDB.getLibEntries();
+                    mItems = mDB.getTrackHandler().getLibEntries();
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -326,7 +326,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
                                         Log.i(getClassTag(), mSelectedItems.toString());
-                                        mDB.setChecked(mType, mItems, checkedItems);
+                                        mDB.getTagHandler().setChecked(mType, mItems, checkedItems);
                                         generatePlaylist();
                                     }
                                 })
@@ -370,8 +370,8 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
      */
     @SuppressLint("NewApi")
     private void generatePlaylist() {
-        JSONObject seeds = Uutils.merge(mDB.getCheckedItems(SeedType.TAGS),
-                mDB.getCheckedItems(SeedType.TRACKS));
+        JSONObject seeds = Uutils.merge(mDB.getTagHandler().getCheckedItems(SeedType.TAGS),
+                mDB.getTagHandler().getCheckedItems(SeedType.TRACKS));
 
         if (seeds != null) {
             final AppData data = AppData.getInstance(SoloPlaylistsActivity.this);

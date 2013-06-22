@@ -68,7 +68,7 @@ public class LibraryService extends Service {
         // LibraryHelper helper = new LibraryHelper(this);
         // helper.truncate();
         // helper.close();
-        mDB.truncate(TrackItem.class);
+        mDB.getTrackHandler().truncate();
 
     }
 
@@ -82,7 +82,7 @@ public class LibraryService extends Service {
             mIsUpdating = true;
             // LibraryHelper helper = new LibraryHelper(this);
             // if (helper.isEmpty()) {
-            if (mDB.isEmpty(TrackItem.class)) {
+            if (mDB.getTrackHandler().isEmpty()) {
                 // If the DB is empty, just PUT all the tracks.
                 Log.d(TAG, "uploading all the music");
                 new Uploader().execute();
@@ -153,7 +153,7 @@ public class LibraryService extends Service {
         private List<JsonStruct.Delta> getDeltas() {
             // Setting up the expectations.
             // Set<MusicItem> expectation = helper.getEntries();
-            Set<TrackItem> expectation = (Set<TrackItem>) mDB.getEntries(TrackItem.class);
+            Set<TrackItem> expectation = mDB.getTrackHandler().getItems();
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
@@ -208,10 +208,10 @@ public class LibraryService extends Service {
                         delta.entry.localId, delta.entry.artist, delta.entry.title);
                 if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
                     // helper.insert(item);
-                    mDB.insert(item);
+                    mDB.getTrackHandler().insert(item);
                 } else { // TYPE_DELETE.
                     // helper.delete(item);
-                    mDB.delete(item);
+                    mDB.getTrackHandler().delete(item);
                 }
             }
 
@@ -254,7 +254,7 @@ public class LibraryService extends Service {
             // LibraryHelper helper = new LibraryHelper(LibraryService.this);
             for (TrackItem item : music) {
                 // helper.insert(item);
-                mDB.insert(item);
+                mDB.getTrackHandler().insert(item);
             }
 
             // helper.close();

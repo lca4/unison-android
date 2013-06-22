@@ -29,6 +29,7 @@ import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.data.UnisonDB.Playlist;
 
 /**
  * Shows the locally stored playlists made with GS.
@@ -122,7 +123,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                                 @Override
                                 public void callback(JsonStruct.PlaylistJS struct) {
                                     // Then from local databases
-                                    if (mHostActivity.getDB().delete(
+                                    if (mHostActivity.getDB().getPlaylistHandler().delete(
                                             mPlaylistsLocal
                                                     .get(info.position)) > 0) {
                                         mListener.onDeletePlaylist(
@@ -198,8 +199,9 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
             do {
                 long localId = cur.getLong(colId);
                 final AppData data = AppData.getInstance(mHostActivity);
-                if (mHostActivity.getDB().isMadeWithGS(localId, data.getUid())) {
-                    int size = mHostActivity.getDB().getTracksCount(localId);
+                Playlist handler = mHostActivity.getDB().getPlaylistHandler();
+                if (handler.isMadeWithGS(localId, data.getUid())) {
+                    int size = handler.getTracksCount(localId);
                     PlaylistItem pl = new PlaylistItem.Builder().localId(localId)
                             .size(size).build();
                     if (pl != null) {

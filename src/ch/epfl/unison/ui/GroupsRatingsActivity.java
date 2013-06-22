@@ -132,7 +132,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
     private void initItems() {
         UnisonDB db = new UnisonDB(this);
         mItems = new ArrayList<TrackItem>(
-                (Collection<? extends TrackItem>) db.getEntries(TrackItem.class));
+                (Collection<? extends TrackItem>) db.getTrackHandler().getItems());
         // LibraryHelper helper = new LibraryHelper(this);
         // mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);

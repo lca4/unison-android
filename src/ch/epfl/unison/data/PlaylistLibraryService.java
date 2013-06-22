@@ -50,7 +50,7 @@ public class PlaylistLibraryService extends AbstractService {
     private void truncate() {
         Log.d(TAG, "truncating the user playlist library");
         UnisonDB mDB = new UnisonDB(this);
-        mDB.truncate(PlaylistItem.class);
+        mDB.getPlaylistHandler().truncate();
     }
 
     /*
@@ -65,7 +65,7 @@ public class PlaylistLibraryService extends AbstractService {
         if (!isUpdating() && interval > MIN_UPDATE_INTERVAL) {
             setIsUpdating(true);
             UnisonDB mDB = new UnisonDB(this);
-            if (mDB.isEmpty(PlaylistItem.class)) {
+            if (mDB.getPlaylistHandler().isEmpty()) {
                 // If the DB is empty, just PUT all the tracks.
                 Log.d(TAG, "uploading all the playlists");
                 new Uploader().execute();
@@ -135,7 +135,7 @@ public class PlaylistLibraryService extends AbstractService {
 
         private List<JsonStruct.Delta> getDeltas(UnisonDB uDB) {
             // Setting up the expectations.
-            Set<PlaylistItem> expectation = (Set<PlaylistItem>) uDB.getEntries(PlaylistItem.class);
+            Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems();
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.

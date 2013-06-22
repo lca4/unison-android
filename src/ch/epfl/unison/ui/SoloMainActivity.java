@@ -51,7 +51,7 @@ public class SoloMainActivity extends AbstractMainActivity
             if (extras.containsKey(Const.Strings.TITLE)) {
                 setTitle(extras.getString(Const.Strings.TITLE));
             }
-            mPlaylist = (PlaylistItem) mDB.getItem(PlaylistItem.class,
+            mPlaylist = (PlaylistItem) mDB.getPlaylistHandler().getItem(
                     extras.getLong(Const.Strings.LOCAL_ID));
             if (mPlaylist == null) {
                 finish();
