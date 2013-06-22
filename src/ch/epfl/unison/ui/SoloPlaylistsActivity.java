@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
@@ -19,6 +21,7 @@ import ch.epfl.unison.api.JsonStruct.TagsList;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
 import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.data.PlaylistLibraryService;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.view.Menu;
@@ -101,8 +104,9 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     @Override
     public void onResume() {
         super.onResume();
-        // startService(new Intent(PlaylistLibraryService.ACTION_UPDATE));
-        // //TODO
+        // Starts the playlist libbrary service.
+        startService(new Intent(PlaylistLibraryService.ACTION_UPDATE)
+                .putExtra(Const.PrefKeys.UID, AppData.getInstance(this).getUid()));
     }
 
     @Override

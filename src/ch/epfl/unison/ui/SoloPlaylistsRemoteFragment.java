@@ -118,7 +118,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                         // Updates the local_id on server
                         JSONObject json = new JSONObject();
                         json.put("local_id", localId);
-                        data.getAPI().updatePlaylist(data.getUid(), pl.getPLId(), json,
+                        data.getAPI().updatePlaylist(data.getUid(), pl.getPlaylistId(), json,
                                 new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
 
                                     @Override
@@ -153,7 +153,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
                  */
                 // Remove from server
                 data.getAPI().removePlaylist(data.getUid(),
-                        mPlaylistsRemote.get(info.position).getPLId(),
+                        mPlaylistsRemote.get(info.position).getPlaylistId(),
                         new UnisonAPI.Handler<JsonStruct.Success>() {
 
                             @Override

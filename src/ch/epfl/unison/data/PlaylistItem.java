@@ -443,7 +443,11 @@ public class PlaylistItem extends AbstractItem {
         return mLocalId;
     }
 
-    public long getPLId() {
+    /**
+     * 
+     * @return GroupStreamer playlist id
+     */
+    public long getPlaylistId() {
         return mGSPLId;
     }
 

@@ -15,6 +15,7 @@ import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +31,9 @@ public class PlaylistLibraryService extends AbstractService {
 
     public static final String ACTION_UPDATE = "ch.epfl.unison.action.UPDATE";
     public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
+    public static final String ACTION_STOP = "ch.epfl.unison.action.STOP";
+    
+    private long mUid;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,8 +42,13 @@ public class PlaylistLibraryService extends AbstractService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "starting the playlist library service");
+        Log.d(TAG, "Starting the playlist library service");
         String action = intent.getAction();
+        mUid = intent.getLongExtra(Const.PrefKeys.UID, -1);
+        if (mUid < 0) {
+            throw new RuntimeException("Playlist library service aborted due to invalid user id: "
+                    + mUid);
+        }
         if (action.equals(ACTION_UPDATE)) {
             update();
         } else if (action.equals(ACTION_TRUNCATE)) {
@@ -66,14 +75,14 @@ public class PlaylistLibraryService extends AbstractService {
         if (!isUpdating() && interval > MIN_UPDATE_INTERVAL) {
             setIsUpdating(true);
             UnisonDB mDB = new UnisonDB(this);
-            if (mDB.getPlaylistHandler().isEmpty()) {
-                // If the DB is empty, just PUT all the tracks.
-                Log.d(TAG, "uploading all the playlists");
-                new Uploader().execute();
-            } else {
-                Log.d(TAG, "updating the library");
-                new Updater().execute();
-            }
+            // if (mDB.getPlaylistHandler().isEmpty()) {
+            // If the DB is empty, just PUT all the playlists.
+            // Log.d(TAG, "uploading all the playlists");
+            // new Uploader().execute();
+            // } else {
+            Log.d(TAG, "Updating the playlist library"); // Always update (nothing else to do)
+            new Updater().execute();
+            // }
         } else {
             Log.d(TAG, String.format("didn't update the library (interval: %d)", interval));
         }
@@ -129,38 +138,35 @@ public class PlaylistLibraryService extends AbstractService {
 
     /**
      * If the local DB is already populated, we only send deltas to the server
-     * (i.e. a list of tracks that were added and a list of tracks that were
-     * removed).
+     * (i.e. a list of playlists that were added and a list of playlists that
+     * were removed).
      */
     private class Updater extends LibraryTask {
 
-        private List<JsonStruct.Delta> getDeltas(UnisonDB uDB) {
+        private List<JsonStruct.PlaylistDelta> getDeltas(UnisonDB uDB) {
             // Setting up the expectations.
-            Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems();
-            Log.d(TAG, "number of OUR entries: " + expectation.size());
+            Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems(mUid);
+            Log.d(TAG, "Number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
-            // Set<Playlist> reality = getRealPlaylists();
             Set<PlaylistItem> reality = AndroidDB.getPlaylists(getContentResolver());
-            Log.d(TAG, "number of TRUE music entries: " + reality.size());
+            Log.d(TAG, "Number of TRUE music entries: " + reality.size());
+            Set<Long> realityIds = extractLocalIds(reality);
 
             // Trying to reconcile everyone.
-            List<JsonStruct.Delta> deltas = new ArrayList<JsonStruct.Delta>();
-            for (PlaylistItem item : reality) {
-                if (!expectation.contains(item)) {
-                    Log.d(TAG, "Adding playlist: " + item.getTitle());
-                    // deltas.add(new
-                    // JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,
-                    // item.localId, item.artist, item.title)); // Add item.
+            List<JsonStruct.PlaylistDelta> deltas = new ArrayList<JsonStruct.PlaylistDelta>();
+
+            for (PlaylistItem item : expectation) {
+                if (!realityIds.contains(item.getLocalId())) {
+                    Log.d(TAG, "Removing playlist: " + item.getTitle());
+                    // FIXME issue here, what if user logs out?
+                     deltas.add(new
+                     JsonStruct.PlaylistDelta(JsonStruct.PlaylistDelta.TYPE_DELETE, 
+                             mUid, item.getLocalId(), item.getPlaylistId()
+                     )); // Delete item.
                 }
             }
-            // for (MusicItem item : expectation) {
-            // if (!reality.contains(item)) {
-            // Log.d(TAG, "Removing track: " + item.title);
-            // deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_DELETE,
-            // item.localId, item.artist, item.title)); // Delete item.
-            // }
-            // }
+
             Log.d(TAG, "number of deltas: " + deltas.size());
             return deltas;
         }
@@ -168,13 +174,24 @@ public class PlaylistLibraryService extends AbstractService {
         @Override
         protected Boolean doInBackground(Void... arg0) {
             UnisonDB uDB = new UnisonDB(PlaylistLibraryService.this);
-            List<JsonStruct.Delta> deltas = getDeltas(uDB);
+            List<JsonStruct.PlaylistDelta> deltas = getDeltas(uDB);
+            
+            /*
+             * 
+             * TODO
+             * 
+             * WORK IN PROGRESS
+             * 
+             * 
+             * 
+             */
 
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
             long uid = AppData.getInstance(PlaylistLibraryService.this).getUid();
 
-            Request.Result<JsonStruct.Success> res = api.updateLibrarySync(uid, deltas);
+            Request.Result<JsonStruct.Success> res = null; // api.updateLibrarySync(uid,
+                                                           // deltas);
             if (res.result == null) {
                 if (res.error.hasJsonError()) {
                     Log.w(TAG, "couldn't send deltas to server: " + res.error.jsonError.message);
@@ -184,62 +201,16 @@ public class PlaylistLibraryService extends AbstractService {
                 return false;
             }
 
-            // // "Commiting" the changes locally.
-            // for (JsonStruct.Delta delta : deltas) {
-            // MusicItem item = new MusicItem(
-            // delta.entry.localId, delta.entry.artist, delta.entry.title);
-            // if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
-            // helper.insert(item);
-            // } else { // TYPE_DELETE.
-            // helper.delete(item);
-            // }
-            // }
-
             return true;
         }
-    }
-
-    /**
-     * If it's the first time that the application is used (i.e. the local DB
-     * doesn't exist yet) we simply "upload" all the music on the server (which
-     * will then invalidate any library entries previously valid for the user).
-     */
-    private class Uploader extends LibraryTask {
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            List<JsonStruct.Track> tracks = new ArrayList<JsonStruct.Track>();
-            // Iterable<Playlist> playlist = getRealPlaylists();
-
-            // for (Playlist item : playlist) {
-            // // tracks.add(new JsonStruct.Track(item.localId, item.artist,
-            // item.title));
-            // }
-
-            // Sending the updates to the server.
-            UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
-            long uid = AppData.getInstance(PlaylistLibraryService.this).getUid();
-
-            Request.Result<JsonStruct.Success> res = api.uploadLibrarySync(uid, tracks);
-            if (res.result == null) {
-                if (res.error.hasJsonError()) {
-                    Log.w(TAG, "couldn't send tracks to server: " + res.error.jsonError.message);
-                } else {
-                    Log.w(TAG, "couldn't send tracks to server.", res.error.error);
-                }
-                return false;
+        
+        private Set<Long> extractLocalIds(Set<PlaylistItem> playlist) {
+            Set<Long> res = new HashSet<Long>();
+            for (PlaylistItem item : playlist) {
+                res.add(item.getLocalId());
             }
-
-            // // Store the music in the library.
-            // LibraryHelper helper = new
-            // LibraryHelper(PlaylistLibraryService.this);
-            // for (MusicItem item : music) {
-            // helper.insert(item);
-            // }
-
-            return true;
+            return res;
         }
-
     }
 
 }

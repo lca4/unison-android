@@ -117,7 +117,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
                     // Set local_id to null on GS server
                     data.getAPI().updatePlaylist(data.getUid(),
                             mPlaylistsLocal
-                                    .get(info.position).getPLId(),
+                                    .get(info.position).getPlaylistId(),
                             new JSONObject().put("local_id", JSONObject.NULL),
                             new UnisonAPI.Handler<JsonStruct.PlaylistJS>() {
 

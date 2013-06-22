@@ -23,6 +23,7 @@ import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
+import ch.epfl.unison.data.PlaylistLibraryService;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -153,6 +154,9 @@ public class LoginActivity extends SherlockActivity {
 
         // Truncate the library.
         startService(new Intent(LibraryService.ACTION_TRUNCATE));
+        
+        // Stops the playlist libbrary service.
+        stopService(new Intent(PlaylistLibraryService.ACTION_STOP));
     }
 
     /**

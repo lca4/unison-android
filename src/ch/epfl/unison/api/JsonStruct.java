@@ -135,6 +135,26 @@ public abstract class JsonStruct {
             this.entry = new Track(localId, artist, title);
         }
     }
+    
+    /** Notification of removal of playlist on the device. */
+    public static class PlaylistDelta extends JsonStruct {
+        
+        public static final String TYPE_DELETE = "DELETE";
+        
+        public String type;
+        public long userId; 
+        public long localId;
+        public long gsId;
+        
+        public PlaylistDelta() { }
+        
+        public PlaylistDelta(String t, long uid, long lid, long gsid) {
+            this.type = t;
+            this.userId = uid;
+            this.localId = lid;
+            this.gsId = gsid;
+        }
+    }
 
     /** Information about a playlist (used in both directions). */
     public static class PlaylistJS extends JsonStruct {
