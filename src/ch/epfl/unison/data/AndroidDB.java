@@ -106,7 +106,7 @@ final class AndroidDB {
             int percent = 0;
             int i = 0;
             // TODO improve: bulk insertion instead of sequential insertion
-            Iterator<MusicItem> it = pl.getTracks().iterator();
+            Iterator<TrackItem> it = pl.getTracks().iterator();
             while (it.hasNext()) {
                 // Don't pollute with progress messages..has to be at least 1%
                 // increments
@@ -117,7 +117,7 @@ final class AndroidDB {
                 }
                 i++;
                 values.clear();
-                MusicItem mi = it.next();
+                TrackItem mi = it.next();
                 values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, mi.localId);
                 values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, mi.playOrder);
                 Uri insertUri = mCRC.insert(mUri, values);
@@ -174,13 +174,13 @@ final class AndroidDB {
                 null,
                 MediaStore.Audio.Playlists.Members.PLAY_ORDER);
         if (cur != null & cur.moveToFirst()) {
-            LinkedList<MusicItem> mTracks = new LinkedList<MusicItem>();
+            LinkedList<TrackItem> mTracks = new LinkedList<TrackItem>();
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID);
             int colTitle = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.TITLE);
             int colArtist = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.ARTIST);
             int colPlayOrder = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.PLAY_ORDER);
             do {
-                mTracks.add(new MusicItem(cur.getLong(colId), cur.getString(colArtist),
+                mTracks.add(new TrackItem(cur.getLong(colId), cur.getString(colArtist),
                         cur.getString(colTitle), cur.getInt(colPlayOrder)));
             } while (cur.moveToNext());
             pl.setTracks(mTracks);

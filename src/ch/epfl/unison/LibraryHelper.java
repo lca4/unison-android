@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.data.UnisonDB;
 
 /**
@@ -43,20 +43,20 @@ public class LibraryHelper {
         mDbHelper = new OpenHelper(context);
     }
 
-    public Set<MusicItem> getEntries() {
+    public Set<TrackItem> getEntries() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cur = db.query(TABLE_NAME,
                 new String[] {
                         C_LOCAL_ID, C_ARTIST, C_TITLE
                 },
                 null, null, null, null, null);
-        Set<MusicItem> set = new HashSet<MusicItem>();
+        Set<TrackItem> set = new HashSet<TrackItem>();
         if (cur != null && cur.moveToFirst()) {
             int colId = cur.getColumnIndex(C_LOCAL_ID);
             int colArtist = cur.getColumnIndex(C_ARTIST);
             int colTitle = cur.getColumnIndex(C_TITLE);
             do {
-                set.add(new MusicItem(cur.getInt(colId),
+                set.add(new TrackItem(cur.getInt(colId),
                         cur.getString(colArtist), cur.getString(colTitle)));
             } while (cur.moveToNext());
         }
@@ -78,7 +78,7 @@ public class LibraryHelper {
         return isEmpty;
     }
 
-    public void insert(MusicItem item) {
+    public void insert(TrackItem item) {
         ContentValues values = new ContentValues();
         values.put(C_LOCAL_ID, item.localId);
         values.put(C_ARTIST, item.artist);
@@ -89,7 +89,7 @@ public class LibraryHelper {
         db.close();
     }
 
-    public void delete(MusicItem item) {
+    public void delete(TrackItem item) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, WHERE_ALL,
                 new String[] {
@@ -98,7 +98,7 @@ public class LibraryHelper {
         db.close();
     }
 
-    public boolean exists(MusicItem item) {
+    public boolean exists(TrackItem item) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME,
                 new String[] {

@@ -34,7 +34,7 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.data.UnisonDB;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -53,7 +53,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
     private CheckBox mUnratedCheck;
 
     private Map<String, Integer> mRatings;
-    private List<MusicItem> mItems;
+    private List<TrackItem> mItems;
 
     private boolean mUnratedOnly;
 
@@ -131,8 +131,8 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
     private void initItems() {
         UnisonDB db = new UnisonDB(this);
-        mItems = new ArrayList<MusicItem>(
-                (Collection<? extends MusicItem>) db.getEntries(MusicItem.class));
+        mItems = new ArrayList<TrackItem>(
+                (Collection<? extends TrackItem>) db.getEntries(TrackItem.class));
         // LibraryHelper helper = new LibraryHelper(this);
         // mItems = new ArrayList<MusicItem>(helper.getEntries());
         Collections.sort(mItems);
@@ -145,8 +145,8 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
     private void refreshList(int position) {
         if (mUnratedOnly) {
-            List<MusicItem> filtered = new ArrayList<MusicItem>();
-            for (MusicItem item : mItems) {
+            List<TrackItem> filtered = new ArrayList<TrackItem>();
+            for (TrackItem item : mItems) {
                 if (!mRatings.containsKey(item.artist + item.title)) {
                     filtered.add(item);
                 }
@@ -159,13 +159,13 @@ public class GroupsRatingsActivity extends SherlockActivity {
     }
 
     /** Adapter used to display tracks and their ratings in a ListView. */
-    private class RatingsAdapter extends ArrayAdapter<MusicItem> {
+    private class RatingsAdapter extends ArrayAdapter<TrackItem> {
 
         public static final int ROW_LAYOUT = R.layout.listrow_ratings;
 
         private GroupsRatingsActivity mActivity;
 
-        public RatingsAdapter(List<MusicItem> ratings) {
+        public RatingsAdapter(List<TrackItem> ratings) {
             super(GroupsRatingsActivity.this, 0, ratings);
             mActivity = GroupsRatingsActivity.this;
         }
@@ -199,7 +199,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
     /** Listens to changes in ratings and updates the back-end accordingly. */
     private class OnChangeRatingListener implements OnItemClickListener {
 
-        public void sendRating(final MusicItem item, final int rating, final int position) {
+        public void sendRating(final TrackItem item, final int rating, final int position) {
             AppData data = AppData.getInstance(GroupsRatingsActivity.this);
             data.getAPI().rate(data.getUid(), item.artist, item.title, rating,
                     new UnisonAPI.Handler<JsonStruct.Success>() {
@@ -226,7 +226,7 @@ public class GroupsRatingsActivity extends SherlockActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            final MusicItem item = (MusicItem) view.getTag();
+            final TrackItem item = (TrackItem) view.getTag();
             int tempRating = 0;
             if (mRatings.get(item.artist + item.title) != null) {
                 tempRating = mRatings.get(item.artist + item.title);

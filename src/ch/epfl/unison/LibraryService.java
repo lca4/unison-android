@@ -19,7 +19,7 @@ import android.util.Log;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.data.UnisonDB;
 
 /**
@@ -68,7 +68,7 @@ public class LibraryService extends Service {
         // LibraryHelper helper = new LibraryHelper(this);
         // helper.truncate();
         // helper.close();
-        mDB.truncate(MusicItem.class);
+        mDB.truncate(TrackItem.class);
 
     }
 
@@ -82,7 +82,7 @@ public class LibraryService extends Service {
             mIsUpdating = true;
             // LibraryHelper helper = new LibraryHelper(this);
             // if (helper.isEmpty()) {
-            if (mDB.isEmpty(MusicItem.class)) {
+            if (mDB.isEmpty(TrackItem.class)) {
                 // If the DB is empty, just PUT all the tracks.
                 Log.d(TAG, "uploading all the music");
                 new Uploader().execute();
@@ -114,8 +114,8 @@ public class LibraryService extends Service {
             }
         }
 
-        public Set<MusicItem> getRealMusic() {
-            Set<MusicItem> set = new HashSet<MusicItem>();
+        public Set<TrackItem> getRealMusic() {
+            Set<TrackItem> set = new HashSet<TrackItem>();
             String[] columns = {
                     MediaStore.Audio.Media._ID,
                     MediaStore.Audio.Media.ARTIST,
@@ -130,7 +130,7 @@ public class LibraryService extends Service {
                 int colArtist = cur.getColumnIndex(MediaStore.Audio.Media.ARTIST);
                 int colTitle = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
                 do {
-                    set.add(new MusicItem(cur.getInt(colId),
+                    set.add(new TrackItem(cur.getInt(colId),
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
             }
@@ -153,16 +153,16 @@ public class LibraryService extends Service {
         private List<JsonStruct.Delta> getDeltas() {
             // Setting up the expectations.
             // Set<MusicItem> expectation = helper.getEntries();
-            Set<MusicItem> expectation = (Set<MusicItem>) mDB.getEntries(MusicItem.class);
+            Set<TrackItem> expectation = (Set<TrackItem>) mDB.getEntries(TrackItem.class);
             Log.d(TAG, "number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
-            Set<MusicItem> reality = getRealMusic();
+            Set<TrackItem> reality = getRealMusic();
             Log.d(TAG, "number of TRUE music entries: " + reality.size());
 
             // Trying to reconcile everyone.
             List<JsonStruct.Delta> deltas = new ArrayList<JsonStruct.Delta>();
-            for (MusicItem item : reality) {
+            for (TrackItem item : reality) {
                 if (!expectation.contains(item)) {
                     Log.d(TAG, "Adding track: " + item.title);
                     deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_PUT,
@@ -170,7 +170,7 @@ public class LibraryService extends Service {
                                                                      // item.
                 }
             }
-            for (MusicItem item : expectation) {
+            for (TrackItem item : expectation) {
                 if (!reality.contains(item)) {
                     Log.d(TAG, "Removing track: " + item.title);
                     deltas.add(new JsonStruct.Delta(JsonStruct.Delta.TYPE_DELETE,
@@ -204,7 +204,7 @@ public class LibraryService extends Service {
 
             // "Commiting" the changes locally.
             for (JsonStruct.Delta delta : deltas) {
-                MusicItem item = new MusicItem(
+                TrackItem item = new TrackItem(
                         delta.entry.localId, delta.entry.artist, delta.entry.title);
                 if (delta.type.equals(JsonStruct.Delta.TYPE_PUT)) {
                     // helper.insert(item);
@@ -230,9 +230,9 @@ public class LibraryService extends Service {
         @Override
         protected Boolean doInBackground(Void... params) {
             List<JsonStruct.Track> tracks = new ArrayList<JsonStruct.Track>();
-            Iterable<MusicItem> music = getRealMusic();
+            Iterable<TrackItem> music = getRealMusic();
 
-            for (MusicItem item : music) {
+            for (TrackItem item : music) {
                 tracks.add(new JsonStruct.Track(item.localId, item.artist, item.title));
             }
 
@@ -252,7 +252,7 @@ public class LibraryService extends Service {
 
             // Store the music in the library.
             // LibraryHelper helper = new LibraryHelper(LibraryService.this);
-            for (MusicItem item : music) {
+            for (TrackItem item : music) {
                 // helper.insert(item);
                 mDB.insert(item);
             }

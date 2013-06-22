@@ -23,7 +23,7 @@ import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.TrackQueue;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.music.MusicService;
 
 /**
@@ -89,7 +89,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     private TrackQueue mTrackQueue;
     private boolean mTrackAdded;
 
-    private List<MusicItem> mHistory;
+    private List<TrackItem> mHistory;
 
     private int mHistPointer;
 
@@ -110,7 +110,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         // mDJSupport = false;
         mIsDJ = false;
         // setDJSupport(true);
-        mHistory = new ArrayList<MusicItem>();
+        mHistory = new ArrayList<TrackItem>();
         mHistPointer = 0;
 
         setDjBtn((Button) v.findViewById(R.id.djToggleBtn));
@@ -162,7 +162,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         if (groupInfo.track != null) {
             getArtistTxt().setText(groupInfo.track.artist);
             getTitleTxt().setText(groupInfo.track.title);
-            setCurrentTrack(new MusicItem(-1, groupInfo.track.artist,
+            setCurrentTrack(new TrackItem(-1, groupInfo.track.artist,
                     groupInfo.track.title));
             if (groupInfo.track.image != null) {
                 Uutils.setBitmapFromURL(getCoverImg(), groupInfo.track.image);
@@ -212,7 +212,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
     }
 
     @Override
-    protected void notifyPlay(MusicItem item) {
+    protected void notifyPlay(TrackItem item) {
         UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         api.setCurrentTrack(
                 mHostActivity.getGroupId(),
@@ -457,7 +457,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         mTrackQueue.get(new TrackQueue.Callback() {
 
             @Override
-            public void callback(MusicItem item) {
+            public void callback(TrackItem item) {
                 addToHistory(item);
                 mTrackAdded = true;
                 play(mHistory.get(0));
@@ -538,7 +538,7 @@ public class GroupsPlayerFragment extends AbstractPlayerFragment implements
         }
     }
 
-    private void addToHistory(MusicItem item) {
+    private void addToHistory(TrackItem item) {
         mHistory.add(0, item);
     }
 }

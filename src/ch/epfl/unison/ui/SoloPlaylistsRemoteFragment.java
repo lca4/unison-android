@@ -18,11 +18,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import ch.epfl.unison.AppData;
+import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.data.PlaylistItem;
+import ch.epfl.unison.data.UnisonDB;
 
 /**
  * Shows the playlists available on the GS server but not stored on the device.
@@ -111,7 +113,7 @@ public class SoloPlaylistsRemoteFragment extends AbstractListFragment {
             case R.id.solo_playlists_context_menu_item_save:
                 PlaylistItem pl = mPlaylistsRemote.get(info.position);
                 // Adds PL to local databases
-                long localId = mHostActivity.getDB().insert(pl);
+                long localId = mHostActivity.getDB().getPlaylistHandler().insert(pl);
                 if (localId >= 0) {
                     try {
                         // Updates the local_id on server

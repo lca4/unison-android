@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.data.PlaylistItem;
 
 /**
@@ -187,7 +187,7 @@ public final class Uutils {
         }
 
         /** ArrayAdapter that displays the tracks of the playlist. */
-        public static class TracksAdapter extends ArrayAdapter<MusicItem> {
+        public static class TracksAdapter extends ArrayAdapter<TrackItem> {
 
             public TracksAdapter(Activity activity, PlaylistItem playlist) {
                 super(activity, 0, playlist.getTracks());
@@ -197,7 +197,7 @@ public final class Uutils {
 
             @Override
             public View getView(int position, View view, ViewGroup parent) {
-                MusicItem track = getItem(position);
+                TrackItem track = getItem(position);
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) smActivity
                             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

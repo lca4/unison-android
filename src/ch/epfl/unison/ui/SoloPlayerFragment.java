@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.UnisonAPI;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 
 /**
  * Specialized Fragment for {@link SoloMainFragment}. Contains the music player.
@@ -80,7 +80,7 @@ public class SoloPlayerFragment extends AbstractPlayerFragment {
     }
 
     @Override
-    protected void notifyPlay(MusicItem item) {
+    protected void notifyPlay(TrackItem item) {
         UnisonAPI api = AppData.getInstance(mHostActivity).getAPI();
         // TODO tell the server to increment the listener counter
         // api.setCurrentTrack(mActivity.getGroupId(), item.artist,

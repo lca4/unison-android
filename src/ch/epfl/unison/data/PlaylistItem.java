@@ -43,7 +43,7 @@ public class PlaylistItem extends AbstractItem {
     private String mAuthorName;
     private long mUserId;
     private int mGSSize;
-    private List<MusicItem> mTracks;
+    private List<TrackItem> mTracks;
     private int mUserRating;
     private String mUserComment;
     private int mListeners;
@@ -61,7 +61,7 @@ public class PlaylistItem extends AbstractItem {
     private Random mRandom = new Random();
 
     public PlaylistItem() {
-        mTracks = Collections.synchronizedList(new LinkedList<MusicItem>());
+        mTracks = Collections.synchronizedList(new LinkedList<TrackItem>());
         mOptions = new HashMap<String, Object>();
     }
 
@@ -87,7 +87,7 @@ public class PlaylistItem extends AbstractItem {
         private String mAuthorName; // Not yet available
         private long mUserId;
         private int mGSSize;
-        private LinkedList<MusicItem> mTracks;
+        private LinkedList<TrackItem> mTracks;
         private int mUserRating;
         private String mUserComment;
         private int mListeners;
@@ -208,17 +208,17 @@ public class PlaylistItem extends AbstractItem {
             return this;
         }
 
-        public Builder tracks(LinkedList<MusicItem> ll) {
+        public Builder tracks(LinkedList<TrackItem> ll) {
             this.mTracks = ll;
             this.mSize = mTracks.size();
             return this;
         }
 
         public Builder tracks(Track[] t) {
-            LinkedList<MusicItem> ll = new LinkedList<MusicItem>();
+            LinkedList<TrackItem> ll = new LinkedList<TrackItem>();
             if (t != null) {
                 for (int i = 0; i < t.length; i++) {
-                    ll.add(new MusicItem(t[i].localId, t[i].artist, t[i].title,
+                    ll.add(new TrackItem(t[i].localId, t[i].artist, t[i].title,
                             t[i].playOrder));
                 }
             }
@@ -292,7 +292,7 @@ public class PlaylistItem extends AbstractItem {
         }
     }
 
-    public MusicItem next() {
+    public TrackItem next() {
         synchronized (mTracks) {
             if (hasNext()) {
                 mCurrent++;
@@ -308,7 +308,7 @@ public class PlaylistItem extends AbstractItem {
         }
     }
 
-    public MusicItem current() {
+    public TrackItem current() {
         synchronized (mTracks) {
             if (mCurrent >= 0 && mTracks.size() > 0 && mCurrent < mTracks.size()) {
                 return mTracks.get(mCurrent);
@@ -325,7 +325,7 @@ public class PlaylistItem extends AbstractItem {
         return false;
     }
 
-    public MusicItem previous() {
+    public TrackItem previous() {
         synchronized (mTracks) {
             if (hasPrevious()) {
                 mCurrent--;
@@ -367,7 +367,7 @@ public class PlaylistItem extends AbstractItem {
         }
     }
 
-    public void setTracks(LinkedList<MusicItem> tracks) {
+    public void setTracks(LinkedList<TrackItem> tracks) {
         this.mTracks = tracks;
         this.mSize = mTracks.size();
     }
@@ -471,7 +471,7 @@ public class PlaylistItem extends AbstractItem {
         return mGSSize;
     }
 
-    public List<MusicItem> getTracks() {
+    public List<TrackItem> getTracks() {
         return mTracks;
     }
 
@@ -487,7 +487,7 @@ public class PlaylistItem extends AbstractItem {
         return mOptions;
     }
 
-    public List<MusicItem> getPlaylist() {
+    public List<TrackItem> getPlaylist() {
         return mTracks;
     }
 
@@ -507,7 +507,7 @@ public class PlaylistItem extends AbstractItem {
             case Shuffle:
                 mShuffled.clear();
                 LinkedList<Integer> temp = new LinkedList<Integer>();
-                Iterator<MusicItem> it = mTracks.iterator();
+                Iterator<TrackItem> it = mTracks.iterator();
                 while (it.hasNext()) {
                     temp.add((int) it.next().playOrder);
                 }

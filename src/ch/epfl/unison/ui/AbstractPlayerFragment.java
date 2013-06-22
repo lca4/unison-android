@@ -34,7 +34,7 @@ import ch.epfl.unison.R;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.UnisonAPI;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 import ch.epfl.unison.music.MusicService;
 import ch.epfl.unison.music.MusicService.MusicServiceBinder;
 
@@ -66,7 +66,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
 
     protected abstract void next();
 
-    protected abstract void notifyPlay(MusicItem item);
+    protected abstract void notifyPlay(TrackItem item);
 
     protected abstract void notifySkip();
 
@@ -111,7 +111,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
             alert.show();
         }
 
-        private void sendRating(MusicItem item, int rating) {
+        private void sendRating(TrackItem item, int rating) {
             Log.d(mTag, String.format("artist: %s, title: %s, rating: %d",
                     item.artist, item.title, rating));
 
@@ -185,7 +185,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
     private MusicServiceBinder mMusicService;
     private Handler mHandler = new Handler();
 
-    private MusicItem mCurrentTrack;
+    private TrackItem mCurrentTrack;
 
     private Status mStatus = Status.Stopped;
     private BroadcastReceiver mCompletedReceiver = new TrackCompletedReceiver();
@@ -375,7 +375,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         }
     }
 
-    protected MusicItem getCurrentTrack() {
+    protected TrackItem getCurrentTrack() {
         return mCurrentTrack;
     }
 
@@ -429,7 +429,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         });
     }
 
-    protected void play(MusicItem item) {
+    protected void play(TrackItem item) {
         Log.i(mTag, String.format("playing %s - %s", item.artist, item.title));
         // Send the song to the music player service.
         Uri uri = ContentUris.withAppendedId(
@@ -461,7 +461,7 @@ public abstract class AbstractPlayerFragment extends SherlockFragment implements
         }
     }
 
-    protected void setCurrentTrack(MusicItem currentTrack) {
+    protected void setCurrentTrack(TrackItem currentTrack) {
         this.mCurrentTrack = currentTrack;
     }
 

@@ -13,7 +13,7 @@ import android.util.Log;
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.api.JsonStruct.TracksList;
 import ch.epfl.unison.api.UnisonAPI.Error;
-import ch.epfl.unison.data.MusicItem;
+import ch.epfl.unison.data.TrackItem;
 
 /**
  * Implements an "infinite" playlist. Tracks are buffered locally such that we
@@ -38,7 +38,7 @@ public class TrackQueue {
     /** Max number of requests to get a track from the server. */
     private static final int MAX_REQUESTS = 10;
 
-    private Set<MusicItem> mPlaylist; // Is a set, but insertion order is
+    private Set<TrackItem> mPlaylist; // Is a set, but insertion order is
                                       // important!
     private String mPlaylistId;
     private int mNextPtr;
@@ -54,7 +54,7 @@ public class TrackQueue {
     public TrackQueue(Context context, long gid) {
         // LinkedHashSet returns insert-order iterators.
         mPlaylist = Collections.synchronizedSet(
-                new LinkedHashSet<MusicItem>());
+                new LinkedHashSet<TrackItem>());
         mIsPending = false;
         mIsActive = false;
         mHandler = new Handler();
@@ -80,7 +80,7 @@ public class TrackQueue {
 
     /** Simple callback for the asynchronous get() method. */
     public interface Callback {
-        void callback(MusicItem item);
+        void callback(TrackItem item);
 
         void onError();
     }
@@ -91,13 +91,13 @@ public class TrackQueue {
         }
 
         this.ensureEnoughElements();
-        AsyncTask<Void, Void, MusicItem> task = new AsyncTask<Void, Void, MusicItem>() {
+        AsyncTask<Void, Void, TrackItem> task = new AsyncTask<Void, Void, TrackItem>() {
 
             @Override
-            protected MusicItem doInBackground(Void... nothing) {
+            protected TrackItem doInBackground(Void... nothing) {
                 for (int i = 0; i < MAX_RETRIES; ++i) {
                     try {
-                        MusicItem next = new LinkedList<MusicItem>(mPlaylist).get(mNextPtr);
+                        TrackItem next = new LinkedList<TrackItem>(mPlaylist).get(mNextPtr);
                         mNextPtr += 1;
                         return next;
                     } catch (IndexOutOfBoundsException e) {
@@ -113,7 +113,7 @@ public class TrackQueue {
             }
 
             @Override
-            protected void onPostExecute(MusicItem item) {
+            protected void onPostExecute(TrackItem item) {
                 if (item != null) {
                     ensureEnoughElements();
                     clbk.callback(item);
@@ -159,7 +159,7 @@ public class TrackQueue {
                         Log.d(TAG, String.format("Adding %s - %s to the queue",
                                 track.artist, track.title));
                         // Commit 9767af6583a91dc91591395e7553d78d5a26a3aa
-                        mPlaylist.add(new MusicItem(track.localId, track.artist, track.title));
+                        mPlaylist.add(new TrackItem(track.localId, track.artist, track.title));
                         // if (!mPlaylist.add(new MusicItem(track.localId,
                         // track.artist,
                         // track.title))) {
