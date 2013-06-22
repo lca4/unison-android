@@ -23,13 +23,7 @@ import java.util.Set;
 
 /**
  * Class for accessing / managing the unison database. Note: we are talking
- * about the one *that GroupStreamer owns*, i.e. on the phone <br />
- * <br />
- * Refactoring in progress:
- * <ul>
- * <li>1 private inner class for each table</li>
- * <li>interface implemented by every such inner classes</li>
- * </ul>
+ * about the one that GroupStreamer owns, i.e. on the phone.
  * 
  * @author marc
  */
