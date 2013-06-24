@@ -531,6 +531,8 @@ public final class UnisonDB {
                 if (item.getLocalId() >= 0) {
                     ContentValues values = new ContentValues();
                     values.put(ConstDB.PLYL_C_LOCAL_ID, item.getLocalId());
+                    values.put(ConstDB.PLYL_C_TRACKS, item.getTracksJson());
+                    values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, item.getDateModified());
                     values.put(ConstDB.PLYL_C_GS_USER_ID, item.getUserId());
                     values.put(ConstDB.PLYL_C_GS_SIZE, item.getSize());
                     values.put(ConstDB.PLYL_C_CREATED_BY_GS, 1);
@@ -622,8 +624,10 @@ public final class UnisonDB {
             Cursor cur = getCursor(mTable,
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
-                            ConstDB.PLYL_C_GS_SIZE,
+                            ConstDB.PLYL_C_TRACKS,
+                            ConstDB.PLYL_C_LOCAL_UPDATE_TIME,
                             ConstDB.PLYL_C_CREATED_BY_GS,
+                            ConstDB.PLYL_C_GS_SIZE,
                             ConstDB.PLYL_C_GS_ID,
                             ConstDB.PLYL_C_GS_CREATION_TIME,
                             ConstDB.PLYL_C_GS_UPDATE_TIME,
@@ -638,6 +642,8 @@ public final class UnisonDB {
             Set<PlaylistItem> set = new HashSet<PlaylistItem>();
             if (cur != null && cur.moveToFirst()) {
                 int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
+                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
+                int colDateModified = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_UPDATE_TIME);
                 int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
                 int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
                 int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
@@ -651,7 +657,10 @@ public final class UnisonDB {
                 int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
                 int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
                 do {
-                    set.add(new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
+                    set.add(new PlaylistItem.Builder()
+                            .localId(cur.getInt(colLocalId))
+                            .tracks(cur.getString(colTracks))
+                            .modified(cur.getLong(colDateModified))
                             .size(cur.getInt(colGSSize))
                             .createdByGS(cur.getInt(colCreatedByGS) != 0)
                             .plId(cur.getInt(colGSId))

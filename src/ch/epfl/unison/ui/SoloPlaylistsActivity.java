@@ -105,8 +105,7 @@ public class SoloPlaylistsActivity extends AbstractFragmentActivity
     public void onResume() {
         super.onResume();
         // Starts the playlist libbrary service.
-        startService(new Intent(PlaylistLibraryService.ACTION_UPDATE)
-                .putExtra(Const.PrefKeys.UID, AppData.getInstance(this).getUid()));
+        startService(new Intent(PlaylistLibraryService.ACTION_UPDATE));
     }
 
     @Override

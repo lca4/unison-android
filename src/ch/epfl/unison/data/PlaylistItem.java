@@ -1,6 +1,12 @@
 
 package ch.epfl.unison.data;
 
+import com.google.gson.JsonArray;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.epfl.unison.Const;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct.Track;
@@ -28,6 +34,20 @@ public class PlaylistItem extends AbstractItem {
     private enum Mode {
         Linear, Circular, LoopOnTrack, Shuffle
     }
+    
+    /**
+     * 
+     * @author marc
+     *
+     */
+    private static final class JsonKey {
+        static final String LOCAL_ID = "local_id";
+        static final String ARTIST = "artist";
+        static final String TITLE = "title";
+        static final String PLAY_ORDER = "play_order";
+        
+        private JsonKey() { }
+    }
 
     private long mLocalId = -1; // Android sqlite
     private int mSize = -1;
@@ -38,7 +58,7 @@ public class PlaylistItem extends AbstractItem {
     private Date mGSCreated;
     private Date mGSLastUpdated;
     private Date mDateCreated; // unused for now
-    private Date mDateModified; // from android
+    private long mDateModified; // from android
     private int mAuthorId;
     private String mAuthorName;
     private long mUserId;
@@ -82,7 +102,7 @@ public class PlaylistItem extends AbstractItem {
         private long mGSPLId; // GS database id
         private Date mGSCreated;
         private Date mGSUpdated;
-        private Date mDateModified;
+        private long mDateModified;
         private int mAuthorId;
         private String mAuthorName; // Not yet available
         private long mUserId;
@@ -173,20 +193,25 @@ public class PlaylistItem extends AbstractItem {
             return this;
         }
 
-        public Builder modBuilder(Date d) {
-            this.mDateModified = d;
+//        public Builder modified(Date d) {
+//            this.mDateModified = d;
+//            return this;
+//        }
+        
+        public Builder modified(long l) {
+            this.mDateModified = l;
             return this;
         }
 
-        public Builder modified(String u) {
-            try {
-                this.mDateModified = Uutils.stringToDate(u);
-            } catch (ParseException e) {
-                this.mDateModified = null;
-                e.printStackTrace();
-            }
-            return this;
-        }
+//        public Builder modified(String u) {
+//            try {
+//                this.mDateModified = Uutils.stringToDate(u);
+//            } catch (ParseException e) {
+//                this.mDateModified = null;
+//                e.printStackTrace();
+//            }
+//            return this;
+//        }
 
         public Builder authorId(int id) {
             this.mAuthorId = id;
@@ -224,6 +249,31 @@ public class PlaylistItem extends AbstractItem {
             }
             this.mTracks = ll;
             this.mSize = mTracks.size();
+            return this;
+        }
+        
+        /**
+         * Tracks in JSONArray format.
+         * 
+         * @param json
+         * @return the builder
+         */
+        public Builder tracks(String json) {
+            LinkedList<TrackItem> ll = new LinkedList<TrackItem>();
+            try {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject t = (JSONObject) array.get(i);
+                    ll.add(new TrackItem(
+                            t.getLong(JsonKey.LOCAL_ID), 
+                            t.getString(JsonKey.ARTIST), 
+                            t.getString(JsonKey.TITLE),
+                            t.getLong(JsonKey.PLAY_ORDER)));
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             return this;
         }
 
@@ -266,6 +316,7 @@ public class PlaylistItem extends AbstractItem {
         this.mTitle = builder.mTitle;
         this.mGSCreated = builder.mGSCreated;
         this.mGSLastUpdated = builder.mGSUpdated;
+        this.mDateModified = builder.mDateModified;
         this.mAuthorId = builder.mAuthorId;
         this.mAuthorName = builder.mAuthorName;
         this.mUserId = builder.mUserId;
@@ -397,6 +448,10 @@ public class PlaylistItem extends AbstractItem {
             e.printStackTrace();
         }
     }
+    
+    public void setDateModified(long timestamp) {
+        this.mDateModified = timestamp;
+    }
 
     public int getUserRating() {
         return mUserRating;
@@ -454,6 +509,10 @@ public class PlaylistItem extends AbstractItem {
     public String getCreationTime() {
         return mGSCreated.toString();
     }
+    
+    public long getDateModified() {
+        return mDateModified;
+    }
 
     public int getAuthorId() {
         return mAuthorId;
@@ -477,6 +536,25 @@ public class PlaylistItem extends AbstractItem {
 
     public List<TrackItem> getTracks() {
         return mTracks;
+    }
+    
+    public String getTracksJson() {
+        JSONArray json = new JSONArray();
+        JSONObject jsonTrack;
+        for (TrackItem track : mTracks) {
+            jsonTrack = new JSONObject();
+            try {
+                jsonTrack.put(JsonKey.LOCAL_ID, track.localId);
+                jsonTrack.put(JsonKey.ARTIST, track.artist);
+                jsonTrack.put(JsonKey.TITLE, track.title);
+                jsonTrack.put(JsonKey.PLAY_ORDER, track.playOrder);
+                json.put(jsonTrack);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return json.toString();
     }
 
     public int getListeners() {

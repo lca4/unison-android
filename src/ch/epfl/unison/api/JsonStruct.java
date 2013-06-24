@@ -145,6 +145,7 @@ public abstract class JsonStruct {
         public long userId; 
         public long localId;
         public long gsId;
+        public Delta[] trackDeltas;
         
         public PlaylistDelta() { }
         

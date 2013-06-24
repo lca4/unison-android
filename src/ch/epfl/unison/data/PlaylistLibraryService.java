@@ -15,6 +15,7 @@ import ch.epfl.unison.api.Request;
 import ch.epfl.unison.api.UnisonAPI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class PlaylistLibraryService extends AbstractService {
     public static final String ACTION_UPDATE = "ch.epfl.unison.action.UPDATE";
     public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
     public static final String ACTION_STOP = "ch.epfl.unison.action.STOP";
-    
+
     private long mUid;
 
     @Override
@@ -44,11 +45,6 @@ public class PlaylistLibraryService extends AbstractService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting the playlist library service");
         String action = intent.getAction();
-        mUid = intent.getLongExtra(Const.PrefKeys.UID, -1);
-        if (mUid < 0) {
-            throw new RuntimeException("Playlist library service aborted due to invalid user id: "
-                    + mUid);
-        }
         if (action.equals(ACTION_UPDATE)) {
             update();
         } else if (action.equals(ACTION_TRUNCATE)) {
@@ -80,7 +76,8 @@ public class PlaylistLibraryService extends AbstractService {
             // Log.d(TAG, "uploading all the playlists");
             // new Uploader().execute();
             // } else {
-            Log.d(TAG, "Updating the playlist library"); // Always update (nothing else to do)
+            Log.d(TAG, "Updating the playlist library"); // Always update
+                                                         // (nothing else to do)
             new Updater().execute();
             // }
         } else {
@@ -138,32 +135,50 @@ public class PlaylistLibraryService extends AbstractService {
 
     /**
      * If the local DB is already populated, we only send deltas to the server
-     * (i.e. a list of playlists that were added and a list of playlists that
-     * were removed).
+     * (i.e. a list of playlists that were removed and/or a list of changes
+     * inside a playlist (added/removed tracks, reordering of the tracks)).
      */
     private class Updater extends LibraryTask {
 
         private List<JsonStruct.PlaylistDelta> getDeltas(UnisonDB uDB) {
+            
+            /*
+             * TODO compare local update time:
+             * - if removed outside app, commit delete delta;
+             * - else,
+             *      - if same, do nothing;
+             *      - else, commit delta track by track (like LibraryService)
+             */
+            
+            
+            
+            
             // Setting up the expectations.
-            Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems(mUid);
+            Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems();
             Log.d(TAG, "Number of OUR entries: " + expectation.size());
 
             // Take a hard look at the reality.
             Set<PlaylistItem> reality = AndroidDB.getPlaylists(getContentResolver());
             Log.d(TAG, "Number of TRUE music entries: " + reality.size());
-            Set<Long> realityIds = extractLocalIds(reality);
+            HashMap<Long, PlaylistItem> realityIds = extractLocalIds(reality);
 
             // Trying to reconcile everyone.
             List<JsonStruct.PlaylistDelta> deltas = new ArrayList<JsonStruct.PlaylistDelta>();
 
             for (PlaylistItem item : expectation) {
-                if (!realityIds.contains(item.getLocalId())) {
+                if (!realityIds.containsKey(item.getLocalId())) {
                     Log.d(TAG, "Removing playlist: " + item.getTitle());
-                    // FIXME issue here, what if user logs out?
-                     deltas.add(new
-                     JsonStruct.PlaylistDelta(JsonStruct.PlaylistDelta.TYPE_DELETE, 
-                             mUid, item.getLocalId(), item.getPlaylistId()
-                     )); // Delete item.
+                    deltas.add(new
+                            JsonStruct.PlaylistDelta(JsonStruct.PlaylistDelta.TYPE_DELETE,
+                                    item.getUserId(), item.getLocalId(), item.getPlaylistId()
+                            )); // Delete item.
+                } else {
+                    long realDateModified = realityIds.get(item.getLocalId()).getDateModified();
+                    long expectationDateModified = item.getDateModified();
+                    if (realDateModified > expectationDateModified) {
+                        // Update from outside the app.
+                        //TODO
+                    }
                 }
             }
 
@@ -175,39 +190,29 @@ public class PlaylistLibraryService extends AbstractService {
         protected Boolean doInBackground(Void... arg0) {
             UnisonDB uDB = new UnisonDB(PlaylistLibraryService.this);
             List<JsonStruct.PlaylistDelta> deltas = getDeltas(uDB);
-            
-            /*
-             * 
-             * TODO
-             * 
-             * WORK IN PROGRESS
-             * 
-             * 
-             * 
-             */
 
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
             long uid = AppData.getInstance(PlaylistLibraryService.this).getUid();
 
-            Request.Result<JsonStruct.Success> res = null; // api.updateLibrarySync(uid,
-                                                           // deltas);
+            Request.Result<JsonStruct.Success> res = api.updatePlaylistLibrarySync(uid, deltas);
             if (res.result == null) {
                 if (res.error.hasJsonError()) {
-                    Log.w(TAG, "couldn't send deltas to server: " + res.error.jsonError.message);
+                    Log.w(TAG, "Couldn't send playlist deltas to server: "
+                            + res.error.jsonError.message);
                 } else {
-                    Log.w(TAG, "couldn't send deltas to server.", res.error.error);
+                    Log.w(TAG, "Couldn't send playlist deltas to server.", res.error.error);
                 }
                 return false;
             }
 
             return true;
         }
-        
-        private Set<Long> extractLocalIds(Set<PlaylistItem> playlist) {
-            Set<Long> res = new HashSet<Long>();
+
+        private HashMap<Long, PlaylistItem> extractLocalIds(Set<PlaylistItem> playlist) {
+            HashMap<Long, PlaylistItem> res = new  HashMap<Long, PlaylistItem>();
             for (PlaylistItem item : playlist) {
-                res.add(item.getLocalId());
+                res.put(item.getLocalId(), item);
             }
             return res;
         }

@@ -130,9 +130,9 @@ public final class Uutils {
      * @param u Uri used to make the insertion
      * @return
      */
-    public static int lastInsert(Uri u) {
+    public static long lastInsertId(Uri u) {
         // Empirically seen that the index is at the end
-        return Integer.parseInt(u.getPathSegments().get(u.getPathSegments().size() - 1));
+        return Long.parseLong(u.getPathSegments().get(u.getPathSegments().size() - 1));
     }
 
     /** Container of adapters. */

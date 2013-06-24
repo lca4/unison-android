@@ -60,15 +60,16 @@ final class AndroidDB {
      * @param pl The playlist to store in android databse
      * @return local playlist id
      */
-    static int insert(ContentResolver cr, PlaylistItem pl) {
+    static long insert(ContentResolver cr, PlaylistItem pl) {
         // Add the playlist to the android dabase
+        long timestamp = System.currentTimeMillis();
         ContentValues mValues = new ContentValues();
         mValues.put(MediaStore.Audio.Playlists.NAME, pl.getTitle());
-        mValues.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis());
-        mValues.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis());
+        mValues.put(MediaStore.Audio.Playlists.DATE_ADDED, timestamp);
+        mValues.put(MediaStore.Audio.Playlists.DATE_MODIFIED, timestamp);
 
         Uri uri = cr.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, mValues);
-        int playlistId = Uutils.lastInsert(uri);
+        long playlistId = Uutils.lastInsertId(uri);
         pl.setLocalId(playlistId);
         if (playlistId >= 0) {
 
@@ -77,7 +78,7 @@ final class AndroidDB {
             uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
 
             insertTracks(cr, pl);
-
+            pl.setDateModified(timestamp);
         } else {
             throw new SQLiteException("Playlists " + pl.toString() + " could not be inserted to "
                     + MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI);
@@ -93,8 +94,9 @@ final class AndroidDB {
      * @param resolver
      * @param playlistId
      * @param c
+     * @return DATE_MODIFIED
      */
-    private static void insertTracks(ContentResolver resolver, PlaylistItem pl) {
+    private static long insertTracks(ContentResolver resolver, PlaylistItem pl) {
         ContentResolver mCR = resolver;
         ContentProviderClient mCRC = null;
         try {
@@ -124,7 +126,7 @@ final class AndroidDB {
                 Uri insertUri = mCRC.insert(mUri, values);
                 Log.d(TAG,
                         "addSongsInCursorToPlaylist -Adding AudioID: "
-                                + Uutils.lastInsert(insertUri)
+                                + Uutils.lastInsertId(insertUri)
                                 + " with Uri : " + insertUri
                                 + " to Uri: " + mUri.toString());
             }
@@ -132,6 +134,8 @@ final class AndroidDB {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        // TODO return DATE_MODIFIED (to update GS app DB)
+        return 0;
     }
 
     static int delete(ContentResolver resolver, PlaylistItem pl) {
@@ -226,7 +230,7 @@ final class AndroidDB {
             int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
             do {
                 PlaylistItem pl = new PlaylistItem.Builder().plId(cur.getLong(colId))
-                        .title(cur.getString(colName)).build();
+                        .title(cur.getString(colName)).modified(cur.getLong(colDateModified)).build();
 
                 getTracks(resolver, pl);
                 set.add(pl);

@@ -62,6 +62,7 @@ final class ConstDB {
                                                        // support
     // several accounts on the same device)
     static final String PLYL_C_LOCAL_ID = "local_id";
+    static final String PLYL_C_TRACKS = "tracks"; // JsonStruct.Track[]
     // =PlaylistsColumns.DATE_MODIFIED, needed to see if playlist modified
     // outside GS
     static final String PLYL_C_LOCAL_UPDATE_TIME = "local_update_time";
