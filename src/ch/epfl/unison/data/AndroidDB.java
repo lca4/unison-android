@@ -177,7 +177,7 @@ final class AndroidDB {
                 projection,
                 null,
                 null,
-                MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER + " ASC ");
         if (cur != null & cur.moveToFirst()) {
             LinkedList<TrackItem> mTracks = new LinkedList<TrackItem>();
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID);
@@ -210,6 +210,12 @@ final class AndroidDB {
         return count;
     }
 
+    /**
+     * Tracks are sorted by ascending play_order.
+     * 
+     * @param resolver
+     * @return
+     */
     static Set<PlaylistItem> getPlaylists(ContentResolver resolver) {
         Set<PlaylistItem> set = new HashSet<PlaylistItem>();
         String[] columns = {

@@ -6,6 +6,7 @@ import ch.epfl.unison.data.TagItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJOs for JSON serialization / deserialization.
@@ -139,13 +140,15 @@ public abstract class JsonStruct {
     /** Notification of removal of playlist on the device. */
     public static class PlaylistDelta extends JsonStruct {
         
+        public static final String TYPE_UPDATE = "UPDATE";
         public static final String TYPE_DELETE = "DELETE";
         
         public String type;
         public long userId; 
-        public long localId;
+        public long localId; // Maybe useless, gsId should be sufficient
         public long gsId;
-        public Delta[] trackDeltas;
+        public String title = null;
+        public List<JsonStruct.Delta> trackDeltas = null;
         
         public PlaylistDelta() { }
         
@@ -154,6 +157,12 @@ public abstract class JsonStruct {
             this.userId = uid;
             this.localId = lid;
             this.gsId = gsid;
+        }
+        
+        public PlaylistDelta(String t, long uid, long lid, long gsid, 
+                List<JsonStruct.Delta> tdeltas) {
+            new PlaylistDelta(t, uid, lid, gsid);
+            this.trackDeltas = tdeltas;
         }
     }
 

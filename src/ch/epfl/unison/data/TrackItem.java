@@ -7,7 +7,7 @@ package ch.epfl.unison.data;
  * 
  * @author lum
  */
-public class TrackItem extends AbstractItem {
+public class TrackItem extends AbstractItem<TrackItem> {
 
     public final long localId;
     public final String artist;
@@ -76,27 +76,35 @@ public class TrackItem extends AbstractItem {
         return true;
     }
 
-    @Override
-    public int compareTo(AbstractItem another) {
-        if (another instanceof TrackItem) {
-            TrackItem musicItem = (TrackItem) another;
-            int artistComp = artist.compareTo(musicItem.artist);
-            if (artistComp != 0) {
-                return artistComp;
-            }
-            int titleComp = title.compareTo(musicItem.title);
-            if (titleComp != 0) {
-                return titleComp;
-            }
-            if (localId < musicItem.localId) {
-                return -1;
-            } else if (localId > musicItem.localId) {
-                return 1;
-            }
-            return 0;
-        } else {
-            throw new IllegalArgumentException();
+    public int compareTo(TrackItem another, boolean withRespectToPlayOrder) {
+        int comparison = this.compareTo(another);
+        if (comparison != 0 || !withRespectToPlayOrder) {
+            return comparison;
         }
+        if (playOrder < another.playOrder) {
+            return -1;
+        } else if (playOrder > another.playOrder) {
+            return 1;
+        }
+        return 0;
     }
 
+    @Override
+    public int compareTo(TrackItem another) {
+        TrackItem musicItem = (TrackItem) another;
+        int artistComp = artist.compareTo(musicItem.artist);
+        if (artistComp != 0) {
+            return artistComp;
+        }
+        int titleComp = title.compareTo(musicItem.title);
+        if (titleComp != 0) {
+            return titleComp;
+        }
+        if (localId < musicItem.localId) {
+            return -1;
+        } else if (localId > musicItem.localId) {
+            return 1;
+        }
+        return 0;
+    }
 }

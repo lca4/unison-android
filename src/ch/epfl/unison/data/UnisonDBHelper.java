@@ -39,7 +39,7 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLAYLISTS_TABLE_NAME + " ("
             + ConstDB.C_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + ConstDB.PLYL_C_LOCAL_ID + " int UNIQUE, "
-            + ConstDB.PLYL_C_TRACKS + " text, "
+            + ConstDB.PLYL_C_TRACKS + " text, " // Actually, I don't care about this.
             + ConstDB.PLYL_C_LOCAL_UPDATE_TIME + " long, "
             + ConstDB.PLYL_C_GS_USER_ID + " bigint NOT NULL, "
             + ConstDB.PLYL_C_GS_SIZE + " int, "

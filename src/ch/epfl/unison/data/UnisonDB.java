@@ -823,6 +823,10 @@ public final class UnisonDB {
             closeCursor(cur);
             return set;
         }
+        
+        public void updateDateModified(long plid, long timestamp) {
+            
+        }
 
     }
 

@@ -26,7 +26,7 @@ import java.util.Random;
  * 
  * @author marc
  */
-public class PlaylistItem extends AbstractItem {
+public class PlaylistItem extends AbstractItem<PlaylistItem> {
 
     private static final String TAG = PlaylistItem.class.getName();
 
@@ -573,17 +573,6 @@ public class PlaylistItem extends AbstractItem {
         return mTracks;
     }
 
-    @Override
-    public int compareTo(AbstractItem another) {
-        if (another instanceof PlaylistItem) {
-            PlaylistItem playlistItem = (PlaylistItem) another;
-            // TODO
-            return 0;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
     public void setMode(Mode mode) {
         switch (mode) {
             case Shuffle:
@@ -608,6 +597,12 @@ public class PlaylistItem extends AbstractItem {
         map.put(Const.Strings.TITLE, mTitle);
         map.put(Const.Strings.SIZE, String.valueOf(mSize));
         return map;
+    }
+
+    @Override
+    public int compareTo(PlaylistItem another) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

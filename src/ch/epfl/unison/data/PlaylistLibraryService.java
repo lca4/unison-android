@@ -17,6 +17,7 @@ import ch.epfl.unison.api.UnisonAPI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class PlaylistLibraryService extends AbstractService {
     public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
     public static final String ACTION_STOP = "ch.epfl.unison.action.STOP";
 
-    private long mUid;
+    private UnisonDB mDB;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,6 +46,7 @@ public class PlaylistLibraryService extends AbstractService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Starting the playlist library service");
         String action = intent.getAction();
+        mDB = new UnisonDB(this);
         if (action.equals(ACTION_UPDATE)) {
             update();
         } else if (action.equals(ACTION_TRUNCATE)) {
@@ -55,7 +57,6 @@ public class PlaylistLibraryService extends AbstractService {
 
     private void truncate() {
         Log.d(TAG, "truncating the user playlist library");
-        UnisonDB mDB = new UnisonDB(this);
         mDB.getPlaylistHandler().truncate();
     }
 
@@ -70,7 +71,6 @@ public class PlaylistLibraryService extends AbstractService {
 
         if (!isUpdating() && interval > MIN_UPDATE_INTERVAL) {
             setIsUpdating(true);
-            UnisonDB mDB = new UnisonDB(this);
             // if (mDB.getPlaylistHandler().isEmpty()) {
             // If the DB is empty, just PUT all the playlists.
             // Log.d(TAG, "uploading all the playlists");
@@ -141,18 +141,13 @@ public class PlaylistLibraryService extends AbstractService {
     private class Updater extends LibraryTask {
 
         private List<JsonStruct.PlaylistDelta> getDeltas(UnisonDB uDB) {
-            
+
             /*
-             * TODO compare local update time:
-             * - if removed outside app, commit delete delta;
-             * - else,
-             *      - if same, do nothing;
-             *      - else, commit delta track by track (like LibraryService)
+             * TODO compare local update time: - if removed outside app, commit
+             * delete delta; - else, - if same, do nothing; - else, commit delta
+             * track by track (like LibraryService)
              */
-            
-            
-            
-            
+
             // Setting up the expectations.
             Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems();
             Log.d(TAG, "Number of OUR entries: " + expectation.size());
@@ -169,17 +164,61 @@ public class PlaylistLibraryService extends AbstractService {
                 if (!realityIds.containsKey(item.getLocalId())) {
                     Log.d(TAG, "Removing playlist: " + item.getTitle());
                     deltas.add(new
-                            JsonStruct.PlaylistDelta(JsonStruct.PlaylistDelta.TYPE_DELETE,
-                                    item.getUserId(), item.getLocalId(), item.getPlaylistId()
+                            JsonStruct.PlaylistDelta(
+                                    JsonStruct.PlaylistDelta.TYPE_DELETE,
+                                    item.getUserId(),
+                                    item.getLocalId(),
+                                    item.getPlaylistId()
                             )); // Delete item.
                 } else {
                     long realDateModified = realityIds.get(item.getLocalId()).getDateModified();
                     long expectationDateModified = item.getDateModified();
                     if (realDateModified > expectationDateModified) {
+                        Log.d(TAG, "Updating playlist: " + item.getTitle());
                         // Update from outside the app.
-                        //TODO
+                        PlaylistItem realPlaylist = realityIds.get(item.getLocalId());
+                        LinkedList<TrackItem> realTracks =
+                                (LinkedList<TrackItem>) realPlaylist.getTracks();
+                        /*
+                         * Don't worry about checking which track has changed.
+                         * Server will remove all the tracks and recreate the
+                         * playlist based on deltas.
+                         */
+                        List<JsonStruct.Delta> trackDeltas = new ArrayList<JsonStruct.Delta>();
+                        for (TrackItem track : realTracks) {
+                            if (!expectation.contains(track)) {
+                                Log.d(TAG, "Adding track: " + track.title);
+                                trackDeltas.add(new JsonStruct.Delta(
+                                        JsonStruct.Delta.TYPE_PUT,
+                                        track.localId,
+                                        track.artist,
+                                        track.title));
+                            }
+                        }
+                        JsonStruct.PlaylistDelta delta = new
+                                JsonStruct.PlaylistDelta(
+                                        JsonStruct.PlaylistDelta.TYPE_UPDATE,
+                                        item.getUserId(),
+                                        item.getLocalId(),
+                                        item.getPlaylistId(),
+                                        trackDeltas
+                                );
+                        if (item.getTitle().compareTo(realPlaylist.getTitle()) != 0) {
+                            delta.title = realPlaylist.getTitle();
+                        }
+                        deltas.add(delta); // Update item.
                     }
+                    // "Commiting" the changes locally.
+                    /*
+                     * It's too much overhead to compare and update the copy of 
+                     * tracks of the playlist. It's also quiet useless.
+                     * Thus, only update the DATE_MODIFIED field, which is 
+                     * actually the key point of these deltas.
+                     */
+                    mDB.getPlaylistHandler().updateDateModified(item.getLocalId(), 
+                            realDateModified);
                 }
+                
             }
 
             Log.d(TAG, "number of deltas: " + deltas.size());
@@ -210,7 +249,7 @@ public class PlaylistLibraryService extends AbstractService {
         }
 
         private HashMap<Long, PlaylistItem> extractLocalIds(Set<PlaylistItem> playlist) {
-            HashMap<Long, PlaylistItem> res = new  HashMap<Long, PlaylistItem>();
+            HashMap<Long, PlaylistItem> res = new HashMap<Long, PlaylistItem>();
             for (PlaylistItem item : playlist) {
                 res.put(item.getLocalId(), item);
             }
