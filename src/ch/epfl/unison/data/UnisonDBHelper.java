@@ -42,9 +42,9 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             + ConstDB.PLYL_C_TRACKS + " text, " // Actually, I don't care about this.
             + ConstDB.PLYL_C_LOCAL_UPDATE_TIME + " long, "
             + ConstDB.PLYL_C_GS_USER_ID + " bigint NOT NULL, "
-            + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_CREATED_BY_GS + " tinyint DEFAULT " + ConstDB.FALSE + ", "
             + ConstDB.PLYL_C_GS_ID + " bigint, "
+            + ConstDB.PLYL_C_GS_SIZE + " int, "
             + ConstDB.PLYL_C_GS_CREATION_TIME + " datetime, " // TODO check
                                                               // type!
             + ConstDB.PLYL_C_GS_UPDATE_TIME + " datetime, " // TODO check type!

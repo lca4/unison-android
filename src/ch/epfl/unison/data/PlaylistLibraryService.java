@@ -233,7 +233,7 @@ public class PlaylistLibraryService extends AbstractService {
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
             long uid = AppData.getInstance(PlaylistLibraryService.this).getUid();
-
+            
             Request.Result<JsonStruct.Success> res = api.updatePlaylistLibrarySync(uid, deltas);
             if (res.result == null) {
                 if (res.error.hasJsonError()) {

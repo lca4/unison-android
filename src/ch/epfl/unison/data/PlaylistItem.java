@@ -530,8 +530,12 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
      * @return the size as computed on the GS server. If you want the real size
      *         of the playlist on the device, use {@link #size()} instead.
      */
-    public int getSize() {
+    public int getGSSize() {
         return mGSSize;
+    }
+    
+    public int getSize() {
+        return mTracks.size();
     }
 
     public List<TrackItem> getTracks() {
