@@ -89,7 +89,7 @@ public class SoloPlaylistsLocalFragment extends AbstractListFragment {
         inflater.inflate(R.menu.solo_playlists_context_menu, menu);
         // menu.findItem(R.id.solo_playlists_context_menu_item_edit).setVisible(true);
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();

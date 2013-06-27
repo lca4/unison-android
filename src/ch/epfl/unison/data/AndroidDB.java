@@ -236,7 +236,8 @@ final class AndroidDB {
             int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
             do {
                 PlaylistItem pl = new PlaylistItem.Builder().plId(cur.getLong(colId))
-                        .title(cur.getString(colName)).modified(cur.getLong(colDateModified)).build();
+                        .title(cur.getString(colName)).modified(cur.getLong(colDateModified))
+                        .build();
 
                 getTracks(resolver, pl);
                 set.add(pl);
@@ -245,14 +246,16 @@ final class AndroidDB {
         }
         return set;
     }
-    
+
     static PlaylistItem getPlaylist(ContentResolver resolver, PlaylistItem pl) {
         String[] columns = {
                 MediaStore.Audio.Playlists.NAME,
                 MediaStore.Audio.Playlists.DATE_MODIFIED
         };
         String selection = MediaStore.Audio.Playlists._ID + " = ?";
-        String[] selectionArgs = {String.valueOf(pl.getLocalId())};        
+        String[] selectionArgs = {
+            String.valueOf(pl.getLocalId())
+        };
         Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         Cursor cur = resolver.query(uri, columns,
                 selection,
@@ -262,8 +265,8 @@ final class AndroidDB {
             int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
             int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
             int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
-                pl.setTitle(cur.getString(colName)).setDateModified(cur.getLong(colDateModified));
-                getTracks(resolver, pl);
+            pl.setTitle(cur.getString(colName)).setDateModified(cur.getLong(colDateModified));
+            getTracks(resolver, pl);
             cur.close();
         }
         return pl;

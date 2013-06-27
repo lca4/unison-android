@@ -288,7 +288,7 @@ public class UnisonAPI {
         AsyncRequest.of(url, handler, JsonStruct.PlaylistJS.class)
                 .setAuth(mAuth).addParam("fields", fields).doPOST();
     }
-    
+
     public Request.Result<JsonStruct.Success> updatePlaylistLibrarySync(
             long uid, Iterable<JsonStruct.PlaylistDelta> deltas) {
         URL url = urlFor("/solo/%d/playlists/batch", uid);
@@ -298,7 +298,7 @@ public class UnisonAPI {
             request.addParam("deltas", GSON.toJson(delta));
         }
         return request.doPOST();
-    } 
+    }
 
     public void listUserPlaylists(long uid, Handler<JsonStruct.PlaylistsList> handler) {
         URL url = urlFor("/solo/%d/playlists", uid);

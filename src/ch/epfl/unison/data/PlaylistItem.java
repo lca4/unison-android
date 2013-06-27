@@ -1,15 +1,13 @@
 
 package ch.epfl.unison.data;
 
-import com.google.gson.JsonArray;
+import ch.epfl.unison.Const;
+import ch.epfl.unison.Uutils;
+import ch.epfl.unison.api.JsonStruct.Track;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import ch.epfl.unison.Const;
-import ch.epfl.unison.Uutils;
-import ch.epfl.unison.api.JsonStruct.Track;
 
 import java.text.ParseException;
 import java.util.Collections;
@@ -34,19 +32,18 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     private enum Mode {
         Linear, Circular, LoopOnTrack, Shuffle
     }
-    
+
     /**
-     * 
      * @author marc
-     *
      */
     private static final class JsonKey {
         static final String LOCAL_ID = "local_id";
         static final String ARTIST = "artist";
         static final String TITLE = "title";
         static final String PLAY_ORDER = "play_order";
-        
-        private JsonKey() { }
+
+        private JsonKey() {
+        }
     }
 
     private long mLocalId = -1; // Android sqlite
@@ -193,25 +190,25 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
             return this;
         }
 
-//        public Builder modified(Date d) {
-//            this.mDateModified = d;
-//            return this;
-//        }
-        
+        // public Builder modified(Date d) {
+        // this.mDateModified = d;
+        // return this;
+        // }
+
         public Builder modified(long l) {
             this.mDateModified = l;
             return this;
         }
 
-//        public Builder modified(String u) {
-//            try {
-//                this.mDateModified = Uutils.stringToDate(u);
-//            } catch (ParseException e) {
-//                this.mDateModified = null;
-//                e.printStackTrace();
-//            }
-//            return this;
-//        }
+        // public Builder modified(String u) {
+        // try {
+        // this.mDateModified = Uutils.stringToDate(u);
+        // } catch (ParseException e) {
+        // this.mDateModified = null;
+        // e.printStackTrace();
+        // }
+        // return this;
+        // }
 
         public Builder authorId(int id) {
             this.mAuthorId = id;
@@ -251,7 +248,7 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
             this.mSize = mTracks.size();
             return this;
         }
-        
+
         /**
          * Tracks in JSONArray format.
          * 
@@ -265,8 +262,8 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject t = (JSONObject) array.get(i);
                     ll.add(new TrackItem(
-                            t.getLong(JsonKey.LOCAL_ID), 
-                            t.getString(JsonKey.ARTIST), 
+                            t.getLong(JsonKey.LOCAL_ID),
+                            t.getString(JsonKey.ARTIST),
                             t.getString(JsonKey.TITLE),
                             t.getLong(JsonKey.PLAY_ORDER)));
                 }
@@ -407,7 +404,7 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
 
     /**
      * @return The arbitrary size if set, else the number of tracks (if some),
-     *  -1 if nothing set.
+     *         -1 if nothing set.
      */
     public int getSize() {
         if (mSize >= 0) {
@@ -449,7 +446,7 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
             e.printStackTrace();
         }
     }
-    
+
     public PlaylistItem setDateModified(long timestamp) {
         this.mDateModified = timestamp;
         return this;
@@ -502,7 +499,6 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     }
 
     /**
-     * 
      * @return GroupStreamer playlist id
      */
     public long getPlaylistId() {
@@ -512,7 +508,7 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     public String getCreationTime() {
         return mGSCreated.toString();
     }
-    
+
     public long getDateModified() {
         return mDateModified;
     }
@@ -536,9 +532,10 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     public int getGSSize() {
         return mGSSize;
     }
-    
+
     /**
      * Actual number of tracks in the playlist
+     * 
      * @return
      */
     public int size() {
@@ -548,7 +545,7 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     public List<TrackItem> getTracks() {
         return mTracks;
     }
-    
+
     public String getTracksJson() {
         JSONArray json = new JSONArray();
         JSONObject jsonTrack;

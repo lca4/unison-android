@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const.SeedType;
-import ch.epfl.unison.Const;
 import ch.epfl.unison.R;
 import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;

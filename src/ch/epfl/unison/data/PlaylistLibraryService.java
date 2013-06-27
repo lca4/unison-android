@@ -16,7 +16,6 @@ import ch.epfl.unison.api.UnisonAPI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +26,8 @@ import java.util.Set;
 public class PlaylistLibraryService extends AbstractService {
 
     private static final String TAG = "ch.epfl.unison.PlaylistLibraryService";
-//    private static final int MIN_UPDATE_INTERVAL = 10 * 60 * 60; // In seconds.
+    // private static final int MIN_UPDATE_INTERVAL = 10 * 60 * 60; // In
+    // seconds.
     private static final int MIN_UPDATE_INTERVAL = 5; // In seconds.
     private static final long MILLIS_IN_S = 1000L; // Number of milliseconds in
                                                    // a second.
@@ -205,15 +205,15 @@ public class PlaylistLibraryService extends AbstractService {
                     }
                     // "Commiting" the changes locally.
                     /*
-                     * It's too much overhead to compare and update the copy of 
-                     * tracks of the playlist. It's also quite useless.
-                     * Thus, only update the DATE_MODIFIED field, which is 
-                     * actually the key point of these deltas.
+                     * It's too much overhead to compare and update the copy of
+                     * tracks of the playlist. It's also quite useless. Thus,
+                     * only update the DATE_MODIFIED field, which is actually
+                     * the key point of these deltas.
                      */
-                    mDB.getPlaylistHandler().updateDateModified(item.getLocalId(), 
+                    mDB.getPlaylistHandler().updateDateModified(item.getLocalId(),
                             realDateModified);
                 }
-                
+
             }
 
             Log.d(TAG, "number of deltas: " + deltas.size());
@@ -228,7 +228,7 @@ public class PlaylistLibraryService extends AbstractService {
             // Sending the updates to the server.
             UnisonAPI api = AppData.getInstance(PlaylistLibraryService.this).getAPI();
             long uid = AppData.getInstance(PlaylistLibraryService.this).getUid();
-            
+
             Request.Result<JsonStruct.Success> res = api.updatePlaylistLibrarySync(uid, deltas);
             if (res.result == null) {
                 if (res.error.hasJsonError()) {

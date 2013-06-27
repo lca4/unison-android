@@ -41,8 +41,9 @@ public final class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-//         Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-//         mContext.deleteDatabase(ConstDB.DATABASE_NAME); //FIXME remove for production app!
+        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); //FIXME remove for
+        // production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
         mTrackHandler = new Track();
@@ -74,16 +75,16 @@ public final class UnisonDB {
         return mDB.query(table, columns, selection, selectionArgs, null, null, null);
     }
 
-     private Cursor getCursorW(String table, String[] columns) {
-         openW();
-         return mDB.query(table, columns, null, null, null, null, null);
-     }
-     
-     private Cursor getCursorW(String table, String[] columns, String selection,
-             String[] selectionArgs) {
-         openW();
-         return mDB.query(table, columns, selection, selectionArgs, null, null, null);
-     }
+    private Cursor getCursorW(String table, String[] columns) {
+        openW();
+        return mDB.query(table, columns, null, null, null, null, null);
+    }
+
+    private Cursor getCursorW(String table, String[] columns, String selection,
+            String[] selectionArgs) {
+        openW();
+        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
+    }
 
     private void closeCursor(Cursor openCursor) {
         if (openCursor != null) {
@@ -536,7 +537,7 @@ public final class UnisonDB {
                 if (item.getLocalId() >= 0) {
                     ContentValues values = new ContentValues();
                     values.put(ConstDB.PLYL_C_LOCAL_ID, item.getLocalId());
-//                    values.put(ConstDB.PLYL_C_TRACKS, item.getTracksJson());
+                    // values.put(ConstDB.PLYL_C_TRACKS, item.getTracksJson());
                     values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, item.getDateModified());
                     values.put(ConstDB.PLYL_C_GS_USER_ID, item.getUserId());
                     values.put(ConstDB.PLYL_C_GS_SIZE, item.getGSSize());
@@ -574,7 +575,7 @@ public final class UnisonDB {
             Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
-//                            ConstDB.PLYL_C_TRACKS,
+                            // ConstDB.PLYL_C_TRACKS,
                             ConstDB.PLYL_C_LOCAL_UPDATE_TIME,
                             ConstDB.PLYL_C_GS_SIZE,
                             ConstDB.PLYL_C_CREATED_BY_GS,
@@ -594,7 +595,7 @@ public final class UnisonDB {
             PlaylistItem pl = null;
             if (cur != null && cur.moveToFirst()) {
                 int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-//                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
+                // int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
                 int colDateModified = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_UPDATE_TIME);
                 int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
                 int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -634,7 +635,7 @@ public final class UnisonDB {
             Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
-//                            ConstDB.PLYL_C_TRACKS,
+                            // ConstDB.PLYL_C_TRACKS,
                             ConstDB.PLYL_C_LOCAL_UPDATE_TIME,
                             ConstDB.PLYL_C_CREATED_BY_GS,
                             ConstDB.PLYL_C_GS_SIZE,
@@ -652,7 +653,7 @@ public final class UnisonDB {
             Set<PlaylistItem> set = new HashSet<PlaylistItem>();
             if (cur != null && cur.moveToFirst()) {
                 int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-//                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
+                // int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
                 int colDateModified = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_UPDATE_TIME);
                 int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
                 int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -667,24 +668,24 @@ public final class UnisonDB {
                 int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
                 int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
                 do {
-                    set.add(AndroidDB.getPlaylist(mContext.getContentResolver(), 
+                    set.add(AndroidDB.getPlaylist(mContext.getContentResolver(),
                             new PlaylistItem.Builder()
-                            .localId(cur.getInt(colLocalId))
-//                            .tracks(cur.getString(colTracks))
-                            .modified(cur.getLong(colDateModified))
-                            .size(cur.getInt(colGSSize))
-                            .createdByGS(cur.getInt(colCreatedByGS) != 0)
-                            .plId(cur.getInt(colGSId))
-                            .created(cur.getString(colGSCreationTime))
-                            .gsUpdated(cur.getString(colGSUpdateTime))
-                            .authorId(cur.getInt(colGSAuthorId))
-                            .authorName(cur.getString(colGSAuthorName))
-                            .avgRating(cur.getDouble(colGSAvgRating))
-                            .isShared(cur.getInt(colGSIsShared) != 0)
-                            .isSynced(cur.getInt(colGSIsSynced) != 0)
-                            .userRating(cur.getInt(colGSUserRating))
-                            .userComment(cur.getString(colGSUserComment))
-                            .build()));
+                                    .localId(cur.getInt(colLocalId))
+                                    // .tracks(cur.getString(colTracks))
+                                    .modified(cur.getLong(colDateModified))
+                                    .size(cur.getInt(colGSSize))
+                                    .createdByGS(cur.getInt(colCreatedByGS) != 0)
+                                    .plId(cur.getInt(colGSId))
+                                    .created(cur.getString(colGSCreationTime))
+                                    .gsUpdated(cur.getString(colGSUpdateTime))
+                                    .authorId(cur.getInt(colGSAuthorId))
+                                    .authorName(cur.getString(colGSAuthorName))
+                                    .avgRating(cur.getDouble(colGSAvgRating))
+                                    .isShared(cur.getInt(colGSIsShared) != 0)
+                                    .isSynced(cur.getInt(colGSIsSynced) != 0)
+                                    .userRating(cur.getInt(colGSUserRating))
+                                    .userComment(cur.getString(colGSUserComment))
+                                    .build()));
                 } while (cur.moveToNext());
             }
             closeCursor(cur);
@@ -772,86 +773,95 @@ public final class UnisonDB {
         public int getTracksCount(long playlistId) {
             return AndroidDB.getTracksCount(mContext.getContentResolver(), playlistId);
         }
-        
-//        /**
-//         * 
-//         * @param uid
-//         * @return an empty Set if no match found, a non-empty Set else
-//         */
-//        public Set<PlaylistItem> getItems(long uid) {
-//            String selection = ConstDB.PLYL_C_GS_USER_ID + " = ? ";
-//            String[] selectionArgs = new String[] {String.valueOf(uid)};
-//            Cursor cur = getCursor(mTable,
-//                    new String[] {
-//                            ConstDB.PLYL_C_LOCAL_ID,
-//                            ConstDB.PLYL_C_GS_SIZE,
-//                            ConstDB.PLYL_C_CREATED_BY_GS,
-//                            ConstDB.PLYL_C_GS_ID,
-//                            ConstDB.PLYL_C_GS_CREATION_TIME,
-//                            ConstDB.PLYL_C_GS_UPDATE_TIME,
-//                            ConstDB.PLYL_C_GS_AUTHOR_ID,
-//                            ConstDB.PLYL_C_GS_AUTHOR_NAME,
-//                            ConstDB.PLYL_C_GS_AVG_RATING,
-//                            ConstDB.PLYL_C_GS_IS_SHARED,
-//                            ConstDB.PLYL_C_GS_IS_SYNCED,
-//                            ConstDB.PLYL_C_GS_USER_RATING,
-//                            ConstDB.PLYL_C_GS_USER_COMMENT
-//                    },
-//                    selection,
-//                    selectionArgs);
-//            Set<PlaylistItem> set = new HashSet<PlaylistItem>();
-//            if (cur != null && cur.moveToFirst()) {
-//                int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-//                int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
-//                int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
-//                int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
-//                int colGSCreationTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
-//                int colGSUpdateTime = cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
-//                int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
-//                int colGSAuthorName = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
-//                int colGSAvgRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
-//                int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
-//                int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
-//                int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
-//                int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
-//                do {
-//                    set.add(new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
-//                            .size(cur.getInt(colGSSize))
-//                            .createdByGS(cur.getInt(colCreatedByGS) != 0)
-//                            .plId(cur.getInt(colGSId))
-//                            .created(cur.getString(colGSCreationTime))
-//                            .gsUpdated(cur.getString(colGSUpdateTime))
-//                            .authorId(cur.getInt(colGSAuthorId))
-//                            .authorName(cur.getString(colGSAuthorName))
-//                            .avgRating(cur.getDouble(colGSAvgRating))
-//                            .isShared(cur.getInt(colGSIsShared) != 0)
-//                            .isSynced(cur.getInt(colGSIsSynced) != 0)
-//                            .userRating(cur.getInt(colGSUserRating))
-//                            .userComment(cur.getString(colGSUserComment))
-//                            .build());
-//                } while (cur.moveToNext());
-//            }
-//            closeCursor(cur);
-//            return set;
-//        }
-//        
-        
+
+        // /**
+        // *
+        // * @param uid
+        // * @return an empty Set if no match found, a non-empty Set else
+        // */
+        // public Set<PlaylistItem> getItems(long uid) {
+        // String selection = ConstDB.PLYL_C_GS_USER_ID + " = ? ";
+        // String[] selectionArgs = new String[] {String.valueOf(uid)};
+        // Cursor cur = getCursor(mTable,
+        // new String[] {
+        // ConstDB.PLYL_C_LOCAL_ID,
+        // ConstDB.PLYL_C_GS_SIZE,
+        // ConstDB.PLYL_C_CREATED_BY_GS,
+        // ConstDB.PLYL_C_GS_ID,
+        // ConstDB.PLYL_C_GS_CREATION_TIME,
+        // ConstDB.PLYL_C_GS_UPDATE_TIME,
+        // ConstDB.PLYL_C_GS_AUTHOR_ID,
+        // ConstDB.PLYL_C_GS_AUTHOR_NAME,
+        // ConstDB.PLYL_C_GS_AVG_RATING,
+        // ConstDB.PLYL_C_GS_IS_SHARED,
+        // ConstDB.PLYL_C_GS_IS_SYNCED,
+        // ConstDB.PLYL_C_GS_USER_RATING,
+        // ConstDB.PLYL_C_GS_USER_COMMENT
+        // },
+        // selection,
+        // selectionArgs);
+        // Set<PlaylistItem> set = new HashSet<PlaylistItem>();
+        // if (cur != null && cur.moveToFirst()) {
+        // int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
+        // int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
+        // int colCreatedByGS =
+        // cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
+        // int colGSId = cur.getColumnIndex(ConstDB.PLYL_C_GS_ID);
+        // int colGSCreationTime =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_CREATION_TIME);
+        // int colGSUpdateTime =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_UPDATE_TIME);
+        // int colGSAuthorId = cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_ID);
+        // int colGSAuthorName =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_AUTHOR_NAME);
+        // int colGSAvgRating =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_AVG_RATING);
+        // int colGSIsShared = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SHARED);
+        // int colGSIsSynced = cur.getColumnIndex(ConstDB.PLYL_C_GS_IS_SYNCED);
+        // int colGSUserRating =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
+        // int colGSUserComment =
+        // cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
+        // do {
+        // set.add(new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
+        // .size(cur.getInt(colGSSize))
+        // .createdByGS(cur.getInt(colCreatedByGS) != 0)
+        // .plId(cur.getInt(colGSId))
+        // .created(cur.getString(colGSCreationTime))
+        // .gsUpdated(cur.getString(colGSUpdateTime))
+        // .authorId(cur.getInt(colGSAuthorId))
+        // .authorName(cur.getString(colGSAuthorName))
+        // .avgRating(cur.getDouble(colGSAvgRating))
+        // .isShared(cur.getInt(colGSIsShared) != 0)
+        // .isSynced(cur.getInt(colGSIsSynced) != 0)
+        // .userRating(cur.getInt(colGSUserRating))
+        // .userComment(cur.getString(colGSUserComment))
+        // .build());
+        // } while (cur.moveToNext());
+        // }
+        // closeCursor(cur);
+        // return set;
+        // }
+        //
+
         public int updateDateModified(long plid, long timestamp) {
             ContentValues values = new ContentValues();
             values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, timestamp);
-            return UnisonDB.this.mDB.update(mTable, values, 
-                    ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[]{String.valueOf(plid)});
+            return UnisonDB.this.mDB.update(mTable, values,
+                    ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
+                        String.valueOf(plid)
+                    });
         }
 
         private Cursor getCursor(String[] columns) {
             return UnisonDB.this.getCursorW(mTable, columns);
         }
-        
+
         private Cursor getCursor(String[] columns, String selection,
                 String[] selectionArgs) {
             return UnisonDB.this.getCursor(mTable, columns, selection, selectionArgs);
         }
-        
+
         private Cursor getCursorW(String[] columns, String selection,
                 String[] selectionArgs) {
             return UnisonDB.this.getCursorW(mTable, columns, selection, selectionArgs);

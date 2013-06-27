@@ -136,30 +136,31 @@ public abstract class JsonStruct {
             this.entry = new Track(localId, artist, title);
         }
     }
-    
+
     /** Notification of removal of playlist on the device. */
     public static class PlaylistDelta extends JsonStruct {
-        
+
         public static final String TYPE_UPDATE = "UPDATE";
         public static final String TYPE_DELETE = "DELETE";
-        
+
         public String type;
         public long userId; // Maybe useless, since given in url
         public long localId; // Maybe useless, gsId should be sufficient
         public long gsId;
         public String title = null;
         public List<JsonStruct.Delta> trackDeltas = null;
-        
-        public PlaylistDelta() { }
-        
+
+        public PlaylistDelta() {
+        }
+
         public PlaylistDelta(String t, long uid, long lid, long gsid) {
             this.type = t;
             this.userId = uid;
             this.localId = lid;
             this.gsId = gsid;
         }
-        
-        public PlaylistDelta(String t, long uid, long lid, long gsid, 
+
+        public PlaylistDelta(String t, long uid, long lid, long gsid,
                 List<JsonStruct.Delta> tdeltas) {
             new PlaylistDelta(t, uid, lid, gsid);
             this.trackDeltas = tdeltas;
