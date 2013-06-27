@@ -291,11 +291,11 @@ public class UnisonAPI {
     
     public Request.Result<JsonStruct.Success> updatePlaylistLibrarySync(
             long uid, Iterable<JsonStruct.PlaylistDelta> deltas) {
-        URL url = urlFor("/libentries/%d/batch", uid);
+        URL url = urlFor("/solo/%d/playlists/batch", uid);
         Request<JsonStruct.Success> request = Request.of(url, JsonStruct.Success.class)
                 .setAuth(mAuth);
         for (JsonStruct.PlaylistDelta delta : deltas) {
-            request.addParam("delta", GSON.toJson(delta));
+            request.addParam("deltas", GSON.toJson(delta));
         }
         return request.doPOST();
     } 

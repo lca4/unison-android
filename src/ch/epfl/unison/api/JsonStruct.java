@@ -144,7 +144,7 @@ public abstract class JsonStruct {
         public static final String TYPE_DELETE = "DELETE";
         
         public String type;
-        public long userId; 
+        public long userId; // Maybe useless, since given in url
         public long localId; // Maybe useless, gsId should be sufficient
         public long gsId;
         public String title = null;

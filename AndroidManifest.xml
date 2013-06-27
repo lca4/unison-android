@@ -136,6 +136,14 @@
                     android:scheme="vnd.android.nfc" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="ch.epfl.unison.ui.NFCSendGroupActivity"
+            android:label="@string/title_activity_nfcsend_group" >
+        </activity>
+        <activity
+            android:name="ch.epfl.unison.ui.NFCReceiveGroupActivity"
+            android:label="@string/title_activity_nfcrecieve_group" >
+        </activity>
 
 
         <!-- Services. -->
@@ -165,15 +173,16 @@
                 <action android:name="ch.epfl.unison.action.TRUNCATE" />
             </intent-filter>
         </service>
+        <service
+            android:name="ch.epfl.unison.data.PlaylistLibraryService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="ch.epfl.unison.data.action.UPDATE" />
+                <action android:name="ch.epfl.unison.data.action.TRUNCATE" />
+                <action android:name="ch.epfl.unison.data.action.STOP" />
+            </intent-filter>
+        </service>
 
-        <activity
-            android:name="ch.epfl.unison.ui.NFCSendGroupActivity"
-            android:label="@string/title_activity_nfcsend_group" >
-        </activity>
-        <activity
-            android:name="ch.epfl.unison.ui.NFCReceiveGroupActivity"
-            android:label="@string/title_activity_nfcrecieve_group" >
-        </activity>
     </application>
 
 </manifest>

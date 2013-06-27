@@ -41,9 +41,8 @@ public final class UnisonDB {
 
     public UnisonDB(Context c) {
         mContext = c;
-        // Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
-        // mContext.deleteDatabase(ConstDB.DATABASE_NAME); //FIXME remove for
-        // production app!
+//         Log.e(TAG + "UnisonDB", "REMOVE THE DB DELETION ON PROD APP");
+//         mContext.deleteDatabase(ConstDB.DATABASE_NAME); //FIXME remove for production app!
         mDbHelper = new UnisonDBHelper(mContext, ConstDB.DATABASE_NAME, null,
                 ConstDB.DATABASE_VERSION);
         mTrackHandler = new Track();
@@ -105,7 +104,7 @@ public final class UnisonDB {
         open();
         Cursor cur = mDB.query(table,
                 new String[] {
-                    ConstDB.LIBE_C_LOCAL_ID
+                    ConstDB.C_ID
                 },
                 selection,
                 selectionArgs,
@@ -266,7 +265,7 @@ public final class UnisonDB {
         private static final String TAGS_WHERE_ALL = ConstDB.C_ID + " = ? AND "
                 + ConstDB.TAG_C_NAME + " = ? AND "
                 + ConstDB.C_IS_CHECKED + " = ?";
-        private static final String TAG_WHERE_NAME = ConstDB.TAG_C_NAME + " LIKE ? ";
+        private static final String TAG_WHERE_NAME = ConstDB.TAG_C_NAME + " LIKE ?";
 
         Tag() {
         }
@@ -668,7 +667,8 @@ public final class UnisonDB {
                 int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
                 int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
                 do {
-                    set.add(new PlaylistItem.Builder()
+                    set.add(AndroidDB.getPlaylist(mContext.getContentResolver(), 
+                            new PlaylistItem.Builder()
                             .localId(cur.getInt(colLocalId))
 //                            .tracks(cur.getString(colTracks))
                             .modified(cur.getLong(colDateModified))
@@ -684,7 +684,7 @@ public final class UnisonDB {
                             .isSynced(cur.getInt(colGSIsSynced) != 0)
                             .userRating(cur.getInt(colGSUserRating))
                             .userComment(cur.getString(colGSUserComment))
-                            .build());
+                            .build()));
                 } while (cur.moveToNext());
             }
             closeCursor(cur);

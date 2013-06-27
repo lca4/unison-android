@@ -27,13 +27,14 @@ import java.util.Set;
 public class PlaylistLibraryService extends AbstractService {
 
     private static final String TAG = "ch.epfl.unison.PlaylistLibraryService";
-    private static final int MIN_UPDATE_INTERVAL = 60 * 60 * 10; // In seconds.
+//    private static final int MIN_UPDATE_INTERVAL = 10 * 60 * 60; // In seconds.
+    private static final int MIN_UPDATE_INTERVAL = 5; // In seconds.
     private static final long MILLIS_IN_S = 1000L; // Number of milliseconds in
                                                    // a second.
 
-    public static final String ACTION_UPDATE = "ch.epfl.unison.action.UPDATE";
-    public static final String ACTION_TRUNCATE = "ch.epfl.unison.action.TRUNCATE";
-    public static final String ACTION_STOP = "ch.epfl.unison.action.STOP";
+    public static final String ACTION_UPDATE = "ch.epfl.unison.data.action.UPDATE";
+    public static final String ACTION_TRUNCATE = "ch.epfl.unison.data.action.TRUNCATE";
+    public static final String ACTION_STOP = "ch.epfl.unison.data.action.STOP";
 
     private UnisonDB mDB;
 

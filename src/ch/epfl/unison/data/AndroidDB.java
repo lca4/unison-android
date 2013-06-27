@@ -245,6 +245,29 @@ final class AndroidDB {
         }
         return set;
     }
+    
+    static PlaylistItem getPlaylist(ContentResolver resolver, PlaylistItem pl) {
+        String[] columns = {
+                MediaStore.Audio.Playlists.NAME,
+                MediaStore.Audio.Playlists.DATE_MODIFIED
+        };
+        String selection = MediaStore.Audio.Playlists._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(pl.getLocalId())};        
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Cursor cur = resolver.query(uri, columns,
+                selection,
+                selectionArgs, null);
+
+        if (cur != null && cur.moveToFirst()) {
+            int colId = cur.getColumnIndex(MediaStore.Audio.Playlists._ID);
+            int colName = cur.getColumnIndex(MediaStore.Audio.Playlists.NAME);
+            int colDateModified = cur.getColumnIndex(MediaStore.Audio.Playlists.DATE_MODIFIED);
+                pl.setTitle(cur.getString(colName)).setDateModified(cur.getLong(colDateModified));
+                getTracks(resolver, pl);
+            cur.close();
+        }
+        return pl;
+    }
 
     static Uri getPlaylistMembersUri(long playlistId) {
         return MediaStore.Audio.Playlists.Members

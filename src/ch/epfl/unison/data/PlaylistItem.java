@@ -400,8 +400,9 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
         return mTitle;
     }
 
-    public void setTitle(String title) {
+    public PlaylistItem setTitle(String title) {
         this.mTitle = title;
+        return this;
     }
 
     /**
@@ -449,8 +450,9 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
         }
     }
     
-    public void setDateModified(long timestamp) {
+    public PlaylistItem setDateModified(long timestamp) {
         this.mDateModified = timestamp;
+        return this;
     }
 
     public int getUserRating() {
@@ -478,8 +480,9 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
         return mIsShared;
     }
 
-    public void setLocalId(long localId) {
+    public PlaylistItem setLocalId(long localId) {
         this.mLocalId = localId;
+        return this;
     }
 
     public void setIsShared(boolean isShared) {
