@@ -142,12 +142,6 @@ public class PlaylistLibraryService extends AbstractService {
 
         private List<JsonStruct.PlaylistDelta> getDeltas(UnisonDB uDB) {
 
-            /*
-             * TODO compare local update time: - if removed outside app, commit
-             * delete delta; - else, - if same, do nothing; - else, commit delta
-             * track by track (like LibraryService)
-             */
-
             // Setting up the expectations.
             Set<PlaylistItem> expectation = uDB.getPlaylistHandler().getItems();
             Log.d(TAG, "Number of OUR entries: " + expectation.size());
@@ -211,7 +205,7 @@ public class PlaylistLibraryService extends AbstractService {
                     // "Commiting" the changes locally.
                     /*
                      * It's too much overhead to compare and update the copy of 
-                     * tracks of the playlist. It's also quiet useless.
+                     * tracks of the playlist. It's also quite useless.
                      * Thus, only update the DATE_MODIFIED field, which is 
                      * actually the key point of these deltas.
                      */

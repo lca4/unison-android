@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 /**
  * Shows the playlists available on the GS server but not stored on the device.
+ * Stores the playlist in the database (when user asks for it).
  * 
  * @author marc
  */

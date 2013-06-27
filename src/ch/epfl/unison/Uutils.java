@@ -167,7 +167,7 @@ public final class Uutils {
                 }
                 ((TextView) view.findViewById(R.id.listrow_playlist_title))
                         .setText((getItem(position)).getTitle());
-                int size = (int) getItem(position).size();
+                int size = (int) getItem(position).getSize();
                 String subtitle = smActivity.getString(R.string.default_empty);
                 switch (size) {
                     case 0:

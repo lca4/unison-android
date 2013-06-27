@@ -537,7 +537,7 @@ public final class UnisonDB {
                 if (item.getLocalId() >= 0) {
                     ContentValues values = new ContentValues();
                     values.put(ConstDB.PLYL_C_LOCAL_ID, item.getLocalId());
-                    values.put(ConstDB.PLYL_C_TRACKS, item.getTracksJson());
+//                    values.put(ConstDB.PLYL_C_TRACKS, item.getTracksJson());
                     values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, item.getDateModified());
                     values.put(ConstDB.PLYL_C_GS_USER_ID, item.getUserId());
                     values.put(ConstDB.PLYL_C_GS_SIZE, item.getGSSize());
@@ -572,10 +572,10 @@ public final class UnisonDB {
 
         @Override
         public PlaylistItem getItem(long index) {
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
-                            ConstDB.PLYL_C_TRACKS,
+//                            ConstDB.PLYL_C_TRACKS,
                             ConstDB.PLYL_C_LOCAL_UPDATE_TIME,
                             ConstDB.PLYL_C_GS_SIZE,
                             ConstDB.PLYL_C_CREATED_BY_GS,
@@ -595,7 +595,7 @@ public final class UnisonDB {
             PlaylistItem pl = null;
             if (cur != null && cur.moveToFirst()) {
                 int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
+//                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
                 int colDateModified = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_UPDATE_TIME);
                 int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
                 int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -610,6 +610,7 @@ public final class UnisonDB {
                 int colGSUserRating = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_RATING);
                 int colGSUserComment = cur.getColumnIndex(ConstDB.PLYL_C_GS_USER_COMMENT);
                 pl = new PlaylistItem.Builder().localId(cur.getInt(colLocalId))
+                        .modified(cur.getLong(colDateModified))
                         .size(cur.getInt(colGSSize))
                         .createdByGS(cur.getInt(colCreatedByGS) != 0)
                         .plId(cur.getInt(colGSId))
@@ -631,10 +632,10 @@ public final class UnisonDB {
 
         @Override
         public Set<PlaylistItem> getItems() {
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
-                            ConstDB.PLYL_C_TRACKS,
+//                            ConstDB.PLYL_C_TRACKS,
                             ConstDB.PLYL_C_LOCAL_UPDATE_TIME,
                             ConstDB.PLYL_C_CREATED_BY_GS,
                             ConstDB.PLYL_C_GS_SIZE,
@@ -652,7 +653,7 @@ public final class UnisonDB {
             Set<PlaylistItem> set = new HashSet<PlaylistItem>();
             if (cur != null && cur.moveToFirst()) {
                 int colLocalId = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_ID);
-                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
+//                int colTracks = cur.getColumnIndex(ConstDB.PLYL_C_TRACKS);
                 int colDateModified = cur.getColumnIndex(ConstDB.PLYL_C_LOCAL_UPDATE_TIME);
                 int colGSSize = cur.getColumnIndex(ConstDB.PLYL_C_GS_SIZE);
                 int colCreatedByGS = cur.getColumnIndex(ConstDB.PLYL_C_CREATED_BY_GS);
@@ -669,7 +670,7 @@ public final class UnisonDB {
                 do {
                     set.add(new PlaylistItem.Builder()
                             .localId(cur.getInt(colLocalId))
-                            .tracks(cur.getString(colTracks))
+//                            .tracks(cur.getString(colTracks))
                             .modified(cur.getLong(colDateModified))
                             .size(cur.getInt(colGSSize))
                             .createdByGS(cur.getInt(colCreatedByGS) != 0)
@@ -728,7 +729,7 @@ public final class UnisonDB {
         }
 
         public boolean isMadeWithGS(long id) {
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
                             ConstDB.PLYL_C_CREATED_BY_GS
@@ -750,7 +751,7 @@ public final class UnisonDB {
             String selection = ConstDB.PLYL_C_LOCAL_ID + " = ? "
                     + "AND " + ConstDB.PLYL_C_CREATED_BY_GS + " = ? "
                     + "AND " + ConstDB.PLYL_C_GS_USER_ID + " = ? ";
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.PLYL_C_LOCAL_ID,
                             ConstDB.PLYL_C_CREATED_BY_GS,
@@ -836,17 +837,21 @@ public final class UnisonDB {
 //        
         
         public int updateDateModified(long plid, long timestamp) {
-            Cursor cur = getCursorW(new String[] {
-                    ConstDB.PLYL_C_LOCAL_ID,
-                    ConstDB.PLYL_C_LOCAL_UPDATE_TIME},
-                    ConstDB.PLYL_C_LOCAL_ID + " = ? ",
-                    new String[]{String.valueOf(plid)});
             ContentValues values = new ContentValues();
             values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, timestamp);
             return UnisonDB.this.mDB.update(mTable, values, 
                     ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[]{String.valueOf(plid)});
         }
 
+        private Cursor getCursor(String[] columns) {
+            return UnisonDB.this.getCursorW(mTable, columns);
+        }
+        
+        private Cursor getCursor(String[] columns, String selection,
+                String[] selectionArgs) {
+            return UnisonDB.this.getCursor(mTable, columns, selection, selectionArgs);
+        }
+        
         private Cursor getCursorW(String[] columns, String selection,
                 String[] selectionArgs) {
             return UnisonDB.this.getCursorW(mTable, columns, selection, selectionArgs);

@@ -405,10 +405,10 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
     }
 
     /**
-     * @return The arbitrary size if set, else the number of tracks, -1 if
-     *         nothing set.
+     * @return The arbitrary size if set, else the number of tracks (if some),
+     *  -1 if nothing set.
      */
-    public int size() {
+    public int getSize() {
         if (mSize >= 0) {
             return this.mSize;
         } else if (mTracks != null) {
@@ -534,7 +534,11 @@ public class PlaylistItem extends AbstractItem<PlaylistItem> {
         return mGSSize;
     }
     
-    public int getSize() {
+    /**
+     * Actual number of tracks in the playlist
+     * @return
+     */
+    public int size() {
         return mTracks.size();
     }
 
