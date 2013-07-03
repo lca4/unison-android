@@ -31,7 +31,7 @@ public final class UnisonDB {
 
     private static final String TAG = "ch.epfl.unison.UnisonDB";
 
-    private SQLiteDatabase mDB;
+//    private SQLiteDatabase mDB;
     private final Context mContext;
     private final UnisonDBHelper mDbHelper;
 
@@ -51,83 +51,86 @@ public final class UnisonDB {
         mTagHandler = new Tag();
     }
 
-    private void open() {
-        mDB = mDbHelper.getReadableDatabase();
-    }
+//    private void open() {
+////        mDB = mDbHelper.getReadableDatabase();
+//        mDbHelper.open();
+//    }
 
-    private SQLiteDatabase openW() {
-        mDB = mDbHelper.getWritableDatabase();
-        return mDB;
-    }
+//    private void openW() {
+////        mDB = mDbHelper.getWritableDatabase();
+//        mDbHelper.openW();
+////        return mDB;
+//    }
 
-    private void close() {
-        mDB.close();
-    }
+//    private void close() {
+////        mDB.close();
+//        mDbHelper.close();
+//    }
 
-    private Cursor getCursor(String table, String[] columns) {
-        open();
-        return mDB.query(table, columns, null, null, null, null, null);
-    }
+//    private Cursor getCursor(String table, String[] columns) {
+////        open();
+//        return mDbHelper.getCursor(table, columns);
+//    }
 
-    private Cursor getCursor(String table, String[] columns, String selection,
-            String[] selectionArgs) {
-        open();
-        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
-    }
+//    private Cursor getCursor(String table, String[] columns, String selection,
+//            String[] selectionArgs) {
+////        open();
+//        return mDbHelper.getCursor(table, columns, selection, selectionArgs);
+//    }
 
-    private Cursor getCursorW(String table, String[] columns) {
-        openW();
-        return mDB.query(table, columns, null, null, null, null, null);
-    }
+//    private Cursor getCursorW(String table, String[] columns) {
+////        openW();
+//        return mDbHelper.getCursorW(table, columns);
+//    }
 
-    private Cursor getCursorW(String table, String[] columns, String selection,
-            String[] selectionArgs) {
-        openW();
-        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
-    }
+//    private Cursor getCursorW(String table, String[] columns, String selection,
+//            String[] selectionArgs) {
+////        openW();
+//        return mDbHelper.getCursorW(table, columns, selection, selectionArgs);
+//    }
 
-    private void closeCursor(Cursor openCursor) {
-        if (openCursor != null) {
-            openCursor.close();
-        }
-        close();
-    }
+//    private void closeCursor(Cursor openCursor) {
+//        if (openCursor != null) {
+//            openCursor.close();
+//        }
+//        close();
+//    }
 
     private void resetIsChecked(String table) {
-        openW();
+        mDbHelper.openW();
         ContentValues values = new ContentValues();
         values.put(ConstDB.C_IS_CHECKED, ConstDB.FALSE);
-        mDB.update(table, values, null, null);
-        close();
+        mDbHelper.update(table, values, null, null);
+        mDbHelper.close();
     }
 
-    public boolean exists(String table, String selection, String[] selectionArgs) {
-        open();
-        Cursor cur = mDB.query(table,
-                new String[] {
-                    ConstDB.C_ID
-                },
-                selection,
-                selectionArgs,
-                null, null, null, "1"); // LIMIT 1
-        boolean exists = cur.moveToFirst();
-        closeCursor(cur);
-        return exists;
-    }
+//    public boolean exists(String table, String selection, String[] selectionArgs) {
+//        open();
+//        Cursor cur = mDB.query(table,
+//                new String[] {
+//                    ConstDB.C_ID
+//                },
+//                selection,
+//                selectionArgs,
+//                null, null, null, "1"); // LIMIT 1
+//        boolean exists = cur.moveToFirst();
+//        closeCursor(cur);
+//        return exists;
+//    }
 
-    private boolean isEmpty(String table) {
-        Cursor cur = getCursor(table,
-                new String[] {
-                    ConstDB.C_ID
-                });
-        if (cur != null) {
-            boolean isEmpty = !cur.moveToFirst();
-            closeCursor(cur);
-            return isEmpty;
-        } else {
-            throw new SQLiteException("Table " + table + " does not exist.");
-        }
-    }
+//    private boolean isEmpty(String table) {
+//        Cursor cur = getCursor(table,
+//                new String[] {
+//                    ConstDB.C_ID
+//                });
+//        if (cur != null) {
+//            boolean isEmpty = !cur.moveToFirst();
+//            closeCursor(cur);
+//            return isEmpty;
+//        } else {
+//            throw new SQLiteException("Table " + table + " does not exist.");
+//        }
+//    }
 
     /**
      * All the inner classes have to implement these basic functionalities.
@@ -148,6 +151,11 @@ public final class UnisonDB {
         int delete(T item);
 
         void truncate();
+        
+        Cursor getCursor(String[] columns);
+        
+        Cursor getCursor(String[] columns, String selection,
+                String[] selectionArgs);
     }
 
     /**
@@ -166,12 +174,12 @@ public final class UnisonDB {
 
         @Override
         public boolean isEmpty() {
-            return UnisonDB.this.isEmpty(mTable);
+            return mDbHelper.isEmpty(mTable);
         }
 
         @Override
         public boolean exists(TrackItem item) {
-            return UnisonDB.this.exists(mTable, LIBE_WHERE_ALL, new String[] {
+            return mDbHelper.exists(mTable, LIBE_WHERE_ALL, new String[] {
                     String.valueOf(item.localId), item.artist, item.title
             });
         }
@@ -183,10 +191,9 @@ public final class UnisonDB {
             values.put(ConstDB.LIBE_C_ARTIST, item.artist);
             values.put(ConstDB.LIBE_C_TITLE, item.title);
 
-            openW();
-            long res = mDB.insert(ConstDB.LIBE_TABLE_NAME, null, values);
-            close();
-            return res;
+            long rowId = mDbHelper.insert(ConstDB.LIBE_TABLE_NAME, values);
+            mDbHelper.close();
+            return rowId;
         }
 
         @Override
@@ -197,7 +204,7 @@ public final class UnisonDB {
 
         @Override
         public Set<TrackItem> getItems() {
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.LIBE_C_LOCAL_ID, ConstDB.LIBE_C_ARTIST, ConstDB.LIBE_C_TITLE
                     });
@@ -211,30 +218,30 @@ public final class UnisonDB {
                             cur.getString(colArtist), cur.getString(colTitle)));
                 } while (cur.moveToNext());
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return set;
         }
 
         @Override
         public int delete(TrackItem item) {
-            openW();
-            int res = mDB.delete(mTable, LIBE_WHERE_ALL,
+            mDbHelper.openW();
+            int res = mDbHelper.delete(mTable, LIBE_WHERE_ALL,
                     new String[] {
                             String.valueOf(item.localId), item.artist, item.title
                     });
-            close();
+            mDbHelper.close();
             return res;
         }
 
         @Override
         public void truncate() {
-            openW();
-            mDB.delete(mTable, null, null);
-            close();
+            mDbHelper.openW();
+            mDbHelper.delete(mTable, null, null);
+            mDbHelper.close();
         }
 
         public LinkedHashMap<String, Integer> getLibEntries() {
-            Cursor cursor = getCursor(mTable, new String[] {
+            Cursor cursor = getCursor(new String[] {
                     ConstDB.C_ID, ConstDB.LIBE_C_TITLE, ConstDB.LIBE_C_ARTIST
             });
             LinkedHashMap<String, Integer> tags = null;
@@ -249,8 +256,19 @@ public final class UnisonDB {
                             cursor.getInt(colId));
                 } while (cursor.moveToNext());
             }
-            closeCursor(cursor);
+            mDbHelper.closeCursor(cursor);
             return tags;
+        }
+
+        @Override
+        public Cursor getCursor(String[] columns, String selection,
+                String[] selectionArgs) {
+            return mDbHelper.getCursor(mTable, columns, selection, selectionArgs);
+        }
+
+        @Override
+        public Cursor getCursor(String[] columns) {
+            return mDbHelper.getCursor(mTable, columns);
         }
 
     }
@@ -273,12 +291,12 @@ public final class UnisonDB {
 
         @Override
         public boolean isEmpty() {
-            return UnisonDB.this.isEmpty(mTable);
+            return mDbHelper.isEmpty(mTable);
         }
 
         @Override
         public boolean exists(TagItem item) {
-            return UnisonDB.this.exists(mTable, TAG_WHERE_NAME, new String[] {
+            return mDbHelper.exists(mTable, TAG_WHERE_NAME, new String[] {
                     item.name
             });
         }
@@ -297,9 +315,9 @@ public final class UnisonDB {
 
             long rowId = -1;
             if (!exists(item)) {
-                openW();
-                rowId = mDB.insert(mTable, null, values);
-                close();
+                mDbHelper.openW();
+                rowId = mDbHelper.insert(mTable, values);
+                mDbHelper.close();
             }
             return rowId;
         }
@@ -312,7 +330,7 @@ public final class UnisonDB {
 
         @Override
         public Set<TagItem> getItems() {
-            Cursor cur = getCursor(mTable,
+            Cursor cur = getCursor(
                     new String[] {
                             ConstDB.C_ID, ConstDB.TAG_C_NAME
                     });
@@ -328,26 +346,26 @@ public final class UnisonDB {
                             cur.getLong(colRemoteId)));
                 } while (cur.moveToNext());
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return set;
         }
 
         @Override
         public int delete(TagItem item) {
-            openW();
-            int res = mDB.delete(mTable, TAGS_WHERE_ALL,
+            mDbHelper.openW();
+            int res = mDbHelper.delete(mTable, TAGS_WHERE_ALL,
                     new String[] {
                             String.valueOf(item.localId), item.name
                     });
-            close();
+            mDbHelper.close();
             return res;
         }
 
         @Override
         public void truncate() {
-            openW();
-            mDB.delete(mTable, null, null);
-            close();
+            mDbHelper.openW();
+            mDbHelper.delete(mTable, null, null);
+            mDbHelper.close();
         }
 
         // public void setChecked(int tagId, boolean isChecked) {
@@ -365,7 +383,7 @@ public final class UnisonDB {
         // }
 
         public LinkedHashMap<String, Integer> getTags() {
-            Cursor cursor = getCursor(mTable, new String[] {
+            Cursor cursor = getCursor(new String[] {
                     ConstDB.C_ID, ConstDB.TAG_C_NAME
             });
             LinkedHashMap<String, Integer> tags = null;
@@ -377,7 +395,7 @@ public final class UnisonDB {
                     tags.put(cursor.getString(colName), cursor.getInt(colId));
                 } while (cursor.moveToNext());
             }
-            closeCursor(cursor);
+            mDbHelper.closeCursor(cursor);
             return tags;
         }
 
@@ -400,7 +418,7 @@ public final class UnisonDB {
                 default:
                     throw new IllegalArgumentException();
             }
-            Cursor cur = getCursor(table, columns, ConstDB.C_IS_CHECKED + " = ? ", new String[] {
+            Cursor cur = getCursor(columns, ConstDB.C_IS_CHECKED + " = ? ", new String[] {
                     String.valueOf(ConstDB.TRUE)
             });
 
@@ -452,14 +470,14 @@ public final class UnisonDB {
                         throw new IllegalArgumentException();
                 }
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             resetIsChecked(table);
             return json;
         }
 
         public void setChecked(SeedType type, LinkedHashMap<String, Integer> items,
                 boolean[] checked) {
-            openW();
+            mDbHelper.openW();
             String table = null;
             switch (type) {
                 case TAGS:
@@ -482,12 +500,22 @@ public final class UnisonDB {
                 }
                 Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>) it.next();
                 int tagId = pair.getValue();
-                mDB.update(table, values, ConstDB.C_ID + " = ? ", new String[] {
+                mDbHelper.update(table, values, ConstDB.C_ID + " = ? ", new String[] {
                         String.valueOf(tagId)
                 });
                 index++;
             }
-            close();
+            mDbHelper.close();
+        }
+
+        @Override
+        public Cursor getCursor(String[] columns) {
+            return mDbHelper.getCursor(mTable, columns);
+        }
+
+        @Override
+        public Cursor getCursor(String[] columns, String selection, String[] selectionArgs) {
+            return mDbHelper.getCursor(mTable, columns, selection, selectionArgs);
         }
 
     }
@@ -507,7 +535,7 @@ public final class UnisonDB {
 
         @Override
         public boolean isEmpty() {
-            return UnisonDB.this.isEmpty(mTable);
+            return mDbHelper.isEmpty(mTable);
         }
 
         @Override
@@ -528,8 +556,8 @@ public final class UnisonDB {
          */
         @Override
         public long insert(PlaylistItem item) {
-            openW();
-            mDB.beginTransaction();
+            mDbHelper.openW();
+            mDbHelper.beginTransaction();
             try {
                 // First store to android DB
                 AndroidDB.insert(mContext.getContentResolver(), item);
@@ -551,21 +579,21 @@ public final class UnisonDB {
                     values.put(ConstDB.PLYL_C_GS_IS_SHARED, item.isIsShared());
                     values.put(ConstDB.PLYL_C_GS_IS_SYNCED, item.isIsSynced());
 
-                    long plId = mDB.insert(mTable, null, values);
+                    long plId = mDbHelper.insert(mTable, values);
                     Log.i(TAG, "Added playlist to GS in-app DB with id=" + plId + " (localId="
                             + item.getLocalId() + ")");
                     if (plId < 0) {
                         throw new SQLiteException("Playlist " + item.toString()
                                 + " could not be inserted to " + mTable);
                     }
-                    mDB.setTransactionSuccessful();
+                    mDbHelper.commit();
                 }
             } catch (SQLiteException sqle) {
                 // An error occured, roll back should happen
+                mDbHelper.rollback();
                 sqle.printStackTrace();
             } finally {
-                mDB.endTransaction();
-                close();
+                mDbHelper.close();
             }
             return item.getLocalId();
         }
@@ -626,7 +654,7 @@ public final class UnisonDB {
                         .build();
                 AndroidDB.getTracks(mContext.getContentResolver(), pl);
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return pl;
         }
 
@@ -688,7 +716,7 @@ public final class UnisonDB {
                                     .build()));
                 } while (cur.moveToNext());
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return set;
         }
 
@@ -696,11 +724,11 @@ public final class UnisonDB {
         public int delete(PlaylistItem item) {
             int res = 0;
             if (item.getLocalId() >= 0) {
-                openW();
-                mDB.beginTransaction();
+                mDbHelper.openW();
+                mDbHelper.beginTransaction();
 
                 try {
-                    res = mDB.delete(mTable, ConstDB.PLYL_C_LOCAL_ID + " = ?",
+                    res = mDbHelper.delete(mTable, ConstDB.PLYL_C_LOCAL_ID + " = ?",
                             new String[] {
                                 String.valueOf(item.getLocalId())
                             });
@@ -710,13 +738,13 @@ public final class UnisonDB {
                                 + mTable);
                     }
                     res += AndroidDB.delete(mContext.getContentResolver(), item);
-                    mDB.setTransactionSuccessful();
+                    mDbHelper.commit();
                 } catch (SQLiteException sqle) {
                     // An error occured, roll back should happen
+                    mDbHelper.rollback();
                     sqle.printStackTrace();
                 } finally {
-                    mDB.endTransaction();
-                    close();
+                    mDbHelper.close();
                 }
             }
             return res;
@@ -724,9 +752,9 @@ public final class UnisonDB {
 
         @Override
         public void truncate() {
-            openW();
-            mDB.delete(mTable, null, null);
-            close();
+            mDbHelper.openW();
+            mDbHelper.delete(mTable, null, null);
+            mDbHelper.close();
         }
 
         public boolean isMadeWithGS(long id) {
@@ -744,7 +772,7 @@ public final class UnisonDB {
                     result = true;
                 }
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return result;
         }
 
@@ -766,7 +794,7 @@ public final class UnisonDB {
             if (cur != null && cur.moveToFirst()) {
                 result = true;
             }
-            closeCursor(cur);
+            mDbHelper.closeCursor(cur);
             return result;
         }
 
@@ -847,25 +875,27 @@ public final class UnisonDB {
         public int updateDateModified(long plid, long timestamp) {
             ContentValues values = new ContentValues();
             values.put(ConstDB.PLYL_C_LOCAL_UPDATE_TIME, timestamp);
-            return UnisonDB.this.mDB.update(mTable, values,
+            return UnisonDB.this.mDbHelper.update(mTable, values,
                     ConstDB.PLYL_C_LOCAL_ID + " = ? ", new String[] {
                         String.valueOf(plid)
                     });
         }
 
-        private Cursor getCursor(String[] columns) {
-            return UnisonDB.this.getCursorW(mTable, columns);
+        @Override
+        public Cursor getCursor(String[] columns) {
+            return mDbHelper.getCursorW(mTable, columns);
         }
 
-        private Cursor getCursor(String[] columns, String selection,
+        @Override
+        public Cursor getCursor(String[] columns, String selection,
                 String[] selectionArgs) {
-            return UnisonDB.this.getCursor(mTable, columns, selection, selectionArgs);
+            return mDbHelper.getCursor(mTable, columns, selection, selectionArgs);
         }
 
-        private Cursor getCursorW(String[] columns, String selection,
-                String[] selectionArgs) {
-            return UnisonDB.this.getCursorW(mTable, columns, selection, selectionArgs);
-        }
+//        private Cursor getCursorW(String[] columns, String selection,
+//                String[] selectionArgs) {
+//            return mDbHelper.getCursorW(mTable, columns, selection, selectionArgs);
+//        }
     }
 
     /*

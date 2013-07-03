@@ -1,7 +1,9 @@
 
 package ch.epfl.unison.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
@@ -75,6 +77,8 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     UnisonDBHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, ConstDB.DATABASE_NAME, null, ConstDB.DATABASE_VERSION);
     }
+    
+    private SQLiteDatabase mDB;
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -84,6 +88,8 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
             db.execSQL(PLYL_SCHEMA);
         } catch (SQLiteException e) {
             Log.v(TAG, e.getMessage()); // "Create table exception"
+        } finally {
+            mDB = null;
         }
     }
 
@@ -98,5 +104,109 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
         // db.execSQL("DROP TABLE IF EXISTS " + ConstDB.TAG_TABLE_NAME);
         // TODO db.execSQL("UPDATE TABLE IF EXISTS playlists [...]");
         onCreate(db);
+    }
+    
+    void open() {
+        if (!mDB.isOpen()) {
+            mDB = getReadableDatabase();            
+        }
+    }
+    
+    void openW() {
+        if (!mDB.isOpen() || mDB.isReadOnly()) {
+            mDB = getWritableDatabase();            
+        }
+    }
+    
+    Cursor getCursor(String table, String[] columns) {
+        open();
+        return mDB.query(table, columns, null, null, null, null, null);
+    }
+    
+    Cursor getCursor(String table, String[] columns, String selection,
+            String[] selectionArgs) {
+        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
+    }
+
+    Cursor getCursorW(String table, String[] columns) {
+        openW();
+        return mDB.query(table, columns, null, null, null, null, null);
+    }
+    
+    Cursor getCursorW(String table, String[] columns, String selection,
+            String[] selectionArgs) {
+        openW();
+        return mDB.query(table, columns, selection, selectionArgs, null, null, null);
+    }
+    
+    void closeCursor(Cursor openCursor) {
+        if (openCursor != null) {
+            openCursor.close();
+        }
+        close();
+    }
+    
+    /**
+     * For a single item insertion. Manages the open/close of the DB. 
+     * @param table
+     * @param values
+     * @return
+     */
+    long insert(String table, ContentValues values) {
+        openW();
+        return mDB.insert(table, null, values);
+    }
+    
+    int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
+        openW();
+        return mDB.update(table, values, whereClause, whereArgs);
+    }
+    
+    int delete(String table, String whereClause, String[] whereArgs) {
+        openW();
+        return mDB.delete(table, whereClause, whereArgs);
+    }
+    
+    void beginTransaction() {
+        openW();
+        mDB.beginTransaction();
+    }
+    
+    void commit() {
+        mDB.setTransactionSuccessful();
+        mDB.endTransaction();
+    }
+    
+    void rollback() {
+        mDB.endTransaction();
+    }
+
+    // UTILITIES
+    boolean isEmpty(String table) {
+        Cursor cur = getCursor(table,
+                new String[] {
+                    ConstDB.C_ID
+                });
+        if (cur != null) {
+            boolean isEmpty = !cur.moveToFirst();
+            closeCursor(cur);
+            return isEmpty;
+        } else {
+            throw new SQLiteException("Table " + table + " does not exist.");
+        }
+    }
+    
+    boolean exists(String table, String selection, String[] selectionArgs) {
+        open();
+        Cursor cur = mDB.query(table,
+                new String[] {
+                    ConstDB.C_ID
+                },
+                selection,
+                selectionArgs,
+                null, null, null, "1"); // LIMIT 1
+        boolean exists = cur.moveToFirst();
+        closeCursor(cur);
+        return exists;
     }
 }
