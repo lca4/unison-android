@@ -107,13 +107,13 @@ public class UnisonDBHelper extends SQLiteOpenHelper {
     }
     
     void open() {
-        if (!mDB.isOpen()) {
+        if (mDB == null || !mDB.isOpen()) {
             mDB = getReadableDatabase();            
         }
     }
     
     void openW() {
-        if (!mDB.isOpen() || mDB.isReadOnly()) {
+        if (mDB == null || !mDB.isOpen() || mDB.isReadOnly()) {
             mDB = getWritableDatabase();            
         }
     }

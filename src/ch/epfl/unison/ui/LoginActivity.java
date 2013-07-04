@@ -19,6 +19,7 @@ import ch.epfl.unison.AppData;
 import ch.epfl.unison.Const;
 import ch.epfl.unison.LibraryService;
 import ch.epfl.unison.R;
+import ch.epfl.unison.Uutils;
 import ch.epfl.unison.api.JsonStruct;
 import ch.epfl.unison.api.JsonStruct.Success;
 import ch.epfl.unison.api.UnisonAPI;
@@ -334,33 +335,40 @@ public class LoginActivity extends SherlockActivity {
     }
 
     private void login(final String email, final String password) {
-        final ProgressDialog dialog = ProgressDialog.show(
-                LoginActivity.this, null, getString(R.string.login_signing_in));
-        UnisonAPI api = new UnisonAPI(email, password);
-        api.login(new UnisonAPI.Handler<JsonStruct.User>() {
-
-            @Override
-            public void callback(JsonStruct.User user) {
-                LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
-                AppData.getInstance(LoginActivity.this).setLoggedIn(true);
-                LoginActivity.this.nextActivity(user);
-                dialog.dismiss();
-            }
-
-            @Override
-            public void onError(Error error) {
-                if (error != null) {
-                    Log.d(TAG, error.toString());
+        // TODO: login only if data connection available (wifi, mobile, etc.)
+        if (Uutils.hasNetworkConnection(getApplicationContext())) {
+            final ProgressDialog dialog = ProgressDialog.show(
+                    LoginActivity.this, null, getString(R.string.login_signing_in));
+            UnisonAPI api = new UnisonAPI(email, password);
+            api.login(new UnisonAPI.Handler<JsonStruct.User>() {
+    
+                @Override
+                public void callback(JsonStruct.User user) {
+                    LoginActivity.this.storeInfo(email, password, user.nickname, user.uid);
+                    AppData.getInstance(LoginActivity.this).setLoggedIn(true);
+                    LoginActivity.this.nextActivity(user);
+                    dialog.dismiss();
                 }
-                if (error != null && error.statusCode == Error.STATUS_FORBIDDEN) {
-                    Toast.makeText(LoginActivity.this, R.string.error_unauthorized,
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(LoginActivity.this, R.string.error_login_general,
-                            Toast.LENGTH_LONG).show();
+    
+                @Override
+                public void onError(Error error) {
+                    if (error != null) {
+                        Log.d(TAG, error.toString());
+                    }
+                    if (error != null && error.statusCode == Error.STATUS_FORBIDDEN) {
+                        Toast.makeText(LoginActivity.this, R.string.error_unauthorized,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, R.string.error_login_general,
+                                Toast.LENGTH_LONG).show();
+                    }
+                    dialog.dismiss();
                 }
-                dialog.dismiss();
-            }
-        });
+            });
+        } else {
+            Toast.makeText(LoginActivity.this,
+                    R.string.generic_no_data_connection_error,
+                    Toast.LENGTH_LONG).show();
+        }
     }
 }
